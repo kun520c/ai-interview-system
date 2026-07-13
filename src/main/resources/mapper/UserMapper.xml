@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace = "com.kun.aiinterview.user.mapper.UserMapper">
+        <select id = "getUserById" resultType = "com.kun.aiinterview.user.entity.User">
+            SELECT id,account,username,email,role,status,created_at
+            FROM `user`
+            WHERE id = #{id}
+        </select>
+
+        <select id = "getUserByAccount" resultType = "com.kun.aiinterview.user.entity.User">
+            SELECT id,account,username,email,role,status,created_at
+            FROM `user`
+            WHERE account = #{account}
+        </select>
+
+        <select id = "getUserByEmail" resultType = "com.kun.aiinterview.user.entity.User">
+            SELECT id,account,username,email,role,status,created_at
+            FROM `user`
+            WHERE email = #{email}
+        </select>
+    </mapper>
