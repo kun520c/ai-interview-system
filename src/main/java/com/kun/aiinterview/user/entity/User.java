@@ -3,14 +3,12 @@ package com.kun.aiinterview.user.entity;
 
 import com.kun.aiinterview.user.enums.UserRole;
 import com.kun.aiinterview.user.enums.UserStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Data
+@ToString(exclude = "password")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
