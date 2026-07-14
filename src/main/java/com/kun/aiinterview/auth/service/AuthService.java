@@ -1,15 +1,14 @@
-package com.kun.aiinterview.user.service;
+package com.kun.aiinterview.auth.service;
 
 import com.kun.aiinterview.common.exception.BusinessException;
-import com.kun.aiinterview.user.dto.RegisterRequest;
+import com.kun.aiinterview.auth.dto.RegisterRequest;
 import com.kun.aiinterview.user.entity.User;
 import com.kun.aiinterview.user.enums.UserRole;
 import com.kun.aiinterview.user.enums.UserStatus;
 import com.kun.aiinterview.user.mapper.UserMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +18,11 @@ import org.springframework.validation.annotation.Validated;
 @Transactional
 @Validated
 @RequiredArgsConstructor
+@Configuration
 public class AuthService {
 
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
     public void register(@Valid RegisterRequest registerRequest) {
      if(userMapper.getUserByAccount(registerRequest.getAccount())!=null){

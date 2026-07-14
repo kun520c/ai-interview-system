@@ -1,4 +1,4 @@
-package com.kun.aiinterview.user.dto;
+package com.kun.aiinterview.auth.dto;
 
 
 import jakarta.validation.constraints.Email;
