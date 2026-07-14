@@ -52,15 +52,17 @@ public class AuthControllerTest {
     @BeforeEach
     void setUp(){
         jdbcTemplate.update(
-                "DELETE FROM `user` WHERE account = ?",
-                testUserAccount
+                "DELETE FROM `user` WHERE account = ? OR email = ?",
+                testUserAccount,
+                testUserEmail
         );
     }
 
     @AfterEach
     void tearDown(){
-        jdbcTemplate.update("DELETE FROM `user` WHERE account = ?",
-                testUserAccount
+        jdbcTemplate.update("DELETE FROM `user` WHERE account = ? OR email = ?",
+                testUserAccount,
+                testUserEmail
         );
     }
 

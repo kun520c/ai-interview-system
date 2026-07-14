@@ -1,4 +1,4 @@
-create database ai_interview
+create database if not exists ai_interview
 default character set utf8mb4
 default collate utf8mb4_unicode_ci;
 
@@ -108,8 +108,6 @@ create table question_scoring_point
 )ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
-
-SHOW INDEX FROM question_scoring_point;
 
 create table interview_session
 (

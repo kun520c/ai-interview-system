@@ -14,6 +14,7 @@ Current core stack:
 
 * Java 21
 * Spring Boot 3.5.16
+* Spring Web and Jakarta Bean Validation
 * MyBatis 3.0.5
 * MySQL 8.0.45
 * BCrypt password hashing via spring-security-crypto
@@ -221,10 +222,8 @@ Only implement the explicitly requested development stage.
 
 Do not automatically expand into later stages.
 
-For example, when working only on User entity and Mapper mapping, do not also implement:
+For example, when working only on a login endpoint, do not also implement:
 
-* Registration
-* Login
 * JWT
 * Spring Security
 * Redis
@@ -284,30 +283,31 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-User module — basic database mapping
+Authentication module — phase one: the complete user registration HTTP flow is complete
 ```
+
+Completed in this stage:
+
+* User entity, `UserRole` and `UserStatus`
+* `UserMapper` and MyBatis XML mapping, including user queries by id, account and email, plus user insertion
+* `BCryptPasswordEncoder` exposed through a `PasswordEncoder` bean
+* Complete registration flow: JSON → `RegisterRequest` DTO → `@Valid` → `AuthController` → `AuthService` → `UserMapper` → MySQL → `Result` JSON
+* `POST /api/auth/register`
+* Account and email duplicate pre-checks, with database unique constraints and `DuplicateKeyException` translated to `BusinessException` as the concurrency fallback
+* `Result<T>` unified response structure, `BusinessException`, and `GlobalExceptionHandler`
+* Unified handling for validation failures, unreadable JSON request bodies, business exceptions and unknown exceptions
+* MyBatis Mapper integration tests, AuthService integration tests and MockMvc AuthController integration tests
 
 Current allowed scope:
 
-* User entity
-* UserRole enum
-* UserStatus enum
-* UserMapper
-* Query user by id
-* Query user by account
-* Query user by email
-* Necessary MyBatis Mapper tests
+* Login feature development
 
 Current forbidden scope:
 
-* Registration endpoint
-* Login endpoint
 * JWT
 * Spring Security
-* BCrypt business logic
 * Redis
 * Email verification
-* Controller
-* Full UserService
+* Password reset
 * RAG
 * LLM
