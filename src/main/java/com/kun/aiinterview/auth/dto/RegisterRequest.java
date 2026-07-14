@@ -12,17 +12,17 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class RegisterRequest {
-    @NotBlank
-    @Size(max = 50)
+    @NotBlank(message = "账号不能为空")
+    @Size(max = 50, message = "账号长度不能超过50位")
     private String account;
-    @NotBlank
-    @Size(max = 50)
+    @NotBlank(message = "用户名不能为空")
+    @Size(max = 50, message = "用户名长度不能超过50位")
     private String username;
-    @NotBlank
-    @Size(min = 8,max = 72)
+    @NotBlank(message = "密码不能为空")
+    @Size(min = 8, max = 72, message = "密码长度应为8到72位")
     private String password;
-    @NotBlank
-    @Size(max = 100)
-    @Email
+    @NotBlank(message = "邮箱不能为空")
+    @Size(max = 100, message = "邮箱长度不能超过100位")
+    @Email(message = "邮箱格式不正确")
     private String email;
 }

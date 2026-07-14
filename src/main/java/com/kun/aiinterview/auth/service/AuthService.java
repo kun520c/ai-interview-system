@@ -8,13 +8,13 @@ import com.kun.aiinterview.user.enums.UserStatus;
 import com.kun.aiinterview.user.mapper.UserMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 @Service
-@Transactional
 @Validated
 @RequiredArgsConstructor
 public class AuthService {
@@ -22,6 +22,7 @@ public class AuthService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public void register(@Valid RegisterRequest registerRequest) {
      if(userMapper.getUserByAccount(registerRequest.getAccount())!=null){
          throw new BusinessException("账号已存在");
@@ -42,6 +43,10 @@ public class AuthService {
              .status(UserStatus.ENABLED)
              .build();
 
-     userMapper.insertUser(user);
+     try {
+         userMapper.insertUser(user);
+     } catch (DuplicateKeyException e) {
+         throw new BusinessException("账号或邮箱已存在");
+     }
     }
 }

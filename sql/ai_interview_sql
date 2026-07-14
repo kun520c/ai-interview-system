@@ -1,0 +1,703 @@
+create database ai_interview
+default character set utf8mb4
+default collate utf8mb4_unicode_ci;
+
+use ai_interview;
+
+create table `user`
+(
+    id                  bigint unsigned not null auto_increment,
+    account             varchar(50)    not null,
+    username            varchar(50)     not null,
+    password            varchar(100)    not null,
+    email               varchar(100)   not null,
+    role                varchar(20)    not null default 'USER',
+    status              varchar(20)    not null default 'ENABLED',
+    password_changed_at  datetime       not null default current_timestamp,
+    created_at          datetime       not null default current_timestamp,
+    updated_at          datetime       not null default current_timestamp on update current_timestamp,
+
+    primary key (id),
+
+    constraint uk_user_account
+            unique (account),
+
+    constraint uk_user_email
+            unique (email),
+
+    constraint  chk_user_role
+            check ( role in ('USER','ADMIN')),
+
+    constraint chk_user_status
+            check ( status in ('ENABLED','DISABLED'))
+
+)ENGINE = InnoDB
+ default  charset = utf8mb4
+ collate = utf8mb4_unicode_ci;
+
+create table question
+(
+    id                  bigint unsigned not null auto_increment,
+    category            varchar(50) not null,
+    knowledge_point     varchar(100) not null,
+    difficulty          varchar(20) not null,
+    question_content    text not null ,
+    reference_answer    text not null ,
+    status              varchar(20) not null default 'ENABLED',
+    created_at          datetime not null default current_timestamp,
+    updated_at          datetime not null default current_timestamp on update current_timestamp,
+
+    primary key(id),
+
+    constraint chk_question_status
+            check (status in('ENABLED','DISABLED')),
+
+    index idx_question_selection(
+            category,
+            difficulty,
+            status
+        )
+
+)engine = innodb
+ default  charset = utf8mb4
+ collate = utf8mb4_unicode_ci;
+
+create table question_scoring_point
+(
+    id                  bigint unsigned not null auto_increment,
+    question_id         bigint unsigned not null ,
+    point_type          varchar(20) not null ,
+    content             text not null ,
+    weight              tinyint unsigned not null ,
+    sort_order          int unsigned not null default 0,
+    status              varchar(20) not null  default 'ENABLED',
+    created_at          datetime not null default current_timestamp,
+    updated_at          datetime not null default current_timestamp on update current_timestamp,
+
+    PRIMARY KEY (id),
+
+    CONSTRAINT fk_scoring_point_question
+        foreign key (question_id)
+                    references question(id)
+                    on delete restrict
+                    on update restrict ,
+
+    constraint chk_scoring_point_type
+            check (
+                point_type in(
+                    'CORE',
+                    'KEY',
+                    'PRINCIPLE',
+                    'INTERNAL',
+                    'ADVANCED'
+                    )
+                ),
+
+    constraint chk_scoring_point_weight
+            check (weight between 1 and 100),
+
+    constraint chk_scoring_point_status
+            check (status in('ENABLED','DISABLED')),
+
+    index idx_scoring_point_question_status_order(
+        question_id,
+        status,
+        sort_order
+        )
+
+)ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+SHOW INDEX FROM question_scoring_point;
+
+create table interview_session
+(
+    id          bigint unsigned not null auto_increment,
+    user_id     bigint unsigned not null ,
+    difficulty  varchar(20) not null ,
+    status      varchar(20) not null default 'CREATED',
+    current_interview_question_id   bigint unsigned null,
+    planned_question_count int unsigned not null,
+    completed_question_count int unsigned not null default 0,
+    total_score decimal(5,2) null ,
+    report_status varchar(20) not null default 'NOT_STARTED',
+    version int unsigned not null default 0,
+    started_at datetime null ,
+    ended_at datetime null,
+    created_at datetime not null default current_timestamp,
+    updated_at datetime not null default current_timestamp on update current_timestamp,
+
+    primary key (id),
+
+    constraint fk_interview_session_user
+        foreign key (user_id)
+            references `user`(id)
+            on delete restrict
+            on update restrict ,
+
+    constraint chk_interview_session_status
+        check (
+            status in(
+                'CREATED',
+                'IN_PROGRESS',
+                'COMPLETED',
+                'CANCELLED'
+                )
+            ),
+
+    constraint  chk_interview_session_report_status
+        check (
+            report_status in(
+                'NOT_STARTED',
+                'GENERATING',
+                'READY',
+                'FAILED'
+                )
+            ),
+
+    constraint chk_interview_session_counts
+        check (
+            completed_question_count <= planned_question_count
+            ),
+
+    constraint chk_interview_session_total_score
+        check (
+            total_score is null
+            or total_score between 0 and 100
+            ),
+
+    index idx_interview_session_user_created(
+        user_id,
+        created_at
+        ),
+
+    index idx_interview_session_user_status(
+        user_id,
+        status
+        )
+)ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+create table interview_question
+(
+    id          bigint unsigned not null auto_increment,
+    session_id  bigint unsigned not null ,
+    question_id bigint unsigned null,
+    category    varchar(50) not null,
+    knowledge_point varchar(100) not null ,
+    question_content    text    not null ,
+    scoring_points_snapshot json null,
+    question_type VARCHAR(20) NOT NULL,
+    parent_question_id bigint unsigned null,
+    follow_up_target_points json null,
+    plan_order int unsigned null,
+    display_order int unsigned not null,
+    status varchar(20) not null default 'PENDING',
+    created_at datetime not null default current_timestamp,
+    updated_at datetime not null default current_timestamp on update current_timestamp,
+
+    primary key (id),
+
+    constraint  fk_interview_question_session
+        foreign key (session_id)
+            references interview_session(id)
+            on delete restrict
+            on update restrict,
+
+    constraint fk_interview_question_question
+        foreign key (question_id)
+            references question(id)
+            on delete restrict
+            on update restrict,
+
+    constraint fk_interview_question_parent
+        foreign key (parent_question_id)
+        references interview_question(id)
+        on delete restrict
+        on update restrict,
+
+    constraint chk_interview_question_status
+        check (
+            status in(
+                'PENDING',
+                'WAITING_ANSWER',
+                'ANSWERED',
+                'SKIPPED'
+                )
+            ),
+
+    constraint chk_interview_question_structure
+        check (
+            (
+                question_type = 'MAIN'
+                and question_id is not null
+                and parent_question_id is null
+                and plan_order is not null
+                )
+            or
+            (
+                question_type = 'FOLLOW_UP'
+                and question_id is null
+                and parent_question_id is not null
+                and plan_order is null
+                )
+            ),
+
+    constraint chk_interview_question_type
+    check  (
+        question_type in (
+            'MAIN',
+            'FOLLOW_UP'
+        )
+    ),
+
+    constraint uk_interview_question_session_plan_order
+            unique (session_id,plan_order),
+
+    constraint uk_interview_question_session_display_order
+            unique (session_id,display_order),
+
+    index idx_interview_question_next_main(
+            session_id,
+            question_type,
+            status,
+            plan_order
+        ),
+
+    index idx_interview_question_parent_type(
+            parent_question_id,
+            question_type
+        )
+)ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+create table interview_answer
+(
+    id              bigint unsigned not null auto_increment,
+    interview_question_id   bigint unsigned not null ,
+    answer_content  text not null,
+    status          varchar(20) not null default 'SUBMITTED',
+    request_id      varchar(64) not null,
+    error_code      varchar(20) null,
+    submitted_at    datetime not null default current_timestamp,
+    created_at      datetime not null default current_timestamp,
+    updated_at      datetime not null default current_timestamp on update current_timestamp,
+
+    primary key (id),
+
+    constraint fk_interview_answer_question
+        foreign key (interview_question_id)
+            references interview_question(id)
+            on delete restrict
+            on update restrict,
+
+    constraint uk_interview_answer_question
+        unique(interview_question_id),
+
+    constraint uk_interview_answer_request
+        unique(request_id),
+
+    constraint chk_interview_answer_status
+        check (
+            status in(
+                'SUBMITTED',
+                'EVALUATING',
+                'EVALUATED',
+                'FAILED'
+                )
+            )
+)engine = InnoDB
+ default charset = utf8mb4
+ collate = utf8mb4_unicode_ci;
+
+create table answer_evaluation
+(
+    id                  bigint unsigned not null auto_increment,
+    answer_id           bigint unsigned not null ,
+    main_interview_question_id bigint unsigned not null,
+    evaluation_phase varchar(20) not null,
+    correctness_score   tinyint unsigned not null ,
+    completeness_score  tinyint unsigned not null ,
+    depth_score         tinyint unsigned not null ,
+    clarity_score       tinyint unsigned not null ,
+    practice_score      tinyint unsigned not null ,
+    total_score         tinyint unsigned not null ,
+    level               varchar(20) not null ,
+    strengths json null,
+    missing_points json null,
+    correction text null,
+    scoring_point_results json not null ,
+    follow_up_recommended tinyint(1) not null default 0,
+    suggested_follow_up text null,
+    decision_action     varchar(20) not null ,
+    retrieval_batch_id  varchar(64) not null ,
+    llm_model           varchar(100)not null ,
+    prompt_version      varchar(50) not null ,
+    evaluation_standard_version varchar(50) not null ,
+    raw_result          json not null ,
+    created_at datetime not null default current_timestamp,
+
+    primary key (id),
+
+    constraint fk_answer_evaluation_answer
+        foreign key (answer_id)
+            references interview_answer(id)
+            on delete restrict
+            on update restrict ,
+
+    constraint fk_answer_evaluation_main_question
+        foreign key (main_interview_question_id)
+            references interview_question(id)
+            on delete restrict
+            on update restrict ,
+
+    constraint uk_answer_evaluation_answer
+        unique (answer_id),
+
+    constraint chk_answer_evaluation_phase
+        check (
+            evaluation_phase in(
+                'INITIAL',
+                'FINAL'
+                )
+        ),
+
+    CONSTRAINT chk_answer_evaluation_correctness
+        CHECK (correctness_score BETWEEN 0 AND 20),
+
+    CONSTRAINT chk_answer_evaluation_completeness
+        CHECK (completeness_score BETWEEN 0 AND 20),
+
+    CONSTRAINT chk_answer_evaluation_depth
+        CHECK (depth_score BETWEEN 0 AND 20),
+
+    CONSTRAINT chk_answer_evaluation_clarity
+        CHECK (clarity_score BETWEEN 0 AND 20),
+
+    CONSTRAINT chk_answer_evaluation_practice
+        CHECK (practice_score BETWEEN 0 AND 20),
+
+    constraint chk_answer_evaluation_total_score
+        check (
+            total_score between 0 and 100
+            and total_score =
+                correctness_score
+                + completeness_score
+                + depth_score
+                + clarity_score
+                + practice_score
+            ),
+
+    constraint chk_answer_evaluation_follow_up_recommended
+        check (
+            follow_up_recommended in(0,1)
+            ),
+
+    constraint chk_answer_evaluation_decision_action
+        check (
+            decision_action in(
+                'FOLLOW_UP',
+                'NEXT_MAIN',
+                'FINISH'
+                )
+            ),
+
+    index idx_answer_evaluation_main_phase(
+            main_interview_question_id,
+            evaluation_phase
+        ),
+
+    index idx_answer_evaluation_retrieval_batch(
+            retrieval_batch_id
+        )
+)engine = InnoDB
+ default  charset = utf8mb4
+ collate = utf8mb4_unicode_ci;
+
+create table knowledge_document
+(
+    id                      bigint unsigned not null auto_increment,
+    title                   varchar(200) not null ,
+    category                varchar(50) not null ,
+    file_name               varchar(255) not null ,
+    file_type               varchar(20) not null ,
+    content                 mediumtext not null ,
+    source                  varchar(255) null ,
+    content_hash            char(64) not null ,
+    document_version        int unsigned not null default 1,
+    processing_status       varchar(20) not null default 'UPLOADED',
+    error_message           text null ,
+    created_at              datetime not null default current_timestamp,
+    updated_at              datetime not null default current_timestamp on update current_timestamp,
+
+    primary key (id),
+
+    CONSTRAINT chk_knowledge_document_status
+    CHECK (
+        processing_status IN (
+            'UPLOADED',
+            'PROCESSING',
+            'READY',
+            'FAILED',
+            'DISABLED'
+        )
+    ),
+
+    constraint chk_knowledge_document_file_type
+        check (
+            file_type in (
+                'MARKDOWN',
+                'TEXT'
+                )
+            ),
+
+    constraint chk_knowledge_document_version
+        check (
+            document_version >= 1
+            ),
+
+    index idx_knowledge_document_category_status(
+        category,
+        processing_status
+        ),
+
+    index idx_knowledge_document_content_hash(
+        content_hash
+        )
+)engine = InnoDB
+ default charset = utf8mb4
+ collate  = utf8mb4_unicode_ci;
+
+create table knowledge_chunk
+(
+    id                      bigint unsigned not null auto_increment,
+    document_id             bigint unsigned not null ,
+    document_version        int unsigned not null ,
+    chunk_index             int unsigned not null ,
+    content                 text not null ,
+    token_count             int unsigned not null ,
+    vector_id               varchar(128) not null ,
+    embedding_model         varchar(100) not null ,
+    embedding_version       varchar(50) not null ,
+    status                  varchar(20) not null default 'ACTIVE',
+    created_at              datetime not null default current_timestamp,
+    updated_at              datetime not null default current_timestamp on update current_timestamp,
+
+    primary key (id),
+
+    constraint fk_knowledge_chunk_document
+        foreign key (document_id)
+            references knowledge_document(id)
+            on delete restrict
+            on update restrict ,
+
+    constraint uk_knowledge_chunk_document_version_index
+        unique (
+               document_id,
+               document_version,
+               chunk_index
+        ),
+
+    constraint uk_knowledge_chunk_vector_id
+        unique(vector_id),
+
+    constraint chk_knowledge_chunk_document_version
+        check (
+            document_version >= 1
+            ),
+
+    constraint chk_knowledge_chunk_token_count
+        check (
+            token_count > 0
+            ),
+
+    constraint chk_knowledge_chunk_status
+        check (
+            status in (
+                'ACTIVE',
+                'INACTIVE'
+                )
+            ),
+
+    index idx_knowledge_chunk_document_version_status(
+        document_id,
+        document_version,
+        status
+        )
+)engine = InnoDB
+ default charset = utf8mb4
+ collate = utf8mb4_unicode_ci;
+
+create table rag_hit_log
+(
+    id                      bigint unsigned not null auto_increment,
+    answer_id               bigint unsigned not null ,
+    retrieval_batch_id      varchar(64) not null ,
+    chunk_id                bigint unsigned not null ,
+    similarity_score        decimal(10,8) not null ,
+    rank_no                 int unsigned not null ,
+    query_text              text not null ,
+    top_k                   int unsigned not null ,
+    filter_snapshot         json not null ,
+    embedding_model         varchar(100) not null ,
+    embedding_version       varchar(50) not null ,
+    created_at              datetime not null default current_timestamp,
+
+    primary key (id),
+
+    constraint fk_rag_hit_log_chunk
+        foreign key (chunk_id)
+            references knowledge_chunk(id)
+            on delete restrict
+            on update restrict ,
+
+    CONSTRAINT fk_rag_hit_log_answer
+    FOREIGN KEY (answer_id)
+        REFERENCES interview_answer(id)
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT,
+
+    CONSTRAINT chk_rag_hit_log_rank_within_top_k
+    CHECK (
+        rank_no <= top_k
+    ),
+
+    constraint chk_rag_hit_log_rank_no
+        check (
+            rank_no >= 1
+            ),
+
+    constraint chk_rag_hit_log_top_k
+        check (
+            top_k >= 1
+            ),
+
+    constraint uk_rag_hit_log_batch_rank
+        unique (
+               retrieval_batch_id,
+               rank_no
+        ),
+
+    index idx_rag_hit_log_answer_batch(
+        answer_id,
+        retrieval_batch_id
+        ),
+
+    index idx_rag_hit_log_chunk(
+        chunk_id
+        )
+
+)engine  = InnoDB
+ default charset = utf8mb4
+ collate = utf8mb4_unicode_ci;
+
+create table interview_report
+(
+    id                      bigint unsigned not null auto_increment,
+    session_id              bigint unsigned not null ,
+    overall_score           decimal(5,2) not null ,
+    result                  varchar(20) not null ,
+    summary                 text not null ,
+    strengths               json not null ,
+    weaknesses              json not null ,
+    suggestions             json not null ,
+    llm_model               varchar(100) not null ,
+    prompt_version          varchar(50) not null ,
+    created_at              datetime not null default current_timestamp,
+    updated_at              datetime not null default current_timestamp on update current_timestamp,
+
+    primary key (id),
+
+    constraint fk_interview_report_session
+        foreign key (session_id)
+            references interview_session(id)
+            on delete restrict
+            on update restrict ,
+
+    constraint uk_interview_report_session
+        unique(session_id),
+
+    constraint chk_interview_report_overall_score
+        check (
+            overall_score between 0 and 100
+            )
+)engine = InnoDB
+ default charset = utf8mb4
+ collate = utf8mb4_unicode_ci;
+
+create table user_weakness
+(
+    id                      bigint unsigned not null auto_increment,
+    user_id                 bigint unsigned not null ,
+    category                varchar(50) not null ,
+    knowledge_point         varchar(100) not null ,
+    weakness_score          decimal(5,2) not null ,
+    discovered_count        int unsigned not null default 1,
+    last_discovered_at      datetime not null default current_timestamp,
+    status                  varchar(20) not null default 'ACTIVE',
+    resolved_at             datetime null ,
+    created_at              datetime not null default current_timestamp,
+    updated_at              datetime not null default current_timestamp on update current_timestamp,
+
+    primary key (id),
+
+    constraint fk_user_weakness_user
+        foreign key (user_id)
+            references `user`(id)
+            on delete restrict
+            on update restrict ,
+
+    constraint uk_user_weakness_user_category_point
+        unique (
+               user_id,
+               category,
+               knowledge_point
+        ),
+
+    constraint chk_user_weakness_score
+        check (
+            weakness_score between 0 and 100
+            ),
+
+    constraint chk_user_weakness_discovered_count
+        check (
+            discovered_count >= 1
+            ),
+
+    constraint chk_user_weakness_status
+        check (
+            status in(
+                'ACTIVE',
+                'RESOLVED'
+                )
+            ),
+
+    constraint chk_user_weakness_resolved_state
+        check (
+            (
+                status = 'ACTIVE'
+                and resolved_at is null
+                )
+            or
+            (
+                status = 'RESOLVED'
+                and resolved_at is not null
+                )
+            ),
+
+    index idx_user_weakness_user_status_score(
+        user_id,
+        status,
+        weakness_score
+        ),
+
+    index idx_user_weakness_user_last_discovered(
+        user_id,
+        last_discovered_at
+        )
+)engine = InnoDB
+ default charset = utf8mb4
+ collate = utf8mb4_unicode_ci;

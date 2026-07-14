@@ -133,11 +133,6 @@ public class AuthServiceTest {
         assertEquals(UserRole.USER, savedUser.getRole());
         assertEquals(UserStatus.ENABLED, savedUser.getStatus());
 
-        assertTrue(
-                passwordEncoder.matches(
-                        EXISTING_PASSWORD,
-                        savedUser.getPassword()
-                )
-        );
+        assertTrue(passwordEncoder.matches(EXISTING_PASSWORD, savedUser.getPassword()));
     }
 }

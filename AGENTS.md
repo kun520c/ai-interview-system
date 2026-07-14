@@ -16,12 +16,12 @@ Current core stack:
 * Spring Boot 3.5.16
 * MyBatis 3.0.5
 * MySQL 8.0.45
+* BCrypt password hashing via spring-security-crypto
 
 Planned technologies used only when their corresponding modules are developed:
 
 * Redis
 * JWT
-* BCrypt
 * Spring Security
 * Spring Mail
 * Knife4j
