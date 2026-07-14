@@ -1,10 +1,9 @@
-package com.kun.aiinterview;
+package com.kun.aiinterview.user.mapper;
 
 import org.springframework.test.context.ActiveProfiles;
 import com.kun.aiinterview.user.entity.User;
 import com.kun.aiinterview.user.enums.UserRole;
 import com.kun.aiinterview.user.enums.UserStatus;
-import com.kun.aiinterview.user.mapper.UserMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,11 +24,15 @@ public class UserMapperTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    private final String testUserAccount = "test_mapper_user";
+    private final String testUserEmail = "mapper-test@example.com";
+    private final String testUserUsername = "Mapper测试用户";
+
     @BeforeEach
     void setUp() {
         jdbcTemplate.update(
                 "DELETE FROM `user` WHERE account = ?",
-                "test_mapper_user"
+                testUserAccount
         );
 
         jdbcTemplate.update(
@@ -39,9 +42,9 @@ public class UserMapperTest {
             VALUES (?, ?, ?, ?, ?, ?)
             """,
                 "test_mapper_user",
-                "Mapper测试用户",
+                testUserUsername,
                 "TEST_HASH_NOT_FOR_AUTH",
-                "mapper-test@example.com",
+                testUserEmail,
                 "USER",
                 "ENABLED"
         );
@@ -51,24 +54,24 @@ public class UserMapperTest {
     void tearDown(){
         jdbcTemplate.update(
                 "DELETE FROM `user` WHERE account = ?",
-                "test_mapper_user"
+                testUserAccount
                 );
     }
 
     @Test
-    void shouldFindUserByAccount(){
-        User user = userMapper.getUserByAccount("test_mapper_user");
+    void shouldGetUserByAccount(){
+        User user = userMapper.getUserByAccount(testUserAccount);
 
         assertNotNull(user);
-        assertEquals("test_mapper_user", user.getAccount());
-        assertEquals("Mapper测试用户", user.getUsername());
+        assertEquals(testUserAccount, user.getAccount());
+        assertEquals(testUserUsername, user.getUsername());
         assertEquals(UserRole.USER, user.getRole());
         assertEquals(UserStatus.ENABLED, user.getStatus());
     }
 
     @Test
-    void shouldFindUserById(){
-        User inserted = userMapper.getUserByAccount("test_mapper_user");
+    void shouldGetUserById(){
+        User inserted = userMapper.getUserByAccount(testUserAccount);
 
         User user = userMapper.getUserById(inserted.getId());
 
@@ -77,13 +80,10 @@ public class UserMapperTest {
     }
 
     @Test
-    void shouldFindUserByEmail(){
-        User user = userMapper.getUserByEmail("mapper-test@example.com");
-
+    void shouldGetUserByEmail(){
+        User user = userMapper.getUserByEmail(testUserEmail);
         assertNotNull(user);
-        assertEquals("mapper-test@example.com", user.getEmail());
-
-
+        assertEquals(testUserEmail, user.getEmail());
     }
 
 }

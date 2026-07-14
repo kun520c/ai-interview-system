@@ -20,4 +20,25 @@
             FROM `user`
             WHERE email = #{email}
         </select>
+
+        <insert id = "insertUser" parameterType = "com.kun.aiinterview.user.entity.User" useGeneratedKeys = "true" keyProperty = "id">
+            insert into `user`
+            (
+                account,
+                username,
+                password,
+                email,
+                role,
+                status
+            )
+            values
+            (
+                #{account},
+                #{username},
+                #{password},
+                #{email},
+                #{role},
+                #{status}
+            )
+        </insert>
     </mapper>
