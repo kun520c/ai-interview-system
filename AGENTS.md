@@ -283,7 +283,7 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-Authentication module — phase one: the complete user registration HTTP flow is complete
+Authentication module — phase two: registration and credential-based login HTTP flows are complete
 ```
 
 Completed in this stage:
@@ -294,19 +294,32 @@ Completed in this stage:
 * Complete registration flow: JSON → `RegisterRequest` DTO → `@Valid` → `AuthController` → `AuthService` → `UserMapper` → MySQL → `Result` JSON
 * `POST /api/auth/register`
 * Account and email duplicate pre-checks, with database unique constraints and `DuplicateKeyException` translated to `BusinessException` as the concurrency fallback
+* `LoginRequest` with Jakarta Bean Validation and password-safe `toString`
+* `LoginResponse` containing only userId, account, username and role
+* Complete login flow: JSON → `LoginRequest` → `@Valid` → `AuthController` → `AuthService` → `UserMapper` → BCrypt password verification → account status validation → `LoginResponse` → `Result` JSON
+* `POST /api/auth/login`
+* Generic credential-error response for missing users and incorrect passwords
+* Password verification before disabled-account status disclosure
+* Disabled accounts with an incorrect password still receive the generic credential error
 * `Result<T>` unified response structure, `BusinessException`, and `GlobalExceptionHandler`
 * Unified handling for validation failures, unreadable JSON request bodies, business exceptions and unknown exceptions
-* MyBatis Mapper integration tests, AuthService integration tests and MockMvc AuthController integration tests
+* MyBatis Mapper integration tests, AuthService registration and login integration tests, and MockMvc AuthController registration and login integration tests
 
 Current allowed scope:
 
-* Login feature development
+* JWT access-token configuration
+* JWT access-token generation after successful credential verification
+* JWT token parsing and signature/expiration validation
+* Adding the access token to the successful login response
+* Focused unit and integration tests required for JWT generation and validation
 
 Current forbidden scope:
 
-* JWT
-* Spring Security
-* Redis
+* Spring Security authentication filter chain
+* Authorization interceptors or filters
+* Redis token storage or blacklist
+* Refresh tokens
+* Logout token invalidation
 * Email verification
 * Password reset
 * RAG
