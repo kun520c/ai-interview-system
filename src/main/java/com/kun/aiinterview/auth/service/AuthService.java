@@ -1,5 +1,7 @@
 package com.kun.aiinterview.auth.service;
 
+import com.kun.aiinterview.auth.dto.LoginRequest;
+import com.kun.aiinterview.auth.vo.LoginResponse;
 import com.kun.aiinterview.common.exception.BusinessException;
 import com.kun.aiinterview.auth.dto.RegisterRequest;
 import com.kun.aiinterview.user.entity.User;
@@ -48,5 +50,27 @@ public class AuthService {
      } catch (DuplicateKeyException e) {
          throw new BusinessException("账号或邮箱已存在");
      }
+    }
+
+    public LoginResponse login(LoginRequest loginRequest) {
+        User user = userMapper.getUserByAccount(loginRequest.getAccount());
+        if (user == null) {
+            throw new BusinessException("账号或密码错误");
+        }
+
+        if(user.getStatus() == UserStatus.DISABLED){
+            throw new BusinessException("账号已被禁用");
+        }
+
+        if(!passwordEncoder.matches(loginRequest.getPassword(),user.getPassword())){
+            throw new BusinessException("账号或密码错误");
+        }
+
+        return LoginResponse.builder()
+                .userId(user.getId())
+                .account(user.getAccount())
+                .username(user.getUsername())
+                .role(user.getRole())
+                .build();
     }
 }

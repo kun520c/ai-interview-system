@@ -1,7 +1,9 @@
 package com.kun.aiinterview.auth.controller;
 
+import com.kun.aiinterview.auth.dto.LoginRequest;
 import com.kun.aiinterview.auth.dto.RegisterRequest;
 import com.kun.aiinterview.auth.service.AuthService;
+import com.kun.aiinterview.auth.vo.LoginResponse;
 import com.kun.aiinterview.common.response.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,5 +23,11 @@ public class AuthController {
     public Result<Void> register(@Valid @RequestBody  RegisterRequest registerRequest){
         authService.register(registerRequest);
         return Result.success();
+    }
+
+    @PostMapping("/login")
+    public Result<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest){
+        LoginResponse loginResponse =  authService.login(loginRequest);
+        return Result.success(loginResponse);
     }
 }
