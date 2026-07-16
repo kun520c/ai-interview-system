@@ -229,7 +229,7 @@ public class AuthServiceTest {
 
     @Test
     void shouldRejectLoginWhenUserIsDisabled() {
-        LoginRequest loginRequest = new LoginRequest(DISABLED_LOGIN_ACCOUNT, WRONG_PASSWORD);
+        LoginRequest loginRequest = new LoginRequest(DISABLED_LOGIN_ACCOUNT, DISABLED_LOGIN_PASSWORD);
 
         BusinessException exception = assertThrows(
                 BusinessException.class,
@@ -237,5 +237,17 @@ public class AuthServiceTest {
         );
 
         assertEquals("账号已被禁用", exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectDisabledUserWithGenericMessageWhenPasswordIsWrong() {
+        LoginRequest loginRequest = new LoginRequest(DISABLED_LOGIN_ACCOUNT, WRONG_PASSWORD);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> authService.login(loginRequest)
+        );
+
+        assertEquals("账号或密码错误", exception.getMessage());
     }
 }

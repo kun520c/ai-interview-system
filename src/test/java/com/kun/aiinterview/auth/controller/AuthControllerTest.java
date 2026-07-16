@@ -266,8 +266,16 @@ public class AuthControllerTest {
     @Test
     void shouldRejectLoginWhenUserIsDisabled() throws Exception{
         assertLoginFails(
-                new LoginRequest(disabledUserAccount, wrongPassword),
+                new LoginRequest(disabledUserAccount, disabledUserPassword),
                 "账号已被禁用"
+        );
+    }
+
+    @Test
+    void shouldRejectDisabledUserWithGenericMessageWhenPasswordIsWrong() throws Exception{
+        assertLoginFails(
+                new LoginRequest(disabledUserAccount, wrongPassword),
+                "账号或密码错误"
         );
     }
 

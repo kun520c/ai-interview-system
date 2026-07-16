@@ -52,18 +52,17 @@ public class AuthService {
      }
     }
 
-    public LoginResponse login(LoginRequest loginRequest) {
+    public LoginResponse login(@Valid LoginRequest loginRequest) {
         User user = userMapper.getUserByAccount(loginRequest.getAccount());
         if (user == null) {
+            throw new BusinessException("账号或密码错误");
+        }
+        if(!passwordEncoder.matches(loginRequest.getPassword(),user.getPassword())){
             throw new BusinessException("账号或密码错误");
         }
 
         if(user.getStatus() == UserStatus.DISABLED){
             throw new BusinessException("账号已被禁用");
-        }
-
-        if(!passwordEncoder.matches(loginRequest.getPassword(),user.getPassword())){
-            throw new BusinessException("账号或密码错误");
         }
 
         return LoginResponse.builder()
