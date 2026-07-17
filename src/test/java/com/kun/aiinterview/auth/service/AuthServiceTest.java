@@ -4,6 +4,8 @@ import com.kun.aiinterview.common.exception.BusinessException;
 import com.kun.aiinterview.auth.dto.LoginRequest;
 import com.kun.aiinterview.auth.dto.RegisterRequest;
 import com.kun.aiinterview.auth.vo.LoginResponse;
+import com.kun.aiinterview.security.jwt.JwtProperties;
+import com.kun.aiinterview.security.jwt.JwtTokenService;
 import com.kun.aiinterview.user.entity.User;
 import com.kun.aiinterview.user.enums.UserRole;
 import com.kun.aiinterview.user.enums.UserStatus;
@@ -20,7 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("local")
+@ActiveProfiles({"local", "test"})
 public class AuthServiceTest {
     @Autowired
     private AuthService authService;
@@ -33,6 +35,12 @@ public class AuthServiceTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtTokenService jwtTokenService;
+
+    @Autowired
+    private JwtProperties jwtProperties;
 
     private static final String EXISTING_ACCOUNT = "auth_test_existing_user";
     private static final String EXISTING_USERNAME = "注册测试用户";
@@ -201,6 +209,21 @@ public class AuthServiceTest {
         assertEquals(LOGIN_ACCOUNT, loginResponse.getAccount());
         assertEquals(LOGIN_USERNAME, loginResponse.getUsername());
         assertEquals(UserRole.USER, loginResponse.getRole());
+        assertNotNull(loginResponse.getAccessToken());
+        assertFalse(loginResponse.getAccessToken().isBlank());
+        assertEquals("Bearer", loginResponse.getTokenType());
+        assertEquals(
+                jwtProperties.getAccessTokenExpiration().toSeconds(),
+                loginResponse.getExpiresInSeconds()
+        );
+
+        var claims = jwtTokenService.parseAndValidate(
+                loginResponse.getAccessToken()
+        );
+        assertEquals(savedUser.getId().toString(), claims.getSubject());
+        assertEquals(LOGIN_ACCOUNT, claims.get("account", String.class));
+        assertEquals(UserRole.USER.name(), claims.get("role", String.class));
+        assertEquals(jwtProperties.getIssuer(), claims.getIssuer());
     }
 
     @Test

@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("local")
+@ActiveProfiles({"local", "test"})
 public class AuthControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -211,8 +211,11 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.data.account").value(loginUserAccount))
                 .andExpect(jsonPath("$.data.username").value(loginUserUsername))
                 .andExpect(jsonPath("$.data.role").value("USER"))
+                .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.data.tokenType").value("Bearer"))
+                .andExpect(jsonPath("$.data.expiresInSeconds").value(7200))
                 .andExpect(jsonPath("$.data.password").doesNotExist())
-                .andExpect(jsonPath("$.data.token").doesNotExist());
+                .andExpect(jsonPath("$.data.refreshToken").doesNotExist());
     }
 
     @Test

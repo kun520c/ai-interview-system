@@ -4,6 +4,8 @@ import com.kun.aiinterview.auth.dto.LoginRequest;
 import com.kun.aiinterview.auth.vo.LoginResponse;
 import com.kun.aiinterview.common.exception.BusinessException;
 import com.kun.aiinterview.auth.dto.RegisterRequest;
+import com.kun.aiinterview.security.jwt.JwtProperties;
+import com.kun.aiinterview.security.jwt.JwtTokenService;
 import com.kun.aiinterview.user.entity.User;
 import com.kun.aiinterview.user.enums.UserRole;
 import com.kun.aiinterview.user.enums.UserStatus;
@@ -23,6 +25,7 @@ public class AuthService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenService jwtTokenService;
 
     @Transactional
     public void register(@Valid RegisterRequest registerRequest) {
@@ -65,11 +68,22 @@ public class AuthService {
             throw new BusinessException("账号已被禁用");
         }
 
+        String accessToken = jwtTokenService.generateAccessToken(
+                user.getId(),
+                user.getAccount(),
+                user.getRole()
+        );
+
         return LoginResponse.builder()
                 .userId(user.getId())
                 .account(user.getAccount())
                 .username(user.getUsername())
                 .role(user.getRole())
+                .accessToken(accessToken)
+                .tokenType("Bearer")
+                .expiresInSeconds(
+                        jwtTokenService.getAccessTokenExpirationSeconds()
+                )
                 .build();
     }
 }
