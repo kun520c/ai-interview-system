@@ -9,5 +9,4 @@ public class AiInterviewSystemApplication {
     public static void main(String[] args) {
         SpringApplication.run(AiInterviewSystemApplication.class, args);
     }
-
 }

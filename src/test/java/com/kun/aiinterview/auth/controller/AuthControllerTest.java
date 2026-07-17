@@ -12,21 +12,25 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.springframework.http.MediaType;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles({"local", "test"})
 public class AuthControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -43,7 +47,7 @@ public class AuthControllerTest {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    AuthService authService;
+    private AuthService authService;
 
     private final String testUserAccount = "test_mapper_user";
     private final String testUserEmail = "mapper-test@example.com";
@@ -60,7 +64,6 @@ public class AuthControllerTest {
     private final String disabledUserUsername = "禁用登录接口测试用户";
     private final String disabledUserPassword = "DisabledPassword123";
 
-
     private final String blankAccount = "";
     private final String longAccount = "a".repeat(51);
     private final String shortPassword = "1234567";
@@ -69,7 +72,7 @@ public class AuthControllerTest {
     private final String missingAccount = "controller_login_missing_user";
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         cleanUpTestUsers();
 
         insertLoginUser(
@@ -90,7 +93,7 @@ public class AuthControllerTest {
     }
 
     @AfterEach
-    void tearDown(){
+    void tearDown() {
         cleanUpTestUsers();
     }
 
@@ -133,8 +136,13 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldRegisterSuccessfully() throws Exception{
-        RegisterRequest registerRequest = new RegisterRequest(testUserAccount, testUserUsername,testUserPassword,testUserEmail);
+    void shouldRegisterSuccessfully() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(
+                testUserAccount,
+                testUserUsername,
+                testUserPassword,
+                testUserEmail
+        );
         mockMvc.perform(
                 post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -154,8 +162,13 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldRegisterWithEmptyPassword() throws Exception{
-        RegisterRequest registerRequest = new RegisterRequest(testUserAccount, testUserUsername,null,testUserEmail);
+    void shouldRegisterWithEmptyPassword() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(
+                testUserAccount,
+                testUserUsername,
+                null,
+                testUserEmail
+        );
         mockMvc.perform(
                 post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -171,14 +184,19 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldRegisterRepetitive()throws Exception{
-        RegisterRequest registerRequest = new RegisterRequest(testUserAccount, testUserUsername,testUserPassword,testUserEmail);
+    void shouldRegisterRepetitive() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(
+                testUserAccount,
+                testUserUsername,
+                testUserPassword,
+                testUserEmail
+        );
         authService.register(registerRequest);
 
         mockMvc.perform(
                 post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registerRequest))
         ).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("账号已存在"))
@@ -194,7 +212,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldLoginSuccessfully() throws Exception{
+    void shouldLoginSuccessfully() throws Exception {
         User user = userMapper.getUserByAccount(loginUserAccount);
         assertNotNull(user);
         assertTrue(passwordEncoder.matches(loginUserPassword, user.getPassword()));
@@ -219,7 +237,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldRejectLoginWhenAccountIsBlank() throws Exception{
+    void shouldRejectLoginWhenAccountIsBlank() throws Exception {
         assertLoginFails(
                 new LoginRequest(blankAccount, loginUserPassword),
                 "账号不能为空"
@@ -227,7 +245,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldRejectLoginWhenAccountIsTooLong() throws Exception{
+    void shouldRejectLoginWhenAccountIsTooLong() throws Exception {
         assertLoginFails(
                 new LoginRequest(longAccount, loginUserPassword),
                 "账号长度不能超过50位"
@@ -235,7 +253,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldRejectLoginWhenPasswordIsBlank() throws Exception{
+    void shouldRejectLoginWhenPasswordIsBlank() throws Exception {
         assertLoginFails(
                 new LoginRequest(loginUserAccount, null),
                 "密码不能为空"
@@ -243,7 +261,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldRejectLoginWhenPasswordIsTooShort() throws Exception{
+    void shouldRejectLoginWhenPasswordIsTooShort() throws Exception {
         assertLoginFails(
                 new LoginRequest(loginUserAccount, shortPassword),
                 "密码长度应为8到72位"
@@ -251,7 +269,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldRejectLoginWhenPasswordIsTooLong() throws Exception{
+    void shouldRejectLoginWhenPasswordIsTooLong() throws Exception {
         assertLoginFails(
                 new LoginRequest(loginUserAccount, longPassword),
                 "密码长度应为8到72位"
@@ -259,7 +277,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldRejectLoginWhenPasswordIsWrong() throws Exception{
+    void shouldRejectLoginWhenPasswordIsWrong() throws Exception {
         assertLoginFails(
                 new LoginRequest(loginUserAccount, wrongPassword),
                 "账号或密码错误"
@@ -267,7 +285,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldRejectLoginWhenUserIsDisabled() throws Exception{
+    void shouldRejectLoginWhenUserIsDisabled() throws Exception {
         assertLoginFails(
                 new LoginRequest(disabledUserAccount, disabledUserPassword),
                 "账号已被禁用"
@@ -275,7 +293,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldRejectDisabledUserWithGenericMessageWhenPasswordIsWrong() throws Exception{
+    void shouldRejectDisabledUserWithGenericMessageWhenPasswordIsWrong() throws Exception {
         assertLoginFails(
                 new LoginRequest(disabledUserAccount, wrongPassword),
                 "账号或密码错误"
@@ -283,7 +301,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void shouldRejectLoginWhenUserDoesNotExist() throws Exception{
+    void shouldRejectLoginWhenUserDoesNotExist() throws Exception {
         assertLoginFails(
                 new LoginRequest(missingAccount, loginUserPassword),
                 "账号或密码错误"

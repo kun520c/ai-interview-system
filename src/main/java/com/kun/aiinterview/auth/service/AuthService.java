@@ -1,10 +1,9 @@
 package com.kun.aiinterview.auth.service;
 
 import com.kun.aiinterview.auth.dto.LoginRequest;
+import com.kun.aiinterview.auth.dto.RegisterRequest;
 import com.kun.aiinterview.auth.vo.LoginResponse;
 import com.kun.aiinterview.common.exception.BusinessException;
-import com.kun.aiinterview.auth.dto.RegisterRequest;
-import com.kun.aiinterview.security.jwt.JwtProperties;
 import com.kun.aiinterview.security.jwt.JwtTokenService;
 import com.kun.aiinterview.user.entity.User;
 import com.kun.aiinterview.user.enums.UserRole;
@@ -29,30 +28,30 @@ public class AuthService {
 
     @Transactional
     public void register(@Valid RegisterRequest registerRequest) {
-     if(userMapper.getUserByAccount(registerRequest.getAccount())!=null){
-         throw new BusinessException("账号已存在");
+        if (userMapper.getUserByAccount(registerRequest.getAccount()) != null) {
+            throw new BusinessException("账号已存在");
         }
 
-     if(userMapper.getUserByEmail(registerRequest.getEmail())!=null){
-         throw new BusinessException("邮箱已被注册");
-     }
+        if (userMapper.getUserByEmail(registerRequest.getEmail()) != null) {
+            throw new BusinessException("邮箱已被注册");
+        }
 
-     String encodedPassword = passwordEncoder.encode(registerRequest.getPassword());
+        String encodedPassword = passwordEncoder.encode(registerRequest.getPassword());
 
-     User user  = User.builder()
-             .account(registerRequest.getAccount())
-             .username(registerRequest.getUsername())
-             .password(encodedPassword)
-             .email(registerRequest.getEmail())
-             .role(UserRole.USER)
-             .status(UserStatus.ENABLED)
-             .build();
+        User user = User.builder()
+                .account(registerRequest.getAccount())
+                .username(registerRequest.getUsername())
+                .password(encodedPassword)
+                .email(registerRequest.getEmail())
+                .role(UserRole.USER)
+                .status(UserStatus.ENABLED)
+                .build();
 
-     try {
-         userMapper.insertUser(user);
-     } catch (DuplicateKeyException e) {
-         throw new BusinessException("账号或邮箱已存在");
-     }
+        try {
+            userMapper.insertUser(user);
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException("账号或邮箱已存在");
+        }
     }
 
     public LoginResponse login(@Valid LoginRequest loginRequest) {
@@ -60,11 +59,11 @@ public class AuthService {
         if (user == null) {
             throw new BusinessException("账号或密码错误");
         }
-        if(!passwordEncoder.matches(loginRequest.getPassword(),user.getPassword())){
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new BusinessException("账号或密码错误");
         }
 
-        if(user.getStatus() == UserStatus.DISABLED){
+        if (user.getStatus() == UserStatus.DISABLED) {
             throw new BusinessException("账号已被禁用");
         }
 
@@ -81,9 +80,7 @@ public class AuthService {
                 .role(user.getRole())
                 .accessToken(accessToken)
                 .tokenType("Bearer")
-                .expiresInSeconds(
-                        jwtTokenService.getAccessTokenExpirationSeconds()
-                )
+                .expiresInSeconds(jwtTokenService.getAccessTokenExpirationSeconds())
                 .build();
     }
 }

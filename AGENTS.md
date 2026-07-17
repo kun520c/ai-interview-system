@@ -18,11 +18,11 @@ Current core stack:
 * MyBatis 3.0.5
 * MySQL 8.0.45
 * BCrypt password hashing via spring-security-crypto
+* JJWT 0.13.0 for JWT access-token signing and validation
 
 Planned technologies used only when their corresponding modules are developed:
 
 * Redis
-* JWT
 * Spring Security
 * Spring Mail
 * Knife4j
@@ -246,6 +246,26 @@ Do not turn the project into a large block of unexplained generated code.
 
 Prefer small development increments.
 
+### JWT learning boundary
+
+The JWT implementation is complete, but the developer is still consolidating the underlying concepts.
+
+Before Spring Security implementation begins, Codex must first explain:
+
+* Authentication versus authorization
+* `SecurityFilterChain`
+* `Authentication`
+* `SecurityContextHolder`
+* `GrantedAuthority`
+* The stateless JWT request flow
+* HTTP 401 versus 403
+
+Codex must not replace this learning phase with a large generated Spring Security implementation.
+
+The JWT payload is signed but not encrypted. JWT validation proves signature integrity, issuer and expiration, but does not guarantee that the database user is still enabled or that the role is still current.
+
+The next design phase must explicitly decide whether protected requests query the database or another trusted state source.
+
 ## 12. Testing
 
 After making changes:
@@ -283,7 +303,7 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-Authentication module — phase two: registration and credential-based login HTTP flows are complete
+Authentication module — phase three: JWT access-token issuance and standalone validation are complete; Spring Security request authentication has not started
 ```
 
 Completed in this stage:
@@ -295,8 +315,9 @@ Completed in this stage:
 * `POST /api/auth/register`
 * Account and email duplicate pre-checks, with database unique constraints and `DuplicateKeyException` translated to `BusinessException` as the concurrency fallback
 * `LoginRequest` with Jakarta Bean Validation and password-safe `toString`
-* `LoginResponse` containing only userId, account, username and role
-* Complete login flow: JSON → `LoginRequest` → `@Valid` → `AuthController` → `AuthService` → `UserMapper` → BCrypt password verification → account status validation → `LoginResponse` → `Result` JSON
+* `LoginResponse` containing userId, account, username, role, accessToken, tokenType and expiresInSeconds
+* Access token excluded from `LoginResponse.toString()`
+* Complete login flow: JSON → `LoginRequest` → `@Valid` → `AuthController` → `AuthService` → `UserMapper` → BCrypt password verification → account status validation → JWT generation → `LoginResponse` → `Result` JSON
 * `POST /api/auth/login`
 * Generic credential-error response for missing users and incorrect passwords
 * Password verification before disabled-account status disclosure
@@ -304,22 +325,43 @@ Completed in this stage:
 * `Result<T>` unified response structure, `BusinessException`, and `GlobalExceptionHandler`
 * Unified handling for validation failures, unreadable JSON request bodies, business exceptions and unknown exceptions
 * MyBatis Mapper integration tests, AuthService registration and login integration tests, and MockMvc AuthController registration and login integration tests
+* JJWT 0.13.0 dependency setup using `jjwt-api`, `jjwt-impl` and `jjwt-jackson`
+* Type-safe JWT configuration through `JwtProperties`
+* JWT secret loaded externally through `JWT_SECRET`
+* Base64 secret decoding and `SecretKey` creation
+* HS256 access-token generation after successful password and user-status validation
+* Standard claims: `sub`, `iss`, `iat` and `exp`
+* Custom claims: `account` and `role`
+* `JwtParser` configured with signature verification and required issuer
+* Token expiration validation
+* Dedicated test profile JWT configuration using a non-production test secret
+* Unit tests for normal parsing, expiration, tampering, wrong key and wrong issuer
+* Integration tests confirming successful login returns a valid access token
+* Claims minimization: passwords, password hashes, email, username, status and full `User` objects are not stored in JWT
 
 Current allowed scope:
 
-* JWT access-token configuration
-* JWT access-token generation after successful credential verification
-* JWT token parsing and signature/expiration validation
-* Adding the access token to the successful login response
-* Focused unit and integration tests required for JWT generation and validation
+* Reading and explaining the existing JWT implementation
+* Learning and documenting Spring Security authentication architecture
+* Designing the future stateless JWT request-authentication flow
+* Identifying required components and responsibilities without implementing them
+* Evaluating whether protected requests should re-check current user status and role
+* Small cleanup directly related to the completed JWT stage only when explicitly requested
+* Focused design notes and test planning for the next authentication phase
 
 Current forbidden scope:
 
-* Spring Security authentication filter chain
-* Authorization interceptors or filters
+* Adding `spring-boot-starter-security` unless explicitly approved
+* Creating `SecurityFilterChain`
+* Creating JWT authentication filters or interceptors
+* Writing to `SecurityContextHolder`
+* Adding authorization annotations or endpoint permission rules
+* Adding `AuthenticationEntryPoint` or `AccessDeniedHandler`
 * Redis token storage or blacklist
 * Refresh tokens
 * Logout token invalidation
+* Token rotation
+* OAuth2 or OpenID Connect
 * Email verification
 * Password reset
 * RAG

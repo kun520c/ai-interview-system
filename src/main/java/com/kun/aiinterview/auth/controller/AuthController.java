@@ -20,14 +20,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public Result<Void> register(@Valid @RequestBody  RegisterRequest registerRequest){
+    public Result<Void> register(@Valid @RequestBody RegisterRequest registerRequest) {
         authService.register(registerRequest);
         return Result.success();
     }
 
     @PostMapping("/login")
-    public Result<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest){
-        LoginResponse loginResponse =  authService.login(loginRequest);
+    public Result<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+        LoginResponse loginResponse = authService.login(loginRequest);
         return Result.success(loginResponse);
     }
 }

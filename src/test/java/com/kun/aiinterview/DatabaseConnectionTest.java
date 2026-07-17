@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @ActiveProfiles({"local", "test"})
 public class DatabaseConnectionTest {
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -22,6 +21,6 @@ public class DatabaseConnectionTest {
                 Integer.class
         );
 
-        assertEquals(1,result);
+        assertEquals(1, result);
     }
 }

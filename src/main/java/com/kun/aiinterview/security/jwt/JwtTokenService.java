@@ -14,6 +14,7 @@ import java.util.Date;
 
 @Component
 public class JwtTokenService {
+
     private static final String CLAIM_ACCOUNT = "account";
     private static final String CLAIM_ROLE = "role";
 
@@ -36,14 +37,12 @@ public class JwtTokenService {
 
     public String generateAccessToken(Long userId, String account, UserRole role) {
         Instant issuedAt = Instant.now();
-        Instant expiration = issuedAt.plus(
-                jwtProperties.getAccessTokenExpiration()
-        );
+        Instant expiration = issuedAt.plus(jwtProperties.getAccessTokenExpiration());
 
         return Jwts.builder()
-                .subject((userId.toString()))
+                .subject(userId.toString())
                 .claim(CLAIM_ACCOUNT, account)
-                .claim(CLAIM_ROLE,role.name())
+                .claim(CLAIM_ROLE, role.name())
                 .issuer(jwtProperties.getIssuer())
                 .issuedAt(Date.from(issuedAt))
                 .expiration(Date.from(expiration))
@@ -51,15 +50,13 @@ public class JwtTokenService {
                 .compact();
     }
 
-    public Claims parseAndValidate(String token){
+    public Claims parseAndValidate(String token) {
         return jwtParser
                 .parseSignedClaims(token)
                 .getPayload();
     }
 
-    public long getAccessTokenExpirationSeconds(){
-        return jwtProperties
-                .getAccessTokenExpiration()
-                .toSeconds();
+    public long getAccessTokenExpirationSeconds() {
+        return jwtProperties.getAccessTokenExpiration().toSeconds();
     }
 }
