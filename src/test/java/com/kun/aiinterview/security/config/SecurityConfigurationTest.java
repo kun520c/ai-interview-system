@@ -33,7 +33,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = SecurityConfigurationTest.SecurityTestController.class)
@@ -91,8 +90,7 @@ class SecurityConfigurationTest {
                 .andExpect(jsonPath("$.message").value("未认证或访问令牌无效"))
                 .andExpect(jsonPath("$.data").isEmpty())
                 .andExpect(header().doesNotExist(HttpHeaders.LOCATION))
-                .andExpect(header().doesNotExist(HttpHeaders.WWW_AUTHENTICATE))
-                .andExpect(redirectedUrl(null));
+                .andExpect(header().doesNotExist(HttpHeaders.WWW_AUTHENTICATE));
     }
 
     @Test
