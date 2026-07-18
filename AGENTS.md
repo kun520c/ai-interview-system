@@ -19,11 +19,11 @@ Current core stack:
 * MySQL 8.0.45
 * BCrypt password hashing via spring-security-crypto
 * JJWT 0.13.0 for JWT access-token signing and validation
+* Spring Security for stateless request authentication and authorization
 
 Planned technologies used only when their corresponding modules are developed:
 
 * Redis
-* Spring Security
 * Spring Mail
 * Knife4j
 * LangChain4j
@@ -246,25 +246,25 @@ Do not turn the project into a large block of unexplained generated code.
 
 Prefer small development increments.
 
-### JWT learning boundary
+### Spring Security implementation approach
 
-The JWT implementation is complete, but the developer is still consolidating the underlying concepts.
+The authentication and authorization concepts required for Spring Security implementation have been reviewed.
 
-Before Spring Security implementation begins, Codex must first explain:
+The developer will write the main implementation manually.
 
-* Authentication versus authorization
-* `SecurityFilterChain`
-* `Authentication`
-* `SecurityContextHolder`
-* `GrantedAuthority`
-* The stateless JWT request flow
-* HTTP 401 versus 403
+Before each implementation increment, Codex must first explain the responsibility of each new class and provide a file-level implementation plan.
 
-Codex must not replace this learning phase with a large generated Spring Security implementation.
+Codex must not immediately generate the complete Spring Security module unless explicitly requested.
+
+Implementation must proceed in small reviewable increments, and every increment must include focused tests.
+
+Do not reformat unrelated existing files.
+
+Do not modify unrelated imports, whitespace, YAML or Mapper XML.
 
 The JWT payload is signed but not encrypted. JWT validation proves signature integrity, issuer and expiration, but does not guarantee that the database user is still enabled or that the role is still current.
 
-The next design phase must explicitly decide whether protected requests query the database or another trusted state source.
+Protected requests must therefore query the current user from the database and use the database status and role as the trusted state source.
 
 ## 12. Testing
 
@@ -303,8 +303,14 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-Authentication module — phase three: JWT access-token issuance and standalone validation are complete; Spring Security request authentication has not started
+Authentication module — phase four: stateless Spring Security JWT request authentication is approved for implementation
 ```
+
+JWT access-token issuance and standalone validation are already complete.
+
+The authentication and authorization concepts required for implementation have been reviewed.
+
+Spring Security request authentication may now be implemented in small, explained increments.
 
 Completed in this stage:
 
@@ -339,30 +345,80 @@ Completed in this stage:
 * Integration tests confirming successful login returns a valid access token
 * Claims minimization: passwords, password hashes, email, username, status and full `User` objects are not stored in JWT
 
+Design decisions for this stage:
+
+1. The application remains a stateless REST API.
+2. Spring Security must not use HTTP Session to persist authentication.
+3. Existing custom registration and credential-based login remain unchanged.
+4. `POST /api/auth/register` and `POST /api/auth/login` are public endpoints.
+5. Public authentication endpoints must remain usable even when the client has an expired or malformed old token.
+6. A custom JWT authentication filter will restore authentication for protected requests.
+7. The filter must:
+
+    * Read the `Authorization` header.
+    * Accept the `Bearer` scheme only.
+    * Extract and validate the JWT through `JwtTokenService`.
+    * Read the user id from `sub`.
+    * Query the current user by primary key.
+    * Reject missing or disabled users.
+    * Use the current database role rather than the stale JWT role for authorization.
+    * Convert `USER` and `ADMIN` into `ROLE_USER` and `ROLE_ADMIN`.
+    * Create an authenticated `Authentication` object.
+    * Store it in `SecurityContextHolder`.
+
+8. JWT claims are not the authoritative source for current user status or role.
+9. Requests without a token must not be authenticated.
+10. Invalid, expired or tampered tokens on protected requests must produce HTTP 401.
+11. Authenticated users without sufficient authority must receive HTTP 403.
+12. Security errors must return the project's JSON `Result` structure rather than HTML or redirects.
+13. The JWT authentication filter is a Servlet Filter, not a Spring MVC `HandlerInterceptor`.
+14. The filter should execute once per request and be registered in the Spring Security filter chain.
+15. Authorization rules remain separate from JWT parsing and authentication.
+
+Expected components for this stage:
+
+* `SecurityConfiguration`
+* `JwtAuthenticationFilter`
+* `RestAuthenticationEntryPoint`
+* `RestAccessDeniedHandler`
+* Focused security integration tests
+
+Exact class names may be adjusted slightly to fit the existing package structure, but package organization must remain business-module-first and responsibilities must remain clear.
+
 Current allowed scope:
 
-* Reading and explaining the existing JWT implementation
-* Learning and documenting Spring Security authentication architecture
-* Designing the future stateless JWT request-authentication flow
-* Identifying required components and responsibilities without implementing them
-* Evaluating whether protected requests should re-check current user status and role
-* Small cleanup directly related to the completed JWT stage only when explicitly requested
-* Focused design notes and test planning for the next authentication phase
+* Adding `spring-boot-starter-security`
+* Creating a `SecurityFilterChain`
+* Configuring stateless session management
+* Disabling default form login and HTTP Basic authentication
+* Configuring public registration and login endpoints
+* Requiring authentication for other current API requests
+* Restricting `/api/admin/**` to `ADMIN` when needed for verification
+* Creating a once-per-request JWT authentication filter
+* Reading Bearer tokens from the `Authorization` header
+* Reusing `JwtTokenService` for JWT validation
+* Querying current users through the existing `UserMapper`
+* Checking `UserStatus.ENABLED`
+* Mapping database roles to `GrantedAuthority` values
+* Populating `SecurityContextHolder`
+* Implementing JSON `AuthenticationEntryPoint` and `AccessDeniedHandler`
+* Adding focused unit and integration tests for 401, 403 and successful authentication
 
 Current forbidden scope:
 
-* Adding `spring-boot-starter-security` unless explicitly approved
-* Creating `SecurityFilterChain`
-* Creating JWT authentication filters or interceptors
-* Writing to `SecurityContextHolder`
-* Adding authorization annotations or endpoint permission rules
-* Adding `AuthenticationEntryPoint` or `AccessDeniedHandler`
-* Redis token storage or blacklist
 * Refresh tokens
+* Redis token storage
+* Redis blacklist
 * Logout token invalidation
 * Token rotation
-* OAuth2 or OpenID Connect
+* OAuth2
+* OpenID Connect
+* Session-based login
+* Remember-me
+* Complex RBAC
+* Method-level authorization unless explicitly requested
 * Email verification
 * Password reset
 * RAG
 * LLM
+* Unrelated user-profile or business features
