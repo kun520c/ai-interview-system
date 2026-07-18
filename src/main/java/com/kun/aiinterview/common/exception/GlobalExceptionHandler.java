@@ -12,18 +12,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionHandler {
-
+public class GlobalExceptionHandler{
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Result<Void> handleException(Exception e) {
+    public Result<Void> handleException(Exception e){
         log.error("系统异常", e);
         return Result.error(500, "系统异常，请稍后重试");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Result<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public Result<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
         FieldError fieldError = e.getBindingResult().getFieldError();
         String message = fieldError == null ? "请求参数不合法" : fieldError.getDefaultMessage();
         log.warn("请求参数校验失败: {}", message);
@@ -32,13 +31,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Result<Void> handleBusinessException(BusinessException e) {
+    public Result<Void> handleBusinessException(BusinessException e){
         return Result.error(400, e.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Result<Void> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    public Result<Void> handleHttpMessageNotReadableException(HttpMessageNotReadableException e){
         log.warn("请求体解析失败: {}", e.getMessage());
         return Result.error(400, "请求体格式错误");
     }

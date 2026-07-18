@@ -15,7 +15,6 @@ import java.time.Duration;
 @Getter
 @Setter
 public class JwtProperties {
-
     @NotBlank
     private String secret;
 
@@ -26,9 +25,9 @@ public class JwtProperties {
     private Duration accessTokenExpiration;
 
     @AssertTrue(message = "JWT access token 过期时间必须大于0")
-    public boolean isAccessTokenExpirationPositive() {
+    public boolean isAccessTokenExpirationPositive(){
         return accessTokenExpiration == null
-                || (!accessTokenExpiration.isZero())
+                ||(!accessTokenExpiration.isZero())
                 && !accessTokenExpiration.isNegative();
     }
 }

@@ -1,11 +1,7 @@
 package com.kun.aiinterview.auth.vo;
 
 import com.kun.aiinterview.user.enums.UserRole;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
@@ -13,7 +9,6 @@ import lombok.ToString;
 @Builder
 @ToString(exclude = "accessToken")
 public class LoginResponse {
-
     private Long userId;
     private String account;
     private String username;

@@ -2,18 +2,18 @@ spring:
   application:
     name: ai-interview-system
 
-  datasource:
-    url: ${DB_URL}
+  datasource :
+    url : ${DB_URL}
     username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    password : ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-mybatis:
-  mapper-locations: classpath:mapper/*.xml
-  configuration:
-    map-underscore-to-camel-case: true
+mybatis :
+  mapper-locations : classpath:mapper/*.xml
+  configuration :
+    map-underscore-to-camel-case : true
 
-jwt:
-  secret: ${JWT_SECRET}
-  issuer: ai-interview-system
-  access-token-expiration: 2h
+jwt :
+  secret : ${JWT_SECRET}
+  issuer : ai-interview-system
+  access-token-expiration : 2h
