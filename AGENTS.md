@@ -303,14 +303,14 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-Authentication module — phase four: stateless Spring Security JWT request authentication is approved for implementation
+Authentication module — closing stage: develop and validate GET /api/user/me
 ```
 
-JWT access-token issuance and standalone validation are already complete.
+JWT access-token issuance, standalone validation, and stateless Spring Security request authentication and authorization are complete.
 
-The authentication and authorization concepts required for implementation have been reviewed.
+The completed security chain includes `SecurityConfiguration`, `JwtAuthenticationFilter`, `AuthenticatedUser`, JSON 401 and 403 handlers, and focused security tests.
 
-Spring Security request authentication may now be implemented in small, explained increments.
+The current increment is the read-only current-user endpoint. The approved endpoint path is `GET /api/user/me`.
 
 Completed in this stage:
 
@@ -344,15 +344,23 @@ Completed in this stage:
 * Unit tests for normal parsing, expiration, tampering, wrong key and wrong issuer
 * Integration tests confirming successful login returns a valid access token
 * Claims minimization: passwords, password hashes, email, username, status and full `User` objects are not stored in JWT
+* Stateless Spring Security configuration with form login, HTTP Basic, logout, request caching and HTTP Session persistence disabled
+* Public `POST /api/auth/register` and `POST /api/auth/login` endpoints that ignore malformed or expired old tokens
+* `JwtAuthenticationFilter` registered once in the Spring Security filter chain
+* Bearer-token authentication using `JwtTokenService`, the JWT `sub` claim and a current database user lookup
+* Current database status and role used as the trusted authorization source
+* `AuthenticatedUser` stored as the authenticated principal in `SecurityContextHolder`
+* JSON HTTP 401 and 403 responses through `RestAuthenticationEntryPoint` and `RestAccessDeniedHandler`
+* Focused tests for the JWT filter, authenticated principal, security configuration, authentication entry point and access-denied handler
 
-Design decisions for this stage:
+Fixed authentication design decisions:
 
 1. The application remains a stateless REST API.
 2. Spring Security must not use HTTP Session to persist authentication.
 3. Existing custom registration and credential-based login remain unchanged.
 4. `POST /api/auth/register` and `POST /api/auth/login` are public endpoints.
 5. Public authentication endpoints must remain usable even when the client has an expired or malformed old token.
-6. A custom JWT authentication filter will restore authentication for protected requests.
+6. A custom JWT authentication filter restores authentication for protected requests.
 7. The filter must:
 
     * Read the `Authorization` header.
@@ -375,34 +383,27 @@ Design decisions for this stage:
 14. The filter should execute once per request and be registered in the Spring Security filter chain.
 15. Authorization rules remain separate from JWT parsing and authentication.
 
-Expected components for this stage:
+Components for the current increment:
 
-* `SecurityConfiguration`
-* `JwtAuthenticationFilter`
-* `RestAuthenticationEntryPoint`
-* `RestAccessDeniedHandler`
-* Focused security integration tests
+* `CurrentUserResponse`
+* `UserService`
+* `UserController`
+* Focused `UserControllerIntegrationTest`
 
 Exact class names may be adjusted slightly to fit the existing package structure, but package organization must remain business-module-first and responsibilities must remain clear.
 
 Current allowed scope:
 
-* Adding `spring-boot-starter-security`
-* Creating a `SecurityFilterChain`
-* Configuring stateless session management
-* Disabling default form login and HTTP Basic authentication
-* Configuring public registration and login endpoints
-* Requiring authentication for other current API requests
-* Restricting `/api/admin/**` to `ADMIN` when needed for verification
-* Creating a once-per-request JWT authentication filter
-* Reading Bearer tokens from the `Authorization` header
-* Reusing `JwtTokenService` for JWT validation
-* Querying current users through the existing `UserMapper`
-* Checking `UserStatus.ENABLED`
-* Mapping database roles to `GrantedAuthority` values
-* Populating `SecurityContextHolder`
-* Implementing JSON `AuthenticationEntryPoint` and `AccessDeniedHandler`
-* Adding focused unit and integration tests for 401, 403 and successful authentication
+* Implementing `GET /api/user/me`
+* Reading the current principal through `@AuthenticationPrincipal AuthenticatedUser`
+* Passing the authenticated user id from `UserController` to `UserService`
+* Querying the current user through `UserMapper.getUserById(userId)`
+* Rejecting a missing or disabled current user
+* Mapping the `User` entity to `CurrentUserResponse`
+* Returning userId, account, username, email, role, status and createdAt
+* Returning the response through `Result.success()`
+* Verifying the endpoint through the real Spring Security filter chain and `JwtTokenService`
+* Adding focused tests for a missing token, a valid token, database-backed response fields and exclusion of sensitive fields
 
 Current forbidden scope:
 
