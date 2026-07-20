@@ -394,7 +394,7 @@ Exact class names may be adjusted slightly to fit the existing package structure
 
 Current allowed scope:
 
-* Implementing `GET /api/user/me`
+* Implementing `GET /api/users/me`
 * Reading the current principal through `@AuthenticationPrincipal AuthenticatedUser`
 * Passing the authenticated user id from `UserController` to `UserService`
 * Querying the current user through `UserMapper.getUserById(userId)`

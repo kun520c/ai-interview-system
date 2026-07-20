@@ -44,7 +44,7 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldReturnUnauthorizedWhenTokenIsMissing() throws Exception {
-        mockMvc.perform(get("/api/user/me"))
+        mockMvc.perform(get("/api/users/me"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentTypeCompatibleWith(
                         MediaType.APPLICATION_JSON
@@ -63,7 +63,7 @@ class UserControllerIntegrationTest {
         );
 
         mockMvc.perform(
-                        get("/api/user/me")
+                        get("/api/users/me")
                                 .header(
                                         HttpHeaders.AUTHORIZATION,
                                         "Bearer " + accessToken
@@ -81,6 +81,7 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.email").value(user.getEmail()))
                 .andExpect(jsonPath("$.data.role").value("USER"))
                 .andExpect(jsonPath("$.data.status").value("ENABLED"))
+                .andExpect(jsonPath("$.data.createdAt").exists())
 
                 .andExpect(jsonPath("$.data.password").doesNotExist())
                 .andExpect(jsonPath("$.data.passwordHash").doesNotExist())
