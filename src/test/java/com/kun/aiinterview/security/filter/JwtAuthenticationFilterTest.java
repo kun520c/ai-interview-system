@@ -24,6 +24,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -228,6 +231,69 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
+    void shouldRejectTokenWithoutIssuedAtAfterPasswordChange() throws Exception {
+        LocalDateTime passwordChangedAt = LocalDateTime.of(
+                2026,
+                7,
+                21,
+                10,
+                0
+        );
+        stubPasswordChangeValidation(null, passwordChangedAt);
+
+        assertAuthenticationFailure("Bearer " + TOKEN);
+    }
+
+    @Test
+    void shouldRejectTokenIssuedBeforePasswordChange() throws Exception {
+        LocalDateTime passwordChangedAt = LocalDateTime.of(
+                2026,
+                7,
+                21,
+                10,
+                0
+        );
+        Date issuedAt = toDate(passwordChangedAt.minusSeconds(1));
+        stubPasswordChangeValidation(issuedAt, passwordChangedAt);
+
+        assertAuthenticationFailure("Bearer " + TOKEN);
+    }
+
+    @Test
+    void shouldAllowTokenIssuedAtPasswordChangeTime() throws Exception {
+        LocalDateTime passwordChangedAt = LocalDateTime.of(
+                2026,
+                7,
+                21,
+                10,
+                0
+        );
+        Date issuedAt = toDate(passwordChangedAt);
+
+        assertPasswordChangeAuthenticationSucceeds(
+                issuedAt,
+                passwordChangedAt
+        );
+    }
+
+    @Test
+    void shouldAllowTokenIssuedAfterPasswordChange() throws Exception {
+        LocalDateTime passwordChangedAt = LocalDateTime.of(
+                2026,
+                7,
+                21,
+                10,
+                0
+        );
+        Date issuedAt = toDate(passwordChangedAt.plusSeconds(1));
+
+        assertPasswordChangeAuthenticationSucceeds(
+                issuedAt,
+                passwordChangedAt
+        );
+    }
+
+    @Test
     void shouldPropagateDatabaseFailureAsSystemException() throws Exception {
         RuntimeException databaseException = new RuntimeException("database unavailable");
         stubClaims(USER_ID.toString());
@@ -323,6 +389,34 @@ class JwtAuthenticationFilterTest {
         when(userMapper.getUserById(USER_ID)).thenReturn(user(role, status));
     }
 
+    private void stubPasswordChangeValidation(
+            Date issuedAt,
+            LocalDateTime passwordChangedAt
+    ) {
+        Claims tokenClaims = claims(USER_ID.toString());
+        when(tokenClaims.getIssuedAt()).thenReturn(issuedAt);
+        when(jwtTokenService.parseAndValidate(TOKEN)).thenReturn(tokenClaims);
+        when(userMapper.getUserById(USER_ID)).thenReturn(
+                user(UserRole.USER, UserStatus.ENABLED, passwordChangedAt)
+        );
+    }
+
+    private void assertPasswordChangeAuthenticationSucceeds(
+            Date issuedAt,
+            LocalDateTime passwordChangedAt
+    ) throws Exception {
+        stubPasswordChangeValidation(issuedAt, passwordChangedAt);
+        MockHttpServletRequest request = bearerRequest("Bearer " + TOKEN);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        FilterChain filterChain = mock(FilterChain.class);
+
+        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+
+        assertNotNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain).doFilter(request, response);
+        verifyNoInteractions(authenticationEntryPoint);
+    }
+
     private void stubClaims(String subject) {
         Claims tokenClaims = claims(subject);
         when(jwtTokenService.parseAndValidate(TOKEN)).thenReturn(tokenClaims);
@@ -335,6 +429,14 @@ class JwtAuthenticationFilterTest {
     }
 
     private User user(UserRole role, UserStatus status) {
+        return user(role, status, null);
+    }
+
+    private User user(
+            UserRole role,
+            UserStatus status,
+            LocalDateTime passwordChangedAt
+    ) {
         return User.builder()
                 .id(USER_ID)
                 .account("database-account")
@@ -342,7 +444,14 @@ class JwtAuthenticationFilterTest {
                 .password("password-hash-must-not-enter-principal")
                 .role(role)
                 .status(status)
+                .passwordChangedAt(passwordChangedAt)
                 .build();
+    }
+
+    private Date toDate(LocalDateTime localDateTime) {
+        return Date.from(
+                localDateTime.atZone(ZoneId.systemDefault()).toInstant()
+        );
     }
 
     private MockHttpServletRequest bearerRequest(String authorizationHeader) {

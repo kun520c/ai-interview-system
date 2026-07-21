@@ -4,6 +4,8 @@ import com.kun.aiinterview.user.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
+
 @Mapper
 public interface UserMapper {
 
@@ -14,4 +16,6 @@ public interface UserMapper {
     User getUserByEmail(@Param("email") String email);
 
     int insertUser(User user);
+
+    int updatePassword(@Param("id") Long id,@Param("password")String password,@Param("passwordChangedAt") LocalDateTime passwordChangedAt);
 }

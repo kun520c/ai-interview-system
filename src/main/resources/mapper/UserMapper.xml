@@ -41,4 +41,10 @@
                 #{status}
             )
         </insert>
+    <update id = "updatePassword">
+        UPDATE `user`
+        SET password = #{password},
+            password_changed_at = #{passwordChangedAt}
+        WHERE id = #{id}
+    </update>
     </mapper>

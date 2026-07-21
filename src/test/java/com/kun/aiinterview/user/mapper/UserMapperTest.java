@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -84,6 +86,44 @@ public class UserMapperTest {
         User user = userMapper.getUserByEmail(testUserEmail);
         assertNotNull(user);
         assertEquals(testUserEmail, user.getEmail());
+    }
+
+    @Test
+    void shouldUpdatePasswordAndPasswordChangedAtTogether() {
+        User user = userMapper.getUserByAccount(testUserAccount);
+        String newPasswordHash = "NEW_TEST_HASH_NOT_FOR_AUTH";
+        LocalDateTime passwordChangedAt = LocalDateTime.of(
+                2026,
+                7,
+                21,
+                10,
+                30
+        );
+
+        int affectedRows = userMapper.updatePassword(
+                user.getId(),
+                newPasswordHash,
+                passwordChangedAt
+        );
+
+        User updatedUser = userMapper.getUserById(user.getId());
+        assertEquals(1, affectedRows);
+        assertEquals(newPasswordHash, updatedUser.getPassword());
+        assertEquals(passwordChangedAt, updatedUser.getPasswordChangedAt());
+        assertEquals(testUserAccount, updatedUser.getAccount());
+        assertEquals(UserRole.USER, updatedUser.getRole());
+        assertEquals(UserStatus.ENABLED, updatedUser.getStatus());
+    }
+
+    @Test
+    void shouldReturnZeroWhenPasswordUpdateTargetDoesNotExist() {
+        int affectedRows = userMapper.updatePassword(
+                9_000_000_000_000L,
+                "NEW_TEST_HASH_NOT_FOR_AUTH",
+                LocalDateTime.of(2026, 7, 21, 10, 30)
+        );
+
+        assertEquals(0, affectedRows);
     }
 
 }

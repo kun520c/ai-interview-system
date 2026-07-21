@@ -303,14 +303,14 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-Authentication module — closing stage: develop and validate GET /api/user/me
+Authentication module — logged-in password change and old JWT invalidation
 ```
 
 JWT access-token issuance, standalone validation, and stateless Spring Security request authentication and authorization are complete.
 
 The completed security chain includes `SecurityConfiguration`, `JwtAuthenticationFilter`, `AuthenticatedUser`, JSON 401 and 403 handlers, and focused security tests.
 
-The current increment is the read-only current-user endpoint. The approved endpoint path is `GET /api/user/me`.
+The read-only current-user endpoint is complete. The current increment is authenticated password change and invalidation of access tokens issued before the password change. The approved endpoint path is `PUT /api/users/me/password`.
 
 Completed in this stage:
 
@@ -352,6 +352,9 @@ Completed in this stage:
 * `AuthenticatedUser` stored as the authenticated principal in `SecurityContextHolder`
 * JSON HTTP 401 and 403 responses through `RestAuthenticationEntryPoint` and `RestAccessDeniedHandler`
 * Focused tests for the JWT filter, authenticated principal, security configuration, authentication entry point and access-denied handler
+* `GET /api/users/me` using `@AuthenticationPrincipal AuthenticatedUser`
+* Database-backed current-user response containing userId, account, username, email, role, status and createdAt without sensitive fields
+* Focused `UserControllerIntegrationTest` coverage for missing and valid access tokens
 
 Fixed authentication design decisions:
 
@@ -383,27 +386,53 @@ Fixed authentication design decisions:
 14. The filter should execute once per request and be registered in the Spring Security filter chain.
 15. Authorization rules remain separate from JWT parsing and authentication.
 
+Fixed password-change design decisions:
+
+1. The approved endpoint is `PUT /api/users/me/password`.
+2. The current user id must come from `@AuthenticationPrincipal AuthenticatedUser`, never from the request body.
+3. The request body contains only `currentPassword` and `newPassword`.
+4. The current password must be verified with `PasswordEncoder.matches(rawPassword, encodedPassword)`.
+5. The new password must be different from the current password and must be stored only as a BCrypt hash.
+6. `password` and `password_changed_at` must be updated together in one database statement and transaction.
+7. The Java service must require exactly one affected database row.
+8. A successful password-change request may complete using the authentication established at the start of that request.
+9. Subsequent protected requests must compare the JWT `iat` with the current database `password_changed_at` after loading the user and before creating `Authentication`.
+10. If `password_changed_at` is null, no password-change revocation check is required.
+11. If `password_changed_at` is non-null and JWT `iat` is missing, authentication must fail with HTTP 401.
+12. If JWT `iat` is before `password_changed_at`, the token is invalid and must produce the project's JSON HTTP 401 response.
+13. If JWT `iat` equals or is after `password_changed_at`, the token is accepted for the current stage.
+14. JWT revocation failures must use an `AuthenticationException`, clear the security context and delegate to `RestAuthenticationEntryPoint`.
+15. The user must log in again with the new password to obtain a new access token.
+
 Components for the current increment:
 
-* `CurrentUserResponse`
+* `ChangePasswordRequest`
 * `UserService`
 * `UserController`
+* `UserMapper` and `UserMapper.xml`
+* `JwtAuthenticationFilter`
 * Focused `UserControllerIntegrationTest`
+* Focused `JwtAuthenticationFilterTest`
+* Focused `UserMapperTest`
 
 Exact class names may be adjusted slightly to fit the existing package structure, but package organization must remain business-module-first and responsibilities must remain clear.
 
 Current allowed scope:
 
-* Implementing `GET /api/users/me`
+* Implementing `PUT /api/users/me/password`
 * Reading the current principal through `@AuthenticationPrincipal AuthenticatedUser`
-* Passing the authenticated user id from `UserController` to `UserService`
+* Validating `currentPassword` and `newPassword` through `ChangePasswordRequest`
+* Passing only the authenticated user id and password-change request from `UserController` to `UserService`
 * Querying the current user through `UserMapper.getUserById(userId)`
 * Rejecting a missing or disabled current user
-* Mapping the `User` entity to `CurrentUserResponse`
-* Returning userId, account, username, email, role, status and createdAt
+* Verifying the current password and rejecting a reused password through `PasswordEncoder`
+* BCrypt-encoding the new password
+* Updating `password` and `password_changed_at` together
+* Requiring exactly one affected update row and using a transaction boundary
 * Returning the response through `Result.success()`
-* Verifying the endpoint through the real Spring Security filter chain and `JwtTokenService`
-* Adding focused tests for a missing token, a valid token, database-backed response fields and exclusion of sensitive fields
+* Comparing JWT `iat` and database `password_changed_at` in `JwtAuthenticationFilter`
+* Returning JSON HTTP 401 for access tokens issued before the password change
+* Verifying password change, old-token invalidation, old-password rejection and new-password login through the real Spring Security filter chain, `JwtTokenService`, `PasswordEncoder` and test database
 
 Current forbidden scope:
 

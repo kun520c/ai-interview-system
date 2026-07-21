@@ -28,6 +28,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -129,6 +132,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Claims claims = parseAndValidateClaims(token);
         Long userId = extractUserId(claims);
         User user = loadEnabledUser(userId);
+
+        validatePasswordChange(claims,user);
+
         Authentication authentication = createAuthentication(user);
 
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -203,5 +209,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return new SimpleGrantedAuthority(ROLE_PREFIX + role.name());
+    }
+
+    private void validatePasswordChange(
+            Claims claims,
+            User user
+    ) {
+        LocalDateTime passwordChangedAt =
+                user.getPasswordChangedAt();
+
+        if (passwordChangedAt == null) {
+            return;
+        }
+
+        Date issuedAt = claims.getIssuedAt();
+
+        if (issuedAt == null) {
+            throw new BadCredentialsException(
+                    "访问令牌缺少签发时间"
+            );
+        }
+
+        LocalDateTime tokenIssuedAt =
+                LocalDateTime.ofInstant(
+                        issuedAt.toInstant(),
+                        ZoneId.systemDefault()
+                ).withNano(0);
+
+        if (tokenIssuedAt.isBefore(passwordChangedAt)) {
+            throw new BadCredentialsException(
+                    "访问令牌已因密码修改而失效"
+            );
+        }
     }
 }
