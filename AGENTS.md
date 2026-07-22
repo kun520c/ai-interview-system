@@ -275,6 +275,15 @@ After making changes:
 * Report whether tests passed.
 * Report unresolved issues clearly.
 
+For question management changes:
+
+* Use real MyBatis SQL rather than relying only on mocks.
+* Mapper tests must verify generated-key population and scoring-point batch insertion.
+* Service tests must verify scoring-point weight rules, transaction behavior, and affected-row checks.
+* MockMvc tests must verify HTTP 401, HTTP 403, valid administrator requests, and invalid request parameters.
+* Run `mvn test` after the changes are complete.
+* Do not delete, skip, or weaken existing tests merely to make the test suite pass.
+
 Do not claim that code works without running reasonable verification when execution is available.
 
 ## 13. Git Rules
@@ -303,60 +312,29 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-Authentication module — logged-in password change and old JWT invalidation
+管理员题库管理第一阶段：创建题目及评分点
 ```
 
-JWT access-token issuance, standalone validation, and stateless Spring Security request authentication and authorization are complete.
-
-The completed security chain includes `SecurityConfiguration`, `JwtAuthenticationFilter`, `AuthenticatedUser`, JSON 401 and 403 handlers, and focused security tests.
-
-The read-only current-user endpoint is complete. The current increment is authenticated password change and invalidation of access tokens issued before the password change. The approved endpoint path is `PUT /api/users/me/password`.
+The implementation and the first Codex code review are complete. The project is currently synchronizing documentation before submission to GitHub.
 
 Completed in this stage:
 
-* User entity, `UserRole` and `UserStatus`
-* `UserMapper` and MyBatis XML mapping, including user queries by id, account and email, plus user insertion
-* `BCryptPasswordEncoder` exposed through a `PasswordEncoder` bean
-* Complete registration flow: JSON → `RegisterRequest` DTO → `@Valid` → `AuthController` → `AuthService` → `UserMapper` → MySQL → `Result` JSON
-* `POST /api/auth/register`
-* Account and email duplicate pre-checks, with database unique constraints and `DuplicateKeyException` translated to `BusinessException` as the concurrency fallback
-* `LoginRequest` with Jakarta Bean Validation and password-safe `toString`
-* `LoginResponse` containing userId, account, username, role, accessToken, tokenType and expiresInSeconds
-* Access token excluded from `LoginResponse.toString()`
-* Complete login flow: JSON → `LoginRequest` → `@Valid` → `AuthController` → `AuthService` → `UserMapper` → BCrypt password verification → account status validation → JWT generation → `LoginResponse` → `Result` JSON
-* `POST /api/auth/login`
-* Generic credential-error response for missing users and incorrect passwords
-* Password verification before disabled-account status disclosure
-* Disabled accounts with an incorrect password still receive the generic credential error
-* `Result<T>` unified response structure, `BusinessException`, and `GlobalExceptionHandler`
-* Unified handling for validation failures, unreadable JSON request bodies, business exceptions and unknown exceptions
-* MyBatis Mapper integration tests, AuthService registration and login integration tests, and MockMvc AuthController registration and login integration tests
-* JJWT 0.13.0 dependency setup using `jjwt-api`, `jjwt-impl` and `jjwt-jackson`
-* Type-safe JWT configuration through `JwtProperties`
-* JWT secret loaded externally through `JWT_SECRET`
-* Base64 secret decoding and `SecretKey` creation
-* HS256 access-token generation after successful password and user-status validation
-* Standard claims: `sub`, `iss`, `iat` and `exp`
-* Custom claims: `account` and `role`
-* `JwtParser` configured with signature verification and required issuer
-* Token expiration validation
-* Dedicated test profile JWT configuration using a non-production test secret
-* Unit tests for normal parsing, expiration, tampering, wrong key and wrong issuer
-* Integration tests confirming successful login returns a valid access token
-* Claims minimization: passwords, password hashes, email, username, status and full `User` objects are not stored in JWT
-* Stateless Spring Security configuration with form login, HTTP Basic, logout, request caching and HTTP Session persistence disabled
-* Public `POST /api/auth/register` and `POST /api/auth/login` endpoints that ignore malformed or expired old tokens
-* `JwtAuthenticationFilter` registered once in the Spring Security filter chain
-* Bearer-token authentication using `JwtTokenService`, the JWT `sub` claim and a current database user lookup
-* Current database status and role used as the trusted authorization source
-* `AuthenticatedUser` stored as the authenticated principal in `SecurityContextHolder`
-* JSON HTTP 401 and 403 responses through `RestAuthenticationEntryPoint` and `RestAccessDeniedHandler`
-* Focused tests for the JWT filter, authenticated principal, security configuration, authentication entry point and access-denied handler
-* `GET /api/users/me` using `@AuthenticationPrincipal AuthenticatedUser`
-* Database-backed current-user response containing userId, account, username, email, role, status and createdAt without sensitive fields
-* Focused `UserControllerIntegrationTest` coverage for missing and valid access tokens
+* `POST /api/admin/questions`
+* Access restricted to users with the `ADMIN` role through the existing Spring Security rule for `/api/admin/**`
+* `CreateQuestionRequest` accepts question fields and a scoring-point list
+* Question category, difficulty, status, scoring-point type, and scoring-point status are represented by enums
+* `QuestionStatus` and `QuestionPointStatus` are separate enums
+* The backend fixes new question status and new scoring-point status to `ENABLED`
+* The scoring-point list must not be empty, and each scoring point is validated through Jakarta Bean Validation
+* Each scoring-point weight must be between 1 and 100
+* The service requires the total scoring-point weight to equal 100
+* `Question` and `QuestionScoringPoint` records are saved in the same transaction
+* Question insertion checks for exactly one affected row and uses MyBatis generated-key population
+* Scoring points are inserted in one MyBatis `foreach` batch, and the service requires the affected-row count to equal the list size
+* `sortOrder` is generated by the backend from request order, starting at 1
+* A successful response contains only `questionId`
 
-Fixed authentication design decisions:
+Existing fixed authentication decisions remain unchanged:
 
 1. The application remains a stateless REST API.
 2. Spring Security must not use HTTP Session to persist authentication.
@@ -379,76 +357,70 @@ Fixed authentication design decisions:
 
 8. JWT claims are not the authoritative source for current user status or role.
 9. Requests without a token must not be authenticated.
-10. Invalid, expired or tampered tokens on protected requests must produce HTTP 401.
+10. Invalid, expired, or tampered tokens on protected requests must produce HTTP 401.
 11. Authenticated users without sufficient authority must receive HTTP 403.
 12. Security errors must return the project's JSON `Result` structure rather than HTML or redirects.
 13. The JWT authentication filter is a Servlet Filter, not a Spring MVC `HandlerInterceptor`.
-14. The filter should execute once per request and be registered in the Spring Security filter chain.
+14. The filter must execute once per request and be registered in the Spring Security filter chain.
 15. Authorization rules remain separate from JWT parsing and authentication.
 
-Fixed password-change design decisions:
+Existing fixed password-change decisions remain unchanged:
 
-1. The approved endpoint is `PUT /api/users/me/password`.
-2. The current user id must come from `@AuthenticationPrincipal AuthenticatedUser`, never from the request body.
+1. The endpoint is `PUT /api/users/me/password`.
+2. The current user id comes from `@AuthenticationPrincipal AuthenticatedUser`, never from the request body.
 3. The request body contains only `currentPassword` and `newPassword`.
-4. The current password must be verified with `PasswordEncoder.matches(rawPassword, encodedPassword)`.
-5. The new password must be different from the current password and must be stored only as a BCrypt hash.
-6. `password` and `password_changed_at` must be updated together in one database statement and transaction.
-7. The Java service must require exactly one affected database row.
+4. The current password is verified with `PasswordEncoder.matches(rawPassword, encodedPassword)`.
+5. The new password must differ from the current password and is stored only as a BCrypt hash.
+6. `password` and `password_changed_at` are updated together in one database statement and transaction.
+7. The Java service requires exactly one affected database row.
 8. A successful password-change request may complete using the authentication established at the start of that request.
-9. Subsequent protected requests must compare the JWT `iat` with the current database `password_changed_at` after loading the user and before creating `Authentication`.
+9. Subsequent protected requests compare JWT `iat` with the current database `password_changed_at` after loading the user and before creating `Authentication`.
 10. If `password_changed_at` is null, no password-change revocation check is required.
-11. If `password_changed_at` is non-null and JWT `iat` is missing, authentication must fail with HTTP 401.
-12. If JWT `iat` is before `password_changed_at`, the token is invalid and must produce the project's JSON HTTP 401 response.
-13. If JWT `iat` equals or is after `password_changed_at`, the token is accepted for the current stage.
-14. JWT revocation failures must use an `AuthenticationException`, clear the security context and delegate to `RestAuthenticationEntryPoint`.
+11. If `password_changed_at` is non-null and JWT `iat` is missing, authentication fails with HTTP 401.
+12. If JWT `iat` is before `password_changed_at`, the token is invalid and produces the project's JSON HTTP 401 response.
+13. If JWT `iat` equals or is after `password_changed_at`, the token is accepted.
+14. JWT revocation failures use an `AuthenticationException`, clear the security context, and delegate to `RestAuthenticationEntryPoint`.
 15. The user must log in again with the new password to obtain a new access token.
 
-Components for the current increment:
+Next stage:
 
-* `ChangePasswordRequest`
-* `UserService`
-* `UserController`
-* `UserMapper` and `UserMapper.xml`
-* `JwtAuthenticationFilter`
-* Focused `UserControllerIntegrationTest`
-* Focused `JwtAuthenticationFilterTest`
-* Focused `UserMapperTest`
+```text
+管理员修改题目及评分点
+```
 
-Exact class names may be adjusted slightly to fit the existing package structure, but package organization must remain business-module-first and responsibilities must remain clear.
+The planned endpoint is `PUT /api/admin/questions/{questionId}`. This next stage has one objective: update one existing question and its scoring points safely.
 
-Current allowed scope:
+Main goals for the next stage:
 
-* Implementing `PUT /api/users/me/password`
-* Reading the current principal through `@AuthenticationPrincipal AuthenticatedUser`
-* Validating `currentPassword` and `newPassword` through `ChangePasswordRequest`
-* Passing only the authenticated user id and password-change request from `UserController` to `UserService`
-* Querying the current user through `UserMapper.getUserById(userId)`
-* Rejecting a missing or disabled current user
-* Verifying the current password and rejecting a reused password through `PasswordEncoder`
-* BCrypt-encoding the new password
-* Updating `password` and `password_changed_at` together
-* Requiring exactly one affected update row and using a transaction boundary
-* Returning the response through `Result.success()`
-* Comparing JWT `iat` and database `password_changed_at` in `JwtAuthenticationFilter`
-* Returning JSON HTTP 401 for access tokens issued before the password change
-* Verifying password change, old-token invalidation, old-password rejection and new-password login through the real Spring Security filter chain, `JwtTokenService`, `PasswordEncoder` and test database
+* Update question base information by `questionId`
+* Update the scoring-point list
+* Verify that the question exists
+* Require the total scoring-point weight to equal 100
+* Update the question and scoring points in the same transaction
+* Prevent a partial state where the question update succeeds but the scoring-point update fails
+* Keep internal IDs, statuses, ordering, and time fields under backend control rather than client control
+* Decide the concrete scoring-point update strategy before implementation; do not assume either delete-and-reinsert or differential update in advance
+
+Current allowed scope for the next stage:
+
+* Controller, DTO, VO, Service, Mapper, Entity, and enum changes under the `question` module that are directly required for question modification
+* Corresponding MyBatis Mapper XML changes
+* Corresponding Mapper, Service, and MockMvc tests
+* The current-stage description in `AGENTS.md`
 
 Current forbidden scope:
 
-* Refresh tokens
-* Redis token storage
-* Redis blacklist
-* Logout token invalidation
-* Token rotation
-* OAuth2
-* OpenID Connect
-* Session-based login
-* Remember-me
-* Complex RBAC
-* Method-level authorization unless explicitly requested
-* Email verification
-* Password reset
+* Question pagination, question detail queries, enable, disable, or delete operations
+* Interview sessions
+* Answer submission or evaluation
 * RAG
 * LLM
-* Unrelated user-profile or business features
+* Milvus
+* Knowledge-base upload
+* Interview reports or user weaknesses
+* Password reset
+* Refactoring the existing JWT, authentication, Spring Security, or user modules
+* Database table changes
+* Unrelated dependencies
+* Broad cross-module refactoring
+* Changes to the local `docs/learning` learning-material management rules

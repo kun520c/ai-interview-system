@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kun.aiinterview.question.mapper.QuestionMapper">
+
+    <insert id="insertQuestion"
+            parameterType = "com.kun.aiinterview.question.entity.Question"
+            useGeneratedKeys = "true"
+            keyProperty = "id">
+        Insert INTO question
+        (
+            category,
+            knowledge_point,
+            difficulty,
+            question_content,
+            reference_answer,
+            status
+        )
+        VALUES
+        (
+            #{category},
+            #{knowledgePoint},
+            #{difficulty},
+            #{questionContent},
+            #{referenceAnswer},
+            #{status}
+        )
+
+    </insert>
+</mapper>

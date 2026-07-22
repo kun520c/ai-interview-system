@@ -1,0 +1,33 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace = "com.kun.aiinterview.question.mapper.QuestionScoringPointMapper">
+    <insert id = "batchInsert">
+
+        INSERT INTO question_scoring_point
+        (
+            question_id,
+            point_type,
+            content,
+            weight,
+            sort_order,
+            status
+        )
+        VALUES
+
+        <foreach collection = "scoringPoints"
+                 item = "point"
+                 separator = ",">
+            (
+                #{point.questionId},
+                #{point.pointType},
+                #{point.content},
+                #{point.weight},
+                #{point.sortOrder},
+                #{point.status}
+            )
+        </foreach>
+    </insert>
+</mapper>
