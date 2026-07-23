@@ -6,4 +6,8 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface QuestionMapper {
     int insertQuestion(Question question);
+
+    Question getQuestionById(Long id);
+
+    int updateQuestion(Question question);
 }

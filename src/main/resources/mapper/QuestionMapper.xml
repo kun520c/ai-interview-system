@@ -29,4 +29,29 @@
         )
 
     </insert>
+
+    <select id="getQuestionById"
+            resultType="com.kun.aiinterview.question.entity.Question">
+        SELECT id,
+               category,
+               knowledge_point,
+               difficulty,
+               question_content,
+               reference_answer,
+               status,
+               created_at,
+               updated_at
+        FROM question
+        WHERE id = #{id}
+    </select>
+
+    <update id="updateQuestion">
+        UPDATE question
+        SET category = #{category},
+            knowledge_point = #{knowledgePoint},
+            difficulty = #{difficulty},
+            question_content = #{questionContent},
+            reference_answer = #{referenceAnswer}
+        WHERE id = #{id}
+    </update>
 </mapper>

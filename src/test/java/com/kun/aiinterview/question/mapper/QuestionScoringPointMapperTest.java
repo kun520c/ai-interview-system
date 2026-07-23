@@ -80,6 +80,101 @@ class QuestionScoringPointMapperTest {
         );
     }
 
+    @Test
+    void shouldDeleteOnlyTargetQuestionPointsAndInsertReplacementPoints() {
+        Long targetQuestionId = insertParentQuestion();
+        Long otherQuestionId = insertParentQuestion();
+        questionScoringPointMapper.batchInsert(List.of(
+                scoringPoint(
+                        targetQuestionId,
+                        QuestionPointType.CORE,
+                        "目标旧评分点一",
+                        60,
+                        1
+                ),
+                scoringPoint(
+                        targetQuestionId,
+                        QuestionPointType.KEY,
+                        "目标旧评分点二",
+                        40,
+                        2
+                ),
+                scoringPoint(
+                        otherQuestionId,
+                        QuestionPointType.PRINCIPLE,
+                        "其他题目评分点",
+                        100,
+                        1
+                )
+        ));
+
+        int deletedRows =
+                questionScoringPointMapper.deleteByQuestionId(targetQuestionId);
+        List<QuestionScoringPoint> replacements = List.of(
+                scoringPoint(
+                        targetQuestionId,
+                        QuestionPointType.INTERNAL,
+                        "新评分点一",
+                        70,
+                        1
+                ),
+                scoringPoint(
+                        targetQuestionId,
+                        QuestionPointType.ADVANCED,
+                        "新评分点二",
+                        30,
+                        2
+                )
+        );
+        int insertedRows = questionScoringPointMapper.batchInsert(replacements);
+
+        List<Map<String, Object>> targetRows = scoringPointRows(targetQuestionId);
+        List<Map<String, Object>> otherRows = scoringPointRows(otherQuestionId);
+        assertAll(
+                () -> assertEquals(2, deletedRows),
+                () -> assertEquals(2, insertedRows),
+                () -> assertEquals(2, targetRows.size()),
+                () -> assertScoringPointRow(
+                        targetRows.get(0),
+                        targetQuestionId,
+                        "INTERNAL",
+                        "新评分点一",
+                        70,
+                        1,
+                        "ENABLED"
+                ),
+                () -> assertScoringPointRow(
+                        targetRows.get(1),
+                        targetQuestionId,
+                        "ADVANCED",
+                        "新评分点二",
+                        30,
+                        2,
+                        "ENABLED"
+                ),
+                () -> assertEquals(1, otherRows.size()),
+                () -> assertScoringPointRow(
+                        otherRows.get(0),
+                        otherQuestionId,
+                        "PRINCIPLE",
+                        "其他题目评分点",
+                        100,
+                        1,
+                        "ENABLED"
+                )
+        );
+    }
+
+    @Test
+    void shouldReturnZeroWhenQuestionHasNoScoringPoints() {
+        Long questionId = insertParentQuestion();
+
+        int deletedRows =
+                questionScoringPointMapper.deleteByQuestionId(questionId);
+
+        assertEquals(0, deletedRows);
+    }
+
     private Long insertParentQuestion() {
         String knowledgePoint = "mapper-" + UUID.randomUUID();
         jdbcTemplate.update(
@@ -121,6 +216,38 @@ class QuestionScoringPointMapperTest {
                 .sortOrder(sortOrder)
                 .status(QuestionPointStatus.ENABLED)
                 .build();
+    }
+
+    private List<Map<String, Object>> scoringPointRows(Long questionId) {
+        return jdbcTemplate.queryForList(
+                """
+                SELECT question_id, point_type, content, weight,
+                       sort_order, status
+                FROM question_scoring_point
+                WHERE question_id = ?
+                ORDER BY sort_order
+                """,
+                questionId
+        );
+    }
+
+    private void assertScoringPointRow(
+            Map<String, Object> row,
+            Long questionId,
+            String pointType,
+            String content,
+            int weight,
+            int sortOrder,
+            String status
+    ) {
+        assertAll(
+                () -> assertEquals(questionId, asLong(row.get("question_id"))),
+                () -> assertEquals(pointType, row.get("point_type")),
+                () -> assertEquals(content, row.get("content")),
+                () -> assertEquals(weight, asInt(row.get("weight"))),
+                () -> assertEquals(sortOrder, asInt(row.get("sort_order"))),
+                () -> assertEquals(status, row.get("status"))
+        );
     }
 
     private long asLong(Object value) {

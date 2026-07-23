@@ -12,4 +12,6 @@ public interface QuestionScoringPointMapper {
             @Param("scoringPoints")
             List<QuestionScoringPoint> scoringPoints
     );
+
+    int deleteByQuestionId(@Param("questionId") Long questionId);
 }

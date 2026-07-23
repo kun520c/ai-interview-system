@@ -30,4 +30,9 @@
             )
         </foreach>
     </insert>
+
+    <delete id="deleteByQuestionId" parameterType="java.lang.Long">
+        DELETE FROM question_scoring_point
+        WHERE question_id = #{questionId}
+    </delete>
 </mapper>
