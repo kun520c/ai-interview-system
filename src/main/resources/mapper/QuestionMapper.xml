@@ -54,4 +54,51 @@
             reference_answer = #{referenceAnswer}
         WHERE id = #{id}
     </update>
+
+    <sql id = "QuestionPageFilter">
+        <where>
+            <if test = "query.category != null">
+                AND category = #{query.category}
+            </if>
+
+            <if test = "query.difficulty != null">
+                AND difficulty  = #{query.difficulty}
+            </if>
+
+            <if test = "query.status != null">
+                AND status = #{query.status}
+            </if>
+
+            <if test = "query.keyword != null and query.keyword != ''">
+                AND (
+                    knowledge_point LIKE CONCAT('%',#{query.keyword},'%')
+                    OR question_content LIKE CONCAT('%',#{query.keyword},'%')
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id = "countQuestion" resultType = "long">
+        SELECT COUNT(*)
+        FROM question
+
+        <include refid="QuestionPageFilter"/>
+    </select>
+
+    <select id = "selectQuestionPage" resultType = "com.kun.aiinterview.question.vo.AdminQuestionListItem">
+        SELECT  id,
+                category,
+                knowledge_point,
+                difficulty,
+                question_content,
+                status,
+                updated_at
+        FROM question
+
+        <include refid="QuestionPageFilter"/>
+
+        ORDER BY updated_at DESC,id DESC
+        LIMIT #{pageSize}
+        OFFSET #{offset}
+    </select>
 </mapper>

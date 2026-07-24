@@ -2,6 +2,7 @@ package com.kun.aiinterview.question.service;
 
 import com.kun.aiinterview.common.exception.BusinessException;
 import com.kun.aiinterview.question.dto.CreateQuestionRequest;
+import com.kun.aiinterview.question.dto.QuestionPageQuery;
 import com.kun.aiinterview.question.dto.ScoringPointRequest;
 import com.kun.aiinterview.question.dto.UpdateQuestionRequest;
 import com.kun.aiinterview.question.entity.Question;
@@ -10,6 +11,8 @@ import com.kun.aiinterview.question.enums.QuestionPointStatus;
 import com.kun.aiinterview.question.enums.QuestionStatus;
 import com.kun.aiinterview.question.mapper.QuestionMapper;
 import com.kun.aiinterview.question.mapper.QuestionScoringPointMapper;
+import com.kun.aiinterview.question.vo.AdminQuestionListItem;
+import com.kun.aiinterview.question.vo.AdminQuestionPageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -185,5 +188,66 @@ public class QuestionAdminService {
             scoringPoints.add(questionScoringPoint);
         }
         return scoringPoints;
+    }
+
+    @Transactional(readOnly = true)
+    public AdminQuestionPageResponse getQuestionPage(QuestionPageQuery query) {
+        if(query == null){
+            throw new BusinessException("分页查询参数不能为空");
+        }
+
+        int pageNum = query.getPageNum() == null ? 1 : query.getPageNum();
+        int pageSize = query.getPageSize() == null ? 10 : query.getPageSize();
+
+        if (pageNum < 1) {
+            throw new BusinessException("页码必须大于等于1");
+        }
+
+        if(pageSize < 1 || pageSize > 50) {
+            throw new BusinessException("每页数量必须在1到50之间");
+        }
+
+        String keyword = query.getKeyword();
+
+        if (keyword != null) {
+            keyword = keyword.trim();
+
+            if(keyword.isEmpty()){
+                keyword = null;
+            }
+        }
+
+        QuestionPageQuery normalizedQuery = QuestionPageQuery.builder()
+                .pageNum(pageNum)
+                .pageSize(pageSize)
+                .category(query.getCategory())
+                .difficulty(query.getDifficulty())
+                .status(query.getStatus())
+                .keyword(keyword)
+                .build();
+
+        long offset = (long) (pageNum - 1) * pageSize;
+
+        long total = questionMapper.countQuestion(normalizedQuery);
+
+        List<AdminQuestionListItem> records = new ArrayList<>();
+
+        if(total != 0){
+            records = questionMapper.selectQuestionPage(
+                    normalizedQuery,
+                    offset,
+                    pageSize
+            );
+        }
+
+        long totalPages = total == 0 ? 0L : (total + pageSize - 1) / pageSize;
+
+        return   AdminQuestionPageResponse.builder()
+                .records(records)
+                .totalPages(totalPages)
+                .pageNum(pageNum)
+                .pageSize(pageSize)
+                .total(total)
+                .build();
     }
 }
