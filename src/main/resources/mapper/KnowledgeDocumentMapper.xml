@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kun.aiinterview.knowledge.mapper.KnowledgeDocumentMapper">
+
+    <insert id="insertDocument"
+            parameterType="com.kun.aiinterview.knowledge.entity.KnowledgeDocument"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO knowledge_document(
+            title,
+            category,
+            file_name,
+            file_type,
+            content,
+            content_hash,
+            source,
+            document_version,
+            processing_status,
+            error_message
+        )
+        VALUES(
+            #{title},
+            #{category},
+            #{fileName},
+            #{fileType},
+            #{content},
+            #{contentHash},
+            #{source},
+            #{documentVersion},
+            #{processingStatus},
+            #{errorMessage}
+        )
+    </insert>
+
+</mapper>

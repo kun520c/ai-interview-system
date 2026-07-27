@@ -312,48 +312,59 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-管理员题库管理第四阶段：题目详情与启停管理
+知识库模块第一阶段：管理员上传知识文档并保存原文元数据
 ```
 
-Development implementation, the first Codex review, production corrections, test synchronization, and full regression verification are complete. The working tree is ready for the developer's final staged-diff review and GitHub submission.
+The implementation, first Codex production review, production corrections, focused-test synchronization, and full regression verification were completed on 2026-07-27. The working tree is ready for the developer's final diff review and submission.
 
-Question-management stage record:
+Question-management MVP record:
 
-1. First stage: administrator question and scoring-point creation — completed.
-2. Second stage: administrator question update and whole replacement of scoring points — completed. `QuestionAdminService.updateQuestion()` now requires `questionMapper.updateQuestion()` to affect exactly one row before replacing scoring points.
-3. Third stage: administrator question pagination — completed.
-4. Fourth stage: administrator question detail and question-status update — completed and verified.
+1. Administrator question and scoring-point creation — completed.
+2. Administrator whole replacement of a question and its scoring points — completed.
+3. Administrator question pagination — completed.
+4. Administrator question-detail query — completed.
+5. Administrator question-status update — completed.
 
-Fourth-stage completed capability:
+Knowledge-base first-stage completed capability:
 
-* `GET /api/admin/questions/{questionId}`
-* `PUT /api/admin/questions/{questionId}/status`
-* Detail queries load the question and its scoring points separately using the same path `questionId`; there is one question query and one scoring-point query, with no N+1 behavior.
-* Scoring points are queried with `WHERE question_id = #{questionId}` and `ORDER BY sort_order ASC`.
-* MyBatis maps multiple scoring-point rows directly into a scoring-point detail VO list.
-* The detail response is an independent VO and does not expose scoring-point primary keys, scoring-point `questionId`, or scoring-point database timestamps.
-* A question-status update modifies only `question.status`.
-* Repeating a request for the current question status succeeds idempotently without issuing an update.
-* Scoring points are not enabled or disabled through this endpoint.
-* A question-status update must not change scoring-point content, order, status, or weight.
-* The scoring-point weight total of 100 remains enforced by question creation and whole-replacement flows.
-* Existing `/api/admin/**` security rules apply: no token returns HTTP 401 with the project JSON structure, a current database `USER` returns HTTP 403, and a current database `ADMIN` is allowed.
+* `POST /api/admin/knowledge/documents`
+* `multipart/form-data` with `file`, `title`, `category`, and optional `source`
+* UTF-8 Markdown (`.md` and `.markdown`) and TXT uploads only
+* A hard-coded 5 MiB maximum checked before reading the full byte array
+* Removal of Windows and Unix client directory components from the stored file name
+* Strict UTF-8 decoding, UTF-8 BOM removal, newline normalization, and blank-content rejection
+* SHA-256 over the normalized UTF-8 content
+* Original normalized content stored in `knowledge_document.content`
+* Backend-controlled `documentVersion = 1`, `processingStatus = UPLOADED`, and `errorMessage = null`
+* Mapper affected-row and generated-key checks
+* An independent response VO that does not expose content, content hash, or error details
+* Existing `/api/admin/**` authorization: no token is HTTP 401 and a current database `USER` is HTTP 403
 
-First-review corrections completed:
+First-review production corrections completed:
 
-* The invalid trailing comma was removed from `selectDetailByQuestionId`; the real MySQL query now succeeds.
-* `QuestionAdminService.updateQuestionStatus()` now rejects only a missing status at the Service boundary. `QuestionStatus` itself limits JSON values to `ENABLED` and `DISABLED`.
-* `QuestionAdminService.updateQuestion()` now requires exactly one affected question row and stops before deleting scoring points when the update count is invalid.
-* The scoring-point detail VO no longer exposes or mis-models scoring-point status; it contains only `pointType`, `content`, and `weight`.
+* `UploadKnowledgeDocumentRequest` now uses type-compatible validation: `@NotNull` for the multipart file and category, `@NotBlank` for title, and database-aligned length limits for title and source.
+* `KnowledgeDocumentMapper.xml` now supplies all ten INSERT values, including `#{fileType}`, while retaining generated-key population.
+* `KnowledgeDocumentAdminService.uploadDocument()` rejects null and empty files before size checking and byte-array reading.
+* Content normalization now converts both CRLF and standalone CR line endings to LF.
+* File-name cleanup now handles Windows and Unix client paths, rejects root-only, trailing-separator, empty, overlong, and invalid path values with controlled business errors, and never persists a client directory.
+* Service-boundary length checks protect the database limits for title, source, and the cleaned file name.
 
-Fourth-stage synchronized test scope and current result:
+Additional first-review cleanup:
 
-* Real MyBatis/MySQL tests cover scoring-point multi-row mapping, enum mapping, ascending order, question isolation, empty-list behavior, single-column question-status updates, preservation of other question fields and scoring points, missing IDs, and matched-row semantics.
-* Service tests cover detail assembly and order, invalid and missing questions, empty scoring-point lists, both status transitions, idempotency, null input, exceptions, affected-row checks, mapper isolation, and transaction annotations.
-* MockMvc tests cover HTTP 401, HTTP 403, valid administrator access, invalid path IDs, missing/null/unknown status bodies, unified JSON responses, and controller-to-service parameter forwarding.
-* Full integration tests use the real Spring Security filter chain, JWT, service, MyBatis, and MySQL for detail responses, status persistence/isolation/idempotency, and authorization.
-* Related-test command result after corrections: 91 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
-* Full `mvn test` result on 2026-07-25 after corrections: 245 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
+* The misspelled `konwledge` package was consistently corrected to `knowledge` in production code, tests, and MyBatis XML references.
+* Unrelated Kotlin dependencies and build plugins were removed; the Maven build remains Java-only and no longer compiles Java sources twice.
+* The knowledge module introduced its own `KnowledgeCategory`; the question module still uses `QuestionCategory`. No shared-category enum migration occurred in this stage, so no migration claim should be made.
+
+Synchronized test scope and current result:
+
+* Real MyBatis/MySQL tests execute `KnowledgeDocumentMapper.xml` and query actual stored column values, generated timestamps, nullable source, and generated IDs.
+* Service tests cover supported extensions and case variants, metadata trimming, client-path cleanup, UTF-8/BOM/newline behavior, SHA-256 stability, controlled entity defaults, file boundaries, mapper row counts, key population, and exception propagation.
+* MockMvc tests execute multipart binding and the real security filter chain with a mocked Service, covering HTTP 401, HTTP 403, administrator access, invalid form fields, DTO forwarding, unified `Result`, and safe response fields.
+* Full integration tests execute real Spring Security, JWT, Controller, Service, MyBatis XML, and MySQL, and verify database row counts and intended stored values.
+* `.\mvnw.cmd -B -ntp -DskipTests compile`: `BUILD SUCCESS`.
+* Knowledge-related tests: 62 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
+* Full `.\mvnw.cmd -B -ntp test`: 307 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
+* All 245 pre-existing authentication, user, security, and question-management regression tests passed.
 
 Existing fixed authentication decisions remain unchanged:
 
@@ -406,24 +417,21 @@ Existing fixed password-change decisions remain unchanged:
 Next development stage:
 
 ```text
-待当前阶段提交后由开发者明确；推荐进入知识库模块
+建议：知识库模块第二阶段：文档处理、切片与处理状态管理
 ```
 
-The question-management MVP is complete. After the developer's final review and submission, the recommended next core stage is the knowledge-base module.
+The first stage is ready for the developer's final review and submission. Do not start the suggested second stage until the developer explicitly authorizes it.
 
-Until the developer explicitly defines the next stage, do not automatically implement:
+The following capabilities are not implemented in the current stage:
 
-* Question deletion or batch enable/disable operations
-* Interview sessions
-* Answer submission or evaluation
-* RAG
-* LLM
-* Milvus
-* Knowledge-base upload
-* Interview reports or user weaknesses
-* Password reset
-* Refactoring the existing JWT, authentication, Spring Security, or user modules
-* Database table changes
-* Unrelated dependencies
-* Broad cross-module refactoring
-* Changes to the local `docs/learning` learning-material management rules
+* Document chunking
+* Embedding generation
+* Vector-database insertion
+* Milvus integration
+* RAG retrieval
+* Document processing-status advancement
+* Document reprocessing
+* Knowledge-document pagination, detail, or enable/disable management
+* Mandatory rejection of duplicate content
+
+Until the developer explicitly authorizes a later stage, also do not implement interview sessions, answer submission or evaluation, LLM integration, interview reports, user weaknesses, password reset, database changes, or broad unrelated refactoring.
