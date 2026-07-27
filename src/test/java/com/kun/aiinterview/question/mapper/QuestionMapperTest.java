@@ -143,6 +143,117 @@ class QuestionMapperTest {
         );
     }
 
+    @Test
+    void givenTwoQuestionsAndScoringPoints_whenUpdatingStatus_thenOnlyTargetQuestionStatusChanges() {
+        Question target = insertQuestion(
+                "状态修改目标知识点",
+                QuestionStatus.ENABLED
+        );
+        Question other = insertQuestion(
+                "状态修改隔离知识点",
+                QuestionStatus.ENABLED
+        );
+        jdbcTemplate.update(
+                """
+                INSERT INTO question_scoring_point
+                (question_id, point_type, content, weight, sort_order, status)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                target.getId(),
+                "CORE",
+                "状态修改不应影响的评分点",
+                100,
+                1,
+                "ENABLED"
+        );
+        Map<String, Object> before = jdbcTemplate.queryForMap(
+                """
+                SELECT category, knowledge_point, difficulty,
+                       question_content, reference_answer
+                FROM question
+                WHERE id = ?
+                """,
+                target.getId()
+        );
+
+        int affectedRows = questionMapper.updateQuestionStatus(
+                target.getId(),
+                QuestionStatus.DISABLED
+        );
+
+        Map<String, Object> after = jdbcTemplate.queryForMap(
+                """
+                SELECT category, knowledge_point, difficulty,
+                       question_content, reference_answer, status
+                FROM question
+                WHERE id = ?
+                """,
+                target.getId()
+        );
+        Map<String, Object> scoringPoint = jdbcTemplate.queryForMap(
+                """
+                SELECT content, weight, sort_order, status
+                FROM question_scoring_point
+                WHERE question_id = ?
+                """,
+                target.getId()
+        );
+        assertAll(
+                () -> assertEquals(1, affectedRows),
+                () -> assertEquals(before.get("category"), after.get("category")),
+                () -> assertEquals(
+                        before.get("knowledge_point"),
+                        after.get("knowledge_point")
+                ),
+                () -> assertEquals(before.get("difficulty"), after.get("difficulty")),
+                () -> assertEquals(
+                        before.get("question_content"),
+                        after.get("question_content")
+                ),
+                () -> assertEquals(
+                        before.get("reference_answer"),
+                        after.get("reference_answer")
+                ),
+                () -> assertEquals("DISABLED", after.get("status")),
+                () -> assertEquals(
+                        QuestionStatus.ENABLED,
+                        questionMapper.getQuestionById(other.getId()).getStatus()
+                ),
+                () -> assertEquals(
+                        "状态修改不应影响的评分点",
+                        scoringPoint.get("content")
+                ),
+                () -> assertEquals(100, ((Number) scoringPoint.get("weight")).intValue()),
+                () -> assertEquals(1, ((Number) scoringPoint.get("sort_order")).intValue()),
+                () -> assertEquals("ENABLED", scoringPoint.get("status"))
+        );
+    }
+
+    @Test
+    void givenMissingQuestion_whenUpdatingStatus_thenAffectedRowsIsZero() {
+        int affectedRows = questionMapper.updateQuestionStatus(
+                Long.MAX_VALUE,
+                QuestionStatus.DISABLED
+        );
+
+        assertEquals(0, affectedRows);
+    }
+
+    @Test
+    void givenQuestionAlreadyInTargetStatus_whenUpdatingStatus_thenMatchedRowCountIsOne() {
+        Question question = insertQuestion(
+                "相同状态影响行数知识点",
+                QuestionStatus.ENABLED
+        );
+
+        int affectedRows = questionMapper.updateQuestionStatus(
+                question.getId(),
+                QuestionStatus.ENABLED
+        );
+
+        assertEquals(1, affectedRows);
+    }
+
     private Question insertQuestion(
             String knowledgePoint,
             QuestionStatus status

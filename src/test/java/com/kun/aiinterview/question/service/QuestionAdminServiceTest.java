@@ -4,6 +4,7 @@ import com.kun.aiinterview.common.exception.BusinessException;
 import com.kun.aiinterview.question.dto.CreateQuestionRequest;
 import com.kun.aiinterview.question.dto.ScoringPointRequest;
 import com.kun.aiinterview.question.dto.UpdateQuestionRequest;
+import com.kun.aiinterview.question.dto.UpdateQuestionStatusRequest;
 import com.kun.aiinterview.question.entity.Question;
 import com.kun.aiinterview.question.entity.QuestionScoringPoint;
 import com.kun.aiinterview.question.enums.QuestionCategory;
@@ -13,6 +14,8 @@ import com.kun.aiinterview.question.enums.QuestionPointType;
 import com.kun.aiinterview.question.enums.QuestionStatus;
 import com.kun.aiinterview.question.mapper.QuestionMapper;
 import com.kun.aiinterview.question.mapper.QuestionScoringPointMapper;
+import com.kun.aiinterview.question.vo.AdminQuestionDetailResponse;
+import com.kun.aiinterview.question.vo.AdminScoringPointDetail;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -380,6 +383,7 @@ class QuestionAdminServiceTest {
     void shouldStopWhenNoOldScoringPointWasDeleted() {
         UpdateQuestionRequest request = validUpdateRequest();
         when(questionMapper.getQuestionById(101L)).thenReturn(existingQuestion());
+        when(questionMapper.updateQuestion(any(Question.class))).thenReturn(1);
         when(questionScoringPointMapper.deleteByQuestionId(101L)).thenReturn(0);
 
         BusinessException exception = assertThrows(
@@ -396,6 +400,7 @@ class QuestionAdminServiceTest {
     void shouldRejectUnexpectedReplacementInsertCount() {
         UpdateQuestionRequest request = validUpdateRequest();
         when(questionMapper.getQuestionById(101L)).thenReturn(existingQuestion());
+        when(questionMapper.updateQuestion(any(Question.class))).thenReturn(1);
         when(questionScoringPointMapper.deleteByQuestionId(101L)).thenReturn(2);
         when(questionScoringPointMapper.batchInsert(anyList())).thenReturn(1);
 
@@ -405,6 +410,20 @@ class QuestionAdminServiceTest {
         );
 
         assertEquals("评分点更新失败", exception.getMessage());
+    }
+
+    @Test
+    void givenUnexpectedQuestionUpdateCount_whenUpdatingQuestion_thenStopsBeforeReplacingPoints() {
+        UpdateQuestionRequest request = validUpdateRequest();
+        when(questionMapper.getQuestionById(101L)).thenReturn(existingQuestion());
+        when(questionMapper.updateQuestion(any(Question.class))).thenReturn(0);
+
+        assertThrows(
+                BusinessException.class,
+                () -> questionAdminService.updateQuestion(101L, request)
+        );
+
+        verifyNoInteractions(questionScoringPointMapper);
     }
 
     @Test
@@ -448,6 +467,7 @@ class QuestionAdminServiceTest {
         ));
         when(questionMapper.getQuestionById(questionId))
                 .thenReturn(existingQuestion());
+        when(questionMapper.updateQuestion(any(Question.class))).thenReturn(1);
         when(questionScoringPointMapper.deleteByQuestionId(questionId))
                 .thenReturn(2);
         when(questionScoringPointMapper.batchInsert(anyList()))
@@ -510,6 +530,278 @@ class QuestionAdminServiceTest {
     }
 
     @Test
+    void givenExistingQuestionAndOrderedPoints_whenGettingDetail_thenAssemblesIndependentResponseVo() {
+        Question question = existingQuestion();
+        List<AdminScoringPointDetail> points = List.of(
+                scoringPointDetail(QuestionPointType.CORE, "核心结论", 60),
+                scoringPointDetail(QuestionPointType.INTERNAL, "内部原理", 40)
+        );
+        when(questionMapper.getQuestionById(101L)).thenReturn(question);
+        when(questionScoringPointMapper.selectDetailByQuestionId(101L))
+                .thenReturn(points);
+
+        AdminQuestionDetailResponse response =
+                questionAdminService.getQuestionScoringPointDetail(101L);
+
+        assertAll(
+                () -> assertEquals(101L, response.getId()),
+                () -> assertEquals(question.getCategory(), response.getCategory()),
+                () -> assertEquals(
+                        question.getKnowledgePoint(),
+                        response.getKnowledgePoint()
+                ),
+                () -> assertEquals(
+                        question.getDifficulty(),
+                        response.getDifficulty()
+                ),
+                () -> assertEquals(
+                        question.getQuestionContent(),
+                        response.getContent()
+                ),
+                () -> assertEquals(
+                        question.getReferenceAnswer(),
+                        response.getReferenceAnswer()
+                ),
+                () -> assertEquals(question.getStatus(), response.getStatus()),
+                () -> assertSame(points, response.getScoringPoints()),
+                () -> assertEquals(
+                        QuestionPointType.CORE,
+                        response.getScoringPoints().get(0).getPointType()
+                ),
+                () -> assertEquals(
+                        QuestionPointType.INTERNAL,
+                        response.getScoringPoints().get(1).getPointType()
+                )
+        );
+        InOrder mapperOrder = inOrder(
+                questionMapper,
+                questionScoringPointMapper
+        );
+        mapperOrder.verify(questionMapper).getQuestionById(101L);
+        mapperOrder.verify(questionScoringPointMapper)
+                .selectDetailByQuestionId(101L);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(longs = {0L, -1L})
+    void givenInvalidQuestionId_whenGettingDetail_thenRejectsBeforeMapperAccess(
+            Long questionId
+    ) {
+        assertThrows(
+                BusinessException.class,
+                () -> questionAdminService.getQuestionScoringPointDetail(
+                        questionId
+                )
+        );
+
+        verifyNoInteractions(questionMapper, questionScoringPointMapper);
+    }
+
+    @Test
+    void givenMissingQuestion_whenGettingDetail_thenDoesNotQueryScoringPoints() {
+        when(questionMapper.getQuestionById(404L)).thenReturn(null);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> questionAdminService.getQuestionScoringPointDetail(404L)
+        );
+
+        assertEquals("题目不存在", exception.getMessage());
+        verify(questionMapper).getQuestionById(404L);
+        verifyNoInteractions(questionScoringPointMapper);
+    }
+
+    @Test
+    void givenMapperEmptyScoringPointList_whenGettingDetail_thenReturnsEmptyList() {
+        when(questionMapper.getQuestionById(101L)).thenReturn(existingQuestion());
+        when(questionScoringPointMapper.selectDetailByQuestionId(101L))
+                .thenReturn(List.of());
+
+        AdminQuestionDetailResponse response =
+                questionAdminService.getQuestionScoringPointDetail(101L);
+
+        assertEquals(List.of(), response.getScoringPoints());
+    }
+
+    @Test
+    void givenMapperNullScoringPointList_whenGettingDetail_thenNormalizesToEmptyList() {
+        when(questionMapper.getQuestionById(101L)).thenReturn(existingQuestion());
+        when(questionScoringPointMapper.selectDetailByQuestionId(101L))
+                .thenReturn(null);
+
+        AdminQuestionDetailResponse response =
+                questionAdminService.getQuestionScoringPointDetail(101L);
+
+        assertEquals(List.of(), response.getScoringPoints());
+    }
+
+    @Test
+    void givenEnabledQuestion_whenDisabling_thenUpdatesOnlyQuestionMapper() {
+        Question question = existingQuestion();
+        question.setStatus(QuestionStatus.ENABLED);
+        when(questionMapper.getQuestionById(101L)).thenReturn(question);
+        when(questionMapper.updateQuestionStatus(
+                101L,
+                QuestionStatus.DISABLED
+        )).thenReturn(1);
+
+        questionAdminService.updateQuestionStatus(
+                101L,
+                statusRequest(QuestionStatus.DISABLED)
+        );
+
+        InOrder mapperOrder = inOrder(questionMapper);
+        mapperOrder.verify(questionMapper).getQuestionById(101L);
+        mapperOrder.verify(questionMapper).updateQuestionStatus(
+                101L,
+                QuestionStatus.DISABLED
+        );
+        verifyNoInteractions(questionScoringPointMapper);
+    }
+
+    @Test
+    void givenDisabledQuestion_whenEnabling_thenUpdatesOnlyQuestionMapper() {
+        when(questionMapper.getQuestionById(101L)).thenReturn(existingQuestion());
+        when(questionMapper.updateQuestionStatus(
+                101L,
+                QuestionStatus.ENABLED
+        )).thenReturn(1);
+
+        questionAdminService.updateQuestionStatus(
+                101L,
+                statusRequest(QuestionStatus.ENABLED)
+        );
+
+        verify(questionMapper).updateQuestionStatus(
+                101L,
+                QuestionStatus.ENABLED
+        );
+        verifyNoInteractions(questionScoringPointMapper);
+    }
+
+    @Test
+    void givenQuestionAlreadyInTargetStatus_whenUpdatingStatus_thenReturnsWithoutUpdate() {
+        when(questionMapper.getQuestionById(101L)).thenReturn(existingQuestion());
+
+        questionAdminService.updateQuestionStatus(
+                101L,
+                statusRequest(QuestionStatus.DISABLED)
+        );
+
+        verify(questionMapper).getQuestionById(101L);
+        verify(questionMapper, never()).updateQuestionStatus(
+                any(),
+                any()
+        );
+        verifyNoInteractions(questionScoringPointMapper);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(longs = {0L, -1L})
+    void givenInvalidQuestionId_whenUpdatingStatus_thenRejectsBeforeMapperAccess(
+            Long questionId
+    ) {
+        assertThrows(
+                BusinessException.class,
+                () -> questionAdminService.updateQuestionStatus(
+                        questionId,
+                        statusRequest(QuestionStatus.DISABLED)
+                )
+        );
+
+        verifyNoInteractions(questionMapper, questionScoringPointMapper);
+    }
+
+    @Test
+    void givenNullStatusRequest_whenUpdatingStatus_thenRejectsBeforeMapperAccess() {
+        assertThrows(
+                BusinessException.class,
+                () -> questionAdminService.updateQuestionStatus(101L, null)
+        );
+
+        verifyNoInteractions(questionMapper, questionScoringPointMapper);
+    }
+
+    @Test
+    void givenNullTargetStatus_whenUpdatingStatus_thenRejectsBeforeMapperAccess() {
+        assertThrows(
+                BusinessException.class,
+                () -> questionAdminService.updateQuestionStatus(
+                        101L,
+                        statusRequest(null)
+                )
+        );
+
+        verifyNoInteractions(questionMapper, questionScoringPointMapper);
+    }
+
+    @Test
+    void givenMissingQuestion_whenUpdatingStatus_thenDoesNotExecuteUpdate() {
+        when(questionMapper.getQuestionById(404L)).thenReturn(null);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> questionAdminService.updateQuestionStatus(
+                        404L,
+                        statusRequest(QuestionStatus.DISABLED)
+                )
+        );
+
+        assertEquals("题目不存在", exception.getMessage());
+        verify(questionMapper).getQuestionById(404L);
+        verify(questionMapper, never()).updateQuestionStatus(any(), any());
+        verifyNoInteractions(questionScoringPointMapper);
+    }
+
+    @Test
+    void givenDatabaseFailure_whenUpdatingStatus_thenPropagatesOriginalException() {
+        Question question = existingQuestion();
+        question.setStatus(QuestionStatus.ENABLED);
+        DataAccessResourceFailureException databaseException =
+                new DataAccessResourceFailureException("database unavailable");
+        when(questionMapper.getQuestionById(101L)).thenReturn(question);
+        when(questionMapper.updateQuestionStatus(
+                101L,
+                QuestionStatus.DISABLED
+        )).thenThrow(databaseException);
+
+        DataAccessResourceFailureException thrown = assertThrows(
+                DataAccessResourceFailureException.class,
+                () -> questionAdminService.updateQuestionStatus(
+                        101L,
+                        statusRequest(QuestionStatus.DISABLED)
+                )
+        );
+
+        assertSame(databaseException, thrown);
+        verifyNoInteractions(questionScoringPointMapper);
+    }
+
+    @Test
+    void givenUnexpectedAffectedRows_whenUpdatingStatus_thenRejectsResult() {
+        Question question = existingQuestion();
+        question.setStatus(QuestionStatus.ENABLED);
+        when(questionMapper.getQuestionById(101L)).thenReturn(question);
+        when(questionMapper.updateQuestionStatus(
+                101L,
+                QuestionStatus.DISABLED
+        )).thenReturn(0);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> questionAdminService.updateQuestionStatus(
+                        101L,
+                        statusRequest(QuestionStatus.DISABLED)
+                )
+        );
+
+        assertEquals("状态更改失败", exception.getMessage());
+        verifyNoInteractions(questionScoringPointMapper);
+    }
+
+    @Test
     void shouldDeclareCreateQuestionAsTransactional() throws Exception {
         Method method = QuestionAdminService.class.getMethod(
                 "createQuestion",
@@ -525,6 +817,30 @@ class QuestionAdminServiceTest {
                 "updateQuestion",
                 Long.class,
                 UpdateQuestionRequest.class
+        );
+
+        assertTrue(method.isAnnotationPresent(Transactional.class));
+    }
+
+    @Test
+    void givenDetailMethod_whenInspectingTransaction_thenItIsReadOnly() throws Exception {
+        Method method = QuestionAdminService.class.getMethod(
+                "getQuestionScoringPointDetail",
+                Long.class
+        );
+
+        Transactional transactional =
+                method.getAnnotation(Transactional.class);
+        assertTrue(transactional != null && transactional.readOnly());
+    }
+
+    @Test
+    void givenStatusMethod_whenInspectingTransaction_thenItIsTransactional()
+            throws Exception {
+        Method method = QuestionAdminService.class.getMethod(
+                "updateQuestionStatus",
+                Long.class,
+                UpdateQuestionStatusRequest.class
         );
 
         assertTrue(method.isAnnotationPresent(Transactional.class));
@@ -586,6 +902,24 @@ class QuestionAdminServiceTest {
                 .questionContent("原题目")
                 .referenceAnswer("原答案")
                 .status(QuestionStatus.DISABLED)
+                .build();
+    }
+
+    private AdminScoringPointDetail scoringPointDetail(
+            QuestionPointType pointType,
+            String content,
+            int weight
+    ) {
+        return AdminScoringPointDetail.builder()
+                .pointType(pointType)
+                .content(content)
+                .weight(weight)
+                .build();
+    }
+
+    private UpdateQuestionStatusRequest statusRequest(QuestionStatus status) {
+        return UpdateQuestionStatusRequest.builder()
+                .status(status)
                 .build();
     }
 

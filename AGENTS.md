@@ -312,40 +312,48 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-管理员题库管理第二阶段：修改题目及评分点
+管理员题库管理第四阶段：题目详情与启停管理
 ```
 
-The implementation, Codex code review, and comprehensive test synchronization are complete. The working-tree implementation is ready for the developer's final staged-diff review and GitHub submission.
+Development implementation, the first Codex review, production corrections, test synchronization, and full regression verification are complete. The working tree is ready for the developer's final staged-diff review and GitHub submission.
 
-Completed in this stage:
+Question-management stage record:
 
-* `PUT /api/admin/questions/{questionId}`
-* Access restricted to users with the `ADMIN` role through the existing Spring Security rule for `/api/admin/**`
-* `questionId` comes only from the path variable and must be a positive value
-* `UpdateQuestionRequest` accepts only editable question fields and a scoring-point list
-* Internal IDs, statuses, ordering, and time fields remain under backend control
-* The scoring-point list must not be empty, each element is validated, each weight must be between 1 and 100, and the total weight must equal 100
-* The service queries the question before updating it and reports a business error when the question does not exist
-* The question update changes only category, knowledge point, difficulty, question content, and reference answer
-* The question status is preserved, and `updated_at` remains database-managed
-* Scoring points use the whole-replacement strategy: delete all old points, rebuild from request order, and batch-insert all replacements
-* The backend generates `sortOrder` from 1 and fixes every replacement scoring-point status to `QuestionPointStatus.ENABLED`
-* Deleting zero old scoring points is treated as a business failure under the current strict data-consistency rule
-* The replacement batch-insert count must equal the new scoring-point list size
-* The question update, old scoring-point deletion, and replacement insertion run in one public Service transaction
-* Runtime failures roll back both the question update and the deletion of old scoring points
-* The success response uses the existing `Result<Void>` structure and does not expose a complete `Question` entity
-* Real MyBatis tests cover question querying and updating, scoring-point deletion, and replacement insertion
-* Service tests cover parameter validation, affected-row checks, exception propagation, entity construction, and Mapper call order
-* A Spring transaction integration test verifies that the original question and both old scoring points are restored when replacement insertion fails
-* MockMvc and full integration tests cover HTTP 401, HTTP 403, invalid administrator requests, successful administrator updates, status preservation, replacement ordering, and isolation from other questions
+1. First stage: administrator question and scoring-point creation — completed.
+2. Second stage: administrator question update and whole replacement of scoring points — completed. `QuestionAdminService.updateQuestion()` now requires `questionMapper.updateQuestion()` to affect exactly one row before replacing scoring points.
+3. Third stage: administrator question pagination — completed.
+4. Fourth stage: administrator question detail and question-status update — completed and verified.
 
-Previously completed question-management capability remains unchanged:
+Fourth-stage completed capability:
 
-* `POST /api/admin/questions`
-* Question creation and scoring-point creation remain in one transaction
-* New question and scoring-point statuses remain fixed to `ENABLED`
-* Question creation still uses generated-key population, backend-generated scoring-point order, and affected-row checks
+* `GET /api/admin/questions/{questionId}`
+* `PUT /api/admin/questions/{questionId}/status`
+* Detail queries load the question and its scoring points separately using the same path `questionId`; there is one question query and one scoring-point query, with no N+1 behavior.
+* Scoring points are queried with `WHERE question_id = #{questionId}` and `ORDER BY sort_order ASC`.
+* MyBatis maps multiple scoring-point rows directly into a scoring-point detail VO list.
+* The detail response is an independent VO and does not expose scoring-point primary keys, scoring-point `questionId`, or scoring-point database timestamps.
+* A question-status update modifies only `question.status`.
+* Repeating a request for the current question status succeeds idempotently without issuing an update.
+* Scoring points are not enabled or disabled through this endpoint.
+* A question-status update must not change scoring-point content, order, status, or weight.
+* The scoring-point weight total of 100 remains enforced by question creation and whole-replacement flows.
+* Existing `/api/admin/**` security rules apply: no token returns HTTP 401 with the project JSON structure, a current database `USER` returns HTTP 403, and a current database `ADMIN` is allowed.
+
+First-review corrections completed:
+
+* The invalid trailing comma was removed from `selectDetailByQuestionId`; the real MySQL query now succeeds.
+* `QuestionAdminService.updateQuestionStatus()` now rejects only a missing status at the Service boundary. `QuestionStatus` itself limits JSON values to `ENABLED` and `DISABLED`.
+* `QuestionAdminService.updateQuestion()` now requires exactly one affected question row and stops before deleting scoring points when the update count is invalid.
+* The scoring-point detail VO no longer exposes or mis-models scoring-point status; it contains only `pointType`, `content`, and `weight`.
+
+Fourth-stage synchronized test scope and current result:
+
+* Real MyBatis/MySQL tests cover scoring-point multi-row mapping, enum mapping, ascending order, question isolation, empty-list behavior, single-column question-status updates, preservation of other question fields and scoring points, missing IDs, and matched-row semantics.
+* Service tests cover detail assembly and order, invalid and missing questions, empty scoring-point lists, both status transitions, idempotency, null input, exceptions, affected-row checks, mapper isolation, and transaction annotations.
+* MockMvc tests cover HTTP 401, HTTP 403, valid administrator access, invalid path IDs, missing/null/unknown status bodies, unified JSON responses, and controller-to-service parameter forwarding.
+* Full integration tests use the real Spring Security filter chain, JWT, service, MyBatis, and MySQL for detail responses, status persistence/isolation/idempotency, and authorization.
+* Related-test command result after corrections: 91 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
+* Full `mvn test` result on 2026-07-25 after corrections: 245 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
 
 Existing fixed authentication decisions remain unchanged:
 
@@ -398,12 +406,14 @@ Existing fixed password-change decisions remain unchanged:
 Next development stage:
 
 ```text
-待当前阶段提交后由开发者明确
+待当前阶段提交后由开发者明确；推荐进入知识库模块
 ```
+
+The question-management MVP is complete. After the developer's final review and submission, the recommended next core stage is the knowledge-base module.
 
 Until the developer explicitly defines the next stage, do not automatically implement:
 
-* Question pagination, question detail queries, enable, disable, or delete operations
+* Question deletion or batch enable/disable operations
 * Interview sessions
 * Answer submission or evaluation
 * RAG

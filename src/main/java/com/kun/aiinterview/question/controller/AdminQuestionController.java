@@ -4,7 +4,9 @@ import com.kun.aiinterview.common.response.Result;
 import com.kun.aiinterview.question.dto.CreateQuestionRequest;
 import com.kun.aiinterview.question.dto.QuestionPageQuery;
 import com.kun.aiinterview.question.dto.UpdateQuestionRequest;
+import com.kun.aiinterview.question.dto.UpdateQuestionStatusRequest;
 import com.kun.aiinterview.question.service.QuestionAdminService;
+import com.kun.aiinterview.question.vo.AdminQuestionDetailResponse;
 import com.kun.aiinterview.question.vo.AdminQuestionPageResponse;
 import com.kun.aiinterview.question.vo.CreateQuestionResponse;
 import jakarta.validation.Valid;
@@ -45,5 +47,23 @@ public class AdminQuestionController {
         AdminQuestionPageResponse response = questionAdminService.getQuestionPage(query);
 
         return Result.success(response);
+    }
+
+    @GetMapping("/{questionId}")
+    public Result<AdminQuestionDetailResponse> getQuestionDetail(
+            @PathVariable Long questionId
+    ){
+        return Result.success(
+                questionAdminService.getQuestionScoringPointDetail(questionId)
+        );
+    }
+
+    @PutMapping("/{questionId}/status")
+    public Result<Void> updateQuestionStatus(
+            @PathVariable Long questionId,
+            @Valid @RequestBody UpdateQuestionStatusRequest request
+    ){
+        questionAdminService.updateQuestionStatus(questionId, request);
+        return Result.success();
     }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.question.dto.CreateQuestionRequest;
 import com.kun.aiinterview.question.dto.ScoringPointRequest;
 import com.kun.aiinterview.question.dto.UpdateQuestionRequest;
+import com.kun.aiinterview.question.dto.UpdateQuestionStatusRequest;
 import com.kun.aiinterview.question.enums.QuestionCategory;
 import com.kun.aiinterview.question.enums.QuestionDifficulty;
 import com.kun.aiinterview.question.enums.QuestionPointStatus;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -331,6 +333,185 @@ class AdminQuestionControllerIntegrationTest {
                         )))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(403));
+    }
+
+    @Test
+    void givenAdminAndPersistedQuestion_whenGettingDetail_thenReturnsCompleteOrderedResponse()
+            throws Exception {
+        User admin = createAdmin();
+        Long questionId = insertQuestion(
+                "detail-target",
+                QuestionStatus.ENABLED
+        );
+        insertTargetOldScoringPoints(questionId);
+
+        mockMvc.perform(get("/api/admin/questions/{questionId}", questionId)
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer " + accessToken(admin)
+                        ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.id").value(questionId))
+                .andExpect(jsonPath("$.data.category")
+                        .value("JAVA_COLLECTION"))
+                .andExpect(jsonPath("$.data.knowledgePoint")
+                        .value("detail-target-原知识点"))
+                .andExpect(jsonPath("$.data.difficulty").value("MEDIUM"))
+                .andExpect(jsonPath("$.data.content")
+                        .value("detail-target-原题目内容"))
+                .andExpect(jsonPath("$.data.referenceAnswer")
+                        .value("detail-target-原参考答案"))
+                .andExpect(jsonPath("$.data.status").value("ENABLED"))
+                .andExpect(jsonPath("$.data.createdAt").isNotEmpty())
+                .andExpect(jsonPath("$.data.updatedAt").isNotEmpty())
+                .andExpect(jsonPath("$.data.scoringPoints.length()").value(2))
+                .andExpect(jsonPath("$.data.scoringPoints[0].pointType")
+                        .value("CORE"))
+                .andExpect(jsonPath("$.data.scoringPoints[0].content")
+                        .value("目标旧评分点一"))
+                .andExpect(jsonPath("$.data.scoringPoints[0].weight")
+                        .value(60))
+                .andExpect(jsonPath("$.data.scoringPoints[1].pointType")
+                        .value("KEY"))
+                .andExpect(jsonPath("$.data.scoringPoints[1].content")
+                        .value("目标旧评分点二"))
+                .andExpect(jsonPath("$.data.scoringPoints[1].weight")
+                        .value(40))
+                .andExpect(jsonPath("$.data.scoringPoints[0].id")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.data.scoringPoints[0].questionId")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.data.scoringPoints[0].createdAt")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.data.scoringPoints[0].updatedAt")
+                        .doesNotExist());
+    }
+
+    @Test
+    void givenAdminAndMissingQuestion_whenGettingDetail_thenReturnsBusinessError()
+            throws Exception {
+        User admin = createAdmin();
+
+        mockMvc.perform(get("/api/admin/questions/{questionId}", Long.MAX_VALUE)
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer " + accessToken(admin)
+                        ))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("题目不存在"));
+    }
+
+    @Test
+    void givenAdminAndPersistedQuestion_whenChangingAndRepeatingStatus_thenOnlyStatusChanges()
+            throws Exception {
+        User admin = createAdmin();
+        Long questionId = insertQuestion(
+                "status-target",
+                QuestionStatus.ENABLED
+        );
+        insertTargetOldScoringPoints(questionId);
+        Map<String, Object> questionBefore = questionRow(questionId);
+        List<Map<String, Object>> pointsBefore = scoringPointRows(questionId);
+        UpdateQuestionStatusRequest request =
+                UpdateQuestionStatusRequest.builder()
+                        .status(QuestionStatus.DISABLED)
+                        .build();
+
+        mockMvc.perform(put(
+                        "/api/admin/questions/{questionId}/status",
+                        questionId
+                )
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer " + accessToken(admin)
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data").isEmpty());
+
+        Map<String, Object> questionAfter = questionRow(questionId);
+        List<Map<String, Object>> pointsAfter = scoringPointRows(questionId);
+        assertAll(
+                () -> assertEquals(
+                        questionBefore.get("category"),
+                        questionAfter.get("category")
+                ),
+                () -> assertEquals(
+                        questionBefore.get("knowledge_point"),
+                        questionAfter.get("knowledge_point")
+                ),
+                () -> assertEquals(
+                        questionBefore.get("difficulty"),
+                        questionAfter.get("difficulty")
+                ),
+                () -> assertEquals(
+                        questionBefore.get("question_content"),
+                        questionAfter.get("question_content")
+                ),
+                () -> assertEquals(
+                        questionBefore.get("reference_answer"),
+                        questionAfter.get("reference_answer")
+                ),
+                () -> assertEquals("DISABLED", questionAfter.get("status")),
+                () -> assertEquals(pointsBefore, pointsAfter)
+        );
+
+        mockMvc.perform(put(
+                        "/api/admin/questions/{questionId}/status",
+                        questionId
+                )
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer " + accessToken(admin)
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        assertEquals("DISABLED", questionRow(questionId).get("status"));
+        assertEquals(pointsBefore, scoringPointRows(questionId));
+    }
+
+    @Test
+    void givenDatabaseUser_whenUsingFourthStageEndpoints_thenBothReturnForbidden()
+            throws Exception {
+        User user = createUser(UserRole.USER);
+        String token = accessToken(user);
+
+        mockMvc.perform(get("/api/admin/questions/1")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer " + token
+                        ))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+        mockMvc.perform(put("/api/admin/questions/1/status")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer " + token
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"DISABLED\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+    }
+
+    @Test
+    void givenNoToken_whenUsingFourthStageEndpoints_thenBothReturnUnauthorized()
+            throws Exception {
+        mockMvc.perform(get("/api/admin/questions/1"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401));
+        mockMvc.perform(put("/api/admin/questions/1/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"DISABLED\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401));
     }
 
     private User createAdmin() {

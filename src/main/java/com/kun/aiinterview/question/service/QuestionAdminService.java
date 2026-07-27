@@ -1,18 +1,17 @@
 package com.kun.aiinterview.question.service;
 
 import com.kun.aiinterview.common.exception.BusinessException;
-import com.kun.aiinterview.question.dto.CreateQuestionRequest;
-import com.kun.aiinterview.question.dto.QuestionPageQuery;
-import com.kun.aiinterview.question.dto.ScoringPointRequest;
-import com.kun.aiinterview.question.dto.UpdateQuestionRequest;
+import com.kun.aiinterview.question.dto.*;
 import com.kun.aiinterview.question.entity.Question;
 import com.kun.aiinterview.question.entity.QuestionScoringPoint;
 import com.kun.aiinterview.question.enums.QuestionPointStatus;
 import com.kun.aiinterview.question.enums.QuestionStatus;
 import com.kun.aiinterview.question.mapper.QuestionMapper;
 import com.kun.aiinterview.question.mapper.QuestionScoringPointMapper;
+import com.kun.aiinterview.question.vo.AdminQuestionDetailResponse;
 import com.kun.aiinterview.question.vo.AdminQuestionListItem;
 import com.kun.aiinterview.question.vo.AdminQuestionPageResponse;
+import com.kun.aiinterview.question.vo.AdminScoringPointDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -147,7 +146,11 @@ public class QuestionAdminService {
                 .referenceAnswer(request.getReferenceAnswer())
                 .build();
 
-        questionMapper.updateQuestion(question);
+        int updateRows = questionMapper.updateQuestion(question);
+
+        if (updateRows != 1) {
+            throw new BusinessException("题目更新失败");
+        }
 
         int deleteRows = questionScoringPointMapper.deleteByQuestionId(questionId);
 
@@ -249,5 +252,73 @@ public class QuestionAdminService {
                 .pageSize(pageSize)
                 .total(total)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public AdminQuestionDetailResponse getQuestionScoringPointDetail(Long questionId){
+        if(questionId == null || questionId <= 0){
+            throw new BusinessException("题目ID不合法");
+        }
+
+        Question question = questionMapper.getQuestionById(questionId);
+
+        if(question == null){
+            throw new BusinessException("题目不存在");
+        }
+
+        List<AdminScoringPointDetail> scoringPoints = questionScoringPointMapper.selectDetailByQuestionId(questionId);
+
+        if(scoringPoints == null || scoringPoints.size() == 0){
+            scoringPoints = List.of();
+        }
+
+        return   AdminQuestionDetailResponse.builder()
+                .id(questionId)
+                .category(question.getCategory())
+                .content(question.getQuestionContent())
+                .difficulty(question.getDifficulty())
+                .knowledgePoint(question.getKnowledgePoint())
+                .referenceAnswer(question.getReferenceAnswer())
+                .status(question.getStatus())
+                .createdAt(question.getCreatedAt())
+                .updatedAt(question.getUpdatedAt())
+                .scoringPoints(scoringPoints)
+                .build();
+
+    }
+
+    @Transactional
+    public void updateQuestionStatus(
+            Long questionId,
+            UpdateQuestionStatusRequest request
+    ){
+        if(questionId == null || questionId <= 0){
+            throw new BusinessException("题目ID不合法");
+        }
+
+        if(request == null){
+            throw new BusinessException("更改状态不能为空");
+        }
+
+        if (request.getStatus() == null) {
+            throw new BusinessException("题目状态不能为空");
+        }
+
+        Question question = questionMapper.getQuestionById(questionId);
+
+        if(question == null){
+            throw new BusinessException("题目不存在");
+        }
+
+        if(question.getStatus() == request.getStatus()){
+            return;
+        }
+
+
+        int affectRows = questionMapper.updateQuestionStatus(questionId, request.getStatus());
+
+        if(affectRows != 1 ){
+            throw new BusinessException("状态更改失败");
+        }
     }
 }

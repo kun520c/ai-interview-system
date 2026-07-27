@@ -101,4 +101,10 @@
         LIMIT #{pageSize}
         OFFSET #{offset}
     </select>
+
+    <update id = "updateQuestionStatus">
+        UPDATE question
+        SET status = #{status}
+        WHERE id = #{questionId}
+    </update>
 </mapper>

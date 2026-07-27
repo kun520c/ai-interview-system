@@ -35,4 +35,13 @@
         DELETE FROM question_scoring_point
         WHERE question_id = #{questionId}
     </delete>
+
+    <select id = "selectDetailByQuestionId" resultType = "com.kun.aiinterview.question.vo.AdminScoringPointDetail">
+        SELECT  point_type,
+                content,
+                weight
+        FROM question_scoring_point
+        WHERE question_id = #{questionId}
+        ORDER BY sort_order ASC
+    </select>
 </mapper>

@@ -1,6 +1,7 @@
 package com.kun.aiinterview.question.mapper;
 
 import com.kun.aiinterview.question.entity.QuestionScoringPoint;
+import com.kun.aiinterview.question.vo.AdminScoringPointDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -14,4 +15,8 @@ public interface QuestionScoringPointMapper {
     );
 
     int deleteByQuestionId(@Param("questionId") Long questionId);
+
+    List<AdminScoringPointDetail> selectDetailByQuestionId(
+            @Param("questionId") Long questionId
+    );
 }

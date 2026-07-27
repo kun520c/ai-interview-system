@@ -5,6 +5,7 @@ import com.kun.aiinterview.question.enums.QuestionCategory;
 import com.kun.aiinterview.question.enums.QuestionDifficulty;
 import com.kun.aiinterview.question.enums.QuestionPointStatus;
 import com.kun.aiinterview.question.enums.QuestionPointType;
+import com.kun.aiinterview.question.vo.AdminScoringPointDetail;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -173,6 +174,68 @@ class QuestionScoringPointMapperTest {
                 questionScoringPointMapper.deleteByQuestionId(questionId);
 
         assertEquals(0, deletedRows);
+    }
+
+    @Test
+    void givenMultipleQuestionsAndUnorderedPoints_whenSelectingDetail_thenMapsOnlyTargetInSortOrder() {
+        Long targetQuestionId = insertParentQuestion();
+        Long otherQuestionId = insertParentQuestion();
+        questionScoringPointMapper.batchInsert(List.of(
+                scoringPoint(
+                        targetQuestionId,
+                        QuestionPointType.ADVANCED,
+                        "第二个评分点",
+                        40,
+                        2
+                ),
+                scoringPoint(
+                        targetQuestionId,
+                        QuestionPointType.CORE,
+                        "第一个评分点",
+                        60,
+                        1
+                ),
+                scoringPoint(
+                        otherQuestionId,
+                        QuestionPointType.KEY,
+                        "其他题目的评分点",
+                        100,
+                        1
+                )
+        ));
+
+        List<AdminScoringPointDetail> details =
+                questionScoringPointMapper.selectDetailByQuestionId(
+                        targetQuestionId
+                );
+
+        assertAll(
+                () -> assertNotNull(details),
+                () -> assertEquals(2, details.size()),
+                () -> assertEquals(
+                        QuestionPointType.CORE,
+                        details.get(0).getPointType()
+                ),
+                () -> assertEquals("第一个评分点", details.get(0).getContent()),
+                () -> assertEquals(60, details.get(0).getWeight()),
+                () -> assertEquals(
+                        QuestionPointType.ADVANCED,
+                        details.get(1).getPointType()
+                ),
+                () -> assertEquals("第二个评分点", details.get(1).getContent()),
+                () -> assertEquals(40, details.get(1).getWeight())
+        );
+    }
+
+    @Test
+    void givenQuestionWithoutScoringPoints_whenSelectingDetail_thenReturnsEmptyList() {
+        Long questionId = insertParentQuestion();
+
+        List<AdminScoringPointDetail> details =
+                questionScoringPointMapper.selectDetailByQuestionId(questionId);
+
+        assertNotNull(details);
+        assertEquals(List.of(), details);
     }
 
     private Long insertParentQuestion() {

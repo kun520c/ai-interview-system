@@ -2,6 +2,7 @@ package com.kun.aiinterview.question.mapper;
 
 import com.kun.aiinterview.question.dto.QuestionPageQuery;
 import com.kun.aiinterview.question.entity.Question;
+import com.kun.aiinterview.question.enums.QuestionStatus;
 import com.kun.aiinterview.question.vo.AdminQuestionListItem;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -22,5 +23,10 @@ public interface QuestionMapper {
             @Param("query")QuestionPageQuery query,
             @Param("offset") Long offset,
             @Param("pageSize") int pageSize
+            );
+
+    int updateQuestionStatus(
+            @Param("questionId") Long questionId,
+            @Param("status")QuestionStatus status
             );
 }
