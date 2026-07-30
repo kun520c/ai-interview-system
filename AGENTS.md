@@ -312,10 +312,10 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-知识库模块第一阶段：管理员上传知识文档并保存原文元数据
+知识库模块第二阶段 A：可独立测试的文本切片器
 ```
 
-The implementation, first Codex production review, production corrections, focused-test synchronization, and full regression verification were completed on 2026-07-27. The working tree is ready for the developer's final diff review and submission.
+The implementation, Codex production review, production corrections, focused unit tests, and full regression verification were completed on 2026-07-30. The working tree is ready for the developer's second review and submission.
 
 Question-management MVP record:
 
@@ -340,7 +340,31 @@ Knowledge-base first-stage completed capability:
 * An independent response VO that does not expose content, content hash, or error details
 * Existing `/api/admin/**` authorization: no token is HTTP 401 and a current database `USER` is HTTP 403
 
+Knowledge-base second-stage A completed capability:
+
+* A reusable, stateless Spring `@Component` named `KnowledgeTextChunker` accepts normalized document content as a `String`.
+* The component returns an in-memory `List<KnowledgeChunkDraft>`; each draft contains only `chunkIndex`, `content`, and `characterCount`.
+* Chunk indexes start at 1 and increase continuously.
+* `MAX_CHUNK_CHARACTERS = 1200`, `OVERLAP_CHARACTERS = 150`, and `MIN_NATURAL_BOUNDARY_DISTANCE = 800`.
+* Natural boundaries are considered only from character 800 onward in each maximum 1200-character window.
+* Boundary priority is paragraph (`\n\n`), ordinary newline (`\n`), supported sentence terminators, then a maximum-length hard cut.
+* Supported sentence terminators are Chinese `。！？；` and English `.!?;`; the terminator remains in the preceding chunk.
+* Paragraph-boundary lookup is restricted so a `\n\n` delimiter cannot extend beyond the current hard-end window.
+* When no natural boundary exists, hard cutting still advances safely and the final chunk may be shorter than 1200 characters.
+* Adjacent chunks retain overlap; an English overlap start is moved forward to whitespace when practical to avoid starting in the middle of a word.
+* If no whitespace exists, including long Chinese content or an overlong English word, the overlap candidate is used as a stable fallback.
+* Defensive progress checks prevent a non-advancing chunk loop.
+* Each final chunk uses `strip()`; empty stripped slices are not returned, and `characterCount` is calculated from the stripped content.
+* `characterCount` is Java `String.length()` (UTF-16 code-unit count), not a tokenizer or model token count.
+* The result is not written to `knowledge_chunk`, does not update `knowledge_document.processing_status`, and does not generate vectors or embedding metadata.
+
+Second-stage A production-review corrections completed:
+
+* Corrected the chunk-append condition so non-empty chunks are added and stripped empty slices are skipped.
+* Corrected paragraph-boundary lookup so `\n\n` cannot be matched across `hardEnd`.
+* Corrected the blank-content business message from `带切片` to `待切片`.
 First-review production corrections completed:
+
 
 * `UploadKnowledgeDocumentRequest` now uses type-compatible validation: `@NotNull` for the multipart file and category, `@NotBlank` for title, and database-aligned length limits for title and source.
 * `KnowledgeDocumentMapper.xml` now supplies all ten INSERT values, including `#{fileType}`, while retaining generated-key population.
@@ -362,9 +386,12 @@ Synchronized test scope and current result:
 * MockMvc tests execute multipart binding and the real security filter chain with a mocked Service, covering HTTP 401, HTTP 403, administrator access, invalid form fields, DTO forwarding, unified `Result`, and safe response fields.
 * Full integration tests execute real Spring Security, JWT, Controller, Service, MyBatis XML, and MySQL, and verify database row counts and intended stored values.
 * `.\mvnw.cmd -B -ntp -DskipTests compile`: `BUILD SUCCESS`.
-* Knowledge-related tests: 62 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
-* Full `.\mvnw.cmd -B -ntp test`: 307 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
-* All 245 pre-existing authentication, user, security, and question-management regression tests passed.
+* Text-chunker tests use the public `split()` method only: 17 test methods and 27 executed cases, including 12 parameterized cases, with no reflection, database, or Spring context.
+* Text-chunker coverage includes blank validation, short and stripped content, exact and over-limit lengths, hard cuts, boundary priority, all eight sentence terminators, overlap and full-source coverage, English word starts, overlong words, Chinese without spaces, deterministic independent results, and concurrent singleton calls.
+* `.\mvnw.cmd -B -ntp -Dtest=KnowledgeTextChunkerTest test`: 27 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
+* Knowledge-related tests: 89 tests run, 0 failures, 0 errors, 0 skipped.
+* Full `.\mvnw.cmd -B -ntp test`: 334 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
+* All 307 tests from the previous-stage baseline passed unchanged.
 
 Existing fixed authentication decisions remain unchanged:
 
@@ -417,20 +444,27 @@ Existing fixed password-change decisions remain unchanged:
 Next development stage:
 
 ```text
-建议：知识库模块第二阶段：文档处理、切片与处理状态管理
+知识库模块第二阶段 B：
+Embedding模型选型、向量生成与文档处理流水线设计
 ```
 
-The first stage is ready for the developer's final review and submission. Do not start the suggested second stage until the developer explicitly authorizes it.
+Second-stage A is ready for the developer's second review and submission. Do not start second-stage B until the developer explicitly authorizes it.
 
 The following capabilities are not implemented in the current stage:
 
-* Document chunking
+* Tokenizer integration
+* Real model token-count calculation
 * Embedding generation
-* Vector-database insertion
-* Milvus integration
-* RAG retrieval
-* Document processing-status advancement
+* `vectorId` or other vector metadata
+* Milvus or another vector database
+* Vector insertion
+* `knowledge_chunk` database insertion
+* `knowledge_document.processing_status` advancement from `UPLOADED` to `PROCESSING` or `READY`
+* `FAILED` status handling and error recovery
 * Document reprocessing
+* RAG retrieval
+* Markdown-heading-aware or code-block-aware chunking
+* Semantic chunking
 * Knowledge-document pagination, detail, or enable/disable management
 * Mandatory rejection of duplicate content
 
