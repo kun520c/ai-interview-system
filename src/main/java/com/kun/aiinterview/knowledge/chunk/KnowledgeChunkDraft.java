@@ -1,16 +1,11 @@
 package com.kun.aiinterview.knowledge.chunk;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
-public class KnowledgeChunkDraft {
-    private final int chunkIndex;
+public record KnowledgeChunkDraft(
+    int chunkIndex,
 
-    private final String content;
+    String content,
 
-    private final int characterCount;
-
-
+    int characterCount
+){
 }

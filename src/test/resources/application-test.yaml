@@ -2,3 +2,13 @@ jwt:
   secret: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
   issuer: ai-interview-system-test
   access-token-expiration: 2h
+
+embedding:
+  base-url: http://localhost:18080/v1
+  api-key: test-embedding-api-key
+  model: qwen3.7-text-embedding
+  dimension: 1024
+  batch-size: 20
+  profile-version: qwen3.7-text-embedding-1024-dense-v1
+  connect-timeout: 3s
+  read-timeout: 20s

@@ -40,9 +40,9 @@ class KnowledgeTextChunkerTest {
         List<KnowledgeChunkDraft> chunks = knowledgeTextChunker.split(content);
 
         assertThat(chunks).hasSize(1);
-        assertThat(chunks.getFirst().getChunkIndex()).isEqualTo(1);
-        assertThat(chunks.getFirst().getContent()).isEqualTo(content);
-        assertThat(chunks.getFirst().getCharacterCount())
+        assertThat(chunks.getFirst().chunkIndex()).isEqualTo(1);
+        assertThat(chunks.getFirst().content()).isEqualTo(content);
+        assertThat(chunks.getFirst().characterCount())
                 .isEqualTo(content.length());
         assertChunkMetadata(chunks);
     }
@@ -54,9 +54,9 @@ class KnowledgeTextChunkerTest {
         List<KnowledgeChunkDraft> chunks = knowledgeTextChunker.split(content);
 
         assertThat(chunks).singleElement().satisfies(chunk -> {
-            assertThat(chunk.getContent()).isEqualTo("Java 集合框架");
-            assertThat(chunk.getCharacterCount())
-                    .isEqualTo(chunk.getContent().length());
+            assertThat(chunk.content()).isEqualTo("Java 集合框架");
+            assertThat(chunk.characterCount())
+                    .isEqualTo(chunk.content().length());
         });
     }
 
@@ -67,8 +67,8 @@ class KnowledgeTextChunkerTest {
         List<KnowledgeChunkDraft> chunks = knowledgeTextChunker.split(content);
 
         assertThat(chunks).singleElement().satisfies(chunk -> {
-            assertThat(chunk.getContent()).isEqualTo(content);
-            assertThat(chunk.getCharacterCount())
+            assertThat(chunk.content()).isEqualTo(content);
+            assertThat(chunk.characterCount())
                     .isEqualTo(MAX_CHUNK_CHARACTERS);
         });
     }
@@ -80,12 +80,12 @@ class KnowledgeTextChunkerTest {
         List<KnowledgeChunkDraft> chunks = knowledgeTextChunker.split(content);
 
         assertThat(chunks).hasSize(2);
-        assertThat(chunks.getFirst().getContent())
+        assertThat(chunks.getFirst().content())
                 .hasSize(MAX_CHUNK_CHARACTERS);
-        assertThat(chunks.getLast().getContent()).endsWith("Z");
+        assertThat(chunks.getLast().content()).endsWith("Z");
         assertThat(sharedSuffixPrefixLength(
-                chunks.getFirst().getContent(),
-                chunks.getLast().getContent()
+                chunks.getFirst().content(),
+                chunks.getLast().content()
         )).isPositive();
         assertChunkMetadata(chunks);
     }
@@ -98,13 +98,13 @@ class KnowledgeTextChunkerTest {
 
         assertThat(chunks).hasSizeGreaterThan(3);
         assertThat(chunks)
-                .allSatisfy(chunk -> assertThat(chunk.getContent().length())
+                .allSatisfy(chunk -> assertThat(chunk.content().length())
                         .isLessThanOrEqualTo(MAX_CHUNK_CHARACTERS));
-        assertThat(chunks.getFirst().getContent())
+        assertThat(chunks.getFirst().content())
                 .isEqualTo(content.substring(0, MAX_CHUNK_CHARACTERS));
-        assertThat(chunks.getLast().getContent())
+        assertThat(chunks.getLast().content())
                 .isEqualTo(content.substring(
-                        content.length() - chunks.getLast().getContent().length()
+                        content.length() - chunks.getLast().content().length()
                 ));
         assertChunkMetadata(chunks);
     }
@@ -124,7 +124,7 @@ class KnowledgeTextChunkerTest {
 
         List<KnowledgeChunkDraft> chunks = knowledgeTextChunker.split(content);
 
-        assertThat(chunks.getFirst().getContent()).isEqualTo(expectedFirstChunk);
+        assertThat(chunks.getFirst().content()).isEqualTo(expectedFirstChunk);
         assertChunkMetadata(chunks);
     }
 
@@ -141,7 +141,7 @@ class KnowledgeTextChunkerTest {
 
         List<KnowledgeChunkDraft> chunks = knowledgeTextChunker.split(content);
 
-        assertThat(chunks.getFirst().getContent()).isEqualTo(expectedFirstChunk);
+        assertThat(chunks.getFirst().content()).isEqualTo(expectedFirstChunk);
         assertChunkMetadata(chunks);
     }
 
@@ -155,7 +155,7 @@ class KnowledgeTextChunkerTest {
 
         List<KnowledgeChunkDraft> chunks = knowledgeTextChunker.split(content);
 
-        assertThat(chunks.getFirst().getContent()).isEqualTo(expectedFirstChunk);
+        assertThat(chunks.getFirst().content()).isEqualTo(expectedFirstChunk);
         assertChunkMetadata(chunks);
     }
 
@@ -167,8 +167,8 @@ class KnowledgeTextChunkerTest {
 
         assertThat(chunks).hasSizeGreaterThan(2);
         for (int index = 1; index < chunks.size(); index++) {
-            String previous = chunks.get(index - 1).getContent();
-            String current = chunks.get(index).getContent();
+            String previous = chunks.get(index - 1).content();
+            String current = chunks.get(index).content();
             int sharedLength = sharedSuffixPrefixLength(previous, current);
 
             assertThat(sharedLength).isPositive();
@@ -179,7 +179,7 @@ class KnowledgeTextChunkerTest {
         for (int wordIndex = 0; wordIndex < 500; wordIndex++) {
             String word = "word%04d".formatted(wordIndex);
             assertThat(chunks)
-                    .anySatisfy(chunk -> assertThat(chunk.getContent())
+                    .anySatisfy(chunk -> assertThat(chunk.content())
                             .contains(word));
         }
         assertChunkMetadata(chunks);
@@ -194,7 +194,7 @@ class KnowledgeTextChunkerTest {
         assertThat(chunks).hasSizeGreaterThan(2);
         assertThat(chunks.stream().skip(1))
                 .allSatisfy(chunk -> {
-                    String firstWord = chunk.getContent().split("\\s+", 2)[0];
+                    String firstWord = chunk.content().split("\\s+", 2)[0];
                     assertThat(firstWord).matches("word\\d{4}");
                 });
     }
@@ -209,7 +209,7 @@ class KnowledgeTextChunkerTest {
         );
 
         assertThat(chunks).hasSizeGreaterThan(1);
-        assertThat(chunks).allSatisfy(chunk -> assertThat(chunk.getContent())
+        assertThat(chunks).allSatisfy(chunk -> assertThat(chunk.content())
                 .isNotBlank());
         assertChunkMetadata(chunks);
     }
@@ -236,12 +236,12 @@ class KnowledgeTextChunkerTest {
 
         assertThat(first).hasSameSizeAs(second);
         for (int index = 0; index < first.size(); index++) {
-            assertThat(first.get(index).getChunkIndex())
-                    .isEqualTo(second.get(index).getChunkIndex());
-            assertThat(first.get(index).getContent())
-                    .isEqualTo(second.get(index).getContent());
-            assertThat(first.get(index).getCharacterCount())
-                    .isEqualTo(second.get(index).getCharacterCount());
+            assertThat(first.get(index).chunkIndex())
+                    .isEqualTo(second.get(index).chunkIndex());
+            assertThat(first.get(index).content())
+                    .isEqualTo(second.get(index).content());
+            assertThat(first.get(index).characterCount())
+                    .isEqualTo(second.get(index).characterCount());
             assertThat(first.get(index)).isNotSameAs(second.get(index));
         }
 
@@ -257,9 +257,9 @@ class KnowledgeTextChunkerTest {
         List<KnowledgeChunkDraft> chunks = knowledgeTextChunker.split(content);
 
         assertThat(chunks).singleElement().satisfies(chunk -> {
-            assertThat(chunk.getChunkIndex()).isEqualTo(1);
-            assertThat(chunk.getContent()).isEqualTo("content");
-            assertThat(chunk.getCharacterCount()).isEqualTo(7);
+            assertThat(chunk.chunkIndex()).isEqualTo(1);
+            assertThat(chunk.content()).isEqualTo("content");
+            assertThat(chunk.characterCount()).isEqualTo(7);
         });
     }
 
@@ -272,7 +272,7 @@ class KnowledgeTextChunkerTest {
         List<KnowledgeChunkDraft> chunks = knowledgeTextChunker.split(content);
 
         assertThat(chunks).hasSize(2);
-        assertThat(chunks.get(1).getContent())
+        assertThat(chunks.get(1).content())
                 .startsWith("a".repeat(OVERLAP_CHARACTERS - 1) + "\n\nb");
         assertChunkMetadata(chunks);
     }
@@ -290,12 +290,12 @@ class KnowledgeTextChunkerTest {
         assertThat(concurrentResults).allSatisfy(actual -> {
             assertThat(actual).hasSameSizeAs(expected);
             for (int index = 0; index < expected.size(); index++) {
-                assertThat(actual.get(index).getChunkIndex())
-                        .isEqualTo(expected.get(index).getChunkIndex());
-                assertThat(actual.get(index).getContent())
-                        .isEqualTo(expected.get(index).getContent());
-                assertThat(actual.get(index).getCharacterCount())
-                        .isEqualTo(expected.get(index).getCharacterCount());
+                assertThat(actual.get(index).chunkIndex())
+                        .isEqualTo(expected.get(index).chunkIndex());
+                assertThat(actual.get(index).content())
+                        .isEqualTo(expected.get(index).content());
+                assertThat(actual.get(index).characterCount())
+                        .isEqualTo(expected.get(index).characterCount());
             }
         });
     }
@@ -303,14 +303,14 @@ class KnowledgeTextChunkerTest {
     private static void assertChunkMetadata(List<KnowledgeChunkDraft> chunks) {
         assertThat(chunks).isNotEmpty();
         assertThat(chunks)
-                .extracting(KnowledgeChunkDraft::getChunkIndex)
+                .extracting(KnowledgeChunkDraft::chunkIndex)
                 .containsExactlyElementsOf(
                         IntStream.rangeClosed(1, chunks.size()).boxed().toList()
                 );
         assertThat(chunks).allSatisfy(chunk -> {
-            assertThat(chunk.getContent()).isNotBlank();
-            assertThat(chunk.getCharacterCount())
-                    .isEqualTo(chunk.getContent().length());
+            assertThat(chunk.content()).isNotBlank();
+            assertThat(chunk.characterCount())
+                    .isEqualTo(chunk.content().length());
         });
     }
 

@@ -15,6 +15,10 @@ Current core stack:
 * Java 21
 * Spring Boot 3.5.16
 * Spring Web and Jakarta Bean Validation
+* Spring RestClient
+* Alibaba Cloud Bailian / DashScope OpenAI-compatible Embeddings API
+* `qwen3.7-text-embedding`
+* Current embedding dimension: 1024
 * MyBatis 3.0.5
 * MySQL 8.0.45
 * BCrypt password hashing via spring-security-crypto
@@ -31,6 +35,8 @@ Planned technologies used only when their corresponding modules are developed:
 * Milvus
 * Docker
 * Docker Compose
+
+Spring AI is not a current dependency. A later version may evaluate a Spring AI implementation, but it must continue to integrate through the project's own `EmbeddingClient` interface. The hand-written DashScope implementation remains the current production implementation.
 
 Do not introduce new technologies unless they solve a concrete project requirement.
 
@@ -312,10 +318,10 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-知识库模块第二阶段 A：可独立测试的文本切片器
+知识库模块第二阶段 B1：Embedding 模型选型与百炼向量生成客户端
 ```
 
-The implementation, Codex production review, production corrections, focused unit tests, and full regression verification were completed on 2026-07-30. The working tree is ready for the developer's second review and submission.
+The B1 implementation, Codex production review, production corrections, focused tests, and full regression verification were completed on 2026-07-30. The working tree is ready for the developer's review and submission.
 
 Question-management MVP record:
 
@@ -343,7 +349,7 @@ Knowledge-base first-stage completed capability:
 Knowledge-base second-stage A completed capability:
 
 * A reusable, stateless Spring `@Component` named `KnowledgeTextChunker` accepts normalized document content as a `String`.
-* The component returns an in-memory `List<KnowledgeChunkDraft>`; each draft contains only `chunkIndex`, `content`, and `characterCount`.
+* The component returns an in-memory `List<KnowledgeChunkDraft>`; `KnowledgeChunkDraft` is a Java record containing only `chunkIndex`, `content`, and `characterCount`.
 * Chunk indexes start at 1 and increase continuously.
 * `MAX_CHUNK_CHARACTERS = 1200`, `OVERLAP_CHARACTERS = 150`, and `MIN_NATURAL_BOUNDARY_DISTANCE = 800`.
 * Natural boundaries are considered only from character 800 onward in each maximum 1200-character window.
@@ -379,19 +385,44 @@ Additional first-review cleanup:
 * Unrelated Kotlin dependencies and build plugins were removed; the Maven build remains Java-only and no longer compiles Java sources twice.
 * The knowledge module introduced its own `KnowledgeCategory`; the question module still uses `QuestionCategory`. No shared-category enum migration occurred in this stage, so no migration claim should be made.
 
+Knowledge-base second-stage B1 completed capability:
+
+* The project owns a provider-neutral `EmbeddingClient` interface. `DashScopeEmbeddingClient` is the current hand-written production implementation, and DashScope request and response DTOs are not exposed to upper business layers.
+* `EmbeddingVector` and `EmbeddingBatchResult` are project-internal result records. Their list values are defensively copied and exposed as unmodifiable lists.
+* `EmbeddingProperties` centrally binds `baseUrl`, `apiKey`, `model`, `dimension`, `batchSize`, `profileVersion`, `connectTimeout`, and `readTimeout`.
+* Configuration validation rejects blank required text, non-positive dimensions and batch sizes, and null or non-positive timeouts. The API key is excluded from the generated `toString()` output.
+* `EmbeddingConfiguration` registers `EmbeddingProperties` and creates a dedicated `embeddingRestClient`.
+* The dedicated client uses `Bearer ` authorization and applies both connection and read timeouts.
+* The OpenAI-compatible request DTO serializes `model`, `input`, `dimensions`, and `encoding_format`.
+* The response DTO deserializes `data[].index`, `data[].embedding`, `model`, `usage.prompt_tokens`, and `usage.total_tokens`, while ignoring unrelated supplier fields.
+* Jackson handles the request JSON serialization and response JSON deserialization.
+* The client rejects a null or empty input list and rejects null, empty, or whitespace-only elements with the corresponding element index in the error message.
+* Valid input is defensively copied, and text content is sent without trimming or other modification.
+* Total input larger than `batchSize` is automatically split into multiple HTTP requests, including correct handling of the final short batch.
+* Each request uses the configured model and dimension with float encoding.
+* Supplier-local indexes are validated and converted with `globalIndex = batchStart + localIndex`; out-of-order supplier data is restored to original input order before batches are merged.
+* Responses are rejected when the model, data count, indexes, vector dimensions, or floating-point values are invalid.
+* Null data items, null or non-finite vector values, and null, negative, duplicate, or out-of-range indexes are rejected.
+* Multiple batches are merged into one ordered `EmbeddingBatchResult`.
+* Token usage is treated as request-level metadata and accumulated across trustworthy batch responses. If any batch lacks trustworthy usage or `total_tokens`, the complete call's `totalTokenCount` is null.
+* Negative token counts are rejected. `characterCount` is not used as a token count, and token totals are not distributed across individual vectors.
+* RestClient HTTP, response-body, and JSON problems are exposed to callers as `ExternalServiceException`.
+
 Synchronized test scope and current result:
 
 * Real MyBatis/MySQL tests execute `KnowledgeDocumentMapper.xml` and query actual stored column values, generated timestamps, nullable source, and generated IDs.
 * Service tests cover supported extensions and case variants, metadata trimming, client-path cleanup, UTF-8/BOM/newline behavior, SHA-256 stability, controlled entity defaults, file boundaries, mapper row counts, key population, and exception propagation.
 * MockMvc tests execute multipart binding and the real security filter chain with a mocked Service, covering HTTP 401, HTTP 403, administrator access, invalid form fields, DTO forwarding, unified `Result`, and safe response fields.
 * Full integration tests execute real Spring Security, JWT, Controller, Service, MyBatis XML, and MySQL, and verify database row counts and intended stored values.
-* `.\mvnw.cmd -B -ntp -DskipTests compile`: `BUILD SUCCESS`.
 * Text-chunker tests use the public `split()` method only: 17 test methods and 27 executed cases, including 12 parameterized cases, with no reflection, database, or Spring context.
 * Text-chunker coverage includes blank validation, short and stripped content, exact and over-limit lengths, hard cuts, boundary priority, all eight sentence terminators, overlap and full-source coverage, English word starts, overlong words, Chinese without spaces, deterministic independent results, and concurrent singleton calls.
-* `.\mvnw.cmd -B -ntp -Dtest=KnowledgeTextChunkerTest test`: 27 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
-* Knowledge-related tests: 89 tests run, 0 failures, 0 errors, 0 skipped.
-* Full `.\mvnw.cmd -B -ntp test`: 334 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
-* All 307 tests from the previous-stage baseline passed unchanged.
+* Embedding-focused tests cover result-object validation and immutability, property validation and API-key log protection, request and response JSON mappings, input validation, single and multiple batches, final-batch boundaries, local-to-global index conversion, supplier reordering, vector dimensions and finite values, token accumulation and missing usage, HTTP 400/401/429/500, empty or malformed responses, and invalid response models, counts, indexes, vectors, and token values.
+* Embedding HTTP tests use Spring's `MockRestServiceServer`, small test vectors, and a test-only API key. Unit and HTTP tests do not call the real Bailian service or depend on a real API key.
+* `.\mvnw.cmd -B -ntp -DskipTests compile`: `BUILD SUCCESS`.
+* `.\mvnw.cmd -B -ntp -Dtest="*Embedding*" test`: 80 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
+* Full `.\mvnw.cmd -B -ntp test`: 414 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
+* 真实百炼 API 端到端联调尚未执行。
+* No real supplier vector has been written to MySQL, Milvus, or another vector store.
 
 Existing fixed authentication decisions remain unchanged:
 
@@ -444,25 +475,39 @@ Existing fixed password-change decisions remain unchanged:
 Next development stage:
 
 ```text
-知识库模块第二阶段 B：
-Embedding模型选型、向量生成与文档处理流水线设计
+知识库模块第二阶段 B2：
+向量存储接口、Milvus 接入方案与文档处理流水线
 ```
 
-Second-stage A is ready for the developer's second review and submission. Do not start second-stage B until the developer explicitly authorizes it.
+Second-stage B1 is ready for the developer's review and submission. Do not start second-stage B2 until the developer explicitly authorizes it.
+
+The next stage must first complete the following design work:
+
+1. Design a project-owned `VectorStoreClient` or equivalent vector-storage interface.
+2. Compare Spring AI Milvus VectorStore with the Milvus Java SDK without preselecting either approach.
+3. Define the collection schema, 1024-dimensional vectors, COSINE similarity, and `vectorId` strategy.
+4. Define the relationship between MySQL records and Milvus vectors.
+5. Design `knowledge_document` transitions through `PROCESSING`, `READY`, and `FAILED`.
+6. Design compensation and retry behavior for partial failures.
+
+The Embedding HTTP client and vector-generation capability are implemented and verified with mock HTTP. Real supplier integration, vector persistence, and RAG are separate completion states.
 
 The following capabilities are not implemented in the current stage:
 
 * Tokenizer integration
 * Real model token-count calculation
-* Embedding generation
+* Real Bailian API end-to-end integration
+* A production `VectorStoreClient` or equivalent vector-storage implementation
 * `vectorId` or other vector metadata
 * Milvus or another vector database
-* Vector insertion
+* Vector insertion, deletion, or similarity search
 * `knowledge_chunk` database insertion
-* `knowledge_document.processing_status` advancement from `UPLOADED` to `PROCESSING` or `READY`
-* `FAILED` status handling and error recovery
+* A document-processing pipeline
+* `knowledge_document.processing_status` advancement from `UPLOADED` to `PROCESSING`, `READY`, or `FAILED`
+* Partial-failure compensation and retry
 * Document reprocessing
 * RAG retrieval
+* A Spring AI replacement implementation; it remains only a later candidate behind `EmbeddingClient`
 * Markdown-heading-aware or code-block-aware chunking
 * Semantic chunking
 * Knowledge-document pagination, detail, or enable/disable management

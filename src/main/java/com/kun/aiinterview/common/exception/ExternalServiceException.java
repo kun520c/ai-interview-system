@@ -1,12 +1,11 @@
 package com.kun.aiinterview.common.exception;
 
-
-public class BusinessException extends RuntimeException{
-    public BusinessException(String message){
+public class ExternalServiceException extends RuntimeException {
+    public ExternalServiceException(String message) {
         super(message);
     }
 
-    public BusinessException(
+    public ExternalServiceException(
             String message,
             Throwable cause
     ){
