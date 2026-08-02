@@ -27,3 +27,13 @@ embedding:
   profile-version: ${EMBEDDING_PROFILE_VERSION:qwen3.7-text-embedding-1024-dense-v1}
   connect-timeout: ${EMBEDDING_CONNECT_TIMEOUT:3s}
   read_timeout: ${EMBEDDING_READ_TIMEOUT:20s}
+
+milvus:
+  enabled: ${MILVUS_ENABLED:false}
+  uri: ${MILVUS_URI:http://localhost:19530}
+  token: ${MILVUS_TOKEN:}
+  database-name: ${MILVUS_DATABASE_NAME:default}
+  collection-name: ${MILVUS_COLLECTION_NAME:knowledge_chunk_vectors}
+  dimension: ${MILVUS_DIMENSION:1024}
+  connect-timeout: ${MILVUS_CONNECT_TIMEOUT:5s}
+  request-timeout: ${MILVUS_REQUEST_TIMEOUT:10s}

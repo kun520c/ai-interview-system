@@ -318,10 +318,10 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-知识库模块第二阶段 B1：Embedding 模型选型与百炼向量生成客户端
+知识库模块第二阶段 B2：Milvus 向量存储基础设施与批量写入
 ```
 
-The B1 implementation, Codex production review, production corrections, focused tests, and full regression verification were completed on 2026-07-30. The working tree is ready for the developer's review and submission.
+The B2 Milvus infrastructure and batch-insert increment, Codex production review, production corrections, focused tests, and full regression verification were completed on 2026-08-02. The working tree is ready for the developer's review and submission.
 
 Question-management MVP record:
 
@@ -408,6 +408,33 @@ Knowledge-base second-stage B1 completed capability:
 * Negative token counts are rejected. `characterCount` is not used as a token count, and token totals are not distributed across individual vectors.
 * RestClient HTTP, response-body, and JSON problems are exposed to callers as `ExternalServiceException`.
 
+Knowledge-base second-stage B2 completed capability:
+
+* The project owns a provider-neutral `VectorStoreClient` interface. It defines batch insertion, deletion by vector IDs, deletion by document ID, and similarity search boundaries; only batch insertion is implemented in this increment.
+* The current implementation uses `io.milvus:milvus-sdk-java:2.6.20` directly rather than Spring AI Milvus VectorStore. Direct SDK use provides explicit control over precomputed vectors, Collection Schema, Java-generated primary keys, and the compensation-deletion boundary. Spring AI remains a later replaceable implementation candidate behind `VectorStoreClient`, not a permanently rejected option.
+* MySQL remains the source of truth for document and chunk content and business processing state. Milvus stores vectors and the minimum retrieval identifiers needed to map a hit back to MySQL.
+* Java generates `vectorId`; Milvus does not generate primary keys for this Collection.
+* `MilvusProperties` binds `enabled`, `uri`, optional `token`, `databaseName`, `collectionName`, `dimension`, `connectTimeout`, and `requestTimeout`. Required values, positive dimensions, and positive timeouts are validated, and `token` is excluded from `toString()`.
+* `milvus.enabled` defaults to `false`. When it is not `true`, the `ConnectConfig`, `MilvusClientV2`, `MilvusCollectionInitializer`, and `MilvusVectorStoreClient` beans are not created, so ordinary application tests do not require Milvus.
+* When enabled, `MilvusConfiguration` creates `ConnectConfig` using the configured URI, database name, millisecond connection timeout, and millisecond RPC deadline. Blank tokens are not passed to the SDK. Spring invokes the SDK client's public `close()` method when the bean is destroyed.
+* `MilvusCollectionInitializer` checks `hasCollection()` at application startup. An existing Collection is left unchanged; a missing Collection is created. Existing-Collection Schema consistency validation is not implemented.
+* The Collection uses dynamic fields disabled and the following Schema:
+
+    * `vector_id`: `VarChar`, primary key, `autoID=false`, maximum length 64.
+    * `document_id`: `Int64`.
+    * `chunk_index`: `Int64`.
+    * `embedding_version`: `VarChar`, maximum length 128.
+    * `vector`: `FloatVector`, dimension from `MilvusProperties`, default 1024.
+
+* The vector field uses `AUTOINDEX` with `COSINE` similarity.
+* `MilvusSchemaConstants` is a non-instantiable, non-Spring utility class shared by Collection initialization and insert-row construction.
+* `VectorWriteItem` validates identifiers, document ID, chunk index, embedding version, non-empty finite float values, and defensive list copying. Store-specific vector dimension and Milvus string lengths are validated by `MilvusVectorStoreClient` rather than by the provider-neutral record.
+* `VectorSearchHit` accepts any finite similarity score, including zero and negative COSINE values, and validates its identifiers and indexes.
+* `MilvusVectorStoreClient.insert()` rejects null or empty batches, indexed null elements, duplicate vector IDs, overlong strings, and configured-dimension mismatches before calling Milvus. It sends each vector as a Gson `JsonArray` of JSON numbers with the exact Schema field names.
+* SDK `MilvusClientException` failures during insertion are converted to `ExternalServiceException` with the original cause. A null `InsertResp` or an `InsertResp.getInsertCnt()` value different from the requested batch size is also rejected as an external-service failure.
+* `MilvusCollectionInitializer` currently propagates SDK runtime failures during startup so Spring startup fails visibly; it does not silently continue after a failed existence check or Collection creation.
+* `deleteByVectorIds()`, `deleteByDocumentId()`, and `search()` deliberately throw `UnsupportedOperationException`; no empty or fabricated result is returned.
+
 Synchronized test scope and current result:
 
 * Real MyBatis/MySQL tests execute `KnowledgeDocumentMapper.xml` and query actual stored column values, generated timestamps, nullable source, and generated IDs.
@@ -418,11 +445,13 @@ Synchronized test scope and current result:
 * Text-chunker coverage includes blank validation, short and stripped content, exact and over-limit lengths, hard cuts, boundary priority, all eight sentence terminators, overlap and full-source coverage, English word starts, overlong words, Chinese without spaces, deterministic independent results, and concurrent singleton calls.
 * Embedding-focused tests cover result-object validation and immutability, property validation and API-key log protection, request and response JSON mappings, input validation, single and multiple batches, final-batch boundaries, local-to-global index conversion, supplier reordering, vector dimensions and finite values, token accumulation and missing usage, HTTP 400/401/429/500, empty or malformed responses, and invalid response models, counts, indexes, vectors, and token values.
 * Embedding HTTP tests use Spring's `MockRestServiceServer`, small test vectors, and a test-only API key. Unit and HTTP tests do not call the real Bailian service or depend on a real API key.
+* Milvus-focused tests cover `VectorWriteItem`, `VectorSearchHit`, property binding and validation, token log protection, disabled and enabled conditional bean assembly, blank and non-blank token handling, SDK-client bean closing, Collection existence and Schema construction, insert validation, exact `InsertReq` JSON rows, SDK exception conversion, insert-count validation, and deliberately unsupported operations.
+* Milvus tests use Mockito, `ApplicationContextRunner`, and constructor mocking to prevent the `MilvusClientV2` constructor from opening a real network connection. They do not start Milvus, create a real Collection, insert a real vector, or execute a real search.
 * `.\mvnw.cmd -B -ntp -DskipTests compile`: `BUILD SUCCESS`.
-* `.\mvnw.cmd -B -ntp -Dtest="*Embedding*" test`: 80 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
-* Full `.\mvnw.cmd -B -ntp test`: 414 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
+* `.\mvnw.cmd -B -ntp -Dtest="VectorWriteItemTest,VectorSearchHitTest,MilvusPropertiesTest,MilvusConfigurationTest,MilvusCollectionInitializerTest,MilvusVectorStoreClientTest" test`: 83 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
+* Full `.\mvnw.cmd -B -ntp test`: 497 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
 * 真实百炼 API 端到端联调尚未执行。
-* No real supplier vector has been written to MySQL, Milvus, or another vector store.
+* No real Milvus service was started, no real Collection was created, no vector was written to real Milvus, and no real similarity search was executed. Successful compilation, Spring context isolation, and Mock tests do not constitute real Milvus integration verification.
 
 Existing fixed authentication decisions remain unchanged:
 
@@ -475,20 +504,20 @@ Existing fixed password-change decisions remain unchanged:
 Next development stage:
 
 ```text
-知识库模块第二阶段 B2：
-向量存储接口、Milvus 接入方案与文档处理流水线
+知识库模块第二阶段 B2 后续增量：
+Milvus 删除/搜索边界与文档处理流水线
 ```
 
-Second-stage B1 is ready for the developer's review and submission. Do not start second-stage B2 until the developer explicitly authorizes it.
+The B2 infrastructure and insert increment is ready for the developer's review and submission. Do not implement deletion, search, Docker Milvus, or the document-processing pipeline until the developer explicitly authorizes the next increment.
 
-The next stage must first complete the following design work:
+The next increment must first complete the following design work:
 
-1. Design a project-owned `VectorStoreClient` or equivalent vector-storage interface.
-2. Compare Spring AI Milvus VectorStore with the Milvus Java SDK without preselecting either approach.
-3. Define the collection schema, 1024-dimensional vectors, COSINE similarity, and `vectorId` strategy.
-4. Define the relationship between MySQL records and Milvus vectors.
-5. Design `knowledge_document` transitions through `PROCESSING`, `READY`, and `FAILED`.
-6. Design compensation and retry behavior for partial failures.
+1. Define safe implementations for `deleteByVectorIds()` and `deleteByDocumentId()` as compensation primitives.
+2. Define the search request, `embeddingVersion` filtering, result mapping, and score semantics before implementing `search()`.
+3. Decide how startup should detect an existing Collection whose Schema differs from the configured Schema, without adding automatic destructive migration.
+4. Design `knowledge_document` transitions through `PROCESSING`, `READY`, and `FAILED`.
+5. Design idempotency, compensation, and retry behavior for partial MySQL, Embedding, and Milvus failures.
+6. Define the complete document-chunk ingestion transaction boundary and recovery procedure.
 
 The Embedding HTTP client and vector-generation capability are implemented and verified with mock HTTP. Real supplier integration, vector persistence, and RAG are separate completion states.
 
@@ -497,14 +526,18 @@ The following capabilities are not implemented in the current stage:
 * Tokenizer integration
 * Real model token-count calculation
 * Real Bailian API end-to-end integration
-* A production `VectorStoreClient` or equivalent vector-storage implementation
-* `vectorId` or other vector metadata
-* Milvus or another vector database
-* Vector insertion, deletion, or similarity search
+* `deleteByVectorIds()`
+* `deleteByDocumentId()`
+* Vector similarity `search()`
+* Existing-Collection Schema consistency validation
+* Docker or real Milvus deployment
+* Real Milvus end-to-end integration
+* Verified insertion into a real Milvus Collection
+* Verified similarity search against real Milvus
 * `knowledge_chunk` database insertion
 * A document-processing pipeline
 * `knowledge_document.processing_status` advancement from `UPLOADED` to `PROCESSING`, `READY`, or `FAILED`
-* Partial-failure compensation and retry
+* MySQL and Milvus partial-failure compensation and retry
 * Document reprocessing
 * RAG retrieval
 * A Spring AI replacement implementation; it remains only a later candidate behind `EmbeddingClient`
