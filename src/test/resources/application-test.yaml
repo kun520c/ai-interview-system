@@ -12,3 +12,6 @@ embedding:
   profile-version: qwen3.7-text-embedding-1024-dense-v1
   connect-timeout: 3s
   read-timeout: 20s
+
+milvus:
+  enabled: false
