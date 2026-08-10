@@ -292,6 +292,51 @@ For question management changes:
 
 Do not claim that code works without running reasonable verification when execution is available.
 
+### Test status reporting
+
+When reporting project status, agents must distinguish among work that is designed, coded, compiled, verified by Mock or unit tests, verified against real services, staged, committed, and pushed.
+
+Do not:
+
+* Describe planned work as implemented.
+* Describe Mock or unit-test success as real integration success.
+* Describe compilation success as functional verification.
+* Describe a local commit as pushed.
+* Describe an execution-environment failure as a code failure without evidence.
+
+Report the actual test, failure, error, and skipped counts for each relevant run. Do not treat historical counts as permanent expectations. A conditionally skipped real-service test is not a failure, but it is also not evidence that real integration passed.
+
+### Real external Smoke Tests
+
+`RealEmbeddingSmokeTest` and `RealMilvusVectorStoreSmokeTest` are opt-in real integration / Smoke Tests. They are not Mock tests or ordinary unit tests, and they must be skipped during an ordinary `mvn test` run unless explicitly enabled.
+
+Their explicit opt-in switches are:
+
+* `RealEmbeddingSmokeTest`: `RUN_REAL_EMBEDDING_TEST=true`
+* `RealMilvusVectorStoreSmokeTest`: `RUN_REAL_MILVUS_TEST=true`
+
+Both tests must retain two layers of protection: `@EnabledIfEnvironmentVariable` and `Assumptions.assumeTrue(...)`. Agents must not remove or weaken either layer, make the tests run by default, store `RUN_REAL_*` in Git-managed configuration, persist the switches in Windows user or system environment variables, or enable them during an ordinary full test run. Clear temporary switches promptly after the real test finishes.
+
+Formal real Smoke Test verification must use Maven / Surefire with a temporary `RUN_REAL_*` environment variable and the test's own `@ActiveProfiles("local")`. Do not use an IntelliJ IDEA forced run of a conditionally disabled JUnit test as formal evidence: IDEA may inject `-Djunit.jupiter.conditions.deactivate=org.junit.*Enabled*Condition`, bypassing the `@EnabledIfEnvironmentVariable` layer.
+
+`application-local.yaml` is the local real-service configuration file. It must remain ignored and outside Git. Agents must not expose secrets read from it or copy real API keys, database passwords, JWT secrets, Milvus tokens, or other local credentials into `application-test.yaml` merely to make tests pass. The real Smoke Tests use `@ActiveProfiles("local")`; ordinary automated tests must retain the isolated test configuration.
+
+Before an ordinary full test run, ensure `RUN_REAL_EMBEDDING_TEST` and `RUN_REAL_MILVUS_TEST` are unset, then use:
+
+```text
+.\mvnw.cmd -B -ntp test
+```
+
+The real Smoke Tests must be reported as skipped in that run. Keep the existing `application-test.yaml` isolation: test JWT configuration, test Embedding configuration, and `milvus.enabled=false`.
+
+Real Milvus Smoke Tests must use unique test data and clean up only data created by that test run. They must never drop a Collection or clear an entire Collection. After deletion, verify that non-target data remains. Use Awaitility or equivalent polling for eventual consistency instead of fixed `Thread.sleep` as the primary synchronization mechanism.
+
+### Test execution environment
+
+The database configuration in `application.yaml` depends on `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Codex child processes, IntelliJ IDEA, PowerShell, and Maven may inherit different environments; never assume that variables available in one process are available in another.
+
+If `${DB_URL}` remains unresolved or the MySQL driver reports `Driver com.mysql.cj.jdbc.Driver claims to not accept jdbcUrl, ${DB_URL}`, first check whether the Maven process inherited all three database variables. Distinguish missing execution environment from a code regression, and do not modify production configuration merely to accommodate the agent's environment.
+
 ## 13. Git Rules
 
 Do not execute:
@@ -318,10 +363,10 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-知识库模块第二阶段 B2：Milvus 向量存储基础设施与批量写入
+知识库模块第二阶段 B2：Milvus 向量存储基础设施、批量写入、删除与相似度检索
 ```
 
-The B2 Milvus infrastructure and batch-insert increment, Codex production review, production corrections, focused tests, and full regression verification were completed on 2026-08-02. The working tree is ready for the developer's review and submission.
+The B2 Milvus infrastructure and batch-insert increment was completed on 2026-08-02. The deletion and similarity-search production review, production corrections, focused Mock tests, and full regression verification were completed on 2026-08-03. The working tree is ready for the developer's review and submission.
 
 Question-management MVP record:
 
@@ -410,7 +455,7 @@ Knowledge-base second-stage B1 completed capability:
 
 Knowledge-base second-stage B2 completed capability:
 
-* The project owns a provider-neutral `VectorStoreClient` interface. It defines batch insertion, deletion by vector IDs, deletion by document ID, and similarity search boundaries; only batch insertion is implemented in this increment.
+* The project owns a provider-neutral `VectorStoreClient` interface. Its batch insertion, deletion by vector IDs, deletion by document ID, and similarity search operations are implemented by `MilvusVectorStoreClient`.
 * The current implementation uses `io.milvus:milvus-sdk-java:2.6.20` directly rather than Spring AI Milvus VectorStore. Direct SDK use provides explicit control over precomputed vectors, Collection Schema, Java-generated primary keys, and the compensation-deletion boundary. Spring AI remains a later replaceable implementation candidate behind `VectorStoreClient`, not a permanently rejected option.
 * MySQL remains the source of truth for document and chunk content and business processing state. Milvus stores vectors and the minimum retrieval identifiers needed to map a hit back to MySQL.
 * Java generates `vectorId`; Milvus does not generate primary keys for this Collection.
@@ -433,7 +478,14 @@ Knowledge-base second-stage B2 completed capability:
 * `MilvusVectorStoreClient.insert()` rejects null or empty batches, indexed null elements, duplicate vector IDs, overlong strings, and configured-dimension mismatches before calling Milvus. It sends each vector as a Gson `JsonArray` of JSON numbers with the exact Schema field names.
 * SDK `MilvusClientException` failures during insertion are converted to `ExternalServiceException` with the original cause. A null `InsertResp` or an `InsertResp.getInsertCnt()` value different from the requested batch size is also rejected as an external-service failure.
 * `MilvusCollectionInitializer` currently propagates SDK runtime failures during startup so Spring startup fails visibly; it does not silently continue after a failed existence check or Collection creation.
-* `deleteByVectorIds()`, `deleteByDocumentId()`, and `search()` deliberately throw `UnsupportedOperationException`; no empty or fabricated result is returned.
+* `deleteByVectorIds()` rejects null or empty lists, indexed null or blank IDs, overlong IDs, and duplicates. It does not trim or rewrite IDs and builds `vector_id in {vectorIds}` with a validated immutable `List<String>` template value rather than interpolating IDs into the filter.
+* `deleteByDocumentId()` rejects non-positive IDs and builds `document_id == {documentId}` with the document ID as a template value.
+* Both deletion methods share response validation. A null response or negative `deleteCnt` is rejected, while `deleteCnt == 0` is accepted for idempotent compensation. SDK `MilvusClientException` failures are converted to `ExternalServiceException` with the original cause.
+* `search()` validates and defensively copies one finite FloatVector query whose dimension matches `MilvusProperties.dimension`; it rejects blank or overlong embedding versions and non-positive `topK` values without trimming caller input.
+* Search requests use one `FloatVec`, `COSINE`, `.limit(topK)`, and the template filter `embedding_version == {embeddingVersion}`. Requested output fields are only `document_id`, `chunk_index`, and `embedding_version`; the vector field is not returned and the `vector_id` primary key comes from `SearchResp.SearchResult.getId()`.
+* Search responses must contain exactly one non-null result group for the single query vector. An empty inner result list is valid, result counts may be below `topK`, and Milvus result order is retained in an immutable result list.
+* Search-result mapping requires a non-blank String primary key, Long values for the two Int64 output fields, a positive document ID, a chunk index within the Java int range, an exact embedding-version match, and a finite Float score. Zero and negative COSINE scores are valid.
+* A null or structurally invalid `SearchResp` is exposed as `ExternalServiceException`; SDK `MilvusClientException` failures are converted with the original cause, while unrelated runtime exceptions are not broadly caught.
 
 Synchronized test scope and current result:
 
@@ -445,13 +497,13 @@ Synchronized test scope and current result:
 * Text-chunker coverage includes blank validation, short and stripped content, exact and over-limit lengths, hard cuts, boundary priority, all eight sentence terminators, overlap and full-source coverage, English word starts, overlong words, Chinese without spaces, deterministic independent results, and concurrent singleton calls.
 * Embedding-focused tests cover result-object validation and immutability, property validation and API-key log protection, request and response JSON mappings, input validation, single and multiple batches, final-batch boundaries, local-to-global index conversion, supplier reordering, vector dimensions and finite values, token accumulation and missing usage, HTTP 400/401/429/500, empty or malformed responses, and invalid response models, counts, indexes, vectors, and token values.
 * Embedding HTTP tests use Spring's `MockRestServiceServer`, small test vectors, and a test-only API key. Unit and HTTP tests do not call the real Bailian service or depend on a real API key.
-* Milvus-focused tests cover `VectorWriteItem`, `VectorSearchHit`, property binding and validation, token log protection, disabled and enabled conditional bean assembly, blank and non-blank token handling, SDK-client bean closing, Collection existence and Schema construction, insert validation, exact `InsertReq` JSON rows, SDK exception conversion, insert-count validation, and deliberately unsupported operations.
-* Milvus tests use Mockito, `ApplicationContextRunner`, and constructor mocking to prevent the `MilvusClientV2` constructor from opening a real network connection. They do not start Milvus, create a real Collection, insert a real vector, or execute a real search.
+* Milvus-focused tests cover `VectorWriteItem`, `VectorSearchHit`, property binding and validation, token log protection, disabled and enabled conditional bean assembly, blank and non-blank token handling, SDK-client bean closing, Collection existence and Schema construction, insert validation, exact `InsertReq` JSON rows, delete validation and template requests, delete response semantics, SearchReq construction, SearchResp structure, result ordering and immutability, Long-based Int64 field mapping, finite score semantics, and SDK exception conversion.
+* Milvus tests use Mockito, `ArgumentCaptor`, `ApplicationContextRunner`, and constructor mocking to prevent the `MilvusClientV2` constructor from opening a real network connection. They do not start Milvus, create a real Collection, or execute a real insert, delete, or similarity search.
 * `.\mvnw.cmd -B -ntp -DskipTests compile`: `BUILD SUCCESS`.
-* `.\mvnw.cmd -B -ntp -Dtest="VectorWriteItemTest,VectorSearchHitTest,MilvusPropertiesTest,MilvusConfigurationTest,MilvusCollectionInitializerTest,MilvusVectorStoreClientTest" test`: 83 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
-* Full `.\mvnw.cmd -B -ntp test`: 497 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
+* `.\mvnw.cmd -B -ntp "-Dtest=VectorWriteItemTest,VectorSearchHitTest,MilvusPropertiesTest,MilvusConfigurationTest,MilvusCollectionInitializerTest,MilvusVectorStoreClientTest" test`: 159 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
+* Full `.\mvnw.cmd -B -ntp test`: 573 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
 * 真实百炼 API 端到端联调尚未执行。
-* No real Milvus service was started, no real Collection was created, no vector was written to real Milvus, and no real similarity search was executed. Successful compilation, Spring context isolation, and Mock tests do not constitute real Milvus integration verification.
+* No real Milvus service was started, no real Collection was created, and no real insert, delete, or similarity search was executed. Real COSINE ordering and the final state after a real network timeout remain unverified. Successful compilation, Spring context isolation, and Mock tests do not constitute real Milvus integration verification.
 
 Existing fixed authentication decisions remain unchanged:
 
@@ -505,19 +557,18 @@ Next development stage:
 
 ```text
 知识库模块第二阶段 B2 后续增量：
-Milvus 删除/搜索边界与文档处理流水线
+真实 Milvus 冒烟联调或文档处理流水线设计
 ```
 
-The B2 infrastructure and insert increment is ready for the developer's review and submission. Do not implement deletion, search, Docker Milvus, or the document-processing pipeline until the developer explicitly authorizes the next increment.
+The B2 infrastructure, insert, deletion, and similarity-search increments are ready for the developer's review and submission. Do not add Docker Milvus, real Milvus integration code, or the document-processing pipeline until the developer explicitly authorizes the next increment.
 
 The next increment must first complete the following design work:
 
-1. Define safe implementations for `deleteByVectorIds()` and `deleteByDocumentId()` as compensation primitives.
-2. Define the search request, `embeddingVersion` filtering, result mapping, and score semantics before implementing `search()`.
-3. Decide how startup should detect an existing Collection whose Schema differs from the configured Schema, without adding automatic destructive migration.
-4. Design `knowledge_document` transitions through `PROCESSING`, `READY`, and `FAILED`.
-5. Design idempotency, compensation, and retry behavior for partial MySQL, Embedding, and Milvus failures.
-6. Define the complete document-chunk ingestion transaction boundary and recovery procedure.
+1. Prefer a real local Milvus smoke verification of insert, search, deletion, COSINE ordering, and timeout uncertainty when the environment is available.
+2. Decide how startup should detect an existing Collection whose Schema differs from the configured Schema, without adding automatic destructive migration.
+3. Design `knowledge_document` transitions through `PROCESSING`, `READY`, and `FAILED`.
+4. Design idempotency, compensation, and retry behavior for partial MySQL, Embedding, and Milvus failures.
+5. Define the complete document-chunk ingestion transaction boundary and recovery procedure.
 
 The Embedding HTTP client and vector-generation capability are implemented and verified with mock HTTP. Real supplier integration, vector persistence, and RAG are separate completion states.
 
@@ -526,9 +577,6 @@ The following capabilities are not implemented in the current stage:
 * Tokenizer integration
 * Real model token-count calculation
 * Real Bailian API end-to-end integration
-* `deleteByVectorIds()`
-* `deleteByDocumentId()`
-* Vector similarity `search()`
 * Existing-Collection Schema consistency validation
 * Docker or real Milvus deployment
 * Real Milvus end-to-end integration
