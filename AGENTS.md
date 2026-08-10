@@ -363,10 +363,10 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-知识库模块第二阶段 B2：Milvus 向量存储基础设施、批量写入、删除与相似度检索
+知识库模块第二阶段 B2：Milvus 向量存储基础设施、批量写入、删除与相似度检索（已完成）
 ```
 
-The B2 Milvus infrastructure and batch-insert increment was completed on 2026-08-02. The deletion and similarity-search production review, production corrections, focused Mock tests, and full regression verification were completed on 2026-08-03. The working tree is ready for the developer's review and submission.
+The B2 Milvus infrastructure stage is complete. Its production implementation, focused Mock tests, guarded real-service Smoke Tests, and full regression verification were committed and pushed to `origin/main` in commit `8aceb06bdb5f34b2a971f9930d6ec2a41abf834f`.
 
 Question-management MVP record:
 
@@ -501,9 +501,11 @@ Synchronized test scope and current result:
 * Milvus tests use Mockito, `ArgumentCaptor`, `ApplicationContextRunner`, and constructor mocking to prevent the `MilvusClientV2` constructor from opening a real network connection. They do not start Milvus, create a real Collection, or execute a real insert, delete, or similarity search.
 * `.\mvnw.cmd -B -ntp -DskipTests compile`: `BUILD SUCCESS`.
 * `.\mvnw.cmd -B -ntp "-Dtest=VectorWriteItemTest,VectorSearchHitTest,MilvusPropertiesTest,MilvusConfigurationTest,MilvusCollectionInitializerTest,MilvusVectorStoreClientTest" test`: 159 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
-* Full `.\mvnw.cmd -B -ntp test`: 573 tests run, 0 failures, 0 errors, 0 skipped, `BUILD SUCCESS`.
-* 真实百炼 API 端到端联调尚未执行。
-* No real Milvus service was started, no real Collection was created, and no real insert, delete, or similarity search was executed. Real COSINE ordering and the final state after a real network timeout remain unverified. Successful compilation, Spring context isolation, and Mock tests do not constitute real Milvus integration verification.
+* `RealEmbeddingSmokeTest` passed a real Bailian / DashScope request through Maven / Surefire using the fixed `qwen3.7-text-embedding` 1024-dimensional profile.
+* Local Docker Milvus startup and connectivity were verified. `RealMilvusVectorStoreSmokeTest` passed through Maven / Surefire using real DashScope Embedding and real Milvus insert, COSINE search, `deleteByVectorIds`, `deleteByDocumentId`, and targeted cleanup.
+* The real Milvus Smoke Test verified that a vector's self-search result ranks first with a score close to 1, returned COSINE scores are non-increasing, target data is removed, and non-target data remains after both deletion paths.
+* Full `.\mvnw.cmd -B -ntp test`: 575 tests run, 0 failures, 0 errors, 2 skipped, `BUILD SUCCESS`. The skipped tests were `RealEmbeddingSmokeTest` and `RealMilvusVectorStoreSmokeTest`, confirming their default isolation.
+* These real Smoke Test results verify the local Docker Milvus environment, not a production or remote Milvus deployment. The final state after a real network timeout remains unverified.
 
 Existing fixed authentication decisions remain unchanged:
 
@@ -556,32 +558,29 @@ Existing fixed password-change decisions remain unchanged:
 Next development stage:
 
 ```text
-知识库模块第二阶段 B2 后续增量：
-真实 Milvus 冒烟联调或文档处理流水线设计
+知识库模块下一阶段：
+知识文档处理流水线设计与实现
 ```
 
-The B2 infrastructure, insert, deletion, and similarity-search increments are ready for the developer's review and submission. Do not add Docker Milvus, real Milvus integration code, or the document-processing pipeline until the developer explicitly authorizes the next increment.
+The B2 Milvus infrastructure stage is complete, verified, committed, and pushed. Do not implement the document-processing pipeline until the developer explicitly authorizes the next increment.
 
 The next increment must first complete the following design work:
 
-1. Prefer a real local Milvus smoke verification of insert, search, deletion, COSINE ordering, and timeout uncertainty when the environment is available.
-2. Decide how startup should detect an existing Collection whose Schema differs from the configured Schema, without adding automatic destructive migration.
-3. Design `knowledge_document` transitions through `PROCESSING`, `READY`, and `FAILED`.
-4. Design idempotency, compensation, and retry behavior for partial MySQL, Embedding, and Milvus failures.
-5. Define the complete document-chunk ingestion transaction boundary and recovery procedure.
+1. Design `knowledge_document` transitions through `PROCESSING`, `READY`, and `FAILED`.
+2. Define document chunking and `knowledge_chunk` persistence using the existing chunker.
+3. Define the complete ingestion boundary from document chunking through Embedding generation and Milvus insertion.
+4. Design idempotency, compensation, retry, and recovery for partial MySQL, Embedding, and Milvus failures.
+5. Define the later RAG retrieval orchestration boundary without implementing unrelated interview workflows.
 
-The Embedding HTTP client and vector-generation capability are implemented and verified with mock HTTP. Real supplier integration, vector persistence, and RAG are separate completion states.
+The Embedding HTTP client, vector generation, and Milvus CRUD boundaries have passed real local Smoke verification. `knowledge_chunk` persistence, document-processing orchestration, recovery behavior, and RAG retrieval remain separate completion states.
 
 The following capabilities are not implemented in the current stage:
 
 * Tokenizer integration
 * Real model token-count calculation
-* Real Bailian API end-to-end integration
 * Existing-Collection Schema consistency validation
-* Docker or real Milvus deployment
-* Real Milvus end-to-end integration
-* Verified insertion into a real Milvus Collection
-* Verified similarity search against real Milvus
+* Production or remote Milvus deployment and operations verification
+* Verified final state and recovery behavior after a real network timeout
 * `knowledge_chunk` database insertion
 * A document-processing pipeline
 * `knowledge_document.processing_status` advancement from `UPLOADED` to `PROCESSING`, `READY`, or `FAILED`
