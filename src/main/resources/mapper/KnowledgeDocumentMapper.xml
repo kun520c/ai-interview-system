@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.kun.aiinterview.knowledge.mapper.KnowledgeDocumentMapper">
+<mapper namespace = "com.kun.aiinterview.knowledge.mapper.KnowledgeDocumentMapper">
 
     <insert id="insertDocument"
             parameterType="com.kun.aiinterview.knowledge.entity.KnowledgeDocument"
@@ -34,5 +34,77 @@
             #{errorMessage}
         )
     </insert>
+
+
+    <resultMap
+            id="KnowledgeDocumentResultMap"
+            type="com.kun.aiinterview.knowledge.entity.KnowledgeDocument">
+
+        <id property="id" column="id"/>
+
+        <result property="title" column="title"/>
+        <result property="category" column="category"/>
+        <result property="fileName" column="file_name"/>
+        <result property="fileType" column="file_type"/>
+        <result property="content" column="content"/>
+        <result property="contentHash" column="content_hash"/>
+        <result property="source" column="source"/>
+        <result property="documentVersion" column="document_version"/>
+        <result property="processingStatus" column="processing_status"/>
+        <result property="errorMessage" column="error_message"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+
+    </resultMap>
+
+    <update id="markReady">
+        UPDATE knowledge_document
+        SET
+        processing_status = 'READY',
+        error_message = NULL
+        WHERE id = #{id}
+        AND processing_status = 'PROCESSING'
+    </update>
+
+    <update id="markFailed">
+        UPDATE knowledge_document
+        SET
+        processing_status = 'FAILED',
+        error_message = #{errorMessage}
+        WHERE id = #{id}
+        AND processing_status = 'PROCESSING'
+    </update>
+
+    <select
+            id="selectById"
+            resultMap="KnowledgeDocumentResultMap">
+
+        SELECT
+        id,
+        title,
+        category,
+        file_name,
+        file_type,
+        content,
+        content_hash,
+        source,
+        document_version,
+        processing_status,
+        error_message,
+        created_at,
+        updated_at
+        FROM knowledge_document
+        WHERE id = #{id}
+
+    </select>
+
+    <update id="claimProcessing">
+        UPDATE knowledge_document
+        SET
+        processing_status = 'PROCESSING',
+        error_message = NULL
+        WHERE id = #{id}
+        AND processing_status = 'UPLOADED'
+    </update>
 
 </mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace = "com.kun.aiinterview.knowledge.mapper.KnowledgeChunkMapper">
+    <insert id = "batchInsert">
+        INSERT INTO knowledge_chunk(
+            document_id,
+            document_version,
+            chunk_index,
+            content,
+            token_count,
+            vector_id,
+            embedding_model,
+            embedding_version,
+            status
+        )
+        VALUES
+
+        <foreach collection="chunks"
+                 item="chunk"
+                 separator=",">
+
+            (
+                #{chunk.documentId},
+                #{chunk.documentVersion},
+                #{chunk.chunkIndex},
+                #{chunk.content},
+                #{chunk.tokenCount},
+                #{chunk.vectorId},
+                #{chunk.embeddingModel},
+                #{chunk.embeddingVersion},
+                #{chunk.status}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteByDocumentIdAndVersion">
+        DELETE FROM knowledge_chunk
+        WHERE document_id = #{documentId}
+            AND document_version = #{documentVersion}
+    </delete>
+</mapper>

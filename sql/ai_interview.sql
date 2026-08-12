@@ -476,7 +476,7 @@ create table knowledge_chunk
     document_version        int unsigned not null ,
     chunk_index             int unsigned not null ,
     content                 text not null ,
-    token_count             int unsigned not null ,
+    token_count             int unsigned null ,
     vector_id               varchar(128) not null ,
     embedding_model         varchar(100) not null ,
     embedding_version       varchar(50) not null ,
@@ -509,7 +509,8 @@ create table knowledge_chunk
 
     constraint chk_knowledge_chunk_token_count
         check (
-            token_count > 0
+            token_count is null
+            or token_count > 0
             ),
 
     constraint chk_knowledge_chunk_status
