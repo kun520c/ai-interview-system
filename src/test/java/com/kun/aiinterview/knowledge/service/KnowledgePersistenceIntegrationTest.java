@@ -9,6 +9,7 @@ import com.kun.aiinterview.knowledge.enums.KnowledgeFileType;
 import com.kun.aiinterview.knowledge.enums.KnowledgeProcessingStatus;
 import com.kun.aiinterview.knowledge.mapper.KnowledgeChunkMapper;
 import com.kun.aiinterview.knowledge.mapper.KnowledgeDocumentMapper;
+import com.kun.aiinterview.knowledge.retrieval.KnowledgeRetrievalRow;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -369,18 +371,258 @@ class KnowledgePersistenceIntegrationTest {
         );
     }
 
+    @Test
+    void selectRetrievableByVectorIdsMapsBatchAndExcludesUnrequestedVectorAgainstRealMysql() {
+        String embeddingModel = uniqueEmbeddingModel();
+        String embeddingVersion = uniqueEmbeddingVersion();
+        KnowledgeDocument document = insertDocument(
+                1,
+                KnowledgeProcessingStatus.READY,
+                KnowledgeCategory.JAVA_COLLECTION,
+                "R1 retrieval integration source"
+        );
+        List<KnowledgeChunk> chunks = List.of(
+                chunk(document.getId(), 1, 1, KnowledgeChunkStatus.ACTIVE,
+                        embeddingModel, embeddingVersion),
+                chunk(document.getId(), 1, 2, KnowledgeChunkStatus.ACTIVE,
+                        embeddingModel, embeddingVersion),
+                chunk(document.getId(), 1, 3, KnowledgeChunkStatus.ACTIVE,
+                        embeddingModel, embeddingVersion),
+                chunk(document.getId(), 1, 4, KnowledgeChunkStatus.ACTIVE,
+                        embeddingModel, embeddingVersion)
+        );
+        assertEquals(chunks.size(), knowledgeChunkMapper.batchInsert(chunks));
+        List<KnowledgeChunk> requestedChunks = chunks.subList(0, 3);
+
+        List<KnowledgeRetrievalRow> rows = knowledgeChunkMapper
+                .selectRetrievableByVectorIds(
+                        requestedChunks.stream()
+                                .map(KnowledgeChunk::getVectorId)
+                                .toList(),
+                        embeddingModel,
+                        embeddingVersion
+                );
+
+        Map<String, KnowledgeRetrievalRow> rowByVectorId = rows.stream()
+                .collect(Collectors.toMap(
+                        KnowledgeRetrievalRow::getVectorId,
+                        row -> row
+                ));
+        assertThat(rowByVectorId).containsOnlyKeys(
+                requestedChunks.stream()
+                        .map(KnowledgeChunk::getVectorId)
+                        .toList()
+        );
+        assertThat(rowByVectorId).doesNotContainKey(chunks.get(3).getVectorId());
+        for (KnowledgeChunk chunk : requestedChunks) {
+            KnowledgeRetrievalRow row = rowByVectorId.get(chunk.getVectorId());
+            assertAll(
+                    () -> assertEquals(findChunkId(chunk.getVectorId()), row.getChunkId()),
+                    () -> assertEquals(document.getId(), row.getDocumentId()),
+                    () -> assertEquals(chunk.getDocumentVersion(), row.getDocumentVersion()),
+                    () -> assertEquals(chunk.getChunkIndex(), row.getChunkIndex()),
+                    () -> assertEquals(chunk.getVectorId(), row.getVectorId()),
+                    () -> assertEquals(chunk.getContent(), row.getContent()),
+                    () -> assertEquals(document.getTitle(), row.getTitle()),
+                    () -> assertEquals(document.getCategory(), row.getCategory()),
+                    () -> assertEquals(document.getSource(), row.getSource())
+            );
+        }
+    }
+
+    @Test
+    void selectRetrievableByVectorIdsExcludesInactiveChunksAndNonReadyDocumentsAgainstRealMysql() {
+        String embeddingModel = uniqueEmbeddingModel();
+        String embeddingVersion = uniqueEmbeddingVersion();
+        List<KnowledgeChunk> excludedChunks = new ArrayList<>();
+
+        for (KnowledgeProcessingStatus status : List.of(
+                KnowledgeProcessingStatus.UPLOADED,
+                KnowledgeProcessingStatus.PROCESSING,
+                KnowledgeProcessingStatus.FAILED,
+                KnowledgeProcessingStatus.DISABLED
+        )) {
+            KnowledgeDocument document = insertDocument(
+                    1,
+                    status,
+                    KnowledgeCategory.JAVA_BASIC,
+                    "R1 status filter " + status
+            );
+            excludedChunks.add(chunk(
+                    document.getId(),
+                    1,
+                    1,
+                    KnowledgeChunkStatus.ACTIVE,
+                    embeddingModel,
+                    embeddingVersion
+            ));
+        }
+
+        KnowledgeDocument readyDocument = insertDocument(
+                1,
+                KnowledgeProcessingStatus.READY,
+                KnowledgeCategory.JAVA_BASIC,
+                "R1 inactive chunk filter"
+        );
+        excludedChunks.add(chunk(
+                readyDocument.getId(),
+                1,
+                1,
+                KnowledgeChunkStatus.INACTIVE,
+                embeddingModel,
+                embeddingVersion
+        ));
+        assertEquals(
+                excludedChunks.size(),
+                knowledgeChunkMapper.batchInsert(excludedChunks)
+        );
+
+        List<KnowledgeRetrievalRow> rows = knowledgeChunkMapper
+                .selectRetrievableByVectorIds(
+                        excludedChunks.stream()
+                                .map(KnowledgeChunk::getVectorId)
+                                .toList(),
+                        embeddingModel,
+                        embeddingVersion
+                );
+
+        assertThat(rows).isEmpty();
+    }
+
+    @Test
+    void selectRetrievableByVectorIdsKeepsOnlyCurrentDocumentVersionAgainstRealMysql() {
+        String embeddingModel = uniqueEmbeddingModel();
+        String embeddingVersion = uniqueEmbeddingVersion();
+        KnowledgeDocument document = insertDocument(
+                2,
+                KnowledgeProcessingStatus.READY,
+                KnowledgeCategory.JVM,
+                "R1 document version filter"
+        );
+        KnowledgeChunk oldChunk = chunk(
+                document.getId(),
+                1,
+                1,
+                KnowledgeChunkStatus.ACTIVE,
+                embeddingModel,
+                embeddingVersion
+        );
+        KnowledgeChunk currentChunk = chunk(
+                document.getId(),
+                2,
+                1,
+                KnowledgeChunkStatus.ACTIVE,
+                embeddingModel,
+                embeddingVersion
+        );
+        assertEquals(
+                2,
+                knowledgeChunkMapper.batchInsert(List.of(oldChunk, currentChunk))
+        );
+
+        List<KnowledgeRetrievalRow> rows = knowledgeChunkMapper
+                .selectRetrievableByVectorIds(
+                        List.of(
+                                oldChunk.getVectorId(),
+                                currentChunk.getVectorId()
+                        ),
+                        embeddingModel,
+                        embeddingVersion
+                );
+
+        assertThat(rows).singleElement().satisfies(row -> {
+            assertEquals(currentChunk.getVectorId(), row.getVectorId());
+            assertEquals(2, row.getDocumentVersion());
+        });
+    }
+
+    @Test
+    void selectRetrievableByVectorIdsFiltersEmbeddingMetadataAndMapsNullSourceAgainstRealMysql() {
+        String embeddingModel = uniqueEmbeddingModel();
+        String embeddingVersion = uniqueEmbeddingVersion();
+        KnowledgeDocument document = insertDocument(
+                1,
+                KnowledgeProcessingStatus.READY,
+                KnowledgeCategory.NETWORK,
+                null
+        );
+        KnowledgeChunk validChunk = chunk(
+                document.getId(),
+                1,
+                1,
+                KnowledgeChunkStatus.ACTIVE,
+                embeddingModel,
+                embeddingVersion
+        );
+        KnowledgeChunk wrongModelChunk = chunk(
+                document.getId(),
+                1,
+                2,
+                KnowledgeChunkStatus.ACTIVE,
+                uniqueEmbeddingModel(),
+                embeddingVersion
+        );
+        KnowledgeChunk wrongVersionChunk = chunk(
+                document.getId(),
+                1,
+                3,
+                KnowledgeChunkStatus.ACTIVE,
+                embeddingModel,
+                uniqueEmbeddingVersion()
+        );
+        assertEquals(
+                3,
+                knowledgeChunkMapper.batchInsert(List.of(
+                        validChunk,
+                        wrongModelChunk,
+                        wrongVersionChunk
+                ))
+        );
+
+        List<KnowledgeRetrievalRow> rows = knowledgeChunkMapper
+                .selectRetrievableByVectorIds(
+                        List.of(
+                                validChunk.getVectorId(),
+                                wrongModelChunk.getVectorId(),
+                                wrongVersionChunk.getVectorId()
+                        ),
+                        embeddingModel,
+                        embeddingVersion
+                );
+
+        assertThat(rows).singleElement().satisfies(row -> {
+            assertEquals(validChunk.getVectorId(), row.getVectorId());
+            assertEquals(KnowledgeCategory.NETWORK, row.getCategory());
+            assertNull(row.getSource());
+        });
+    }
+
     private KnowledgeDocument insertUploadedDocument() {
+        return insertDocument(
+                1,
+                KnowledgeProcessingStatus.UPLOADED,
+                KnowledgeCategory.JAVA_BASIC,
+                "C1 integration test"
+        );
+    }
+
+    private KnowledgeDocument insertDocument(
+            int documentVersion,
+            KnowledgeProcessingStatus processingStatus,
+            KnowledgeCategory category,
+            String source
+    ) {
         String uniqueValue = UUID.randomUUID().toString();
         KnowledgeDocument document = KnowledgeDocument.builder()
                 .title("C1 database integration " + uniqueValue)
-                .category(KnowledgeCategory.JAVA_BASIC)
+                .category(category)
                 .fileName("c1-" + uniqueValue + ".md")
                 .fileType(KnowledgeFileType.MARKDOWN)
                 .content("# C1 integration content\n" + uniqueValue)
                 .contentHash(uniqueHash())
-                .source("C1 integration test")
-                .documentVersion(1)
-                .processingStatus(KnowledgeProcessingStatus.UPLOADED)
+                .source(source)
+                .documentVersion(documentVersion)
+                .processingStatus(processingStatus)
                 .errorMessage(null)
                 .build();
 
@@ -395,6 +637,24 @@ class KnowledgePersistenceIntegrationTest {
             int documentVersion,
             int chunkIndex
     ) {
+        return chunk(
+                documentId,
+                documentVersion,
+                chunkIndex,
+                KnowledgeChunkStatus.ACTIVE,
+                EMBEDDING_MODEL,
+                EMBEDDING_VERSION
+        );
+    }
+
+    private KnowledgeChunk chunk(
+            Long documentId,
+            int documentVersion,
+            int chunkIndex,
+            KnowledgeChunkStatus status,
+            String embeddingModel,
+            String embeddingVersion
+    ) {
         String uniqueValue = UUID.randomUUID().toString();
         return KnowledgeChunk.builder()
                 .documentId(documentId)
@@ -403,10 +663,18 @@ class KnowledgePersistenceIntegrationTest {
                 .content("C1 chunk " + uniqueValue)
                 .tokenCount(null)
                 .vectorId(uniqueValue)
-                .embeddingModel(EMBEDDING_MODEL)
-                .embeddingVersion(EMBEDDING_VERSION)
-                .status(KnowledgeChunkStatus.ACTIVE)
+                .embeddingModel(embeddingModel)
+                .embeddingVersion(embeddingVersion)
+                .status(status)
                 .build();
+    }
+
+    private Long findChunkId(String vectorId) {
+        return jdbcTemplate.queryForObject(
+                "SELECT id FROM knowledge_chunk WHERE vector_id = ?",
+                Long.class,
+                vectorId
+        );
     }
 
     private int countDocuments(Long documentId) {
@@ -454,5 +722,13 @@ class KnowledgePersistenceIntegrationTest {
         parts.add(UUID.randomUUID().toString().replace("-", ""));
         parts.add(UUID.randomUUID().toString().replace("-", ""));
         return String.join("", parts);
+    }
+
+    private static String uniqueEmbeddingModel() {
+        return "r1-db-model-" + UUID.randomUUID();
+    }
+
+    private static String uniqueEmbeddingVersion() {
+        return "r1-db-version-" + UUID.randomUUID();
     }
 }

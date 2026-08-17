@@ -366,12 +366,12 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-知识库模块 C1-1 ～ C1-8：知识文档入库、Embedding、Milvus、跨存储补偿与最终回归（已完成）
+RAG Retrieval R1：独立知识检索基础、分层验证与最终回归（技术与文档同步完成，工作树未提交）
 ```
 
 The B2 Milvus infrastructure stage is complete. Its production implementation, focused Mock tests, guarded real-service Smoke Tests, and full regression verification were committed and pushed to `origin/main` in commit `8aceb06bdb5f34b2a971f9930d6ec2a41abf834f`.
 
-The C1 knowledge-document processing stage is also technically complete and has passed its final regression gate. Its current working-tree implementation and tests have not yet been committed or pushed.
+The C1 knowledge-document processing stage is technically complete, passed its final regression gate, and was committed and pushed to `origin/main` in commit `78f6e31` (`feat: complete knowledge ingestion pipeline`).
 
 Question-management MVP record:
 
@@ -539,6 +539,49 @@ Synchronized test scope and current result through C1-8:
 * Final cleanup confirmed zero C1 test documents and chunks, removed all pipeline/sentinel/B2 test vectors, removed the temporary mismatch Collection, and retained the real `knowledge_chunk_vectors_local` Collection.
 * These real tests verify the local development MySQL and Docker Milvus environment, not a production or remote Milvus deployment.
 
+RAG Retrieval R1 completed capability:
+
+* Retrieval has one responsibility: find relevant knowledge and return structured evidence. Its implemented boundary is `Query -> EmbeddingClient -> query vector -> VectorStoreClient/Milvus -> VectorSearchHit -> one MySQL batch hydration -> RetrievedChunk -> RetrievalResult`.
+* Retrieval does not format an LLM prompt, call an LLM, evaluate an answer, write `rag_hit_log`, or control interview workflow. Those concerns remain outside R1.
+* Query Embedding reuses the existing `EmbeddingClient.embed(List<String>)`; no `QueryEmbeddingClient` or second Embedding abstraction was introduced.
+* `KnowledgeRetrievalService` validates the query and `topK`, strips the query, requires exactly one non-null `EmbeddingVector` with `inputIndex == 0`, and passes the actual `EmbeddingBatchResult.profileVersion()` to Milvus search.
+* Milvus remains responsible for COSINE similarity, TopK, and relevance ordering. Java does not calculate cosine similarity, re-sort by score, rerank, or apply an unverified score threshold.
+* `vectorId` is the primary Milvus-to-MySQL association key because it is the Milvus primary identity, `knowledge_chunk.vector_id` is unique, and C1 writes the same generated UUID to both stores. `documentId` and `chunkIndex` are additional cross-store consistency checks; a mismatch fails with `IllegalStateException`.
+* MySQL remains the source of truth for content, document metadata, and business eligibility. Retrieval requires an `ACTIVE` chunk, a `READY` document, matching current document versions, the actual query Embedding model, and the actual query profile version.
+* Retrieval collects all Milvus hit vector IDs and performs one MyBatis `IN` query. It does not perform one MySQL query per hit and therefore does not introduce N+1 retrieval.
+* MySQL `IN` result order is not trusted. Rows are mapped by `vectorId`, then hydrated while iterating the original Milvus hit order. Duplicate mapper `vectorId` values fail rather than being silently overwritten.
+* MySQL eligibility filtering may reduce the final item count below `requestedTopK`. Missing or ineligible hits are skipped without oversampling, retrying Milvus, or automatically filling TopK.
+* `vectorRank` preserves the original Milvus rank. For example, if ranks 2 and 4 fail MySQL eligibility, the returned ranks may remain `1 / 3 / 5` rather than being compressed.
+* `VectorSearchHit` continues to accept every finite similarity score, including zero and negative values. R1 adds no hard score threshold.
+* `RetrievalResult` and `RetrievedChunk` return structured evidence rather than a preformatted prompt string.
+* `KnowledgeRetrievalService` is created only when `milvus.enabled=true`, matching the conditional `VectorStoreClient` implementation and preserving Milvus-disabled application startup.
+
+RAG Retrieval R1 production-review corrections completed:
+
+* Added the missing `#{vectorId}` body to the MyBatis `foreach` used by `selectRetrievableByVectorIds`.
+* Corrected `kc.docuemnt_version` to `kc.document_version` and `kd.soruce` to `kd.source`.
+* Corrected the hydration Map key from chunk content to `KnowledgeRetrievalRow.vectorId` while retaining duplicate-key failure semantics without a merge function.
+* Added explicit query Embedding result validation for a non-null batch result, exactly one vector, a non-null vector, and `inputIndex == 0` before Milvus search.
+* Changed Milvus/MySQL `documentId` and `chunkIndex` mismatch failures to `IllegalStateException`.
+* Replaced unnecessary Guava `Objects` use with `java.util.Objects` and removed clearly unused imports from the Retrieval service.
+
+RAG Retrieval R1 files and verification record:
+
+* Production additions are `KnowledgeRetrievalRow`, `RetrievalResult`, `RetrievedChunk`, and `KnowledgeRetrievalService`. Production changes are `KnowledgeChunkMapper.java` and `KnowledgeChunkMapper.xml`.
+* Test addition is `KnowledgeRetrievalServiceTest`. Retrieval coverage was also added to `KnowledgePersistenceIntegrationTest` and `RealKnowledgeDocumentProcessingSmokeTest`.
+* Review-fix compile used `.\mvnw.cmd -B -ntp -DskipTests compile`, compiled 84 production source files, and completed with `BUILD SUCCESS`. Compilation alone was not treated as functional verification.
+* `KnowledgeRetrievalServiceTest` ran 19 tests with 0 failures, 0 errors, and 0 skipped. It covers normal retrieval, query stripping, model/profile propagation, query-vector propagation, one mapper batch call, MySQL row reordering, partial hydration with original ranks, empty Milvus results, parameter and Embedding contract failures, cross-store mismatches, duplicate vector IDs, and finite zero/negative scores.
+* `EmbeddingBatchResultTest`, `EmbeddingVectorTest`, and `VectorSearchHitTest` ran 43 tests with 0 failures, 0 errors, and 0 skipped.
+* `KnowledgePersistenceIntegrationTest` ran 10 real MySQL/MyBatis tests with 0 failures, 0 errors, and 0 skipped: 6 existing C1 cases and 4 Retrieval Mapper cases. The Retrieval cases execute the real `foreach IN` SQL and verify ACTIVE/READY/current-version/model/profile filtering, exclusion of unrequested or ineligible rows, enum mapping, nullable source, and full projection mapping.
+* The first real MyBatis execution failed before Retrieval SQL ran because the Maven child process had not inherited `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`; MySQL reported `Driver com.mysql.cj.jdbc.Driver claims to not accept jdbcUrl, ${DB_URL}`. This was an execution-environment failure, not a Retrieval SQL bug. No production configuration, test configuration, Schema, or test logic was changed; the existing Windows User-scope values were copied only into the Maven process, and the rerun passed all 10 tests.
+* `RealKnowledgeDocumentProcessingSmokeTest` ran 2 real tests with 0 failures, 0 errors, and 0 skipped. The added `shouldRetrieveProcessedDocumentThroughRealEmbeddingMilvusAndMysql` executed the real path from a semantic query through DashScope/Bailian Embedding, Milvus COSINE TopK, MyBatis/MySQL hydration, and `RetrievalResult`.
+* The real query `Java 中什么 Map 适合多线程并发访问？` was not the chunk text. The test required a hit for the document created by that run, preventing old Collection data from producing a false positive. One observed run returned test-owned `documentId=91`, `chunkId=58`, `documentVersion=1`, `vectorRank=1`, score `0.784863`, and vector ID `f8539bae-f1d6-4cdf-91af-0a86fe50758f`; these values were specific to that cleaned-up Smoke Test run and are not permanent fixtures.
+* Retrieval cleanup deleted only the target vector IDs, verified that a separate test sentinel remained, then deleted the sentinel separately. MySQL test chunks and documents were also removed. No shared Collection was dropped, recreated, or cleared.
+* The first R1 full regression ran 651 tests with 1 failure, 85 errors, and 18 skipped because the Maven process again lacked `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. `application-test.yaml` does not currently define an independent datasource, and some ordinary database-backed tests use the `local,test` profiles. This was an execution-environment failure, not an R1 production regression, Mapper bug, Spring Context bug, or real-test-switch leak.
+* No code or YAML changed for that regression failure. After copying the existing User-scope database variables only into the Maven process, `.\mvnw.cmd -B -ntp -Dtest=DatabaseConnectionTest test` ran 1 test with 0 failures, 0 errors, and 0 skipped. The subsequent `.\mvnw.cmd -B -ntp test` ran 651 tests with 0 failures, 0 errors, and 18 skipped and completed with `BUILD SUCCESS`.
+* The 18 ordinary-regression skips were exactly the guarded real tests: `RealEmbeddingSmokeTest` 1, `RealMilvusVectorStoreSmokeTest` 1, `KnowledgePersistenceIntegrationTest` 10, `RealKnowledgeDocumentProcessingSmokeTest` 2, `RealKnowledgeDocumentProcessingFailureIntegrationTest` 2, and `RealMilvusSchemaValidationSmokeTest` 2. The ordinary full regression did not call real DashScope or Milvus.
+* R1 technical implementation, static review, compile, Unit/Mock, real MyBatis/MySQL, real local-service Retrieval E2E, cleanup, and final regression are complete. The current R1 working-tree changes have not been committed or pushed.
+
 Existing fixed authentication decisions remain unchanged:
 
 1. The application remains a stateless REST API.
@@ -590,21 +633,10 @@ Existing fixed password-change decisions remain unchanged:
 Next development stage:
 
 ```text
-RAG Retrieval 设计与实现（尚未开始编码）
+RAG Retrieval R1 后续编排阶段（待单独设计）
 ```
 
-The C1 knowledge-document ingestion, Embedding, Milvus, compensation, Existing-Collection consistency, and final-regression stages are technically complete. RAG Retrieval is the next stage, but its implementation has not started.
-
-The next increment should first build an independent retrieval foundation with this boundary:
-
-1. Accept and validate a user query.
-2. Generate its vector through the existing `EmbeddingClient`.
-3. Search through `VectorStoreClient.search`.
-4. Consume `VectorSearchHit` identifiers.
-5. Load the source-of-truth `knowledge_chunk` rows by document ID and chunk index.
-6. Assemble a bounded retrieval context.
-
-Do not immediately connect this foundation to the complete interview session, answer-evaluation, or report workflow. Complete and verify the standalone RAG Retrieval infrastructure first.
+The independent RAG Retrieval R1 foundation is technically complete and verified, but its current working-tree changes have not been committed or pushed. The next stage must be designed separately. Its high-level direction may connect structured Retrieval evidence to Prompt / Evaluation Orchestration, but Prompt construction, LLM invocation, answer evaluation, and the complete interview workflow are not implemented by R1.
 
 The following capabilities are not implemented in the current stage:
 
@@ -615,8 +647,10 @@ The following capabilities are not implemented in the current stage:
 * FAILED-document retry
 * Document reprocessing
 * READY-document reprocessing
-* RAG retrieval
-* RAG orchestration
+* Prompt / Evaluation Orchestration that consumes Retrieval evidence
+* LLM invocation based on Retrieval evidence
+* `rag_hit_log` persistence
+* A Retrieval Controller or complete interview-workflow integration
 * A Spring AI replacement implementation; it remains only a later candidate behind `EmbeddingClient`
 * Markdown-heading-aware or code-block-aware chunking
 * Semantic chunking

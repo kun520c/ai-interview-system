@@ -41,4 +41,44 @@
         WHERE document_id = #{documentId}
             AND document_version = #{documentVersion}
     </delete>
+
+    <select id="selectRetrievableByVectorIds"
+            resultType="com.kun.aiinterview.knowledge.retrieval.KnowledgeRetrievalRow">
+        SELECT
+            kc. id AS chunkId,
+            kc.document_id AS documentId,
+            kc.document_version AS documentVersion,
+            kc.chunk_index AS chunkIndex,
+            kc.vector_id AS vectorId,
+            kc. content AS content,
+
+            kd.title AS title,
+            kd. category AS category,
+            kd.source AS source
+
+        FROM knowledge_chunk kc
+
+        INNER JOIN knowledge_document kd
+            ON kd.id = kc.document_id
+
+        WHERE kc.vector_id IN
+
+        <foreach collection="vectorIds"
+                 item="vectorId"
+                 open="("
+                 separator=","
+                 close=")">
+            #{vectorId}
+        </foreach>
+
+        AND kc.status = 'ACTIVE'
+
+        AND kd.processing_status = 'READY'
+
+        AND kc.document_version = kd.document_version
+
+        AND kc.embedding_model = #{embeddingModel}
+
+        AND kc.embedding_version = #{embeddingVersion}
+    </select>
 </mapper>
