@@ -1,0 +1,215 @@
+package com.kun.aiinterview.interview.mapper;
+
+import com.kun.aiinterview.interview.entity.InterviewAnswer;
+import com.kun.aiinterview.interview.enums.InterviewAnswerStatus;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+@SpringBootTest
+@ActiveProfiles({"local", "test"})
+@Transactional
+class InterviewAnswerMapperTest {
+
+    private static final String LONG_ERROR_CODE = "LLM_RESULT_VALIDATION_FAILED";
+
+    @Autowired
+    private InterviewAnswerMapper interviewAnswerMapper;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Test
+    void shouldFindAnswerByIdAndPreserveLongErrorCode() {
+        long interviewQuestionId = insertMainInterviewQuestion();
+        long answerId = insertInterviewAnswer(
+                interviewQuestionId,
+                "回答包含 HashMap 的数组、链表和红黑树结构。",
+                "FAILED",
+                LONG_ERROR_CODE
+        );
+
+        InterviewAnswer found = interviewAnswerMapper.getInterviewAnswerById(answerId);
+        Integer errorCodeLength = jdbcTemplate.queryForObject(
+                """
+                SELECT CHARACTER_MAXIMUM_LENGTH
+                FROM information_schema.columns
+                WHERE table_schema = DATABASE()
+                  AND table_name = 'interview_answer'
+                  AND column_name = 'error_code'
+                """,
+                Integer.class
+        );
+
+        assertNotNull(found);
+        assertAll(
+                () -> assertEquals(answerId, found.getId()),
+                () -> assertEquals(interviewQuestionId, found.getInterviewQuestionId()),
+                () -> assertEquals(
+                        "回答包含 HashMap 的数组、链表和红黑树结构。",
+                        found.getAnswerContent()
+                ),
+                () -> assertEquals(InterviewAnswerStatus.FAILED, found.getStatus()),
+                () -> assertNotNull(found.getRequestId()),
+                () -> assertEquals(LONG_ERROR_CODE, found.getErrorCode()),
+                () -> assertNotNull(found.getSubmittedAt()),
+                () -> assertNotNull(found.getCreatedAt()),
+                () -> assertNotNull(found.getUpdatedAt()),
+                () -> assertEquals(50, errorCodeLength)
+        );
+    }
+
+    @Test
+    void shouldFindAnswerByInterviewQuestionIdWithoutReturningAnotherQuestionsAnswer() {
+        long answeredQuestionId = insertMainInterviewQuestion();
+        long unansweredQuestionId = insertMainInterviewQuestion();
+        long answerId = insertInterviewAnswer(
+                answeredQuestionId,
+                "根据问题 ID 查询的回答",
+                "SUBMITTED",
+                null
+        );
+
+        InterviewAnswer found = interviewAnswerMapper
+                .getInterviewAnswerByInterviewQuestionId(answeredQuestionId);
+        InterviewAnswer unrelated = interviewAnswerMapper
+                .getInterviewAnswerByInterviewQuestionId(unansweredQuestionId);
+
+        assertNotNull(found);
+        assertAll(
+                () -> assertEquals(answerId, found.getId()),
+                () -> assertEquals(answeredQuestionId, found.getInterviewQuestionId()),
+                () -> assertEquals("根据问题 ID 查询的回答", found.getAnswerContent()),
+                () -> assertEquals(InterviewAnswerStatus.SUBMITTED, found.getStatus()),
+                () -> assertNull(found.getErrorCode()),
+                () -> assertNull(unrelated)
+        );
+    }
+
+    @Test
+    void shouldReturnNullForMissingAnswerId() {
+        assertNull(interviewAnswerMapper.getInterviewAnswerById(Long.MAX_VALUE));
+    }
+
+    private long insertMainInterviewQuestion() {
+        long userId = insertUser();
+        long questionId = insertQuestion();
+        long sessionId = insertInterviewSession(userId);
+        jdbcTemplate.update(
+                """
+                INSERT INTO interview_question
+                    (session_id, question_id, category, knowledge_point,
+                     question_content, reference_answer_snapshot,
+                     scoring_points_snapshot, question_type, parent_question_id,
+                     follow_up_target_points, plan_order, display_order, status)
+                VALUES (?, ?, 'JAVA_COLLECTION', 'HashMap', ?, ?, ?, 'MAIN',
+                        NULL, NULL, 1, 1, 'ANSWERED')
+                """,
+                sessionId,
+                questionId,
+                "请说明 HashMap 的核心机制",
+                "本场面试参考答案快照",
+                "[{\"scoringPointId\":101,\"weight\":100}]"
+        );
+        return requiredId(
+                "SELECT id FROM interview_question WHERE session_id = ? AND display_order = 1",
+                sessionId
+        );
+    }
+
+    private long insertInterviewAnswer(
+            long interviewQuestionId,
+            String answerContent,
+            String status,
+            String errorCode
+    ) {
+        String requestId = "e1aa-" + uniqueValue();
+        jdbcTemplate.update(
+                """
+                INSERT INTO interview_answer
+                    (interview_question_id, answer_content, status, request_id, error_code)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                interviewQuestionId,
+                answerContent,
+                status,
+                requestId,
+                errorCode
+        );
+        return requiredId(
+                "SELECT id FROM interview_answer WHERE request_id = ?",
+                requestId
+        );
+    }
+
+    private long insertUser() {
+        String uniqueValue = uniqueValue();
+        String account = "e1aa-" + uniqueValue;
+        jdbcTemplate.update(
+                """
+                INSERT INTO `user` (account, username, password, email, role, status)
+                VALUES (?, ?, ?, ?, 'USER', 'ENABLED')
+                """,
+                account,
+                "E1-A回答测试用户",
+                "test-password-hash",
+                account + "@example.com"
+        );
+        return requiredId("SELECT id FROM `user` WHERE account = ?", account);
+    }
+
+    private long insertQuestion() {
+        String knowledgePoint = "HashMap-" + uniqueValue();
+        jdbcTemplate.update(
+                """
+                INSERT INTO question
+                    (category, knowledge_point, difficulty, question_content,
+                     reference_answer, status)
+                VALUES ('JAVA_COLLECTION', ?, 'MEDIUM', ?, ?, 'ENABLED')
+                """,
+                knowledgePoint,
+                "请说明 HashMap 的核心机制",
+                "题库原始参考答案"
+        );
+        return requiredId(
+                "SELECT id FROM question WHERE knowledge_point = ?",
+                knowledgePoint
+        );
+    }
+
+    private long insertInterviewSession(long userId) {
+        jdbcTemplate.update(
+                """
+                INSERT INTO interview_session
+                    (user_id, difficulty, status, planned_question_count,
+                     completed_question_count, report_status)
+                VALUES (?, 'MEDIUM', 'CREATED', 1, 0, 'NOT_STARTED')
+                """,
+                userId
+        );
+        return requiredId(
+                "SELECT id FROM interview_session WHERE user_id = ?",
+                userId
+        );
+    }
+
+    private long requiredId(String sql, Object... args) {
+        Long id = jdbcTemplate.queryForObject(sql, Long.class, args);
+        assertNotNull(id);
+        return id;
+    }
+
+    private String uniqueValue() {
+        return UUID.randomUUID().toString().replace("-", "");
+    }
+}

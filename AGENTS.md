@@ -366,12 +366,14 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-RAG Retrieval R1：独立知识检索基础、分层验证与最终回归（技术与文档同步完成，工作树未提交）
+E1-A: Answer Evaluation Orchestration Persistence Foundation（技术实现和验证完成，等待本次提交与推送）
 ```
 
 The B2 Milvus infrastructure stage is complete. Its production implementation, focused Mock tests, guarded real-service Smoke Tests, and full regression verification were committed and pushed to `origin/main` in commit `8aceb06bdb5f34b2a971f9930d6ec2a41abf834f`.
 
 The C1 knowledge-document processing stage is technically complete, passed its final regression gate, and was committed and pushed to `origin/main` in commit `78f6e31` (`feat: complete knowledge ingestion pipeline`).
+
+The RAG Retrieval R1 stage is technically complete, passed its layered verification and final regression gate, and was committed and pushed to `origin/main` in commit `d3756e6` (`feat: complete rag retrieval r1`). Milvus remains the current production vector database implementation; `InMemoryEmbeddingStore` is not a production replacement.
 
 Question-management MVP record:
 
@@ -580,7 +582,41 @@ RAG Retrieval R1 files and verification record:
 * The first R1 full regression ran 651 tests with 1 failure, 85 errors, and 18 skipped because the Maven process again lacked `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. `application-test.yaml` does not currently define an independent datasource, and some ordinary database-backed tests use the `local,test` profiles. This was an execution-environment failure, not an R1 production regression, Mapper bug, Spring Context bug, or real-test-switch leak.
 * No code or YAML changed for that regression failure. After copying the existing User-scope database variables only into the Maven process, `.\mvnw.cmd -B -ntp -Dtest=DatabaseConnectionTest test` ran 1 test with 0 failures, 0 errors, and 0 skipped. The subsequent `.\mvnw.cmd -B -ntp test` ran 651 tests with 0 failures, 0 errors, and 18 skipped and completed with `BUILD SUCCESS`.
 * The 18 ordinary-regression skips were exactly the guarded real tests: `RealEmbeddingSmokeTest` 1, `RealMilvusVectorStoreSmokeTest` 1, `KnowledgePersistenceIntegrationTest` 10, `RealKnowledgeDocumentProcessingSmokeTest` 2, `RealKnowledgeDocumentProcessingFailureIntegrationTest` 2, and `RealMilvusSchemaValidationSmokeTest` 2. The ordinary full regression did not call real DashScope or Milvus.
-* R1 technical implementation, static review, compile, Unit/Mock, real MyBatis/MySQL, real local-service Retrieval E2E, cleanup, and final regression are complete. The current R1 working-tree changes have not been committed or pushed.
+* R1 technical implementation, static review, compile, Unit/Mock, real MyBatis/MySQL, real local-service Retrieval E2E, cleanup, and final regression are complete. The completed changes were committed and pushed to `origin/main` in commit `d3756e6` (`feat: complete rag retrieval r1`).
+
+E1-0 Schema correction completed:
+
+* `interview_question.reference_answer_snapshot TEXT NULL` was added to the final Schema snapshot in `sql/ai_interview.sql`. A MAIN question stores the reference answer frozen when that interview is created, so historical evaluation and failure retry do not read a possibly administrator-modified `question.reference_answer`. A FOLLOW_UP does not store its own reference answer; later context assembly must obtain the frozen reference answer from its parent MAIN question.
+* `interview_answer.error_code` was widened from `VARCHAR(20)` to `VARCHAR(50)` because the confirmed E1 error code `LLM_RESULT_VALIDATION_FAILED` exceeds 20 characters. A real MySQL Mapper test verified the database column length and full round-trip value.
+* The repository continues to keep `sql/ai_interview.sql` as the final complete Schema snapshot. No ALTER migration SQL was added.
+
+E1-A completed capability:
+
+* The `com.kun.aiinterview.interview` module now has only the persistence layers required at this stage: `entity`, `enums`, and `mapper`. No empty Controller, Service, DTO, or VO packages were created.
+* `InterviewQuestion` maps the persisted interview-question snapshot and structure, including `referenceAnswerSnapshot`, `scoringPointsSnapshot`, question type, nullable parent question, nullable follow-up target points, ordering, status, and timestamps.
+* `InterviewQuestion.category` reuses `com.kun.aiinterview.question.enums.QuestionCategory`; no duplicate interview-category enum was introduced.
+* `InterviewQuestion.scoringPointsSnapshot` and `followUpTargetPoints` currently map MySQL JSON values as `String`. E1-A does not introduce a custom JSON TypeHandler.
+* `InterviewAnswer` maps answer content, state, request identity, nullable `errorCode`, submission time, and timestamps. `errorCode` remains a `String`; no premature `EvaluationErrorCode` enum was introduced.
+* `InterviewQuestionType` contains `MAIN` and `FOLLOW_UP`; `InterviewQuestionStatus` contains `PENDING`, `WAITING_ANSWER`, `ANSWERED`, and `SKIPPED`; `InterviewAnswerStatus` contains `SUBMITTED`, `EVALUATING`, `EVALUATED`, and `FAILED`. These values match the database CHECK constraints.
+* `InterviewQuestionMapper` currently provides only `getInterviewQuestionById(Long id)`. `InterviewAnswerMapper` currently provides only `getInterviewAnswerById(Long id)` and `getInterviewAnswerByInterviewQuestionId(Long interviewQuestionId)`. Complete CRUD was deliberately not added.
+
+E1-A production-review corrections completed:
+
+* Corrected the Mapper statement id from `getInterviewAnserById` to `getInterviewAnswerById`; the misspelling would have left the interface method without a matching MyBatis statement and risked a `BindingException`.
+* Corrected the resource filename from `InterviewAnserMapper.xml` to `InterviewAnswerMapper.xml`; the old spelling is not retained.
+* Removed the unused `LocalDate` import from `InterviewAnswer` and the unused Lombok import from `InterviewQuestionMapper`.
+
+E1-A files and verification record:
+
+* Production additions are `InterviewQuestion`, `InterviewAnswer`, the three interview status/type enums, both minimal Mapper interfaces, and their two Mapper XML files. Production Schema changes are limited to the E1-0 corrections in `sql/ai_interview.sql`.
+* Test additions are `InterviewQuestionMapperTest` and `InterviewAnswerMapperTest`. Both use `@SpringBootTest`, `@ActiveProfiles({"local", "test"})`, `@Transactional`, and `JdbcTemplate` fixtures that obey the real foreign keys and use UUID-based unique values.
+* `InterviewQuestionMapperTest` covers complete MAIN mapping, isolation of `reference_answer_snapshot` from live `question.reference_answer`, JSON-to-String mapping for `scoring_points_snapshot`, FOLLOW_UP nullable fields, parent mapping, `follow_up_target_points`, and a missing ID.
+* `InterviewAnswerMapperTest` covers lookup by answer ID and interview-question ID, isolation from another question, a missing ID, the real `error_code` column length, and complete persistence of `LLM_RESULT_VALIDATION_FAILED`.
+* `.\mvnw.cmd -B -ntp -DskipTests compile` compiled 91 production source files and completed with `BUILD SUCCESS`. Compilation alone was not treated as functional verification.
+* The first focused Mapper run reached 6 tests with 0 failures, 6 errors, and 0 skipped because its Maven process had not inherited `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`; `${DB_URL}` remained unresolved. This was an execution-environment failure, not a production-code failure. No YAML or test logic was changed.
+* After copying the already-existing Windows User-scope database values only into the Maven process, `.\mvnw.cmd -B -ntp "-Dtest=InterviewQuestionMapperTest,InterviewAnswerMapperTest" test` ran 6 real MySQL/MyBatis tests with 0 failures, 0 errors, and 0 skipped and completed with `BUILD SUCCESS`.
+* With every `RUN_REAL_*` switch and `MILVUS_ENABLED` disabled, the ordinary `.\mvnw.cmd -B -ntp test` regression ran 657 tests with 0 failures, 0 errors, and 18 skipped and completed with `BUILD SUCCESS`.
+* E1-A verification used the local real MySQL service. It did not call the real Embedding API or real Milvus. The 18 guarded skips are not evidence of real Embedding or Milvus success.
 
 Existing fixed authentication decisions remain unchanged:
 
@@ -633,12 +669,25 @@ Existing fixed password-change decisions remain unchanged:
 Next development stage:
 
 ```text
-RAG Retrieval R1 后续编排阶段（待单独设计）
+E1-B: Evaluation Context（待单独设计与实现）
 ```
 
-The independent RAG Retrieval R1 foundation is technically complete and verified, but its current working-tree changes have not been committed or pushed. The next stage must be designed separately. Its high-level direction may connect structured Retrieval evidence to Prompt / Evaluation Orchestration, but Prompt construction, LLM invocation, answer evaluation, and the complete interview workflow are not implemented by R1.
+E1-B is only the next planned stage. It may design and implement `ScoringPointSnapshot`, `EvaluationContext`, MAIN/FOLLOW_UP context assembly, and Evaluation Context validation. None of those capabilities are implemented by E1-A.
 
-The following capabilities are not implemented in the current stage:
+The following Evaluation capabilities are not implemented in the current stage:
+
+* `EvaluationContext`
+* Prompt Builder
+* LLM Client
+* Score Calculator
+* `FollowUpPolicy`
+* Evaluation Persistence
+* `rag_hit_log` orchestration
+* Complete `InterviewService`
+* Interview Controller
+* Complete interview workflow
+
+Other capabilities that also remain unimplemented include:
 
 * Tokenizer integration
 * Trustworthy real-model per-chunk token-count calculation
@@ -657,4 +706,4 @@ The following capabilities are not implemented in the current stage:
 * Knowledge-document pagination, detail, or enable/disable management
 * Mandatory rejection of duplicate content
 
-Until the developer explicitly authorizes a later stage, also do not implement interview sessions, answer submission or evaluation, LLM integration, interview reports, user weaknesses, password reset, database changes, or broad unrelated refactoring.
+Until the developer explicitly authorizes a later stage, do not implement beyond the completed E1-A persistence foundation, including Evaluation Context assembly, answer-evaluation orchestration, LLM integration, interview reports, user weaknesses, password reset, database changes, or broad unrelated refactoring.

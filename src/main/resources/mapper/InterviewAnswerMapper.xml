@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace = "com.kun.aiinterview.interview.mapper.InterviewAnswerMapper">
+
+    <select id="getInterviewAnswerById"
+            resultType="com.kun.aiinterview.interview.entity.InterviewAnswer">
+        SELECT id,
+        interview_question_id,
+        answer_content,
+        status,
+        request_id,
+        error_code,
+        submitted_at,
+        created_at,
+        updated_at
+        FROM interview_answer
+        WHERE id = #{id}
+    </select>
+
+    <select id="getInterviewAnswerByInterviewQuestionId"
+            resultType="com.kun.aiinterview.interview.entity.InterviewAnswer">
+        SELECT id,
+        interview_question_id,
+        answer_content,
+        status,
+        request_id,
+        error_code,
+        submitted_at,
+        created_at,
+        updated_at
+        FROM interview_answer
+        WHERE interview_question_id = #{interviewQuestionId}
+    </select>
+
+</mapper>

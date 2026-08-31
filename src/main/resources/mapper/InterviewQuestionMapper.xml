@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace = "com.kun.aiinterview.interview.mapper.InterviewQuestionMapper">
+
+    <select id = "getInterviewQuestionById"
+            resultType = "com.kun.aiinterview.interview.entity.InterviewQuestion">
+        SELECT  id,
+                session_id,
+                question_id,
+                category,
+                knowledge_point,
+                question_content,
+                reference_answer_snapshot,
+                scoring_points_snapshot,
+                question_type,
+                parent_question_id,
+                follow_up_target_points,
+                plan_order,
+                display_order,
+                status,
+                created_at,
+                updated_at
+        FROM interview_question
+        WHERE id = #{id}
+    </select>
+
+</mapper>
