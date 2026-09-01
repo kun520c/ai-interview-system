@@ -366,7 +366,7 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-E1-A: Answer Evaluation Orchestration Persistence Foundation（技术实现和验证完成，等待本次提交与推送）
+E1-B: Evaluation Context（技术实现和验证完成，等待本次提交与推送）
 ```
 
 The B2 Milvus infrastructure stage is complete. Its production implementation, focused Mock tests, guarded real-service Smoke Tests, and full regression verification were committed and pushed to `origin/main` in commit `8aceb06bdb5f34b2a971f9930d6ec2a41abf834f`.
@@ -617,6 +617,39 @@ E1-A files and verification record:
 * After copying the already-existing Windows User-scope database values only into the Maven process, `.\mvnw.cmd -B -ntp "-Dtest=InterviewQuestionMapperTest,InterviewAnswerMapperTest" test` ran 6 real MySQL/MyBatis tests with 0 failures, 0 errors, and 0 skipped and completed with `BUILD SUCCESS`.
 * With every `RUN_REAL_*` switch and `MILVUS_ENABLED` disabled, the ordinary `.\mvnw.cmd -B -ntp test` regression ran 657 tests with 0 failures, 0 errors, and 18 skipped and completed with `BUILD SUCCESS`.
 * E1-A verification used the local real MySQL service. It did not call the real Embedding API or real Milvus. The 18 guarded skips are not evidence of real Embedding or Milvus success.
+* E1-A was committed and pushed to `origin/main` in commit `cf3e03a8421a5ddecb76e6bb88069085299ddb31` (`feat: establish evaluation persistence foundation`).
+
+E1-B completed capability:
+
+* `EvaluationMode` separates the type of answer currently being evaluated into `MAIN_ANSWER` and `FOLLOW_UP_ANSWER`. It deliberately does not use `INITIAL` or `FINAL`; those values belong to the later evaluation-persistence phase because a MAIN answer may ultimately be stored as either phase.
+* `ScoringPointSnapshot` is an immutable record containing only `scoringPointId`, the existing `QuestionPointType`, `content`, and `weight`. It does not duplicate question IDs, status, or timestamps.
+* `EvaluationContext` is an immutable record containing current and MAIN answer/question identities, mode, MAIN question metadata and historical evaluation snapshots, MAIN answer content, optional follow-up question/answer content, and follow-up target point IDs. Both List fields use `List.copyOf` for defensive copying.
+* `EvaluationContextService.buildContext(answerId)` is the only public assembly entry. It resolves the current answer and interview question, branches by MAIN or FOLLOW_UP, parses historical JSON, validates persistence relationships, and returns the typed Context.
+* MAIN assembly uses only the current `InterviewAnswer` and the persisted MAIN `InterviewQuestion` snapshots. It does not depend on `QuestionMapper`, live `question.reference_answer`, or live `question_scoring_point` rows.
+* FOLLOW_UP assembly resolves the parent MAIN question and MAIN answer, preserves both MAIN and follow-up question/answer content, and inherits the reference answer and complete scoring-point criteria from the parent MAIN snapshot. A FOLLOW_UP does not own separate evaluation criteria.
+* MAIN validation requires the MAIN type, question-bank identity, no parent, a plan order, session/category/knowledge-point/question content, historical reference-answer and scoring-point snapshots, and valid answer content.
+* FOLLOW_UP validation requires the FOLLOW_UP type, no question-bank identity or plan order, a parent MAIN in the same session, no independent reference-answer or scoring-point snapshot, valid target-point JSON, and an existing MAIN answer belonging to the parent.
+* Scoring-point JSON must parse to a non-empty typed List with non-null elements, positive unique IDs, a non-null point type, non-blank content, weights from 1 through 100, and a total weight of exactly 100.
+* Follow-up target JSON must parse to a non-empty List with non-null, unique IDs, and every target must belong to the parent MAIN scoring snapshot. E1-B deliberately does not enforce a maximum of two targets; that is a later `FollowUpPolicy` generation concern.
+* JSON is parsed with the injected real Jackson `ObjectMapper` and `com.fasterxml.jackson.core.type.TypeReference`. No MyBatis JSON TypeHandler or separate Snapshot Parser was introduced because the Context Service is currently the only production consumer.
+* No Service interface/Impl pair, Factory, Assembler, Resolver, or complex evaluation-specific exception hierarchy was introduced. Invalid internal persistence state currently fails with simple Java exceptions at the Context boundary.
+
+E1-B production-review corrections completed:
+
+* Internal persistence-state failures for missing or invalid InterviewQuestion relationships were made consistent as `IllegalStateException`, while null or missing external `answerId` input remains an argument failure.
+* Added defensive identity checks so Mapper results must match the requested answer/question IDs, and the resolved MAIN answer must belong to the expected parent MAIN question.
+* Replaced nullable direct equality calls with `java.util.Objects.equals` where relationship comparison could otherwise be fragile, and removed unused/conflicting imports.
+
+E1-B files and verification record:
+
+* Production additions are `EvaluationMode`, `ScoringPointSnapshot`, `EvaluationContext`, and `EvaluationContextService`. Test addition is `EvaluationContextServiceTest`. E1-B did not modify the database Schema, E1-A Mapper interfaces/XML, or RAG Retrieval R1.
+* `.\mvnw.cmd -B -ntp -DskipTests compile` compiled 95 production source files and completed with `BUILD SUCCESS`. Compilation alone was not treated as functional verification.
+* `.\mvnw.cmd -B -ntp -Dtest=EvaluationContextServiceTest test` ran 52 Unit/Mock test cases with 0 failures, 0 errors, and 0 skipped. It uses Mockito Mapper dependencies and a real Jackson `ObjectMapper`; it does not use MySQL.
+* Focused coverage includes normal MAIN and FOLLOW_UP Contexts, persisted entity and relationship validation, malformed and invalid scoring snapshots, weight validation, parent/session/MAIN-answer rules, malformed and invalid target IDs, key Mapper interactions, and immutable defensive List copies.
+* The first E1-B ordinary regression ran 709 tests with 1 failure, 91 errors, and 18 skipped because its Maven process had not inherited `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`; `${DB_URL}` remained unresolved. This was an execution-environment failure rather than an E1-B code regression, and no code or configuration was changed for it.
+* After copying the existing Windows User-scope database values only into the Maven process, `.\mvnw.cmd -B -ntp test` ran 709 tests with 0 failures, 0 errors, and 18 skipped and completed with `BUILD SUCCESS`.
+* Every `RUN_REAL_*` switch and `MILVUS_ENABLED` remained disabled. Existing ordinary database-backed tests used the local MySQL test datasource during the full regression; the focused E1-B test did not. Neither run called the real Embedding API or real Milvus, and the 18 guarded skips are not evidence of external-service verification.
+* E1-B technical implementation, production review, focused Unit/Mock verification, and full regression are complete. E1-B is awaiting the current commit and push; no commit SHA is claimed before it exists.
 
 Existing fixed authentication decisions remain unchanged:
 
@@ -669,23 +702,27 @@ Existing fixed password-change decisions remain unchanged:
 Next development stage:
 
 ```text
-E1-B: Evaluation Context（待单独设计与实现）
+E1-C: RAG Query Builder / Retrieval Adapter design（NEXT / planned）
 ```
 
-E1-B is only the next planned stage. It may design and implement `ScoringPointSnapshot`, `EvaluationContext`, MAIN/FOLLOW_UP context assembly, and Evaluation Context validation. None of those capabilities are implemented by E1-A.
+E1-C is only the next planned stage. It has not been designed or implemented by E1-B.
 
 The following Evaluation capabilities are not implemented in the current stage:
 
-* `EvaluationContext`
-* Prompt Builder
-* LLM Client
-* Score Calculator
-* `FollowUpPolicy`
-* Evaluation Persistence
+* RAG Query Builder
+* Evaluation Retrieval Adapter
+* Similarity threshold policy
+* Raw Milvus hit logging extension
 * `rag_hit_log` orchestration
-* Complete `InterviewService`
-* Interview Controller
-* Complete interview workflow
+* Prompt Builder
+* DeepSeek Evaluation Client
+* LLM output contract
+* Java Score Calculator
+* `FollowUpPolicy`
+* EvaluationPhase persistence
+* AnswerEvaluation Mapper
+* Complete evaluation orchestration
+* Controller / HTTP submit workflow
 
 Other capabilities that also remain unimplemented include:
 
@@ -696,9 +733,8 @@ Other capabilities that also remain unimplemented include:
 * FAILED-document retry
 * Document reprocessing
 * READY-document reprocessing
-* Prompt / Evaluation Orchestration that consumes Retrieval evidence
-* LLM invocation based on Retrieval evidence
-* `rag_hit_log` persistence
+* Prompt / Evaluation Orchestration that consumes Evaluation Context and Retrieval evidence
+* LLM invocation based on Evaluation Context and Retrieval evidence
 * A Retrieval Controller or complete interview-workflow integration
 * A Spring AI replacement implementation; it remains only a later candidate behind `EmbeddingClient`
 * Markdown-heading-aware or code-block-aware chunking
@@ -706,4 +742,4 @@ Other capabilities that also remain unimplemented include:
 * Knowledge-document pagination, detail, or enable/disable management
 * Mandatory rejection of duplicate content
 
-Until the developer explicitly authorizes a later stage, do not implement beyond the completed E1-A persistence foundation, including Evaluation Context assembly, answer-evaluation orchestration, LLM integration, interview reports, user weaknesses, password reset, database changes, or broad unrelated refactoring.
+Until the developer explicitly authorizes a later stage, do not implement beyond the completed E1-B Evaluation Context boundary, including E1-C retrieval adaptation, answer-evaluation orchestration, LLM integration, interview reports, user weaknesses, password reset, database changes, or broad unrelated refactoring.
