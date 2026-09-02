@@ -37,3 +37,12 @@ milvus:
   dimension: ${MILVUS_DIMENSION:1024}
   connect-timeout: ${MILVUS_CONNECT_TIMEOUT:5s}
   request-timeout: ${MILVUS_REQUEST_TIMEOUT:10s}
+
+deepseek:
+  enabled: ${DEEPSEEK_ENABLED:false}
+  base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
+  api-key: ${DEEPSEEK_API_KEY:}
+  model: ${DEEPSEEK_MODEL:deepseek-v4-flash}
+  max-tokens: ${DEEPSEEK_MAX_TOKENS:4096}
+  connect-timeout: ${DEEPSEEK_CONNECT_TIMEOUT:3s}
+  read-timeout: ${DEEPSEEK_READ_TIMEOUT:60s}

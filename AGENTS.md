@@ -19,6 +19,9 @@ Current core stack:
 * Alibaba Cloud Bailian / DashScope OpenAI-compatible Embeddings API
 * `qwen3.7-text-embedding`
 * Current embedding dimension: 1024
+* DeepSeek OpenAI-compatible Chat Completions API
+* Structured JSON evaluation output
+* Default DeepSeek model: `deepseek-v4-flash`
 * MyBatis 3.0.5
 * MySQL 8.0.45
 * `io.milvus:milvus-sdk-java:2.6.20`
@@ -33,7 +36,6 @@ Planned technologies used only when their corresponding modules are developed:
 * Spring Mail
 * Knife4j
 * LangChain4j
-* DeepSeek API
 
 Spring AI is not a current dependency. A later version may evaluate a Spring AI implementation, but it must continue to integrate through the project's own `EmbeddingClient` interface. The hand-written DashScope implementation remains the current production implementation.
 
@@ -126,6 +128,21 @@ The Java backend controls:
 * Idempotency
 * Transaction boundaries
 * Concurrency control
+
+### Evaluation core data flow
+
+The current Evaluation Core flow is:
+
+```text
+EvaluationContext
+→ Evaluation Retrieval
+→ Evaluation Prompt
+→ DeepSeek suggestion
+→ Java validation
+→ Java score
+```
+
+The Retrieval Query does not contain the user's answer, while the Evaluation Prompt may contain it. Raw Milvus hits are retained for trace purposes but are never sent to the LLM; only evidence that passed MySQL eligibility is included. The LLM suggestion remains untrusted external input until Java validation succeeds, and the final `totalScore` is always calculated by Java.
 
 ## 6. Interview Rules
 
@@ -366,7 +383,7 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-E1-B: Evaluation Context（技术实现和验证完成，等待本次提交与推送）
+Evaluation Core: E1-C Retrieval + E1-D Prompt/DeepSeek Client + E1-E Java Validation/Score completed
 ```
 
 The B2 Milvus infrastructure stage is complete. Its production implementation, focused Mock tests, guarded real-service Smoke Tests, and full regression verification were committed and pushed to `origin/main` in commit `8aceb06bdb5f34b2a971f9930d6ec2a41abf834f`.
@@ -649,7 +666,7 @@ E1-B files and verification record:
 * The first E1-B ordinary regression ran 709 tests with 1 failure, 91 errors, and 18 skipped because its Maven process had not inherited `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`; `${DB_URL}` remained unresolved. This was an execution-environment failure rather than an E1-B code regression, and no code or configuration was changed for it.
 * After copying the existing Windows User-scope database values only into the Maven process, `.\mvnw.cmd -B -ntp test` ran 709 tests with 0 failures, 0 errors, and 18 skipped and completed with `BUILD SUCCESS`.
 * Every `RUN_REAL_*` switch and `MILVUS_ENABLED` remained disabled. Existing ordinary database-backed tests used the local MySQL test datasource during the full regression; the focused E1-B test did not. Neither run called the real Embedding API or real Milvus, and the 18 guarded skips are not evidence of external-service verification.
-* E1-B technical implementation, production review, focused Unit/Mock verification, and full regression are complete. E1-B is awaiting the current commit and push; no commit SHA is claimed before it exists.
+* E1-B technical implementation, production review, focused Unit/Mock verification, and full regression are complete. E1-B was committed and pushed in commit `a202fd0` (`feat: build evaluation context foundation`).
 
 Existing fixed authentication decisions remain unchanged:
 
@@ -699,30 +716,36 @@ Existing fixed password-change decisions remain unchanged:
 14. JWT revocation failures use an `AuthenticationException`, clear the security context, and delegate to `RestAuthenticationEntryPoint`.
 15. The user must log in again with the new password to obtain a new access token.
 
+Evaluation Core completed capability on 2026-09-02:
+
+* E1-C builds stable MAIN and FOLLOW_UP Retrieval Queries without using the user's answer, delegates to the existing R1 retrieval path, and separates raw Milvus hits from MySQL-eligible evidence.
+* E1-D builds versioned system/user prompts from Evaluation Context and eligible evidence, then calls the DeepSeek OpenAI-compatible `/chat/completions` endpoint through a conditional `RestClient`.
+* DeepSeek responses retain model, finish reason, raw JSON, and the parsed `LlmEvaluationSuggestion`. DeepSeek is disabled by default and has only Mock HTTP verification; real DeepSeek integration has not been verified.
+* E1-E validates the untrusted LLM suggestion into a trusted Java object and calculates the five-dimensional total score in Java.
+* The final ordinary `.\mvnw.cmd -B -ntp test` regression ran 829 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`. All real Embedding, Milvus, knowledge-pipeline, and DeepSeek switches were disabled.
+
 Next development stage:
 
 ```text
-E1-C: RAG Query Builder / Retrieval Adapter design（NEXT / planned）
+Evaluation Orchestration
+→ INITIAL / FINAL phase decision
+→ FollowUpPolicy
+→ answer_evaluation persistence
+→ MAIN / FOLLOW_UP evaluation workflow
 ```
 
-E1-C is only the next planned stage. It has not been designed or implemented by E1-B.
+The following Evaluation capabilities remain unimplemented:
 
-The following Evaluation capabilities are not implemented in the current stage:
-
-* RAG Query Builder
-* Evaluation Retrieval Adapter
-* Similarity threshold policy
-* Raw Milvus hit logging extension
-* `rag_hit_log` orchestration
-* Prompt Builder
-* DeepSeek Evaluation Client
-* LLM output contract
-* Java Score Calculator
+* Similarity-threshold policy
+* Category retrieval filtering
+* `rag_hit_log` persistence
+* Complete Evaluation orchestration
 * `FollowUpPolicy`
-* EvaluationPhase persistence
-* AnswerEvaluation Mapper
-* Complete evaluation orchestration
-* Controller / HTTP submit workflow
+* INITIAL / FINAL phase decision
+* AnswerEvaluation Mapper and persistence
+* MAIN / FOLLOW_UP interview workflow and Controller integration
+* Interview reports and user-weakness updates
+* Real DeepSeek integration verification
 
 Other capabilities that also remain unimplemented include:
 
@@ -733,8 +756,7 @@ Other capabilities that also remain unimplemented include:
 * FAILED-document retry
 * Document reprocessing
 * READY-document reprocessing
-* Prompt / Evaluation Orchestration that consumes Evaluation Context and Retrieval evidence
-* LLM invocation based on Evaluation Context and Retrieval evidence
+* Evaluation orchestration that invokes the existing Prompt and DeepSeek components
 * A Retrieval Controller or complete interview-workflow integration
 * A Spring AI replacement implementation; it remains only a later candidate behind `EmbeddingClient`
 * Markdown-heading-aware or code-block-aware chunking
@@ -742,4 +764,4 @@ Other capabilities that also remain unimplemented include:
 * Knowledge-document pagination, detail, or enable/disable management
 * Mandatory rejection of duplicate content
 
-Until the developer explicitly authorizes a later stage, do not implement beyond the completed E1-B Evaluation Context boundary, including E1-C retrieval adaptation, answer-evaluation orchestration, LLM integration, interview reports, user weaknesses, password reset, database changes, or broad unrelated refactoring.
+Until the developer explicitly authorizes the next stage, do not implement Evaluation orchestration, follow-up policy, answer-evaluation persistence, interview workflow integration, reports, user weaknesses, password reset, database changes, or broad unrelated refactoring.

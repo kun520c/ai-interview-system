@@ -104,6 +104,7 @@ public class KnowledgeRetrievalService {
                     topK,
                     embeddingResult.model(),
                     embeddingResult.profileVersion(),
+                    List.of(),
                     List.of()
             );
         }
@@ -191,6 +192,7 @@ public class KnowledgeRetrievalService {
                 topK,
                 embeddingResult.model(),
                 embeddingResult.profileVersion(),
+                hits,
                 retrievedChunks
         );
     }
