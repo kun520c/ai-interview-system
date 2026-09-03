@@ -531,6 +531,55 @@ create table knowledge_chunk
  default charset = utf8mb4
  collate = utf8mb4_unicode_ci;
 
+create table rag_retrieval_batch
+(
+    retrieval_batch_id     varchar(64) not null,
+    answer_id              bigint unsigned not null,
+
+    query_text             text not null,
+    top_k                  int unsigned not null,
+
+    filter_snapshot        json not null,
+
+    embedding_model        varchar(100) not null,
+    embedding_version      varchar(50) not null,
+
+    raw_hit_count          int unsigned not null,
+    evidence_hit_count     int unsigned not null,
+
+    created_at             datetime not null default current_timestamp,
+
+    primary key (retrieval_batch_id),
+
+    constraint fk_rag_retrieval_batch_answer
+        foreign key (answer_id)
+            references interview_answer(id)
+            on delete restrict
+            on update restrict,
+
+    constraint chk_rag_retrieval_batch_top_k
+        check (top_k >= 1),
+
+    constraint chk_rag_retrieval_batch_raw_count
+        check (raw_hit_count >= 0),
+
+    constraint chk_rag_retrieval_batch_evidence_count
+        check (evidence_hit_count >= 0),
+
+    constraint chk_rag_retrieval_batch_raw_within_top_k
+        check (raw_hit_count <= top_k),
+
+    constraint chk_rag_retrieval_batch_evidence_within_raw
+        check (evidence_hit_count <= raw_hit_count),
+
+    index idx_rag_retrieval_batch_answer_created(
+                                                 answer_id,
+                                                 created_at
+        )
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+
 create table rag_hit_log
 (
     id                      bigint unsigned not null auto_increment,
@@ -559,6 +608,12 @@ create table rag_hit_log
         REFERENCES interview_answer(id)
         ON DELETE RESTRICT
         ON UPDATE RESTRICT,
+
+    constraint fk_rag_hit_log_batch
+        foreign key (retrieval_batch_id)
+            references rag_retrieval_batch(retrieval_batch_id)
+            on delete restrict
+            on update restrict,
 
     CONSTRAINT chk_rag_hit_log_rank_within_top_k
     CHECK (

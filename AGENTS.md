@@ -134,15 +134,21 @@ The Java backend controls:
 The current Evaluation Core flow is:
 
 ```text
-EvaluationContext
-→ Evaluation Retrieval
+Answer
+→ EvaluationContext
+→ RAG Retrieval
+→ RAG Trace Persistence
 → Evaluation Prompt
 → DeepSeek suggestion
-→ Java validation
-→ Java score
+→ Java Validation
+→ Java Score
+→ EvaluationStandard
+→ FollowUpPolicy
+→ AnswerEvaluation
+→ EvaluationOrchestrationResult
 ```
 
-The Retrieval Query does not contain the user's answer, while the Evaluation Prompt may contain it. Raw Milvus hits are retained for trace purposes but are never sent to the LLM; only evidence that passed MySQL eligibility is included. The LLM suggestion remains untrusted external input until Java validation succeeds, and the final `totalScore` is always calculated by Java.
+The Retrieval Query does not contain the user's answer, while the Evaluation Prompt may contain it. Raw Milvus hits remain available in the in-memory Retrieval result for runtime diagnostics but are not individually persisted or sent to the LLM. Only evidence that passed MySQL eligibility and was selected as Evaluation Prompt input is persisted in `rag_hit_log`. The LLM suggestion remains untrusted external input until Java validation succeeds, and the final `totalScore` is always calculated by Java.
 
 ## 6. Interview Rules
 
@@ -164,9 +170,9 @@ The LLM may only recommend a follow-up.
 
 ## 7. Database Rules
 
-The current database version is v1.1.
+The current database snapshot extends v1.1 with the F4 RAG Retrieval Batch trace table.
 
-It contains 12 core tables:
+It contains 13 core tables:
 
 ```text
 user
@@ -178,6 +184,7 @@ interview_answer
 answer_evaluation
 knowledge_document
 knowledge_chunk
+rag_retrieval_batch
 rag_hit_log
 interview_report
 user_weakness
@@ -324,7 +331,7 @@ Report the actual test, failure, error, and skipped counts for each relevant run
 
 ### Real external Smoke Tests
 
-The real MySQL and external-service integration / Smoke Tests are opt-in tests. They are not Mock tests or ordinary unit tests, and they must be skipped during an ordinary `mvn test` run unless explicitly enabled.
+The guarded real-service integration / Smoke Tests listed below are opt-in tests. They are not Mock tests or ordinary unit tests, and they must be skipped during an ordinary `mvn test` run unless explicitly enabled. Ordinary real-MySQL Mapper and transaction tests, including the F1/F4 tests, are not controlled by these `RUN_REAL_*` switches and may run in the ordinary full regression when `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` are available.
 
 Their explicit opt-in switches are:
 
@@ -383,8 +390,11 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-Evaluation Core: E1-C Retrieval + E1-D Prompt/DeepSeek Client + E1-E Java Validation/Score completed
+Evaluation Core F1-F4 technically complete
+→ Next stage: Interview Workflow
 ```
+
+The F1-F4 changes have passed their technical verification gate. Determine their commit and push status from the current Git history; do not infer publication state from this document alone.
 
 The B2 Milvus infrastructure stage is complete. Its production implementation, focused Mock tests, guarded real-service Smoke Tests, and full regression verification were committed and pushed to `origin/main` in commit `8aceb06bdb5f34b2a971f9930d6ec2a41abf834f`.
 
@@ -716,36 +726,87 @@ Existing fixed password-change decisions remain unchanged:
 14. JWT revocation failures use an `AuthenticationException`, clear the security context, and delegate to `RestAuthenticationEntryPoint`.
 15. The user must log in again with the new password to obtain a new access token.
 
-Evaluation Core completed capability on 2026-09-02:
+Evaluation Core F1-F4 completed capability on 2026-09-03:
 
-* E1-C builds stable MAIN and FOLLOW_UP Retrieval Queries without using the user's answer, delegates to the existing R1 retrieval path, and separates raw Milvus hits from MySQL-eligible evidence.
-* E1-D builds versioned system/user prompts from Evaluation Context and eligible evidence, then calls the DeepSeek OpenAI-compatible `/chat/completions` endpoint through a conditional `RestClient`.
-* DeepSeek responses retain model, finish reason, raw JSON, and the parsed `LlmEvaluationSuggestion`. DeepSeek is disabled by default and has only Mock HTTP verification; real DeepSeek integration has not been verified.
-* E1-E validates the untrusted LLM suggestion into a trusted Java object and calculates the five-dimensional total score in Java.
-* The final ordinary `.\mvnw.cmd -B -ntp test` regression ran 829 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`. All real Embedding, Milvus, knowledge-pipeline, and DeepSeek switches were disabled.
+### Evaluation persistence and standard
+
+* `AnswerEvaluation` and `AnswerEvaluationMapper` map the complete `answer_evaluation` persistence contract. MySQL generates the numeric primary key through MyBatis, and the orchestration layer checks generated-key population and affected rows.
+* `EvaluationPhase` contains only `INITIAL` and `FINAL`. `DecisionAction` contains only `FOLLOW_UP`, `NEXT_MAIN`, and `FINISH`.
+* `EvaluationDecision` permits exactly `INITIAL + FOLLOW_UP`, `FINAL + NEXT_MAIN`, and `FINAL + FINISH`.
+* Evaluation JSON columns remain Java `String` values at the persistence boundary; no custom JSON TypeHandler was introduced.
+* `EvaluationStandard.VERSION` is the fixed value `evaluation-standard-v1`.
+* Level resolution depends only on Java-calculated `totalScore`: `90-100 -> EXCELLENT`, `80-89 -> GOOD`, `60-79 -> FAIR`, and `0-59 -> WEAK`. Scores outside `0-100` fail.
+
+### Follow-up MVP policy
+
+* Only a `MAIN_ANSWER` can produce a follow-up decision.
+* A MAIN answer produces `INITIAL + FOLLOW_UP` only when the validated LLM suggestion has `followUpRecommended=true` and either `totalScore < 60` or at least one `CORE` scoring point is uncovered.
+* An LLM recommendation is required because Java does not generate the natural-language follow-up question in this stage.
+* A MAIN answer that does not produce a follow-up is `FINAL + NEXT_MAIN` or `FINAL + FINISH`, based on `hasNextMainQuestion`.
+* A `FOLLOW_UP_ANSWER` can never produce another follow-up and is always `FINAL + NEXT_MAIN` or `FINAL + FINISH`.
+* `followUpRecommended` is the validated LLM recommendation, while `decisionAction` is the Java decision. They are deliberately independent and may differ.
+
+### RAG Retrieval Trace persistence
+
+* `rag_retrieval_batch` represents one persisted trace for an Evaluation Retrieval that successfully returned an `EvaluationRetrievalResult`.
+* `rag_hit_log` records only MySQL-eligible evidence selected as input to the Evaluation Prompt. Rejected raw Milvus hits are not persisted as used evidence and are not individually persisted elsewhere.
+* `raw_hit_count` and `evidence_hit_count` distinguish `raw=0/evidence=0`, `raw>0/evidence=0`, and `raw>0/evidence>0` without storing rejected raw hits.
+* `rank_no` preserves the original Milvus rank. Gaps such as `1 / 3 / 5` are valid and are not compressed.
+* `rag_hit_log.retrieval_batch_id` has a database foreign key to `rag_retrieval_batch.retrieval_batch_id`.
+* `answer_evaluation.retrieval_batch_id` remains a logical association and currently has no database foreign key to `rag_retrieval_batch`.
+* The first trace Schema keeps the existing repeated batch metadata in `rag_hit_log` to avoid an unnecessary table redesign.
+* `RagTracePersistenceService.persist()` uses an independent short `@Transactional` boundary for one batch and its zero or more eligible evidence hits. Embedding, Milvus, Prompt construction, DeepSeek, and Evaluation are outside that transaction.
+* If Retrieval Trace persistence succeeds and a later Prompt, DeepSeek, validation, scoring, decision, or Evaluation insert step fails, the committed Trace is intentionally retained. The same answer may produce another retrieval batch on retry.
+* The final `AnswerEvaluation` stores only the `retrievalBatchId` used by the attempt that successfully produced and inserted the Evaluation.
+
+### Evaluation orchestration
+
+* `EvaluationOrchestrationService.evaluate()` has no `@Transactional` annotation because its call chain includes Embedding, Milvus, and DeepSeek operations.
+* The implemented order is `getByAnswerId -> buildContext -> generate retrievalBatchId -> retrieve -> persist trace -> build prompt -> DeepSeek -> validate -> calculate score -> resolve level -> decide follow-up -> insert AnswerEvaluation -> return result`.
+* One UUID retrieval batch ID is generated per new attempt and reused by Trace persistence, `AnswerEvaluation`, and `EvaluationOrchestrationResult`.
+* Trace persistence must complete before Prompt construction and DeepSeek evaluation. If Trace persistence fails, Evaluation does not continue and `AnswerEvaluation` is not inserted.
+* A pre-existing `AnswerEvaluation` is returned before Context, Retrieval, Trace, Prompt, DeepSeek, or downstream Evaluation work begins.
+* `getByAnswerId` plus database `UNIQUE(answer_id)` provides the first idempotency layer for sequential retries. The current check-then-insert flow does not solve a concurrent double-request race.
+* For a FOLLOW_UP answer, Trace persistence belongs to `context.currentAnswerId()`. The resulting Evaluation also uses that current answer ID while `mainInterviewQuestionId` associates the FINAL Evaluation with the original MAIN question.
+* F3/F4 orchestration deliberately does not create a FOLLOW_UP `InterviewQuestion`, update answer/question/session states, advance the interview, or generate reports and weaknesses.
+* `EvaluationOrchestrationService` is created only when both `milvus.enabled=true` and `deepseek.enabled=true`. `RagTracePersistenceService` is an ordinary database `@Service` and does not require those external-service flags itself.
+
+### F1-F4 verification baseline
+
+* Verification date: `2026-09-03`.
+* `.\mvnw.cmd -B -ntp -DskipTests compile` compiled 124 production source files and completed with `BUILD SUCCESS`.
+* The final ordinary `.\mvnw.cmd -B -ntp test` regression ran 917 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
+* F1 and F4 Mapper/transaction tests executed real MyBatis XML and real local MySQL 8.0.45. They verified generated keys, round trips, database constraints, zero-evidence batches, original-rank gaps, short-transaction commit, and rollback of a successful batch insert when the hit insert failed.
+* DeepSeek behavior was verified only through Mock HTTP. No real DeepSeek request was made for the F1-F4 gate.
+* Real Embedding and Milvus Smoke Tests remained protected and disabled for the F1-F4 full regression. The 18 skips are not evidence of real-service success.
+
+The following Evaluation capabilities remain unimplemented:
+
+* Interview Workflow and Controller/API orchestration
+* FOLLOW_UP `InterviewQuestion` creation
+* `InterviewAnswer` state transitions
+* `InterviewQuestion` state transitions
+* `InterviewSession` state transitions and current-question advancement
+* Real `hasNextMainQuestion` calculation from persisted interview state
+* Concurrent Evaluation locking and complete concurrent idempotency
+* Interview reports
+* User-weakness updates
+* Real DeepSeek integration verification
+* Similarity-threshold policy and category retrieval filtering
 
 Next development stage:
 
 ```text
-Evaluation Orchestration
-→ INITIAL / FINAL phase decision
-→ FollowUpPolicy
-→ answer_evaluation persistence
-→ MAIN / FOLLOW_UP evaluation workflow
+Interview Workflow
+→ answer SUBMITTED / EVALUATING / EVALUATED / FAILED transitions
+→ consume INITIAL / FINAL Evaluation results
+→ create at most one FOLLOW_UP InterviewQuestion when required
+→ advance MAIN / FOLLOW_UP InterviewQuestion state
+→ advance InterviewSession current question or completion state
+→ calculate hasNextMainQuestion from persisted state
+→ enforce concurrency and idempotency
+→ keep database state transitions inside short transaction boundaries
 ```
-
-The following Evaluation capabilities remain unimplemented:
-
-* Similarity-threshold policy
-* Category retrieval filtering
-* `rag_hit_log` persistence
-* Complete Evaluation orchestration
-* `FollowUpPolicy`
-* INITIAL / FINAL phase decision
-* AnswerEvaluation Mapper and persistence
-* MAIN / FOLLOW_UP interview workflow and Controller integration
-* Interview reports and user-weakness updates
-* Real DeepSeek integration verification
 
 Other capabilities that also remain unimplemented include:
 
@@ -756,12 +817,11 @@ Other capabilities that also remain unimplemented include:
 * FAILED-document retry
 * Document reprocessing
 * READY-document reprocessing
-* Evaluation orchestration that invokes the existing Prompt and DeepSeek components
-* A Retrieval Controller or complete interview-workflow integration
+* A Retrieval Controller outside the future Interview Workflow
 * A Spring AI replacement implementation; it remains only a later candidate behind `EmbeddingClient`
 * Markdown-heading-aware or code-block-aware chunking
 * Semantic chunking
 * Knowledge-document pagination, detail, or enable/disable management
 * Mandatory rejection of duplicate content
 
-Until the developer explicitly authorizes the next stage, do not implement Evaluation orchestration, follow-up policy, answer-evaluation persistence, interview workflow integration, reports, user weaknesses, password reset, database changes, or broad unrelated refactoring.
+Until the developer explicitly authorizes the next stage, do not implement Interview Workflow, answer/question/session state transitions, follow-up question creation, concurrent Evaluation locking, Controller/API orchestration, reports, user weaknesses, password reset, further database changes, or broad unrelated refactoring.

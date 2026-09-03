@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kun.aiinterview.knowledge.mapper.RagHitLogMapper">
+
+    <resultMap
+            id="RagHitLogResultMap"
+            type="com.kun.aiinterview.knowledge.entity.RagHitLog">
+
+        <id
+                property="id"
+                column="id"/>
+
+        <result
+                property="answerId"
+                column="answer_id"/>
+
+        <result
+                property="retrievalBatchId"
+                column="retrieval_batch_id"/>
+
+        <result
+                property="chunkId"
+                column="chunk_id"/>
+
+        <result
+                property="similarityScore"
+                column="similarity_score"/>
+
+        <result
+                property="rankNo"
+                column="rank_no"/>
+
+        <result
+                property="queryText"
+                column="query_text"/>
+
+        <result
+                property="topK"
+                column="top_k"/>
+
+        <result
+                property="filterSnapshot"
+                column="filter_snapshot"/>
+
+        <result
+                property="embeddingModel"
+                column="embedding_model"/>
+
+        <result
+                property="embeddingVersion"
+                column="embedding_version"/>
+
+        <result
+                property="createdAt"
+                column="created_at"/>
+
+    </resultMap>
+
+    <insert id="batchInsert">
+
+        INSERT INTO rag_hit_log (
+        answer_id,
+        retrieval_batch_id,
+        chunk_id,
+        similarity_score,
+        rank_no,
+        query_text,
+        top_k,
+        filter_snapshot,
+        embedding_model,
+        embedding_version
+        )
+        VALUES
+
+        <foreach
+                collection="hits"
+                item="hit"
+                separator=",">
+
+            (
+            #{hit.answerId},
+            #{hit.retrievalBatchId},
+            #{hit.chunkId},
+            #{hit.similarityScore},
+            #{hit.rankNo},
+            #{hit.queryText},
+            #{hit.topK},
+            #{hit.filterSnapshot},
+            #{hit.embeddingModel},
+            #{hit.embeddingVersion}
+            )
+
+        </foreach>
+
+    </insert>
+
+    <select
+            id="listByBatchId"
+            resultMap="RagHitLogResultMap">
+
+        SELECT
+        id,
+        answer_id,
+        retrieval_batch_id,
+        chunk_id,
+        similarity_score,
+        rank_no,
+        query_text,
+        top_k,
+        filter_snapshot,
+        embedding_model,
+        embedding_version,
+        created_at
+        FROM rag_hit_log
+        WHERE retrieval_batch_id = #{retrievalBatchId}
+        ORDER BY rank_no ASC
+
+    </select>
+
+</mapper>

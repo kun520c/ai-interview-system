@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace = "com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper">
+
+    <resultMap
+            id="AnswerEvaluationResultMap"
+            type="com.kun.aiinterview.interview.entity.AnswerEvaluation">
+
+        <id
+                property="id"
+                column="id"/>
+
+        <result
+                property="answerId"
+                column="answer_id"/>
+
+        <result
+                property="mainInterviewQuestionId"
+                column="main_interview_question_id"/>
+
+        <result
+                property="evaluationPhase"
+                column="evaluation_phase"
+                javaType="com.kun.aiinterview.interview.enums.EvaluationPhase"/>
+
+        <result
+                property="correctnessScore"
+                column="correctness_score"/>
+
+        <result
+                property="completenessScore"
+                column="completeness_score"/>
+
+        <result
+                property="depthScore"
+                column="depth_score"/>
+
+        <result
+                property="clarityScore"
+                column="clarity_score"/>
+
+        <result
+                property="practiceScore"
+                column="practice_score"/>
+
+        <result
+                property="totalScore"
+                column="total_score"/>
+
+        <result
+                property="level"
+                column="level"/>
+
+        <result
+                property="strengths"
+                column="strengths"/>
+
+        <result
+                property="missingPoints"
+                column="missing_points"/>
+
+        <result
+                property="correction"
+                column="correction"/>
+
+        <result
+                property="scoringPointResults"
+                column="scoring_point_results"/>
+
+        <result
+                property="followUpRecommended"
+                column="follow_up_recommended"/>
+
+        <result
+                property="suggestedFollowUp"
+                column="suggested_follow_up"/>
+
+        <result
+                property="decisionAction"
+                column="decision_action"
+                javaType="com.kun.aiinterview.interview.enums.DecisionAction"/>
+
+        <result
+                property="retrievalBatchId"
+                column="retrieval_batch_id"/>
+
+        <result
+                property="llmModel"
+                column="llm_model"/>
+
+        <result
+                property="promptVersion"
+                column="prompt_version"/>
+
+        <result
+                property="evaluationStandardVersion"
+                column="evaluation_standard_version"/>
+
+        <result
+                property="rawResult"
+                column="raw_result"/>
+
+        <result
+                property="createdAt"
+                column="created_at"/>
+
+    </resultMap>
+
+    <insert
+            id="insertEvaluation"
+            parameterType="com.kun.aiinterview.interview.entity.AnswerEvaluation"
+            useGeneratedKeys="true"
+            keyProperty="id">
+
+        INSERT INTO answer_evaluation(
+            answer_id,
+            main_interview_question_id,
+            evaluation_phase,
+            correctness_score,
+            completeness_score,
+            depth_score,
+            clarity_score,
+            practice_score,
+            total_score,
+            level,
+            strengths,
+            missing_points,
+            correction,
+            scoring_point_results,
+            follow_up_recommended,
+            suggested_follow_up,
+            decision_action,
+            retrieval_batch_id,
+            llm_model,
+            prompt_version,
+            evaluation_standard_version,
+            raw_result
+        )
+        VALUES(
+            #{answerId},
+            #{mainInterviewQuestionId},
+            #{evaluationPhase},
+            #{correctnessScore},
+            #{completenessScore},
+            #{depthScore},
+            #{clarityScore},
+            #{practiceScore},
+            #{totalScore},
+            #{level},
+            #{strengths},
+            #{missingPoints},
+            #{correction},
+            #{scoringPointResults},
+            #{followUpRecommended},
+            #{suggestedFollowUp},
+            #{decisionAction},
+            #{retrievalBatchId},
+            #{llmModel},
+            #{promptVersion},
+            #{evaluationStandardVersion},
+            #{rawResult}
+        )
+
+    </insert>
+
+    <select
+            id="getByAnswerId"
+            resultMap="AnswerEvaluationResultMap">
+
+        SELECT
+        id,
+        answer_id,
+        main_interview_question_id,
+        evaluation_phase,
+        correctness_score,
+        completeness_score,
+        depth_score,
+        clarity_score,
+        practice_score,
+        total_score,
+        level,
+        strengths,
+        missing_points,
+        correction,
+        scoring_point_results,
+        follow_up_recommended,
+        suggested_follow_up,
+        decision_action,
+        retrieval_batch_id,
+        llm_model,
+        prompt_version,
+        evaluation_standard_version,
+        raw_result,
+        created_at
+        FROM answer_evaluation
+        WHERE answer_id = #{answerId}
+
+    </select>
+
+</mapper>

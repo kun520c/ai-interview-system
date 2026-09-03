@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace = "com.kun.aiinterview.knowledge.mapper.RagRetrievalBatchMapper">
+    <resultMap
+            id="RagRetrievalBatchResultMap"
+            type="com.kun.aiinterview.knowledge.entity.RagRetrievalBatch">
+
+        <id
+                property="retrievalBatchId"
+                column="retrieval_batch_id"/>
+
+        <result
+                property="answerId"
+                column="answer_id"/>
+
+        <result
+                property="queryText"
+                column="query_text"/>
+
+        <result
+                property="topK"
+                column="top_k"/>
+
+        <result
+                property="filterSnapshot"
+                column="filter_snapshot"/>
+
+        <result
+                property="embeddingModel"
+                column="embedding_model"/>
+
+        <result
+                property="embeddingVersion"
+                column="embedding_version"/>
+
+        <result
+                property="rawHitCount"
+                column="raw_hit_count"/>
+
+        <result
+                property="evidenceHitCount"
+                column="evidence_hit_count"/>
+
+        <result
+                property="createdAt"
+                column="created_at"/>
+
+    </resultMap>
+
+    <insert
+            id="insertBatch"
+            parameterType="com.kun.aiinterview.knowledge.entity.RagRetrievalBatch">
+
+        INSERT INTO rag_retrieval_batch (
+            retrieval_batch_id,
+            answer_id,
+            query_text,
+            top_k,
+            filter_snapshot,
+            embedding_model,
+            embedding_version,
+            raw_hit_count,
+            evidence_hit_count
+        )
+        VALUES (
+            #{retrievalBatchId},
+            #{answerId},
+            #{queryText},
+            #{topK},
+            #{filterSnapshot},
+            #{embeddingModel},
+            #{embeddingVersion},
+            #{rawHitCount},
+            #{evidenceHitCount}
+        )
+
+    </insert>
+
+    <select
+            id="getByBatchId"
+            resultMap="RagRetrievalBatchResultMap">
+
+        SELECT
+        retrieval_batch_id,
+        answer_id,
+        query_text,
+        top_k,
+        filter_snapshot,
+        embedding_model,
+        embedding_version,
+        raw_hit_count,
+        evidence_hit_count,
+        created_at
+        FROM rag_retrieval_batch
+        WHERE retrieval_batch_id = #{retrievalBatchId}
+
+    </select>
+</mapper>
