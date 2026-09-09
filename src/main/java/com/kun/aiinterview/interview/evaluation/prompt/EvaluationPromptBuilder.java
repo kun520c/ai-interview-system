@@ -90,15 +90,15 @@ public class EvaluationPromptBuilder {
     public EvaluationPrompt build(
             EvaluationContext context,
             EvaluationRetrievalResult retrievalResult
-    ){
+    ) {
 
-        if(context == null){
+        if (context == null) {
             throw new IllegalArgumentException(
                     "EvaluationContext不能为空"
             );
         }
 
-        if(retrievalResult == null){
+        if (retrievalResult == null) {
             throw new IllegalArgumentException(
                     "EvaluationRetrievalResult不能为空"
             );
@@ -117,7 +117,7 @@ public class EvaluationPromptBuilder {
     private String buildUserPrompt(
             EvaluationContext context,
             EvaluationRetrievalResult retrievalResult
-    ){
+    ) {
 
         StringBuilder prompt =
                 new StringBuilder();
@@ -148,7 +148,7 @@ public class EvaluationPromptBuilder {
     private void appendBasicContext(
             StringBuilder prompt,
             EvaluationContext context
-    ){
+    ) {
         prompt.append("===== EVALUATION CONTEXT =====\n");
 
         prompt.append("评价模式：")
@@ -175,7 +175,7 @@ public class EvaluationPromptBuilder {
     private void appendScoringPoints(
             StringBuilder prompt,
             EvaluationContext context
-    ){
+    ) {
         prompt.append("===== MAIN SCORING POINTS =====\n");
 
         for (ScoringPointSnapshot scoringPoint

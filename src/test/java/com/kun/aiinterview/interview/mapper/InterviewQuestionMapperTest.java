@@ -145,6 +145,163 @@ class InterviewQuestionMapperTest {
     }
 
     @Test
+    void shouldFindNextPendingMainQuestionByPlanOrder() {
+        long userId = insertUser();
+        long sessionId = insertInterviewSession(userId, 4);
+        long currentQuestionId = insertMainInterviewQuestion(
+                sessionId,
+                insertQuestion(QUESTION_BANK_REFERENCE_ANSWER),
+                INTERVIEW_REFERENCE_ANSWER,
+                SCORING_POINTS_JSON,
+                1,
+                1,
+                "ANSWERED"
+        );
+        long expectedQuestionId = insertMainInterviewQuestion(
+                sessionId,
+                insertQuestion(QUESTION_BANK_REFERENCE_ANSWER),
+                INTERVIEW_REFERENCE_ANSWER,
+                SCORING_POINTS_JSON,
+                2,
+                7,
+                "PENDING"
+        );
+        insertMainInterviewQuestion(
+                sessionId,
+                insertQuestion(QUESTION_BANK_REFERENCE_ANSWER),
+                INTERVIEW_REFERENCE_ANSWER,
+                SCORING_POINTS_JSON,
+                3,
+                3,
+                "PENDING"
+        );
+        insertMainInterviewQuestion(
+                sessionId,
+                insertQuestion(QUESTION_BANK_REFERENCE_ANSWER),
+                INTERVIEW_REFERENCE_ANSWER,
+                SCORING_POINTS_JSON,
+                4,
+                9,
+                "ANSWERED"
+        );
+        insertFollowUpInterviewQuestion(sessionId, currentQuestionId);
+
+        long anotherUserId = insertUser();
+        long anotherSessionId = insertInterviewSession(anotherUserId);
+        insertMainInterviewQuestion(
+                anotherSessionId,
+                insertQuestion(QUESTION_BANK_REFERENCE_ANSWER),
+                INTERVIEW_REFERENCE_ANSWER,
+                SCORING_POINTS_JSON,
+                2,
+                3,
+                "PENDING"
+        );
+
+        InterviewQuestion found = interviewQuestionMapper
+                .findNextPendingMainQuestion(sessionId, 1);
+
+        assertNotNull(found);
+        assertAll(
+                () -> assertEquals(expectedQuestionId, found.getId()),
+                () -> assertEquals(sessionId, found.getSessionId()),
+                () -> assertEquals(InterviewQuestionType.MAIN, found.getQuestionType()),
+                () -> assertEquals(InterviewQuestionStatus.PENDING, found.getStatus()),
+                () -> assertEquals(2, found.getPlanOrder()),
+                () -> assertEquals(7, found.getDisplayOrder()),
+                () -> assertNotNull(found.getUpdatedAt())
+        );
+    }
+
+    @Test
+    void shouldChangeQuestionStatusOnlyFromExpectedStatus() {
+        long userId = insertUser();
+        long sessionId = insertInterviewSession(userId);
+        long questionId = insertMainInterviewQuestion(
+                sessionId,
+                insertQuestion(QUESTION_BANK_REFERENCE_ANSWER),
+                INTERVIEW_REFERENCE_ANSWER,
+                SCORING_POINTS_JSON,
+                1,
+                1,
+                "PENDING"
+        );
+        long anotherSessionId = insertInterviewSession(insertUser());
+
+        assertEquals(0, interviewQuestionMapper.markAnswered(questionId, sessionId));
+        assertEquals(0, interviewQuestionMapper.markWaitingAnswer(questionId, anotherSessionId));
+        assertEquals(1, interviewQuestionMapper.markWaitingAnswer(questionId, sessionId));
+        assertEquals(0, interviewQuestionMapper.markWaitingAnswer(questionId, sessionId));
+        assertEquals(
+                InterviewQuestionStatus.WAITING_ANSWER,
+                interviewQuestionMapper.getInterviewQuestionById(questionId).getStatus()
+        );
+
+        assertEquals(1, interviewQuestionMapper.markAnswered(questionId, sessionId));
+        assertEquals(0, interviewQuestionMapper.markAnswered(questionId, sessionId));
+        assertEquals(0, interviewQuestionMapper.markWaitingAnswer(questionId, sessionId));
+        assertEquals(
+                InterviewQuestionStatus.ANSWERED,
+                interviewQuestionMapper.getInterviewQuestionById(questionId).getStatus()
+        );
+    }
+
+    @Test
+    void shouldInsertFollowUpPopulateKeyAndRecoverItByParentQuestionId()
+            throws JsonProcessingException {
+        long userId = insertUser();
+        long sessionId = insertInterviewSession(userId);
+        long parentQuestionId = insertMainInterviewQuestion(
+                sessionId,
+                insertQuestion(QUESTION_BANK_REFERENCE_ANSWER),
+                INTERVIEW_REFERENCE_ANSWER,
+                SCORING_POINTS_JSON,
+                1,
+                1,
+                "ANSWERED"
+        );
+        InterviewQuestion parent = interviewQuestionMapper
+                .getInterviewQuestionById(parentQuestionId);
+        InterviewQuestion followUp = InterviewQuestion.builder()
+                .sessionId(sessionId)
+                .questionId(null)
+                .category(QuestionCategory.JAVA_COLLECTION)
+                .knowledgePoint("HashMap 扩容")
+                .questionContent("请进一步说明扩容过程")
+                .referenceAnswerSnapshot(null)
+                .scoringPointsSnapshot(null)
+                .questionType(InterviewQuestionType.FOLLOW_UP)
+                .parentQuestionId(parentQuestionId)
+                .followUpTargetPoints(FOLLOW_UP_TARGET_POINTS_JSON)
+                .planOrder(null)
+                .displayOrder(parent.getDisplayOrder() + 1)
+                .status(InterviewQuestionStatus.PENDING)
+                .build();
+
+        int affectedRows = interviewQuestionMapper.insertFollowUp(followUp);
+        InterviewQuestion recovered = interviewQuestionMapper
+                .getFollowUpByParentQuestionId(parentQuestionId);
+
+        assertEquals(1, affectedRows);
+        assertNotNull(followUp.getId());
+        assertNotNull(recovered);
+        assertAll(
+                () -> assertEquals(followUp.getId(), recovered.getId()),
+                () -> assertEquals(sessionId, recovered.getSessionId()),
+                () -> assertNull(recovered.getQuestionId()),
+                () -> assertEquals(InterviewQuestionType.FOLLOW_UP, recovered.getQuestionType()),
+                () -> assertEquals(parentQuestionId, recovered.getParentQuestionId()),
+                () -> assertNull(recovered.getPlanOrder()),
+                () -> assertEquals(parent.getDisplayOrder() + 1, recovered.getDisplayOrder()),
+                () -> assertEquals(InterviewQuestionStatus.PENDING, recovered.getStatus()),
+                () -> assertEquals(
+                        objectMapper.readTree(FOLLOW_UP_TARGET_POINTS_JSON),
+                        objectMapper.readTree(recovered.getFollowUpTargetPoints())
+                )
+        );
+    }
+
+    @Test
     void shouldReturnNullForMissingInterviewQuestionId() {
         assertNull(interviewQuestionMapper.getInterviewQuestionById(Long.MAX_VALUE));
     }
@@ -187,14 +344,19 @@ class InterviewQuestionMapperTest {
     }
 
     private long insertInterviewSession(long userId) {
+        return insertInterviewSession(userId, 1);
+    }
+
+    private long insertInterviewSession(long userId, int plannedQuestionCount) {
         jdbcTemplate.update(
                 """
                 INSERT INTO interview_session
                     (user_id, difficulty, status, planned_question_count,
                      completed_question_count, report_status)
-                VALUES (?, 'MEDIUM', 'CREATED', 1, 0, 'NOT_STARTED')
+                VALUES (?, 'MEDIUM', 'CREATED', ?, 0, 'NOT_STARTED')
                 """,
-                userId
+                userId,
+                plannedQuestionCount
         );
         return requiredId(
                 "SELECT id FROM interview_session WHERE user_id = ?",

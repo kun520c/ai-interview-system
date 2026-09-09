@@ -49,7 +49,7 @@ public class RagTracePersistenceService {
             String retrievalBatchId,
             Long answerId,
             EvaluationRetrievalResult retrievalResult
-    ){
+    ) {
         validateInput(
                 retrievalBatchId,
                 answerId,
@@ -67,13 +67,13 @@ public class RagTracePersistenceService {
                 ragRetrievalBatchMapper
                         .insertBatch(batch);
 
-        if(batchAffectedRows != 1){
+        if (batchAffectedRows != 1) {
             throw new IllegalStateException(
                     "RAG Retrieval Batch写入失败"
             );
         }
 
-        if(retrievalResult.evidence().isEmpty()){
+        if (retrievalResult.evidence().isEmpty()) {
             return;
         }
 
@@ -88,7 +88,7 @@ public class RagTracePersistenceService {
                 ragHitLogMapper
                         .batchInsert(hits);
 
-        if(hitAffectedRows != hits.size()){
+        if (hitAffectedRows != hits.size()) {
             throw new IllegalStateException(
                     "RAG Hit Log写入数量异常"
             );
@@ -99,7 +99,7 @@ public class RagTracePersistenceService {
             String retrievalBatchId,
             Long answerId,
             EvaluationRetrievalResult retrievalResult
-    ){
+    ) {
 
         return RagRetrievalBatch.builder()
 
@@ -146,7 +146,7 @@ public class RagTracePersistenceService {
             String retrievalBatchId,
             Long answerId,
             EvaluationRetrievalResult retrievalResult
-    ){
+    ) {
 
         return retrievalResult
                 .evidence()
@@ -168,7 +168,7 @@ public class RagTracePersistenceService {
             Long answerId,
             EvaluationRetrievalResult retrievalResult,
             RetrievedChunk evidence
-    ){
+    ) {
         return RagHitLog.builder()
 
                 .answerId(
@@ -218,24 +218,24 @@ public class RagTracePersistenceService {
             String retrievalBatchId,
             Long answerId,
             EvaluationRetrievalResult retrievalResult
-    ){
+    ) {
 
-        if(retrievalBatchId == null
-                ||retrievalBatchId.isBlank()){
+        if (retrievalBatchId == null
+                ||retrievalBatchId.isBlank()) {
 
             throw new IllegalArgumentException(
                     "retrievalBatchId不能为空"
             );
         }
 
-        if(answerId == null || answerId <= 0){
+        if (answerId == null || answerId <= 0) {
 
             throw new IllegalArgumentException(
                     "answerId必须大于0"
             );
         }
 
-        if(retrievalResult == null){
+        if (retrievalResult == null) {
 
             throw new IllegalArgumentException(
                     "EvaluationRetrievalResult不能为空"

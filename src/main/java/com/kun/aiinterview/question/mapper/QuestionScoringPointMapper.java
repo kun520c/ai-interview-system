@@ -9,10 +9,8 @@ import java.util.List;
 
 @Mapper
 public interface QuestionScoringPointMapper {
-    int batchInsert(
-            @Param("scoringPoints")
-            List<QuestionScoringPoint> scoringPoints
-    );
+
+    int batchInsert(@Param("scoringPoints") List<QuestionScoringPoint> scoringPoints);
 
     int deleteByQuestionId(@Param("questionId") Long questionId);
 

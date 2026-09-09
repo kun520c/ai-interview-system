@@ -12,16 +12,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.springframework.http.MediaType;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -60,7 +63,6 @@ public class AuthControllerTest {
     private final String disabledUserUsername = "禁用登录接口测试用户";
     private final String disabledUserPassword = "DisabledPassword123";
 
-
     private final String blankAccount = "";
     private final String longAccount = "a".repeat(51);
     private final String shortPassword = "1234567";
@@ -69,7 +71,7 @@ public class AuthControllerTest {
     private final String missingAccount = "controller_login_missing_user";
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         cleanUpTestUsers();
 
         insertLoginUser(
@@ -90,7 +92,7 @@ public class AuthControllerTest {
     }
 
     @AfterEach
-    void tearDown(){
+    void tearDown() {
         cleanUpTestUsers();
     }
 

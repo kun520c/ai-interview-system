@@ -5,20 +5,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.enums.DecisionAction;
 import com.kun.aiinterview.interview.enums.EvaluationPhase;
+import com.kun.aiinterview.interview.evaluation.decision.EvaluationDecision;
+import com.kun.aiinterview.interview.evaluation.decision.FollowUpPolicy;
+import com.kun.aiinterview.interview.evaluation.decision.FollowUpTargetResolver;
 import com.kun.aiinterview.interview.evaluation.EvaluationContext;
 import com.kun.aiinterview.interview.evaluation.EvaluationMode;
 import com.kun.aiinterview.interview.evaluation.EvaluationRetrievalAdapter;
 import com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult;
-import com.kun.aiinterview.interview.evaluation.ScoringPointSnapshot;
-import com.kun.aiinterview.interview.evaluation.decision.EvaluationDecision;
-import com.kun.aiinterview.interview.evaluation.decision.FollowUpPolicy;
+import com.kun.aiinterview.interview.evaluation.llm.deepseek.DeepSeekEvaluationClient;
 import com.kun.aiinterview.interview.evaluation.llm.DeepSeekEvaluationResult;
 import com.kun.aiinterview.interview.evaluation.llm.LlmEvaluationSuggestion;
-import com.kun.aiinterview.interview.evaluation.llm.deepseek.DeepSeekEvaluationClient;
 import com.kun.aiinterview.interview.evaluation.prompt.EvaluationPrompt;
 import com.kun.aiinterview.interview.evaluation.prompt.EvaluationPromptBuilder;
 import com.kun.aiinterview.interview.evaluation.score.EvaluationScore;
 import com.kun.aiinterview.interview.evaluation.score.EvaluationScoreCalculator;
+import com.kun.aiinterview.interview.evaluation.ScoringPointSnapshot;
 import com.kun.aiinterview.interview.evaluation.standard.EvaluationLevel;
 import com.kun.aiinterview.interview.evaluation.standard.EvaluationStandard;
 import com.kun.aiinterview.interview.evaluation.validation.LlmEvaluationValidator;
@@ -31,15 +32,16 @@ import com.kun.aiinterview.knowledge.service.RagTracePersistenceService;
 import com.kun.aiinterview.question.enums.QuestionCategory;
 import com.kun.aiinterview.question.enums.QuestionPointType;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mock;
+import org.mockito.Spy;
 
 import java.util.List;
 import java.util.UUID;
@@ -98,6 +100,9 @@ class EvaluationOrchestrationServiceTest {
     @Mock
     private FollowUpPolicy followUpPolicy;
 
+    @Spy
+    private FollowUpTargetResolver followUpTargetResolver;
+
     @Mock
     private AnswerEvaluationMapper answerEvaluationMapper;
 
@@ -115,7 +120,8 @@ class EvaluationOrchestrationServiceTest {
         EvaluationScore score = new EvaluationScore(12, 12, 12, 12, 11, 59);
         EvaluationDecision decision = new EvaluationDecision(
                 EvaluationPhase.INITIAL,
-                DecisionAction.FOLLOW_UP
+                DecisionAction.FOLLOW_UP,
+                List.of(101L)
         );
         PipelineFixture fixture = stubHappyPipeline(
                 ANSWER_ID,
@@ -138,6 +144,8 @@ class EvaluationOrchestrationServiceTest {
         assertThat(result.level()).isEqualTo(EvaluationLevel.WEAK);
         assertThat(result.followUpRecommended()).isTrue();
         assertThat(result.suggestedFollowUp()).isEqualTo("请进一步解释扩容机制");
+        assertThat(result.followUpTargetPointIds())
+                .containsExactly(101L);
         assertThat(result.retrievalBatchId()).isNotBlank();
         assertThat(UUID.fromString(result.retrievalBatchId()).toString())
                 .isEqualTo(result.retrievalBatchId());
@@ -243,7 +251,11 @@ class EvaluationOrchestrationServiceTest {
                 EvaluationMode.MAIN_ANSWER,
                 score,
                 EvaluationLevel.GOOD,
-                new EvaluationDecision(EvaluationPhase.FINAL, DecisionAction.NEXT_MAIN),
+                new EvaluationDecision(
+                        EvaluationPhase.FINAL,
+                        DecisionAction.NEXT_MAIN,
+                        List.of()
+                ),
                 true
         );
         populateGeneratedKey(9002L);
@@ -266,7 +278,11 @@ class EvaluationOrchestrationServiceTest {
                 EvaluationMode.MAIN_ANSWER,
                 new EvaluationScore(18, 18, 18, 18, 18, 90),
                 EvaluationLevel.EXCELLENT,
-                new EvaluationDecision(EvaluationPhase.FINAL, DecisionAction.FINISH),
+                new EvaluationDecision(
+                        EvaluationPhase.FINAL,
+                        DecisionAction.FINISH,
+                        List.of()
+                ),
                 false
         );
         populateGeneratedKey(9003L);
@@ -288,7 +304,11 @@ class EvaluationOrchestrationServiceTest {
                 EvaluationMode.FOLLOW_UP_ANSWER,
                 new EvaluationScore(16, 16, 16, 16, 16, 80),
                 EvaluationLevel.GOOD,
-                new EvaluationDecision(EvaluationPhase.FINAL, DecisionAction.NEXT_MAIN),
+                new EvaluationDecision(
+                        EvaluationPhase.FINAL,
+                        DecisionAction.NEXT_MAIN,
+                        List.of()
+                ),
                 false
         );
         populateGeneratedKey(9004L);
@@ -338,6 +358,7 @@ class EvaluationOrchestrationServiceTest {
         assertThat(result.level()).isEqualTo(EvaluationLevel.GOOD);
         assertThat(result.followUpRecommended()).isTrue();
         assertThat(result.suggestedFollowUp()).isEqualTo("历史候选追问");
+        assertThat(result.followUpTargetPointIds()).isEmpty();
         assertThat(result.retrievalBatchId()).isEqualTo("existing-batch-id");
         verifyNoInteractions(
                 contextService,
@@ -348,9 +369,108 @@ class EvaluationOrchestrationServiceTest {
                 validator,
                 scoreCalculator,
                 evaluationStandard,
-                followUpPolicy
+                followUpPolicy,
+                followUpTargetResolver
         );
         verify(answerEvaluationMapper, never()).insertEvaluation(any());
+    }
+
+    @Test
+    void shouldRecoverFollowUpTargetsFromExistingEvaluationWithoutDeepSeek()
+            throws Exception {
+        List<LlmEvaluationSuggestion.ScoringPointResult>
+                persistedResults = List.of(
+                new LlmEvaluationSuggestion.ScoringPointResult(
+                        101L,
+                        false,
+                        null
+                )
+        );
+        AnswerEvaluation existing =
+                existingFollowUpEvaluation(
+                        objectMapper.writeValueAsString(
+                                persistedResults
+                        )
+                );
+        EvaluationContext context = fixture(
+                ANSWER_ID,
+                EvaluationMode.MAIN_ANSWER,
+                new EvaluationScore(12, 12, 12, 12, 11, 59),
+                true
+        ).context();
+
+        when(answerEvaluationMapper.getByAnswerId(ANSWER_ID))
+                .thenReturn(existing);
+        when(contextService.buildContext(ANSWER_ID))
+                .thenReturn(context);
+        EvaluationOrchestrationResult result =
+                service.evaluate(ANSWER_ID, true);
+
+        assertThat(result.evaluationPhase())
+                .isEqualTo(EvaluationPhase.INITIAL);
+        assertThat(result.decisionAction())
+                .isEqualTo(DecisionAction.FOLLOW_UP);
+        assertThat(result.suggestedFollowUp())
+                .isEqualTo("历史候选追问");
+        assertThat(result.followUpTargetPointIds())
+                .containsExactly(101L);
+        verify(contextService).buildContext(ANSWER_ID);
+        verify(followUpTargetResolver).resolve(
+                same(context),
+                eq(persistedResults)
+        );
+        verifyNoInteractions(
+                retrievalAdapter,
+                ragTracePersistenceService,
+                promptBuilder,
+                deepSeekEvaluationClient,
+                validator,
+                scoreCalculator,
+                evaluationStandard,
+                followUpPolicy
+        );
+        verify(answerEvaluationMapper, never())
+                .insertEvaluation(any());
+    }
+
+    @Test
+    void shouldRejectInvalidPersistedScoringPointResultsWithoutDeepSeek() {
+        AnswerEvaluation existing =
+                existingFollowUpEvaluation("{");
+        EvaluationContext context = fixture(
+                ANSWER_ID,
+                EvaluationMode.MAIN_ANSWER,
+                new EvaluationScore(12, 12, 12, 12, 11, 59),
+                true
+        ).context();
+
+        when(answerEvaluationMapper.getByAnswerId(ANSWER_ID))
+                .thenReturn(existing);
+        when(contextService.buildContext(ANSWER_ID))
+                .thenReturn(context);
+
+        assertThatThrownBy(
+                () -> service.evaluate(ANSWER_ID, true)
+        )
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(
+                        "AnswerEvaluation中的scoringPointResults JSON非法"
+                )
+                .hasCauseInstanceOf(JsonProcessingException.class);
+
+        verifyNoInteractions(
+                followUpTargetResolver,
+                retrievalAdapter,
+                ragTracePersistenceService,
+                promptBuilder,
+                deepSeekEvaluationClient,
+                validator,
+                scoreCalculator,
+                evaluationStandard,
+                followUpPolicy
+        );
+        verify(answerEvaluationMapper, never())
+                .insertEvaluation(any());
     }
 
     @Test
@@ -369,7 +489,8 @@ class EvaluationOrchestrationServiceTest {
                 validator,
                 scoreCalculator,
                 evaluationStandard,
-                followUpPolicy
+                followUpPolicy,
+                followUpTargetResolver
         );
     }
 
@@ -447,7 +568,11 @@ class EvaluationOrchestrationServiceTest {
                 EvaluationMode.MAIN_ANSWER,
                 new EvaluationScore(12, 12, 12, 12, 11, 59),
                 EvaluationLevel.WEAK,
-                new EvaluationDecision(EvaluationPhase.INITIAL, DecisionAction.FOLLOW_UP),
+                new EvaluationDecision(
+                        EvaluationPhase.INITIAL,
+                        DecisionAction.FOLLOW_UP,
+                        List.of(101L)
+                ),
                 true
         );
         ObjectMapper failingObjectMapper = mock(ObjectMapper.class);
@@ -474,7 +599,11 @@ class EvaluationOrchestrationServiceTest {
                 EvaluationMode.MAIN_ANSWER,
                 new EvaluationScore(16, 16, 16, 16, 16, 80),
                 EvaluationLevel.GOOD,
-                new EvaluationDecision(EvaluationPhase.FINAL, DecisionAction.NEXT_MAIN),
+                new EvaluationDecision(
+                        EvaluationPhase.FINAL,
+                        DecisionAction.NEXT_MAIN,
+                        List.of()
+                ),
                 false
         );
         when(answerEvaluationMapper.insertEvaluation(any())).thenReturn(affectedRows);
@@ -491,7 +620,11 @@ class EvaluationOrchestrationServiceTest {
                 EvaluationMode.MAIN_ANSWER,
                 new EvaluationScore(16, 16, 16, 16, 16, 80),
                 EvaluationLevel.GOOD,
-                new EvaluationDecision(EvaluationPhase.FINAL, DecisionAction.NEXT_MAIN),
+                new EvaluationDecision(
+                        EvaluationPhase.FINAL,
+                        DecisionAction.NEXT_MAIN,
+                        List.of()
+                ),
                 false
         );
         when(answerEvaluationMapper.insertEvaluation(any())).thenReturn(1);
@@ -520,7 +653,8 @@ class EvaluationOrchestrationServiceTest {
                 validator,
                 scoreCalculator,
                 evaluationStandard,
-                followUpPolicy
+                followUpPolicy,
+                followUpTargetResolver
         );
         verify(answerEvaluationMapper, never()).insertEvaluation(any());
     }
@@ -535,6 +669,7 @@ class EvaluationOrchestrationServiceTest {
                 scoreCalculator,
                 evaluationStandard,
                 followUpPolicy,
+                followUpTargetResolver,
                 answerEvaluationMapper,
                 mapper,
                 ragTracePersistenceService
@@ -755,8 +890,35 @@ class EvaluationOrchestrationServiceTest {
                 .level(level)
                 .followUpRecommended(true)
                 .suggestedFollowUp("历史候选追问")
+                .scoringPointResults("""
+                        [
+                          {
+                            "scoringPointId": 101,
+                            "covered": true,
+                            "evidence": "历史覆盖证据"
+                          }
+                        ]
+                        """)
                 .decisionAction(DecisionAction.NEXT_MAIN)
                 .retrievalBatchId("existing-batch-id")
+                .build();
+    }
+
+    private AnswerEvaluation existingFollowUpEvaluation(
+            String scoringPointResults
+    ) {
+        return AnswerEvaluation.builder()
+                .id(7002L)
+                .answerId(ANSWER_ID)
+                .mainInterviewQuestionId(MAIN_QUESTION_ID)
+                .evaluationPhase(EvaluationPhase.INITIAL)
+                .totalScore(59)
+                .level(EvaluationLevel.WEAK.name())
+                .followUpRecommended(true)
+                .suggestedFollowUp("历史候选追问")
+                .scoringPointResults(scoringPointResults)
+                .decisionAction(DecisionAction.FOLLOW_UP)
+                .retrievalBatchId("existing-follow-up-batch-id")
                 .build();
     }
 

@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -94,6 +95,103 @@ class InterviewAnswerMapperTest {
                 () -> assertNull(found.getErrorCode()),
                 () -> assertNull(unrelated)
         );
+    }
+
+    @Test
+    void shouldInsertAnswerPopulateGeneratedKeyAndFindItByRequestId() {
+        long interviewQuestionId = insertMainInterviewQuestion();
+        String requestId = "workflow-answer-" + uniqueValue();
+        LocalDateTime submittedAt = LocalDateTime.now().withNano(0);
+        InterviewAnswer answer = InterviewAnswer.builder()
+                .interviewQuestionId(interviewQuestionId)
+                .answerContent("通过 requestId 验证回答提交幂等查询。")
+                .status(InterviewAnswerStatus.SUBMITTED)
+                .requestId(requestId)
+                .errorCode(null)
+                .submittedAt(submittedAt)
+                .build();
+
+        int affectedRows = interviewAnswerMapper.insertInterviewAnswer(answer);
+        InterviewAnswer found = interviewAnswerMapper
+                .getInterviewAnswerByRequestId(requestId);
+
+        assertEquals(1, affectedRows);
+        assertNotNull(answer.getId());
+        assertNotNull(found);
+        assertAll(
+                () -> assertEquals(answer.getId(), found.getId()),
+                () -> assertEquals(interviewQuestionId, found.getInterviewQuestionId()),
+                () -> assertEquals(answer.getAnswerContent(), found.getAnswerContent()),
+                () -> assertEquals(InterviewAnswerStatus.SUBMITTED, found.getStatus()),
+                () -> assertEquals(requestId, found.getRequestId()),
+                () -> assertNull(found.getErrorCode()),
+                () -> assertEquals(submittedAt, found.getSubmittedAt()),
+                () -> assertNotNull(found.getCreatedAt()),
+                () -> assertNotNull(found.getUpdatedAt())
+        );
+    }
+
+    @Test
+    void shouldApplyEvaluationStateChangesOnlyFromExpectedStatuses() {
+        long submittedQuestionId = insertMainInterviewQuestion();
+        long submittedAnswerId = insertInterviewAnswer(
+                submittedQuestionId,
+                "首次提交后等待评价。",
+                "SUBMITTED",
+                "STALE_ERROR"
+        );
+
+        assertEquals(0, interviewAnswerMapper.retryEvaluation(submittedAnswerId));
+        assertEquals(1, interviewAnswerMapper.claimEvaluation(submittedAnswerId));
+        InterviewAnswer evaluatingFromSubmitted = interviewAnswerMapper
+                .getInterviewAnswerById(submittedAnswerId);
+        assertEquals(InterviewAnswerStatus.EVALUATING, evaluatingFromSubmitted.getStatus());
+        assertNull(evaluatingFromSubmitted.getErrorCode());
+        assertEquals(0, interviewAnswerMapper.claimEvaluation(submittedAnswerId));
+        assertEquals(0, interviewAnswerMapper.retryEvaluation(submittedAnswerId));
+
+        assertEquals(1, interviewAnswerMapper.markEvaluated(submittedAnswerId));
+        assertEquals(
+                InterviewAnswerStatus.EVALUATED,
+                interviewAnswerMapper.getInterviewAnswerById(submittedAnswerId).getStatus()
+        );
+        assertEquals(0, interviewAnswerMapper.markEvaluated(submittedAnswerId));
+        assertEquals(
+                0,
+                interviewAnswerMapper.markFailed(submittedAnswerId, "LATE_FAILURE")
+        );
+
+        long failedQuestionId = insertMainInterviewQuestion();
+        long failedAnswerId = insertInterviewAnswer(
+                failedQuestionId,
+                "上一次评价失败，等待重试。",
+                "FAILED",
+                "LLM_TIMEOUT"
+        );
+
+        assertEquals(0, interviewAnswerMapper.claimEvaluation(failedAnswerId));
+        assertEquals(1, interviewAnswerMapper.retryEvaluation(failedAnswerId));
+        InterviewAnswer evaluatingFromFailed = interviewAnswerMapper
+                .getInterviewAnswerById(failedAnswerId);
+        assertEquals(InterviewAnswerStatus.EVALUATING, evaluatingFromFailed.getStatus());
+        assertNull(evaluatingFromFailed.getErrorCode());
+
+        assertEquals(
+                1,
+                interviewAnswerMapper.markFailed(
+                        failedAnswerId,
+                        "LLM_RESULT_VALIDATION_FAILED"
+                )
+        );
+        InterviewAnswer failed = interviewAnswerMapper
+                .getInterviewAnswerById(failedAnswerId);
+        assertEquals(InterviewAnswerStatus.FAILED, failed.getStatus());
+        assertEquals("LLM_RESULT_VALIDATION_FAILED", failed.getErrorCode());
+        assertEquals(
+                0,
+                interviewAnswerMapper.markFailed(failedAnswerId, "SECOND_FAILURE")
+        );
+        assertEquals(0, interviewAnswerMapper.markEvaluated(failedAnswerId));
     }
 
     @Test

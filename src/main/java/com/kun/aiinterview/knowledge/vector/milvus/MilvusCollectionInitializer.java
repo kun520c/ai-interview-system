@@ -14,14 +14,21 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import static com.kun.aiinterview.knowledge.vector.milvus
-        .MilvusSchemaConstants.*;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.CHUNK_INDEX_FIELD;
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.DOCUMENT_ID_FIELD;
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.EMBEDDING_VERSION_FIELD;
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.EMBEDDING_VERSION_MAX_LENGTH;
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.VECTOR_FIELD;
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.VECTOR_ID_FIELD;
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.VECTOR_ID_MAX_LENGTH;
 
 @Component
 @ConditionalOnProperty(
@@ -40,7 +47,7 @@ public class MilvusCollectionInitializer implements ApplicationRunner {
     }
 
     @Override
-    public void run(ApplicationArguments args){
+    public void run(ApplicationArguments args) {
         HasCollectionReq request = HasCollectionReq.builder()
                 .collectionName(properties.getCollectionName())
                 .build();
@@ -50,7 +57,7 @@ public class MilvusCollectionInitializer implements ApplicationRunner {
                         milvusClient.hasCollection(request)
                 );
 
-        if(collectionExists){
+        if (collectionExists) {
             validateExistingCollection();
             return;
         }
@@ -264,7 +271,7 @@ public class MilvusCollectionInitializer implements ApplicationRunner {
             Object expected,
             Object actual
     ) {
-        if (!java.util.Objects.equals(expected, actual)) {
+        if (!Objects.equals(expected, actual)) {
             throw schemaMismatch(invariant, expected, actual);
         }
     }
@@ -282,7 +289,7 @@ public class MilvusCollectionInitializer implements ApplicationRunner {
         );
     }
 
-    private void createCollection(){
+    private void createCollection() {
         CreateCollectionReq.CollectionSchema schema =
                 CreateCollectionReq.CollectionSchema.builder()
                         .enableDynamicField(false)

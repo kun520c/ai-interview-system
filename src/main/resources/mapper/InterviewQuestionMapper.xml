@@ -1,30 +1,134 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kun.aiinterview.interview.mapper.InterviewQuestionMapper">
 
-<mapper namespace = "com.kun.aiinterview.interview.mapper.InterviewQuestionMapper">
-
-    <select id = "getInterviewQuestionById"
-            resultType = "com.kun.aiinterview.interview.entity.InterviewQuestion">
-        SELECT  id,
-                session_id,
-                question_id,
-                category,
-                knowledge_point,
-                question_content,
-                reference_answer_snapshot,
-                scoring_points_snapshot,
-                question_type,
-                parent_question_id,
-                follow_up_target_points,
-                plan_order,
-                display_order,
-                status,
-                created_at,
-                updated_at
+    <select id="getInterviewQuestionById"
+            resultType="com.kun.aiinterview.interview.entity.InterviewQuestion">
+        SELECT
+            id,
+            session_id,
+            question_id,
+            category,
+            knowledge_point,
+            question_content,
+            reference_answer_snapshot,
+            scoring_points_snapshot,
+            question_type,
+            parent_question_id,
+            follow_up_target_points,
+            plan_order,
+            display_order,
+            status,
+            created_at,
+            updated_at
         FROM interview_question
         WHERE id = #{id}
     </select>
 
+    <select id="findNextPendingMainQuestion"
+            resultType="com.kun.aiinterview.interview.entity.InterviewQuestion">
+        SELECT
+            id,
+            session_id,
+            question_id,
+            category,
+            knowledge_point,
+            question_content,
+            reference_answer_snapshot,
+            scoring_points_snapshot,
+            question_type,
+            parent_question_id,
+            follow_up_target_points,
+            plan_order,
+            display_order,
+            status,
+            created_at,
+            updated_at
+        FROM interview_question
+        WHERE session_id = #{sessionId}
+            AND question_type = 'MAIN'
+            AND status = 'PENDING'
+            AND plan_order > #{currentPlanOrder}
+            ORDER BY plan_order ASC
+            LIMIT 1
+    </select>
+
+    <update id="markWaitingAnswer">
+        UPDATE interview_question
+        SET status = 'WAITING_ANSWER'
+        WHERE id = #{id}
+            AND session_id = #{sessionId}
+            AND status = 'PENDING'
+    </update>
+
+    <update id="markAnswered">
+        UPDATE interview_question
+        SET status = 'ANSWERED'
+        WHERE id = #{id}
+            AND session_id = #{sessionId}
+            AND status = 'WAITING_ANSWER'
+    </update>
+
+    <insert id="insertFollowUp"
+            parameterType="com.kun.aiinterview.interview.entity.InterviewQuestion"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO interview_question (
+            session_id,
+            question_id,
+            category,
+            knowledge_point,
+            question_content,
+            reference_answer_snapshot,
+            scoring_points_snapshot,
+            question_type,
+            parent_question_id,
+            follow_up_target_points,
+            plan_order,
+            display_order,
+            status
+        )
+        VALUES (
+            #{sessionId},
+            #{questionId},
+            #{category},
+            #{knowledgePoint},
+            #{questionContent},
+            #{referenceAnswerSnapshot},
+            #{scoringPointsSnapshot},
+            #{questionType},
+            #{parentQuestionId},
+            #{followUpTargetPoints},
+            #{planOrder},
+            #{displayOrder},
+            #{status}
+        )
+    </insert>
+
+    <select id="getFollowUpByParentQuestionId"
+            resultType="com.kun.aiinterview.interview.entity.InterviewQuestion">
+        SELECT
+            id,
+            session_id,
+            question_id,
+            category,
+            knowledge_point,
+            question_content,
+            reference_answer_snapshot,
+            scoring_points_snapshot,
+            question_type,
+            parent_question_id,
+            follow_up_target_points,
+            plan_order,
+            display_order,
+            status,
+            created_at,
+            updated_at
+        FROM interview_question
+        WHERE parent_question_id = #{parentQuestionId}
+            AND question_type = 'FOLLOW_UP'
+            LIMIT 1
+    </select>
 </mapper>

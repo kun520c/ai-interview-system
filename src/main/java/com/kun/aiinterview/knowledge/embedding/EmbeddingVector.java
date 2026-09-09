@@ -5,7 +5,7 @@ import java.util.List;
 public record EmbeddingVector (
         int inputIndex,
         List<Float> values
-){
+) {
     public EmbeddingVector{
         if (inputIndex < 0) {
             throw new IllegalArgumentException("Embedding 输入索引不能小于0");
@@ -15,7 +15,7 @@ public record EmbeddingVector (
             throw new IllegalArgumentException("Embedding向量不能为空");
         }
 
-        if(values.isEmpty()){
+        if (values.isEmpty()) {
             throw new IllegalArgumentException("Embedding向量不能是空列表");
         }
 

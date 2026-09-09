@@ -9,19 +9,29 @@ import com.kun.aiinterview.knowledge.vector.VectorWriteItem;
 import io.milvus.v2.client.MilvusClientV2;
 import io.milvus.v2.common.IndexParam;
 import io.milvus.v2.exception.MilvusClientException;
+import io.milvus.v2.service.vector.request.data.FloatVec;
 import io.milvus.v2.service.vector.request.DeleteReq;
 import io.milvus.v2.service.vector.request.InsertReq;
 import io.milvus.v2.service.vector.request.SearchReq;
-import io.milvus.v2.service.vector.request.data.FloatVec;
 import io.milvus.v2.service.vector.response.DeleteResp;
 import io.milvus.v2.service.vector.response.InsertResp;
 import io.milvus.v2.service.vector.response.SearchResp;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import static com.kun.aiinterview.knowledge.vector.milvus
-        .MilvusSchemaConstants.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.CHUNK_INDEX_FIELD;
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.DOCUMENT_ID_FIELD;
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.EMBEDDING_VERSION_FIELD;
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.EMBEDDING_VERSION_MAX_LENGTH;
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.VECTOR_FIELD;
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.VECTOR_ID_FIELD;
+import static com.kun.aiinterview.knowledge.vector.milvus.MilvusSchemaConstants.VECTOR_ID_MAX_LENGTH;
 
 @Component
 @ConditionalOnProperty(
@@ -37,13 +47,13 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
     public MilvusVectorStoreClient(
             MilvusClientV2 milvusClient,
             MilvusProperties properties
-    ){
+    ) {
         this.milvusClient = milvusClient;
         this.properties = properties;
     }
 
     @Override
-    public void insert(List<VectorWriteItem> items){
+    public void insert(List<VectorWriteItem> items) {
         List<VectorWriteItem> validatedItems =  validateAndCopyItems(items);
 
         try {
@@ -52,7 +62,7 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
             );
 
             validateInsertResponse(response, validatedItems.size());
-        }catch(MilvusClientException exception){
+        } catch (MilvusClientException exception) {
             throw new ExternalServiceException(
                     "Milvus批量写入向量失败",
                     exception
@@ -61,16 +71,16 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
     }
 
     @Override
-    public void deleteByVectorIds(List<String> vectorIds){
+    public void deleteByVectorIds(List<String> vectorIds) {
         List<String> validatedVectorIds = validateAndCopyVectorIds(vectorIds);
 
-        try{
+        try {
             DeleteResp response = milvusClient.delete(
                     buildDeleteByVectorIdsRequest(validatedVectorIds)
             );
 
             validateDeleteResponse(response);
-        }catch(MilvusClientException exception){
+        } catch (MilvusClientException exception) {
             throw new ExternalServiceException(
                     "Milvus按向量ID删除失败",
                     exception
@@ -87,7 +97,7 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
                     buildDeleteByDocumentIdRequest(documentId)
             );
             validateDeleteResponse(response);
-        }catch (MilvusClientException exception){
+        } catch (MilvusClientException exception) {
             throw new ExternalServiceException(
                     "Milvus按文档ID删除向量失败",
                     exception
@@ -100,7 +110,7 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
             List<Float> queryVector,
             String embeddingVersion,
             int topK
-    ){
+    ) {
         List<Float> validatedQueryVector = validateAndCopyQueryVector(queryVector);
 
         validateEmbeddingVersion(embeddingVersion);
@@ -120,7 +130,7 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
                     embeddingVersion,
                     topK
             );
-        }catch (MilvusClientException exception){
+        } catch (MilvusClientException exception) {
             throw new ExternalServiceException(
                     "Milvus向量检索失败",
                     exception
@@ -130,12 +140,12 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
 
     private List<VectorWriteItem> validateAndCopyItems(
             List<VectorWriteItem> items
-    ){
-        if(items == null){
+    ) {
+        if (items == null) {
             throw new IllegalArgumentException("待写入向量集合不能为null");
         }
 
-        if(items.isEmpty()){
+        if (items.isEmpty()) {
             throw new IllegalArgumentException("待写入向量集合不能为空");
         }
 
@@ -143,10 +153,10 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
 
         Set<String> vectorIds = new HashSet<>();
 
-        for(int index = 0;index < copiedItems.size();index++){
+        for (int index = 0;index < copiedItems.size();index++) {
             VectorWriteItem item = copiedItems.get(index);
 
-            if(item == null){
+            if (item == null) {
                 throw new IllegalArgumentException("待写入向量不能为null，集合索引："
                                                         + index
                 );
@@ -154,7 +164,7 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
 
             validateItemForMilvus(item,index);
 
-            if(!vectorIds.add(item.vectorId())){
+            if (!vectorIds.add(item.vectorId())) {
                 throw new IllegalArgumentException("同一批次存在重复的vectorId:"
                                                         + item.vectorId()
                 );
@@ -167,19 +177,19 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
     private void validateInsertResponse(
             InsertResp response,
             int expectedInsertCount
-    ){
-        if(response == null){
+    ) {
+        if (response == null) {
             throw new ExternalServiceException("Milvus写入响应不能为空");
         }
 
-        if(response.getInsertCnt() != expectedInsertCount){
+        if (response.getInsertCnt() != expectedInsertCount) {
             throw new ExternalServiceException(
                     "Milvus写入数量与请求数量不一致"
             );
         }
     }
 
-    private InsertReq buildInsertRequest(List<VectorWriteItem> items){
+    private InsertReq buildInsertRequest(List<VectorWriteItem> items) {
         List<JsonObject> rows = items.stream()
                 .map(this::toJsonRow)
                 .toList();
@@ -193,22 +203,22 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
     private void validateItemForMilvus(
             VectorWriteItem item,
             int itemIndex
-    ){
-        if(item.vectorId().length() > VECTOR_ID_MAX_LENGTH){
+    ) {
+        if (item.vectorId().length() > VECTOR_ID_MAX_LENGTH) {
             throw new IllegalArgumentException(
                     "vectorId超过Milvus字段长度限制，"
                             + "集合索引：" + itemIndex
             );
         }
 
-        if(item.embeddingVersion().length() > EMBEDDING_VERSION_MAX_LENGTH){
+        if (item.embeddingVersion().length() > EMBEDDING_VERSION_MAX_LENGTH) {
             throw new IllegalArgumentException(
                     "Embedding 版本超过 Milvus 字段长度限制，"
                             + "集合索引：" + itemIndex
             );
         }
 
-        if(item.values().size() != properties.getDimension()){
+        if (item.values().size() != properties.getDimension()) {
             throw new IllegalArgumentException(
                     "向量维度与Milvus Collection不一致，"
                         + "集合索引：" + itemIndex
@@ -220,7 +230,7 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
         }
     }
 
-    private JsonObject toJsonRow(VectorWriteItem item){
+    private JsonObject toJsonRow(VectorWriteItem item) {
         JsonObject row = new JsonObject();
 
         row.addProperty(
@@ -245,7 +255,7 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
 
         JsonArray vector = new JsonArray();
 
-        for(Float value : item.values()){
+        for (Float value : item.values()) {
             vector.add(value);
         }
 
@@ -257,40 +267,40 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
         return row;
     }
 
-    private List<String> validateAndCopyVectorIds(List<String> vectorIds){
-        if(vectorIds == null){
+    private List<String> validateAndCopyVectorIds(List<String> vectorIds) {
+        if (vectorIds == null) {
             throw new IllegalArgumentException("待删除向量ID集合不能为null");
         }
 
-        if(vectorIds.isEmpty()){
+        if (vectorIds.isEmpty()) {
             throw new IllegalArgumentException("待删除向量ID集合不能为空");
         }
 
         List<String> copiedVectorIds = new ArrayList<>(vectorIds);
         Set<String> uniqueVectorIds = new HashSet<>();
 
-        for(int index = 0; index < copiedVectorIds.size(); index++){
+        for (int index = 0; index < copiedVectorIds.size(); index++) {
             String vectorId = copiedVectorIds.get(index);
 
-            if(vectorId == null){
+            if (vectorId == null) {
                 throw new IllegalArgumentException(
                         "待删除向量ID不能为null，集合索引：" + index
                 );
             }
 
-            if(vectorId.isBlank()){
+            if (vectorId.isBlank()) {
                 throw new IllegalArgumentException(
                         "待删除向量ID不能为空，集合索引：" + index
                 );
             }
 
-            if(vectorId.length() > VECTOR_ID_MAX_LENGTH){
+            if (vectorId.length() > VECTOR_ID_MAX_LENGTH) {
                 throw new IllegalArgumentException(
                         "待删除向量ID不能超过最长长度限制，集合索引：" + index
                 );
             }
 
-            if(!uniqueVectorIds.add(vectorId)){
+            if (!uniqueVectorIds.add(vectorId)) {
                 throw new IllegalArgumentException("同一批次存在重复的vectorId：" +  vectorId);
             }
         }
@@ -298,14 +308,14 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
         return List.copyOf(copiedVectorIds);
     }
 
-    private void validateDeleteResponse(DeleteResp response){
-        if(response == null){
+    private void validateDeleteResponse(DeleteResp response) {
+        if (response == null) {
             throw new ExternalServiceException(
                     "Milvus删除响应不能为空"
             );
         }
 
-        if(response.getDeleteCnt() < 0){
+        if (response.getDeleteCnt() < 0) {
             throw new ExternalServiceException(
                     "Milvus删除数量不能为负数"
             );
@@ -314,7 +324,7 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
 
     private DeleteReq buildDeleteByVectorIdsRequest(
             List<String> vectorIds
-    ){
+    ) {
         return DeleteReq.builder()
                 .collectionName(properties.getCollectionName())
                 .filter(VECTOR_ID_FIELD + " in {vectorIds}")
@@ -324,34 +334,34 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
                 .build();
     }
 
-    private void validateDocumentId(long documentId){
-        if(documentId <= 0){
+    private void validateDocumentId(long documentId) {
+        if (documentId <= 0) {
             throw new IllegalArgumentException("文档ID必须大于0");
         }
     }
 
-    private List<Float> validateAndCopyQueryVector(List<Float> queryVector){
-        if(queryVector == null){
+    private List<Float> validateAndCopyQueryVector(List<Float> queryVector) {
+        if (queryVector == null) {
             throw new IllegalArgumentException("查询向量集合不能为null");
         }
 
-        if(queryVector.isEmpty()){
+        if (queryVector.isEmpty()) {
             throw new IllegalArgumentException("查询向量集合不能为空");
         }
 
         List<Float> copiedVector = new ArrayList<>(queryVector);
 
-        for(int index = 0;index < copiedVector.size();index++){
+        for (int index = 0;index < copiedVector.size();index++) {
             Float value = copiedVector.get(index);
 
-            if(value == null || !Float.isFinite(value)){
+            if (value == null || !Float.isFinite(value)) {
                 throw new IllegalArgumentException(
                         "查询向量存在null或非有限值,集合索引：" + index
                 );
             }
         }
 
-        if(copiedVector.size() != properties.getDimension()){
+        if (copiedVector.size() != properties.getDimension()) {
             throw new IllegalArgumentException(
                     "查询向量维度与Milvus Collection不一致，"
                         + "期望维度：" + properties.getDimension()
@@ -362,22 +372,22 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
         return List.copyOf(copiedVector);
     }
 
-    private void validateEmbeddingVersion(String embeddingVersion){
-        if(embeddingVersion == null || embeddingVersion.isBlank()){
+    private void validateEmbeddingVersion(String embeddingVersion) {
+        if (embeddingVersion == null || embeddingVersion.isBlank()) {
             throw new IllegalArgumentException(
                     "Embedding版本不能为空"
             );
         }
 
-        if(embeddingVersion.length() > EMBEDDING_VERSION_MAX_LENGTH){
+        if (embeddingVersion.length() > EMBEDDING_VERSION_MAX_LENGTH) {
             throw new IllegalArgumentException(
                     "Embedding版本不能超过Milvus字段长度限制"
             );
         }
     }
 
-    private void validateTopK(int topK){
-        if(topK <= 0){
+    private void validateTopK(int topK) {
+        if (topK <= 0) {
             throw new IllegalArgumentException("topK必须大于0");
         }
     }
@@ -386,7 +396,7 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
             List<Float> queryVector,
             String embeddingVersion,
             int topK
-    ){
+    ) {
         return SearchReq.builder()
                 .collectionName(properties.getCollectionName())
                 .annsField(VECTOR_FIELD)
@@ -427,8 +437,8 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
             SearchResp response,
             String expectedEmbeddingVersion,
             int topK
-    ){
-        if(response == null){
+    ) {
+        if (response == null) {
             throw new ExternalServiceException(
                     "Milvus检索响应不能为空"
             );
@@ -436,13 +446,13 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
 
         List<List<SearchResp.SearchResult>> resultGroups = response.getSearchResults();
 
-        if(resultGroups == null){
+        if (resultGroups == null) {
             throw new ExternalServiceException(
                     "Milvus检索结果集合不能为空"
             );
         }
 
-        if(resultGroups.size() != 1){
+        if (resultGroups.size() != 1) {
             throw new ExternalServiceException(
                     "Milvus检索结果组数量与查询向量数量不一致"
             );
@@ -450,20 +460,20 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
 
         List<SearchResp.SearchResult> results = resultGroups.get(0);
 
-        if(results == null){
+        if (results == null) {
             throw new ExternalServiceException("Milvus单组检索结果不能为空");
         }
 
-        if(results.size() > topK){
+        if (results.size() > topK) {
             throw new ExternalServiceException("Milvus检索结果数量超过请求的topK");
         }
 
         List<VectorSearchHit> hits = new ArrayList<>(results.size());
 
-        for (int index = 0;index < results.size();index++){
+        for (int index = 0;index < results.size();index++) {
             SearchResp.SearchResult result = results.get(index);
 
-            if(result == null){
+            if (result == null) {
                 throw new ExternalServiceException(
                         "Milvus检索结果项不能为空，结果索引："
                             + index
@@ -485,11 +495,11 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
             SearchResp.SearchResult result,
             String expectedEmbeddingVersion,
             int resultIndex
-    ){
+    ) {
         Object rawVectorId = result.getId();
 
-        if(!(rawVectorId instanceof String vectorId)
-                    || vectorId.isBlank()){
+        if (!(rawVectorId instanceof String vectorId)
+                    || vectorId.isBlank()) {
             throw new ExternalServiceException(
                     "Milvus检索结果vectorId无效,结果索引："
                             + resultIndex
@@ -498,7 +508,7 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
 
         Map<String,Object> entity = result.getEntity();
 
-        if(entity == null){
+        if (entity == null) {
             throw new ExternalServiceException(
                         "Milvus检索结果输出字段不能为空，结果索引："
                             + resultIndex
@@ -524,7 +534,7 @@ public class MilvusVectorStoreClient implements VectorStoreClient {
                         resultIndex
                 );
 
-        if(documentId <= 0){
+        if (documentId <= 0) {
             throw new ExternalServiceException(
                     "Milvus检索结果documentId必须大于0，结果索引："
                             + resultIndex

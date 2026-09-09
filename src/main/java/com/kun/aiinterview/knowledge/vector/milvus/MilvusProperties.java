@@ -50,7 +50,7 @@ public class MilvusProperties {
     }
 
     @AssertTrue(message = "Milvus请求超时时间必须大于0")
-    public boolean isRequestTimeoutPositive(){
+    public boolean isRequestTimeoutPositive() {
         return requestTimeout == null
                 ||(!requestTimeout.isZero())
                 && !requestTimeout.isNegative();

@@ -2,8 +2,8 @@ package com.kun.aiinterview.interview.evaluation.validation;
 
 import com.kun.aiinterview.interview.evaluation.EvaluationContext;
 import com.kun.aiinterview.interview.evaluation.EvaluationMode;
-import com.kun.aiinterview.interview.evaluation.ScoringPointSnapshot;
 import com.kun.aiinterview.interview.evaluation.llm.LlmEvaluationSuggestion;
+import com.kun.aiinterview.interview.evaluation.ScoringPointSnapshot;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -17,15 +17,15 @@ public class LlmEvaluationValidator {
     public ValidatedEvaluationSuggestion validate(
             EvaluationContext context,
             LlmEvaluationSuggestion suggestion
-    ){
+    ) {
 
-        if(context == null){
+        if (context == null) {
             throw new IllegalArgumentException(
                     "EvaluationContext不能为空"
             );
         }
 
-        if(suggestion == null){
+        if (suggestion == null) {
             throw new IllegalArgumentException(
                     "Llm评价结果不能为空"
             );
@@ -112,9 +112,9 @@ public class LlmEvaluationValidator {
     private int validateScore(
             String fieldName,
             Integer score
-    ){
+    ) {
 
-        if(score == null){
+        if (score == null) {
             throw new IllegalStateException(
                     fieldName + "不能为空"
             );
@@ -132,19 +132,19 @@ public class LlmEvaluationValidator {
     private List<String> validateTextList(
             String fieldName,
             List<String> values
-    ){
+    ) {
 
-        if(values == null){
+        if (values == null) {
             throw new IllegalStateException(
                     fieldName + "不能为空"
             );
         }
 
-        for(int index = 0; index < values.size();index++){
+        for (int index = 0; index < values.size();index++) {
 
             String value = values.get(index);
 
-            if(value == null || value.isBlank()){
+            if (value == null || value.isBlank()) {
                 throw new IllegalStateException(
                         fieldName
                             + "包含空白内容，索引："
@@ -159,9 +159,9 @@ public class LlmEvaluationValidator {
     private List<LlmEvaluationSuggestion.ScoringPointResult> validateScoringPointResults(
             EvaluationContext context,
             List<LlmEvaluationSuggestion.ScoringPointResult> results
-    ){
+    ) {
 
-        if(results == null){
+        if (results == null) {
             throw new IllegalStateException(
                     "scoringPointResults不能为空"
             );
@@ -175,7 +175,7 @@ public class LlmEvaluationValidator {
                         )
                         .collect(Collectors.toSet());
 
-        if(results.size() != expectedIds.size()){
+        if (results.size() != expectedIds.size()) {
             throw new IllegalStateException(
                     "scoringPointResults数量与MAIN评分点数量不一致"
             );
@@ -184,12 +184,12 @@ public class LlmEvaluationValidator {
         Set<Long> actualIds =
                 new HashSet<>();
 
-        for(int index = 0;index < results.size();index++){
+        for (int index = 0;index < results.size();index++) {
 
             LlmEvaluationSuggestion.ScoringPointResult result =
                     results.get(index);
 
-            if(result == null){
+            if (result == null) {
                 throw new IllegalStateException(
                         "scoringPointResults包含空结果，索引："
                                 + index
@@ -199,34 +199,34 @@ public class LlmEvaluationValidator {
             Long scoringPointId =
                     result.scoringPointId();
 
-            if(scoringPointId == null || scoringPointId <= 0){
+            if (scoringPointId == null || scoringPointId <= 0) {
 
                 throw new IllegalStateException(
                         "scoringPointResult的scoringPointId非法"
                 );
             }
 
-            if(!expectedIds.contains(scoringPointId)){
+            if (!expectedIds.contains(scoringPointId)) {
                 throw new IllegalStateException(
                         "LLM返回了不属于MAIN评分标准的评分点"
                 );
             }
 
-            if(!actualIds.add(scoringPointId)){
+            if (!actualIds.add(scoringPointId)) {
                 throw new IllegalStateException(
                         "LLM返回了重复的评分点结果"
                 );
             }
 
-            if(result.covered() == null){
+            if (result.covered() == null) {
                 throw new IllegalStateException(
                         "scoringPointResult.covered不能为空"
                 );
             }
 
-            if(result.covered()
+            if (result.covered()
                 && (result.evidence() == null
-                || result.evidence().isBlank())){
+                || result.evidence().isBlank())) {
 
                 throw new IllegalStateException(
                         "已覆盖评分点必须提供回答证据"
@@ -234,7 +234,7 @@ public class LlmEvaluationValidator {
             }
         }
 
-        if(!actualIds.equals(expectedIds)){
+        if (!actualIds.equals(expectedIds)) {
             throw new IllegalStateException(
                     "LLM评分点结果未完整覆盖MAIN评分标准"
             );
@@ -247,25 +247,25 @@ public class LlmEvaluationValidator {
             EvaluationContext context,
             Boolean followUpRecommended,
             String suggestedFollowUp
-    ){
+    ) {
 
-        if(followUpRecommended == null){
+        if (followUpRecommended == null) {
             throw new IllegalStateException(
                     "followUpRecommended不能为空"
             );
         }
 
-        if(context.mode()
-                == EvaluationMode.FOLLOW_UP_ANSWER){
+        if (context.mode()
+                == EvaluationMode.FOLLOW_UP_ANSWER) {
 
-            if(followUpRecommended){
+            if (followUpRecommended) {
                 throw new IllegalStateException(
                         "FOLLOW_UP回答不能再次建议追问"
                 );
             }
 
-            if(suggestedFollowUp != null
-                && !suggestedFollowUp.isBlank()){
+            if (suggestedFollowUp != null
+                && !suggestedFollowUp.isBlank()) {
 
                 throw new IllegalStateException(
                         "FOLLOW_UP回答不能返回新的候选追问"
@@ -275,10 +275,10 @@ public class LlmEvaluationValidator {
             return false;
         }
 
-        if(followUpRecommended){
+        if (followUpRecommended) {
 
-            if(suggestedFollowUp == null
-                    ||suggestedFollowUp.isBlank()){
+            if (suggestedFollowUp == null
+                    ||suggestedFollowUp.isBlank()) {
 
                 throw new IllegalStateException(
                         "建议追问时必须提供候选追问问题"
@@ -288,8 +288,8 @@ public class LlmEvaluationValidator {
             return true;
         }
 
-        if(suggestedFollowUp != null
-            && !suggestedFollowUp.isBlank()){
+        if (suggestedFollowUp != null
+            && !suggestedFollowUp.isBlank()) {
 
             throw new IllegalStateException(
                     "为建议追问时不能提供候选追问问题"
@@ -301,9 +301,9 @@ public class LlmEvaluationValidator {
 
     private String normalizeNullableText(
             String value
-    ){
+    ) {
 
-        if(value == null || value.isBlank()){
+        if (value == null || value.isBlank()) {
             return null;
         }
 

@@ -390,8 +390,9 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-Evaluation Core F1-F4 technically complete
-→ Next stage: Interview Workflow
+Interview Workflow core technically complete
+→ Next stage: Interview Session creation/start and one-time MAIN question selection persistence
+→ Then: external Interview API
 ```
 
 The F1-F4 changes have passed their technical verification gate. Determine their commit and push status from the current Git history; do not infer publication state from this document alone.
@@ -780,15 +781,33 @@ Evaluation Core F1-F4 completed capability on 2026-09-03:
 * DeepSeek behavior was verified only through Mock HTTP. No real DeepSeek request was made for the F1-F4 gate.
 * Real Embedding and Milvus Smoke Tests remained protected and disabled for the F1-F4 full regression. The 18 skips are not evidence of real-service success.
 
+Interview Workflow core completed capability on 2026-09-09:
+
+### Workflow orchestration and state transitions
+
+* `InterviewWorkflowService` completes `MAIN -> FOLLOW_UP`, `MAIN -> NEXT_MAIN`, `MAIN -> FINISH`, `FOLLOW_UP -> NEXT_MAIN`, and `FOLLOW_UP -> FINISH` dispatch without a fallback transition.
+* The Workflow calculates `hasNextMainQuestion` from the persisted pending MAIN plan ordered by `plan_order`. For a FOLLOW_UP answer, the next MAIN lookup uses its parent MAIN question's `planOrder`; a FOLLOW_UP question keeps `planOrder = null`.
+* First evaluation ownership uses the database CAS transition `SUBMITTED -> EVALUATING`; failed evaluation retry uses the separate database CAS transition `FAILED -> EVALUATING`.
+* Evaluation failure uses the conditional transition `EVALUATING -> FAILED`. The original exception is propagated, the Session is not advanced, and a later retry is permitted.
+* Session advancement uses both `version` and `current_interview_question_id` in the database CAS condition. `NEXT_MAIN` and `FINISH` increment `completed_question_count` exactly once, while `FOLLOW_UP` does not increment it.
+* `InterviewWorkflowService.evaluateAnswer()` is not transactional. Evaluation, Embedding, Milvus, RAG, validation, scoring, decision, and DeepSeek calls remain outside the short database transactions used for answer claim/failure and final Workflow state changes.
+* FOLLOW_UP target scoring-point IDs are selected deterministically in Java from validated uncovered scoring-point results and the MAIN scoring-point snapshot: CORE points first, stable snapshot order, at most two IDs, and no ID outside the MAIN snapshot.
+* Existing `AnswerEvaluation` recovery does not call DeepSeek again. It derives the same FOLLOW_UP target IDs through the same `FollowUpTargetResolver` using persisted `scoringPointResults` and the MAIN snapshot.
+* FOLLOW_UP creation and recovery are idempotent. An existing child FOLLOW_UP is reused, each MAIN has at most one FOLLOW_UP, and the Session may recover by pointing to the existing child without inserting a duplicate.
+* `InterviewWorkflowTransactionService` keeps answer evaluation completion, question transition, and Session CAS advancement in one short transaction for each final action. Answer submission and question `WAITING_ANSWER -> ANSWERED` also share one short transaction.
+
+### Interview Workflow verification baseline
+
+* Verification date: `2026-09-09`.
+* The focused Workflow test run executed 125 tests with 0 failures, 0 errors, and 0 skips, and completed with `BUILD SUCCESS`.
+* The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 994 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
+* Workflow Mapper and transaction tests used the existing real local MySQL test environment to verify Answer CAS, Session version/current-question CAS, generated FOLLOW_UP keys, and transaction rollback.
+* Real DeepSeek, Embedding, and Milvus integrations remained protected and disabled for this regression. The 18 skips are not evidence of real external-service verification.
+
 The following Evaluation capabilities remain unimplemented:
 
-* Interview Workflow and Controller/API orchestration
-* FOLLOW_UP `InterviewQuestion` creation
-* `InterviewAnswer` state transitions
-* `InterviewQuestion` state transitions
-* `InterviewSession` state transitions and current-question advancement
-* Real `hasNextMainQuestion` calculation from persisted interview state
-* Concurrent Evaluation locking and complete concurrent idempotency
+* Interview Session creation/start and one-time MAIN question selection persistence
+* External Interview Controller/API orchestration
 * Interview reports
 * User-weakness updates
 * Real DeepSeek integration verification
@@ -797,15 +816,10 @@ The following Evaluation capabilities remain unimplemented:
 Next development stage:
 
 ```text
-Interview Workflow
-→ answer SUBMITTED / EVALUATING / EVALUATED / FAILED transitions
-→ consume INITIAL / FINAL Evaluation results
-→ create at most one FOLLOW_UP InterviewQuestion when required
-→ advance MAIN / FOLLOW_UP InterviewQuestion state
-→ advance InterviewSession current question or completion state
-→ calculate hasNextMainQuestion from persisted state
-→ enforce concurrency and idempotency
-→ keep database state transitions inside short transaction boundaries
+Interview Session creation/start
+→ select and persist all MAIN questions once when the Session is created
+→ start the Session from its first persisted MAIN question
+→ then expose the Interview API
 ```
 
 Other capabilities that also remain unimplemented include:
@@ -824,4 +838,4 @@ Other capabilities that also remain unimplemented include:
 * Knowledge-document pagination, detail, or enable/disable management
 * Mandatory rejection of duplicate content
 
-Until the developer explicitly authorizes the next stage, do not implement Interview Workflow, answer/question/session state transitions, follow-up question creation, concurrent Evaluation locking, Controller/API orchestration, reports, user weaknesses, password reset, further database changes, or broad unrelated refactoring.
+Until the developer explicitly authorizes the next stage, do not implement Interview Session creation/start, MAIN question selection persistence, Controller/API orchestration, reports, user weaknesses, password reset, further database changes, or broad unrelated refactoring.

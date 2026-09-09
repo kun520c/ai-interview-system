@@ -2,8 +2,8 @@ package com.kun.aiinterview.interview.evaluation.validation;
 
 import com.kun.aiinterview.interview.evaluation.EvaluationContext;
 import com.kun.aiinterview.interview.evaluation.EvaluationMode;
-import com.kun.aiinterview.interview.evaluation.ScoringPointSnapshot;
 import com.kun.aiinterview.interview.evaluation.llm.LlmEvaluationSuggestion;
+import com.kun.aiinterview.interview.evaluation.ScoringPointSnapshot;
 import com.kun.aiinterview.question.enums.QuestionCategory;
 import com.kun.aiinterview.question.enums.QuestionPointType;
 import org.junit.jupiter.api.Test;

@@ -19,7 +19,7 @@ public class MilvusConfiguration {
     @Bean
     public ConnectConfig milvusConnectConfig(
             MilvusProperties properties
-    ){
+    ) {
         var builder = ConnectConfig.builder()
                 .uri(properties.getUri().toString())
                 .dbName(properties.getDatabaseName())
@@ -31,7 +31,7 @@ public class MilvusConfiguration {
                 );
 
         String token = properties.getToken();
-        if(token != null && !token.isBlank()){
+        if (token != null && !token.isBlank()) {
             builder.token(token);
         }
 
@@ -41,7 +41,7 @@ public class MilvusConfiguration {
     @Bean
     public MilvusClientV2 milvusClient(
             ConnectConfig milvusConnectConfig
-    ){
+    ) {
         return new MilvusClientV2(milvusConnectConfig);
     }
 }

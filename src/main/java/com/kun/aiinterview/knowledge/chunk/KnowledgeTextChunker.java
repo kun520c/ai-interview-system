@@ -13,8 +13,8 @@ public class KnowledgeTextChunker {
     private static final int OVERLAP_CHARACTERS = 150;
     private static final int MIN_NATURAL_BOUNDARY_DISTANCE = 800;
 
-    public List<KnowledgeChunkDraft> split(String content){
-        if(content == null || content.isBlank()){
+    public List<KnowledgeChunkDraft> split(String content) {
+        if (content == null || content.isBlank()) {
             throw new BusinessException("待切片文档正文不能为空");
         }
 
@@ -23,7 +23,7 @@ public class KnowledgeTextChunker {
         int start = 0;
         int chunkIndex = 1;
 
-        while(start < content.length()){
+        while (start < content.length()) {
             int hardEnd = Math.min(
                     start + MAX_CHUNK_CHARACTERS,
                     content.length());
@@ -34,7 +34,7 @@ public class KnowledgeTextChunker {
                     hardEnd
             );
 
-            if(end <= start){
+            if (end <= start) {
                 end = hardEnd;
             }
 
@@ -42,7 +42,7 @@ public class KnowledgeTextChunker {
                     .substring(start, end)
                     .strip();
 
-            if(!chunkContent.isEmpty()){
+            if (!chunkContent.isEmpty()) {
                 chunks.add(
                         new KnowledgeChunkDraft(
                                 chunkIndex,
@@ -54,7 +54,7 @@ public class KnowledgeTextChunker {
                 chunkIndex++;
             }
 
-            if(end >= content.length()){
+            if (end >= content.length()) {
                 break;
             }
 
@@ -71,7 +71,7 @@ public class KnowledgeTextChunker {
             start = nextStart;
         }
 
-        if(chunks.isEmpty()){
+        if (chunks.isEmpty()) {
             throw new BusinessException("文档切片结果不能为空");
         }
 
@@ -82,8 +82,8 @@ public class KnowledgeTextChunker {
             String content,
             int start,
             int hardEnd
-    ){
-        if(hardEnd >= content.length()){
+    ) {
+        if (hardEnd >= content.length()) {
             return content.length();
         }
 
@@ -97,18 +97,18 @@ public class KnowledgeTextChunker {
                 hardEnd - 2
         );
 
-        if(paragraphBoundary >= minimumBoundary){
+        if (paragraphBoundary >= minimumBoundary) {
             return paragraphBoundary + 2;
         }
 
-        for(int index = hardEnd - 1;index >= minimumBoundary;index--){
-            if(content.charAt(index) == '\n'){
+        for (int index = hardEnd - 1;index >= minimumBoundary;index--) {
+            if (content.charAt(index) == '\n') {
                 return index + 1;
             }
         }
 
-        for(int index = hardEnd - 1;index >= minimumBoundary;index--){
-            if(isSentenceBoundary(content.charAt(index))){
+        for (int index = hardEnd - 1;index >= minimumBoundary;index--) {
+            if (isSentenceBoundary(content.charAt(index))) {
                 return index + 1;
             }
         }
@@ -116,7 +116,7 @@ public class KnowledgeTextChunker {
         return hardEnd;
     }
 
-    private boolean isSentenceBoundary(char character){
+    private boolean isSentenceBoundary(char character) {
         return character == '。'
                 || character == '！'
                 || character == '？'
@@ -131,7 +131,7 @@ public class KnowledgeTextChunker {
             String content,
             int currentStart,
             int currentEnd
-    ){
+    ) {
         int candidate = Math.max(
                 currentStart + 1,
                 currentEnd - OVERLAP_CHARACTERS
@@ -139,10 +139,10 @@ public class KnowledgeTextChunker {
 
         int adjusted = candidate;
 
-        while(adjusted < currentEnd
+        while (adjusted < currentEnd
                 && !Character.isWhitespace(
                         content.charAt(adjusted)
-        )){
+        )) {
             adjusted++;
         }
 
@@ -153,7 +153,7 @@ public class KnowledgeTextChunker {
             adjusted++;
         }
 
-        if(adjusted >= currentEnd){
+        if (adjusted >= currentEnd) {
             return candidate;
         }
 

@@ -25,7 +25,7 @@ public class EvaluationContextService {
     };
 
     private static final TypeReference<List<Long>>
-            TARGET_POINT_IDS_TYPE = new TypeReference<>(){
+            TARGET_POINT_IDS_TYPE = new TypeReference<>() {
     };
 
     private final InterviewAnswerMapper interviewAnswerMapper;
@@ -36,22 +36,21 @@ public class EvaluationContextService {
             InterviewAnswerMapper interviewAnswerMapper,
             InterviewQuestionMapper interviewQuestionMapper,
             ObjectMapper objectMapper
-    ){
+    ) {
         this.interviewAnswerMapper = interviewAnswerMapper;
         this.interviewQuestionMapper = interviewQuestionMapper;
         this.objectMapper = objectMapper;
     }
 
-    public EvaluationContext buildContext(Long answerId){
-        if(answerId == null){
+    public EvaluationContext buildContext(Long answerId) {
+        if (answerId == null) {
             throw new IllegalArgumentException("answerId must not be null");
         }
-
 
         InterviewAnswer currentAnswer =
                 interviewAnswerMapper.getInterviewAnswerById(answerId);
 
-        if(currentAnswer == null){
+        if (currentAnswer == null) {
             throw new IllegalArgumentException(
                     "Interview answer not found:" + answerId);
         }
@@ -69,7 +68,7 @@ public class EvaluationContextService {
                         currentAnswer.getInterviewQuestionId()
                 );
 
-        if(currentQuestion == null){
+        if (currentQuestion == null) {
             throw new IllegalStateException(
                     "Interview question not found for answer:" + answerId
             );
@@ -80,14 +79,14 @@ public class EvaluationContextService {
                 currentAnswer.getInterviewQuestionId()
         );
 
-        if(currentQuestion.getQuestionType() == null){
+        if (currentQuestion.getQuestionType() == null) {
             throw new IllegalStateException(
                     "Interview question type must not be null:"
                             + currentQuestion.getId()
             );
         }
 
-        return switch (currentQuestion.getQuestionType()){
+        return switch (currentQuestion.getQuestionType()) {
             case MAIN ->
                 buildMainContext(currentAnswer,currentQuestion);
 
@@ -99,7 +98,7 @@ public class EvaluationContextService {
     private EvaluationContext buildMainContext(
             InterviewAnswer mainAnswer,
             InterviewQuestion mainQuestion
-    ){
+    ) {
         validateMainQuestion(mainQuestion);
 
         List<ScoringPointSnapshot> scoringPoints =
@@ -136,7 +135,7 @@ public class EvaluationContextService {
     private EvaluationContext buildFollowUpContext(
             InterviewAnswer followUpAnswer,
             InterviewQuestion followUpQuestion
-    ){
+    ) {
         validateFollowUpQuestion(followUpQuestion);
 
         InterviewQuestion mainQuestion =
@@ -144,7 +143,7 @@ public class EvaluationContextService {
                         followUpQuestion.getParentQuestionId()
                 );
 
-        if(mainQuestion == null){
+        if (mainQuestion == null) {
             throw new IllegalStateException(
                     "Parent main interview question not found:"
                             + followUpQuestion.getParentQuestionId()
@@ -174,7 +173,7 @@ public class EvaluationContextService {
                                 mainQuestion.getId()
                         );
 
-        if(mainAnswer == null){
+        if (mainAnswer == null) {
             throw new IllegalStateException(
                     "Main answer not found for follow-up question:"
                                 + followUpQuestion.getId()
@@ -235,7 +234,7 @@ public class EvaluationContextService {
 
     private void validateMainQuestion(
             InterviewQuestion question
-    ){
+    ) {
         if (question.getQuestionType()
                 != InterviewQuestionType.MAIN) {
             throw new IllegalStateException(

@@ -13,12 +13,13 @@ import com.kun.aiinterview.knowledge.enums.KnowledgeProcessingStatus;
 import com.kun.aiinterview.knowledge.mapper.KnowledgeDocumentMapper;
 import com.kun.aiinterview.knowledge.vector.VectorStoreClient;
 import com.kun.aiinterview.knowledge.vector.VectorWriteItem;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,7 +43,7 @@ public class KnowledgeDocumentProcessingService {
 
         int claimedRows = knowledgeDocumentMapper.claimProcessing(documentId);
 
-        if(claimedRows != 1){
+        if (claimedRows != 1) {
             throw new BusinessException("文档不存在或当前不允许处理");
         }
 
@@ -52,7 +53,7 @@ public class KnowledgeDocumentProcessingService {
 
         List<String> vectorIds = new ArrayList<>();
 
-        try{
+        try {
             KnowledgeDocument document = knowledgeDocumentMapper.selectById(documentId);
 
             validateClaimedDocument(document);
@@ -100,8 +101,8 @@ public class KnowledgeDocumentProcessingService {
                             documentId,
                             processingItems.chunks()
                     );
-        }catch (RuntimeException originalException){
-            if(milvusWriteMayExist && !vectorIds.isEmpty()){
+        } catch (RuntimeException originalException) {
+            if (milvusWriteMayExist && !vectorIds.isEmpty()) {
                 compensateMilvus(
                         documentId,
                         vectorIds,
@@ -125,12 +126,12 @@ public class KnowledgeDocumentProcessingService {
             EmbeddingBatchResult embeddingResult,
             List<EmbeddingVector> orderedVectors,
             List<String> vectorIds
-    ){
+    ) {
         List<KnowledgeChunk> chunks = new ArrayList<>(drafts.size());
 
         List<VectorWriteItem> vectorItems = new ArrayList<>(drafts.size());
 
-        for(int index = 0;index < drafts.size();index++){
+        for (int index = 0;index < drafts.size();index++) {
             KnowledgeChunkDraft draft = drafts.get(index);
 
             EmbeddingVector embeddingVector = orderedVectors.get(index);
@@ -182,8 +183,8 @@ public class KnowledgeDocumentProcessingService {
     private List<EmbeddingVector> orderEmbeddingVectors(
             EmbeddingBatchResult embeddingResult,
             int expectedCount
-    ){
-        if(embeddingResult == null){
+    ) {
+        if (embeddingResult == null) {
             throw new BusinessException(
                     "Embedding返回结果不能为空"
             );
@@ -191,7 +192,7 @@ public class KnowledgeDocumentProcessingService {
 
         List<EmbeddingVector> vectors = embeddingResult.vectors();
 
-        if(vectors.size() != expectedCount){
+        if (vectors.size() != expectedCount) {
             throw new BusinessException(
                     "Embedding返回向量数量与知识切片数量不一致"
             );
@@ -199,23 +200,23 @@ public class KnowledgeDocumentProcessingService {
 
         List<EmbeddingVector> ordered =
                 new ArrayList<>(
-                        java.util.Collections.nCopies(
+                        Collections.nCopies(
                                 expectedCount,
                                 null
                         )
                 );
 
-        for(EmbeddingVector vector : vectors){
+        for (EmbeddingVector vector : vectors) {
             int inputIndex = vector.inputIndex();
 
-            if(inputIndex < 0 || inputIndex >= expectedCount){
+            if (inputIndex < 0 || inputIndex >= expectedCount) {
                 throw new BusinessException(
                         "Embedding返回了非法输入索引："
                             +inputIndex
                 );
             }
 
-            if(ordered.get(inputIndex) != null){
+            if (ordered.get(inputIndex) != null) {
                 throw new BusinessException(
                         "Embedding返回了重复输入索引："
                             +inputIndex
@@ -224,8 +225,8 @@ public class KnowledgeDocumentProcessingService {
 
             ordered.set(inputIndex, vector);
         }
-        for(int index = 0;index < ordered.size();index++){
-            if(ordered.get(index) == null){
+        for (int index = 0;index < ordered.size();index++) {
+            if (ordered.get(index) == null) {
                 throw new BusinessException(
                         "Embedding缺少输入索引："
                                 + index
@@ -240,12 +241,12 @@ public class KnowledgeDocumentProcessingService {
             Long documentId,
             List<String> vectorIds,
             RuntimeException originalException
-    ){
+    ) {
         try {
             vectorStoreClient.deleteByVectorIds(
                     List.copyOf(vectorIds)
             );
-        }catch (RuntimeException compensationException){
+        } catch (RuntimeException compensationException) {
             log.error(
                     "Milvus compensation failed,documentId = {}",
                     documentId,
@@ -260,7 +261,7 @@ public class KnowledgeDocumentProcessingService {
             Long documentId,
             String failureMessage,
             RuntimeException originalException
-    ){
+    ) {
         try {
             int updatedRows =
                         knowledgeDocumentMapper.markFailed(
@@ -268,7 +269,7 @@ public class KnowledgeDocumentProcessingService {
                                 failureMessage
                         );
 
-            if(updatedRows != 1){
+            if (updatedRows != 1) {
                 IllegalArgumentException stateException =
                         new IllegalArgumentException(
                                 "知识文档FAILED状态更新失败"
@@ -283,7 +284,7 @@ public class KnowledgeDocumentProcessingService {
                         documentId
                 );
             }
-        }catch (RuntimeException statusException){
+        } catch (RuntimeException statusException) {
             originalException.addSuppressed(statusException);
 
             log.error(
@@ -294,8 +295,8 @@ public class KnowledgeDocumentProcessingService {
         }
     }
 
-    private void validateDocumentId(Long documentId){
-        if(documentId == null || documentId <= 0){
+    private void validateDocumentId(Long documentId) {
+        if (documentId == null || documentId <= 0) {
             throw new BusinessException("文档ID必须大于0");
         }
     }

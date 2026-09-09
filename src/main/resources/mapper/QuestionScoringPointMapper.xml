@@ -1,13 +1,11 @@
-<?xml version = "1.0" encoding = "utf-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kun.aiinterview.question.mapper.QuestionScoringPointMapper">
 
-<mapper namespace = "com.kun.aiinterview.question.mapper.QuestionScoringPointMapper">
-    <insert id = "batchInsert">
-
-        INSERT INTO question_scoring_point
-        (
+    <insert id="batchInsert">
+        INSERT INTO question_scoring_point (
             question_id,
             point_type,
             content,
@@ -16,10 +14,9 @@
             status
         )
         VALUES
-
-        <foreach collection = "scoringPoints"
-                 item = "point"
-                 separator = ",">
+        <foreach collection="scoringPoints"
+                 item="point"
+                 separator=",">
             (
                 #{point.questionId},
                 #{point.pointType},
@@ -36,10 +33,11 @@
         WHERE question_id = #{questionId}
     </delete>
 
-    <select id = "selectDetailByQuestionId" resultType = "com.kun.aiinterview.question.vo.AdminScoringPointDetail">
-        SELECT  point_type,
-                content,
-                weight
+    <select id="selectDetailByQuestionId" resultType="com.kun.aiinterview.question.vo.AdminScoringPointDetail">
+        SELECT
+            point_type,
+            content,
+            weight
         FROM question_scoring_point
         WHERE question_id = #{questionId}
         ORDER BY sort_order ASC

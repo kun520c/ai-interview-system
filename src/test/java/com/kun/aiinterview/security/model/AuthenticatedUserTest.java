@@ -4,11 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 public class AuthenticatedUserTest {
 
     @Test
-    void shouldExposeAuthenticatedUserIdentity(){
+    void shouldExposeAuthenticatedUserIdentity() {
         AuthenticatedUser authenticatedUser = new AuthenticatedUser(1001L,"TEST_ACCOUNT","测试用户");
 
         assertEquals(1001L, authenticatedUser.userId());

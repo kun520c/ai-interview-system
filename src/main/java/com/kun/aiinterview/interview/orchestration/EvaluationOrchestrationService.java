@@ -1,16 +1,19 @@
 package com.kun.aiinterview.interview.orchestration;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
+import com.kun.aiinterview.interview.enums.DecisionAction;
+import com.kun.aiinterview.interview.evaluation.decision.EvaluationDecision;
+import com.kun.aiinterview.interview.evaluation.decision.FollowUpPolicy;
+import com.kun.aiinterview.interview.evaluation.decision.FollowUpTargetResolver;
 import com.kun.aiinterview.interview.evaluation.EvaluationContext;
 import com.kun.aiinterview.interview.evaluation.EvaluationRetrievalAdapter;
 import com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult;
-import com.kun.aiinterview.interview.evaluation.decision.EvaluationDecision;
-import com.kun.aiinterview.interview.evaluation.decision.FollowUpPolicy;
-import com.kun.aiinterview.interview.evaluation.llm.DeepSeekEvaluationResult;
 import com.kun.aiinterview.interview.evaluation.llm.deepseek.DeepSeekEvaluationClient;
+import com.kun.aiinterview.interview.evaluation.llm.DeepSeekEvaluationResult;
+import com.kun.aiinterview.interview.evaluation.llm.LlmEvaluationSuggestion;
 import com.kun.aiinterview.interview.evaluation.prompt.EvaluationPrompt;
 import com.kun.aiinterview.interview.evaluation.prompt.EvaluationPromptBuilder;
 import com.kun.aiinterview.interview.evaluation.score.EvaluationScore;
@@ -21,10 +24,11 @@ import com.kun.aiinterview.interview.evaluation.validation.LlmEvaluationValidato
 import com.kun.aiinterview.interview.evaluation.validation.ValidatedEvaluationSuggestion;
 import com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper;
 import com.kun.aiinterview.interview.service.EvaluationContextService;
+import com.kun.aiinterview.knowledge.service.RagTracePersistenceService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import com.kun.aiinterview.knowledge.service.RagTracePersistenceService;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -38,6 +42,11 @@ import java.util.UUID;
 public class EvaluationOrchestrationService {
 
     private static final int RETRIEVAL_TOP_K = 5;
+
+    private static final TypeReference<List<
+            LlmEvaluationSuggestion.ScoringPointResult>>
+            SCORING_POINT_RESULTS_TYPE = new TypeReference<>() {
+    };
 
     private final EvaluationContextService contextService;
 
@@ -55,6 +64,8 @@ public class EvaluationOrchestrationService {
 
     private final FollowUpPolicy followUpPolicy;
 
+    private final FollowUpTargetResolver followUpTargetResolver;
+
     private final AnswerEvaluationMapper answerEvaluationMapper;
 
     private final ObjectMapper objectMapper;
@@ -70,6 +81,7 @@ public class EvaluationOrchestrationService {
             EvaluationScoreCalculator scoreCalculator,
             EvaluationStandard evaluationStandard,
             FollowUpPolicy followUpPolicy,
+            FollowUpTargetResolver followUpTargetResolver,
             AnswerEvaluationMapper answerEvaluationMapper,
             ObjectMapper objectMapper,
             RagTracePersistenceService ragTracePersistenceService
@@ -83,6 +95,8 @@ public class EvaluationOrchestrationService {
         this.scoreCalculator = scoreCalculator;
         this.evaluationStandard = evaluationStandard;
         this.followUpPolicy = followUpPolicy;
+        this.followUpTargetResolver =
+                followUpTargetResolver;
         this.answerEvaluationMapper =
                 answerEvaluationMapper;
         this.objectMapper = objectMapper;
@@ -92,9 +106,9 @@ public class EvaluationOrchestrationService {
     public EvaluationOrchestrationResult evaluate(
             Long answerId,
             boolean hasNextMainQuestion
-    ){
+    ) {
 
-        if(answerId == null){
+        if (answerId == null) {
             throw new IllegalArgumentException(
                     "answerId不能为空"
             );
@@ -104,8 +118,13 @@ public class EvaluationOrchestrationService {
                 answerEvaluationMapper
                         .getByAnswerId(answerId);
 
-        if(existingEvaluation != null){
-            return toResult(existingEvaluation);
+        if (existingEvaluation != null) {
+            return toResult(
+                    existingEvaluation,
+                    recoverFollowUpTargetPointIds(
+                            existingEvaluation
+                    )
+            );
         }
 
         EvaluationContext context =
@@ -177,19 +196,22 @@ public class EvaluationOrchestrationService {
                 answerEvaluationMapper
                         .insertEvaluation(evaluation);
 
-        if(affectedRows != 1){
+        if (affectedRows != 1) {
             throw new IllegalStateException(
                     "AnswerEvaluation写入失败"
             );
         }
 
-        if(evaluation.getId() == null){
+        if (evaluation.getId() == null) {
             throw new IllegalStateException(
                     "AnswerEvaluation主键未回填"
             );
         }
 
-        return toResult(evaluation);
+        return toResult(
+                evaluation,
+                decision.followUpTargetPointIds()
+        );
     }
 
     private AnswerEvaluation buildAnswerEvaluation(
@@ -201,7 +223,7 @@ public class EvaluationOrchestrationService {
             String retrievalBatchId,
             EvaluationPrompt prompt,
             DeepSeekEvaluationResult llmResult
-    ){
+    ) {
         return AnswerEvaluation.builder()
 
                 .answerId(
@@ -304,14 +326,14 @@ public class EvaluationOrchestrationService {
 
     private String toJson(
             Object value
-    ){
+    ) {
 
         try {
 
             return objectMapper.writeValueAsString(
                     value
             );
-        }catch (JsonProcessingException exception){
+        } catch (JsonProcessingException exception) {
             throw new IllegalStateException(
                     "评价结果JSON序列化失败",
                     exception
@@ -319,9 +341,89 @@ public class EvaluationOrchestrationService {
         }
     }
 
-    private EvaluationOrchestrationResult toResult(
+    private List<Long> recoverFollowUpTargetPointIds(
             AnswerEvaluation evaluation
-    ){
+    ) {
+        if (evaluation.getDecisionAction()
+                != DecisionAction.FOLLOW_UP) {
+            return List.of();
+        }
+
+        EvaluationContext context =
+                contextService.buildContext(
+                        evaluation.getAnswerId()
+                );
+
+        List<LlmEvaluationSuggestion.ScoringPointResult>
+                scoringPointResults =
+                parseScoringPointResults(
+                        evaluation.getScoringPointResults()
+                );
+
+        List<Long> targetPointIds;
+
+        try {
+            targetPointIds = followUpTargetResolver.resolve(
+                    context,
+                    scoringPointResults
+            );
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalStateException(
+                    "AnswerEvaluation中的scoringPointResults非法",
+                    exception
+            );
+        }
+
+        try {
+            return new EvaluationDecision(
+                    evaluation.getEvaluationPhase(),
+                    evaluation.getDecisionAction(),
+                    targetPointIds
+            ).followUpTargetPointIds();
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalStateException(
+                    "AnswerEvaluation中的FOLLOW_UP决策非法",
+                    exception
+            );
+        }
+    }
+
+    private List<LlmEvaluationSuggestion.ScoringPointResult>
+            parseScoringPointResults(
+                    String json
+            ) {
+        if (json == null || json.isBlank()) {
+            throw new IllegalStateException(
+                    "AnswerEvaluation中的scoringPointResults为空"
+            );
+        }
+
+        try {
+            List<LlmEvaluationSuggestion.ScoringPointResult> results =
+                    objectMapper.readValue(
+                            json,
+                            SCORING_POINT_RESULTS_TYPE
+                    );
+
+            if (results == null) {
+                throw new IllegalStateException(
+                        "AnswerEvaluation中的scoringPointResults为空"
+                );
+            }
+
+            return results;
+        } catch (JsonProcessingException exception) {
+            throw new IllegalStateException(
+                    "AnswerEvaluation中的scoringPointResults JSON非法",
+                    exception
+            );
+        }
+    }
+
+    private EvaluationOrchestrationResult toResult(
+            AnswerEvaluation evaluation,
+            List<Long> followUpTargetPointIds
+    ) {
 
         EvaluationLevel level;
 
@@ -331,7 +433,7 @@ public class EvaluationOrchestrationService {
                     evaluation.getLevel()
             );
 
-        }catch (IllegalArgumentException | NullPointerException exception){
+        } catch (IllegalArgumentException | NullPointerException exception) {
 
             throw new IllegalStateException(
                     "AnswerEvaluation中的level非法",
@@ -362,6 +464,8 @@ public class EvaluationOrchestrationService {
                 ),
 
                 evaluation.getSuggestedFollowUp(),
+
+                followUpTargetPointIds,
 
                 evaluation.getRetrievalBatchId()
         );

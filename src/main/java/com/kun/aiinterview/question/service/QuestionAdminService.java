@@ -1,7 +1,11 @@
 package com.kun.aiinterview.question.service;
 
 import com.kun.aiinterview.common.exception.BusinessException;
-import com.kun.aiinterview.question.dto.*;
+import com.kun.aiinterview.question.dto.CreateQuestionRequest;
+import com.kun.aiinterview.question.dto.QuestionPageQuery;
+import com.kun.aiinterview.question.dto.ScoringPointRequest;
+import com.kun.aiinterview.question.dto.UpdateQuestionRequest;
+import com.kun.aiinterview.question.dto.UpdateQuestionStatusRequest;
 import com.kun.aiinterview.question.entity.Question;
 import com.kun.aiinterview.question.entity.QuestionScoringPoint;
 import com.kun.aiinterview.question.enums.QuestionPointStatus;
@@ -195,7 +199,7 @@ public class QuestionAdminService {
 
     @Transactional(readOnly = true)
     public AdminQuestionPageResponse getQuestionPage(QuestionPageQuery query) {
-        if(query == null){
+        if (query == null) {
             throw new BusinessException("分页查询参数不能为空");
         }
 
@@ -206,7 +210,7 @@ public class QuestionAdminService {
             throw new BusinessException("页码必须大于等于1");
         }
 
-        if(pageSize < 1 || pageSize > 50) {
+        if (pageSize < 1 || pageSize > 50) {
             throw new BusinessException("每页数量必须在1到50之间");
         }
 
@@ -215,7 +219,7 @@ public class QuestionAdminService {
         if (keyword != null) {
             keyword = keyword.trim();
 
-            if(keyword.isEmpty()){
+            if (keyword.isEmpty()) {
                 keyword = null;
             }
         }
@@ -235,7 +239,7 @@ public class QuestionAdminService {
 
         List<AdminQuestionListItem> records = new ArrayList<>();
 
-        if(total != 0){
+        if (total != 0) {
             records = questionMapper.selectQuestionPage(
                     normalizedQuery,
                     offset,
@@ -255,20 +259,20 @@ public class QuestionAdminService {
     }
 
     @Transactional(readOnly = true)
-    public AdminQuestionDetailResponse getQuestionScoringPointDetail(Long questionId){
-        if(questionId == null || questionId <= 0){
+    public AdminQuestionDetailResponse getQuestionScoringPointDetail(Long questionId) {
+        if (questionId == null || questionId <= 0) {
             throw new BusinessException("题目ID不合法");
         }
 
         Question question = questionMapper.getQuestionById(questionId);
 
-        if(question == null){
+        if (question == null) {
             throw new BusinessException("题目不存在");
         }
 
         List<AdminScoringPointDetail> scoringPoints = questionScoringPointMapper.selectDetailByQuestionId(questionId);
 
-        if(scoringPoints == null || scoringPoints.size() == 0){
+        if (scoringPoints == null || scoringPoints.size() == 0) {
             scoringPoints = List.of();
         }
 
@@ -291,12 +295,12 @@ public class QuestionAdminService {
     public void updateQuestionStatus(
             Long questionId,
             UpdateQuestionStatusRequest request
-    ){
-        if(questionId == null || questionId <= 0){
+    ) {
+        if (questionId == null || questionId <= 0) {
             throw new BusinessException("题目ID不合法");
         }
 
-        if(request == null){
+        if (request == null) {
             throw new BusinessException("更改状态不能为空");
         }
 
@@ -306,18 +310,17 @@ public class QuestionAdminService {
 
         Question question = questionMapper.getQuestionById(questionId);
 
-        if(question == null){
+        if (question == null) {
             throw new BusinessException("题目不存在");
         }
 
-        if(question.getStatus() == request.getStatus()){
+        if (question.getStatus() == request.getStatus()) {
             return;
         }
 
-
         int affectRows = questionMapper.updateQuestionStatus(questionId, request.getStatus());
 
-        if(affectRows != 1 ){
+        if (affectRows != 1 ) {
             throw new BusinessException("状态更改失败");
         }
     }

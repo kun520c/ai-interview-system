@@ -2,15 +2,15 @@ package com.kun.aiinterview.security.jwt;
 
 import com.kun.aiinterview.user.enums.UserRole;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.util.Date;
+import javax.crypto.SecretKey;
 
 @Component
 public class JwtTokenService {
@@ -51,13 +51,13 @@ public class JwtTokenService {
                 .compact();
     }
 
-    public Claims parseAndValidate(String token){
+    public Claims parseAndValidate(String token) {
         return jwtParser
                 .parseSignedClaims(token)
                 .getPayload();
     }
 
-    public long getAccessTokenExpirationSeconds(){
+    public long getAccessTokenExpirationSeconds() {
         return jwtProperties
                 .getAccessTokenExpiration()
                 .toSeconds();

@@ -10,12 +10,12 @@ record DashScopeEmbeddingResponse (
         List<EmbeddingData> data,
         String model,
         Usage usage
-){
+) {
     @JsonIgnoreProperties(ignoreUnknown = true)
     record EmbeddingData(
             Integer index,
             List<Float> embedding
-    ){
+    ) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -25,6 +25,6 @@ record DashScopeEmbeddingResponse (
 
             @JsonProperty("total_tokens")
             Long totalTokens
-    ){
+    ) {
     }
 }

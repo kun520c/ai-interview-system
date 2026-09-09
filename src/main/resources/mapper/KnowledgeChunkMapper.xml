@@ -1,11 +1,10 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
-<mapper namespace = "com.kun.aiinterview.knowledge.mapper.KnowledgeChunkMapper">
-    <insert id = "batchInsert">
-        INSERT INTO knowledge_chunk(
+<mapper namespace="com.kun.aiinterview.knowledge.mapper.KnowledgeChunkMapper">
+    <insert id="batchInsert">
+        INSERT INTO knowledge_chunk (
             document_id,
             document_version,
             chunk_index,
@@ -59,7 +58,7 @@
         FROM knowledge_chunk kc
 
         INNER JOIN knowledge_document kd
-            ON kd.id = kc.document_id
+            ON kd.id=kc.document_id
 
         WHERE kc.vector_id IN
 
@@ -71,14 +70,14 @@
             #{vectorId}
         </foreach>
 
-        AND kc.status = 'ACTIVE'
+            AND kc.status = 'ACTIVE'
 
-        AND kd.processing_status = 'READY'
+            AND kd.processing_status = 'READY'
 
-        AND kc.document_version = kd.document_version
+            AND kc.document_version = kd.document_version
 
-        AND kc.embedding_model = #{embeddingModel}
+            AND kc.embedding_model = #{embeddingModel}
 
-        AND kc.embedding_version = #{embeddingVersion}
+            AND kc.embedding_version = #{embeddingVersion}
     </select>
 </mapper>

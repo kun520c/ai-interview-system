@@ -9,10 +9,10 @@ import com.kun.aiinterview.knowledge.retrieval.KnowledgeRetrievalRow;
 import com.kun.aiinterview.knowledge.retrieval.RetrievalResult;
 import com.kun.aiinterview.knowledge.vector.VectorSearchHit;
 import com.kun.aiinterview.knowledge.vector.VectorStoreClient;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
+import org.junit.jupiter.api.Test;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mock;
 
 import java.util.List;
 

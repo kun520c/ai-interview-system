@@ -8,7 +8,11 @@ import com.kun.aiinterview.user.vo.CurrentUserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
@@ -27,7 +31,7 @@ public class UserController {
     public Result<Void> changePassword(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @Valid @RequestBody ChangePasswordRequest changePasswordRequest
-            ){
+            ) {
         userService.changePassword(
                 authenticatedUser.userId(),
                 changePasswordRequest

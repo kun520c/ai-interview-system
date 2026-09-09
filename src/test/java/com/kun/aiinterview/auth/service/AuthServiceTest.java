@@ -1,9 +1,9 @@
 package com.kun.aiinterview.auth.service;
 
-import com.kun.aiinterview.common.exception.BusinessException;
 import com.kun.aiinterview.auth.dto.LoginRequest;
 import com.kun.aiinterview.auth.dto.RegisterRequest;
 import com.kun.aiinterview.auth.vo.LoginResponse;
+import com.kun.aiinterview.common.exception.BusinessException;
 import com.kun.aiinterview.security.jwt.JwtProperties;
 import com.kun.aiinterview.security.jwt.JwtTokenService;
 import com.kun.aiinterview.user.entity.User;
@@ -19,7 +19,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles({"local", "test"})
@@ -66,7 +71,7 @@ public class AuthServiceTest {
     private static final String MISSING_ACCOUNT = "auth_login_missing_user";
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         cleanUpTestUsers();
 
         jdbcTemplate.update(
@@ -146,7 +151,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    void shouldRejectDuplicateAccount(){
+    void shouldRejectDuplicateAccount() {
         RegisterRequest registerRequest = new RegisterRequest(EXISTING_ACCOUNT,EXISTING_USERNAME,EXISTING_PASSWORD,TEST_EMAIL);
 
         BusinessException exception = assertThrows(
@@ -158,7 +163,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    void shouldRejectDuplicateEmail(){
+    void shouldRejectDuplicateEmail() {
         RegisterRequest registerRequest = new RegisterRequest(TEST_ACCOUNT,EXISTING_USERNAME,EXISTING_PASSWORD,EXISTING_EMAIL);
 
         BusinessException exception = assertThrows(
@@ -170,7 +175,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    void shouldRegisterUserSuccessfully(){
+    void shouldRegisterUserSuccessfully() {
         RegisterRequest registerRequest = new RegisterRequest(
                 NEW_ACCOUNT,
                 EXISTING_USERNAME,

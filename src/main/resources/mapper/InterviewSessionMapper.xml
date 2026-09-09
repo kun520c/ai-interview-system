@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kun.aiinterview.interview.mapper.InterviewSessionMapper">
+
+    <select id="getInterviewSessionById"
+            resultType="com.kun.aiinterview.interview.entity.InterviewSession">
+        SELECT
+            id,
+            user_id,
+            difficulty,
+            status,
+            current_interview_question_id,
+            planned_question_count,
+            completed_question_count,
+            total_score,
+            report_status,
+            version,
+            started_at,
+            ended_at,
+            created_at,
+            updated_at
+        FROM interview_session
+        WHERE id = #{id}
+    </select>
+
+    <update id="moveToFollowUp">
+        UPDATE interview_session
+        SET
+            current_interview_question_id = #{followUpQuestionId},
+            version = version + 1
+        WHERE id = #{id}
+            AND version = #{expectedVersion}
+            AND status = 'IN_PROGRESS'
+            AND current_interview_question_id = #{expectedCurrentQuestionId}
+    </update>
+
+    <update id="advanceToNextMain">
+        UPDATE interview_session
+        SET
+            current_interview_question_id = #{nextMainQuestionId},
+            completed_question_count = completed_question_count + 1,
+            version = version + 1
+        WHERE id = #{id}
+            AND version = #{expectedVersion}
+            AND status = 'IN_PROGRESS'
+            AND current_interview_question_id = #{expectedCurrentQuestionId}
+            AND completed_question_count &lt; planned_question_count
+    </update>
+
+    <update id="completeSession">
+        UPDATE interview_session
+        SET
+            current_interview_question_id = NULL,
+            completed_question_count = completed_question_count + 1,
+            status = 'COMPLETED',
+            ended_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+            AND version = #{expectedVersion}
+            AND status = 'IN_PROGRESS'
+            AND current_interview_question_id = #{expectedCurrentQuestionId}
+            AND completed_question_count &lt; planned_question_count
+    </update>
+</mapper>

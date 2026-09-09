@@ -1,50 +1,81 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kun.aiinterview.user.mapper.UserMapper">
 
-    <mapper namespace = "com.kun.aiinterview.user.mapper.UserMapper">
-        <select id = "getUserById" resultType = "com.kun.aiinterview.user.entity.User">
-            SELECT id,account,password,username,email,role,status,password_changed_at,created_at,updated_at
-            FROM `user`
-            WHERE id = #{id}
-        </select>
+    <select id="getUserById" resultType="com.kun.aiinterview.user.entity.User">
+        SELECT
+            id,
+            account,
+            password,
+            username,
+            email,
+            role,
+            status,
+            password_changed_at,
+            created_at,
+            updated_at
+        FROM `user`
+        WHERE id = #{id}
+    </select>
 
-        <select id = "getUserByAccount" resultType = "com.kun.aiinterview.user.entity.User">
-            SELECT id,account,password,username,email,role,status,password_changed_at,created_at,updated_at
-            FROM `user`
-            WHERE account = #{account}
-        </select>
+    <select id="getUserByAccount" resultType="com.kun.aiinterview.user.entity.User">
+        SELECT
+            id,
+            account,
+            password,
+            username,
+            email,
+            role,
+            status,
+            password_changed_at,
+            created_at,
+            updated_at
+        FROM `user`
+        WHERE account = #{account}
+    </select>
 
-        <select id = "getUserByEmail" resultType = "com.kun.aiinterview.user.entity.User">
-            SELECT id,account,password,username,email,role,status,password_changed_at,created_at,updated_at
-            FROM `user`
-            WHERE email = #{email}
-        </select>
+    <select id="getUserByEmail" resultType="com.kun.aiinterview.user.entity.User">
+        SELECT
+            id,
+            account,
+            password,
+            username,
+            email,
+            role,
+            status,
+            password_changed_at,
+            created_at,
+            updated_at
+        FROM `user`
+        WHERE email = #{email}
+    </select>
 
-        <insert id = "insertUser" parameterType = "com.kun.aiinterview.user.entity.User" useGeneratedKeys = "true" keyProperty = "id">
-            insert into `user`
-            (
-                account,
-                username,
-                password,
-                email,
-                role,
-                status
-            )
-            values
-            (
-                #{account},
-                #{username},
-                #{password},
-                #{email},
-                #{role},
-                #{status}
-            )
-        </insert>
-    <update id = "updatePassword">
+    <insert id="insertUser"
+            parameterType="com.kun.aiinterview.user.entity.User"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO `user` (
+            account,
+            username,
+            password,
+            email,
+            role,
+            status
+        )
+        VALUES (
+            #{account},
+            #{username},
+            #{password},
+            #{email},
+            #{role},
+            #{status}
+        )
+    </insert>
+    <update id="updatePassword">
         UPDATE `user`
         SET password = #{password},
             password_changed_at = #{passwordChangedAt}
         WHERE id = #{id}
     </update>
-    </mapper>
+</mapper>

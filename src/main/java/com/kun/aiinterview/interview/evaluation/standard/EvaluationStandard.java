@@ -10,22 +10,22 @@ public class EvaluationStandard {
 
     public EvaluationLevel resolveLevel(
             int totalScore
-    ){
-        if(totalScore < 0 || totalScore > 100){
+    ) {
+        if (totalScore < 0 || totalScore > 100) {
             throw new IllegalArgumentException(
                     "totalScore必须在0到100之间"
             );
         }
 
-        if(totalScore >= 90){
+        if (totalScore >= 90) {
             return EvaluationLevel.EXCELLENT;
         }
 
-        if(totalScore >= 80){
+        if (totalScore >= 80) {
             return EvaluationLevel.GOOD;
         }
 
-        if(totalScore >= 60){
+        if (totalScore >= 60) {
             return EvaluationLevel.FAIR;
         }
 

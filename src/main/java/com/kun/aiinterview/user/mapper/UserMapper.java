@@ -17,5 +17,9 @@ public interface UserMapper {
 
     int insertUser(User user);
 
-    int updatePassword(@Param("id") Long id,@Param("password")String password,@Param("passwordChangedAt") LocalDateTime passwordChangedAt);
+    int updatePassword(
+            @Param("id") Long id,
+            @Param("password") String password,
+            @Param("passwordChangedAt") LocalDateTime passwordChangedAt
+    );
 }

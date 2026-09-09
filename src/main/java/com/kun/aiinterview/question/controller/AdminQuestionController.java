@@ -11,7 +11,14 @@ import com.kun.aiinterview.question.vo.AdminQuestionPageResponse;
 import com.kun.aiinterview.question.vo.CreateQuestionResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/admin/questions")
@@ -22,7 +29,7 @@ public class AdminQuestionController {
     @PostMapping
     public Result<CreateQuestionResponse> createQuestion(
             @Valid @RequestBody CreateQuestionRequest request
-            ){
+            ) {
         Long questionId = questionAdminService.createQuestion(request);
         CreateQuestionResponse response = CreateQuestionResponse.builder()
                 .questionId(questionId)
@@ -43,7 +50,7 @@ public class AdminQuestionController {
     @GetMapping
     public Result<AdminQuestionPageResponse> getQuestionPage(
             @Valid @ModelAttribute QuestionPageQuery query
-            ){
+            ) {
         AdminQuestionPageResponse response = questionAdminService.getQuestionPage(query);
 
         return Result.success(response);
@@ -52,7 +59,7 @@ public class AdminQuestionController {
     @GetMapping("/{questionId}")
     public Result<AdminQuestionDetailResponse> getQuestionDetail(
             @PathVariable Long questionId
-    ){
+    ) {
         return Result.success(
                 questionAdminService.getQuestionScoringPointDetail(questionId)
         );
@@ -62,7 +69,7 @@ public class AdminQuestionController {
     public Result<Void> updateQuestionStatus(
             @PathVariable Long questionId,
             @Valid @RequestBody UpdateQuestionStatusRequest request
-    ){
+    ) {
         questionAdminService.updateQuestionStatus(questionId, request);
         return Result.success();
     }

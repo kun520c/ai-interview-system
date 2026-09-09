@@ -6,10 +6,10 @@ import com.kun.aiinterview.knowledge.retrieval.RetrievedChunk;
 import com.kun.aiinterview.knowledge.service.KnowledgeRetrievalService;
 import com.kun.aiinterview.knowledge.vector.VectorSearchHit;
 import com.kun.aiinterview.question.enums.QuestionCategory;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
+import org.junit.jupiter.api.Test;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mock;
 
 import java.util.List;
 

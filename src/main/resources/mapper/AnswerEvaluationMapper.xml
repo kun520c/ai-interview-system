@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
-<mapper namespace = "com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper">
+<mapper namespace="com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper">
 
     <resultMap
             id="AnswerEvaluationResultMap"
@@ -115,7 +114,7 @@
             useGeneratedKeys="true"
             keyProperty="id">
 
-        INSERT INTO answer_evaluation(
+        INSERT INTO answer_evaluation (
             answer_id,
             main_interview_question_id,
             evaluation_phase,
@@ -139,7 +138,7 @@
             evaluation_standard_version,
             raw_result
         )
-        VALUES(
+        VALUES (
             #{answerId},
             #{mainInterviewQuestionId},
             #{evaluationPhase},

@@ -11,5 +11,5 @@ record DashScopeEmbeddingRequest (
 
         @JsonProperty("encoding_format")
         String encodingFormat
-){
+) {
 }

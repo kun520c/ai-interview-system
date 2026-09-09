@@ -20,18 +20,18 @@ public class KnowledgeDocumentProcessingTransactionService {
     public void persistChunksAndMarkReady(
             Long documentId,
             List<KnowledgeChunk> chunks
-    ){
-        if(documentId == null || documentId <= 0){
+    ) {
+        if (documentId == null || documentId <= 0) {
             throw new IllegalArgumentException("文档ID必须大于0");
         }
 
-        if(chunks == null || chunks.isEmpty()){
+        if (chunks == null || chunks.isEmpty()) {
             throw new IllegalArgumentException("待持久化知识切片不能为空");
         }
 
         int insertedRows = knowledgeChunkMapper.batchInsert(chunks);
 
-        if(insertedRows != chunks.size()){
+        if (insertedRows != chunks.size()) {
             throw new BusinessException(
                     "知识切片持久化数量异常，期望写入："
                         + chunks.size()
@@ -42,7 +42,7 @@ public class KnowledgeDocumentProcessingTransactionService {
 
         int updatedRows = knowledgeDocumentMapper.markReady(documentId);
 
-        if(updatedRows != 1){
+        if (updatedRows != 1) {
             throw new BusinessException("知识文档READY状态更新失败");
         }
     }

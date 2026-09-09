@@ -23,11 +23,11 @@ public class UserService {
 
     public CurrentUserResponse getCurrentUser(Long userId) {
         User user = userMapper.getUserById(userId);
-        if(user == null) {
+        if (user == null) {
             throw new BusinessException("用户不存在");
         }
 
-        if(user.getStatus() == UserStatus.DISABLED){
+        if (user.getStatus() == UserStatus.DISABLED) {
             throw new BusinessException("账号已被封禁");
         }
 
@@ -45,19 +45,19 @@ public class UserService {
     @Transactional
     public void changePassword(Long userId, ChangePasswordRequest changePasswordRequest) {
         User user = userMapper.getUserById(userId);
-        if(user == null){
+        if (user == null) {
             throw new BusinessException("用户不存在");
         }
 
-        if(user.getStatus() == UserStatus.DISABLED){
+        if (user.getStatus() == UserStatus.DISABLED) {
             throw new BusinessException("账号已被封禁");
         }
 
-        if(!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(),user.getPassword())){
+        if (!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(),user.getPassword())) {
             throw new BusinessException("请输入正确的现存密码");
         }
 
-        if(passwordEncoder.matches(changePasswordRequest.getNewPassword(),user.getPassword())){
+        if (passwordEncoder.matches(changePasswordRequest.getNewPassword(),user.getPassword())) {
             throw new BusinessException("新密码不能与原密码相同");
         }
 
@@ -66,7 +66,7 @@ public class UserService {
 
         int affectedRows = userMapper.updatePassword(userId,newPassword,passwordChangeTime);
 
-        if(affectedRows != 1){
+        if (affectedRows != 1) {
             throw new BusinessException("密码修改失败");
         }
     }

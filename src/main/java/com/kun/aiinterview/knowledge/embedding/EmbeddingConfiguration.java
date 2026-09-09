@@ -1,16 +1,14 @@
 package com.kun.aiinterview.knowledge.embedding;
 
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 
 import java.net.http.HttpClient;
-
 
 @Configuration
 @EnableConfigurationProperties(EmbeddingProperties.class)
@@ -21,7 +19,7 @@ public class EmbeddingConfiguration {
     public RestClient embeddingRestClient(
             RestClient.Builder builder,
             EmbeddingProperties properties
-    ){
+    ) {
         HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(properties.getConnectTimeout())
                 .build();

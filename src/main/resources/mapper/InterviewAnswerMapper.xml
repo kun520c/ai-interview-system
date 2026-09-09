@@ -1,38 +1,112 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
-<mapper namespace = "com.kun.aiinterview.interview.mapper.InterviewAnswerMapper">
+<mapper namespace="com.kun.aiinterview.interview.mapper.InterviewAnswerMapper">
 
     <select id="getInterviewAnswerById"
             resultType="com.kun.aiinterview.interview.entity.InterviewAnswer">
-        SELECT id,
-        interview_question_id,
-        answer_content,
-        status,
-        request_id,
-        error_code,
-        submitted_at,
-        created_at,
-        updated_at
+        SELECT
+            id,
+            interview_question_id,
+            answer_content,
+            status,
+            request_id,
+            error_code,
+            submitted_at,
+            created_at,
+            updated_at
         FROM interview_answer
         WHERE id = #{id}
     </select>
 
     <select id="getInterviewAnswerByInterviewQuestionId"
             resultType="com.kun.aiinterview.interview.entity.InterviewAnswer">
-        SELECT id,
-        interview_question_id,
-        answer_content,
-        status,
-        request_id,
-        error_code,
-        submitted_at,
-        created_at,
-        updated_at
+        SELECT
+            id,
+            interview_question_id,
+            answer_content,
+            status,
+            request_id,
+            error_code,
+            submitted_at,
+            created_at,
+            updated_at
         FROM interview_answer
         WHERE interview_question_id = #{interviewQuestionId}
     </select>
 
+    <select id="getInterviewAnswerByRequestId"
+            resultType="com.kun.aiinterview.interview.entity.InterviewAnswer">
+        SELECT
+            id,
+            interview_question_id,
+            answer_content,
+            status,
+            request_id,
+            error_code,
+            submitted_at,
+            created_at,
+            updated_at
+        FROM interview_answer
+        WHERE request_id = #{requestId}
+    </select>
+
+    <insert id="insertInterviewAnswer"
+            parameterType="com.kun.aiinterview.interview.entity.InterviewAnswer"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO interview_answer (
+            interview_question_id,
+            answer_content,
+            status,
+            request_id,
+            error_code,
+            submitted_at
+        )
+        VALUES (
+            #{interviewQuestionId},
+            #{answerContent},
+            #{status},
+            #{requestId},
+            #{errorCode},
+            #{submittedAt}
+        )
+    </insert>
+
+    <update id="claimEvaluation">
+        UPDATE interview_answer
+        SET
+            status = 'EVALUATING',
+            error_code = NULL
+        WHERE id = #{id}
+            AND status = 'SUBMITTED'
+    </update>
+
+    <update id="retryEvaluation">
+        UPDATE interview_answer
+        SET
+            status = 'EVALUATING',
+            error_code = NULL
+        WHERE id = #{id}
+            AND status = 'FAILED'
+    </update>
+
+    <update id="markEvaluated">
+        UPDATE interview_answer
+        SET
+            status = 'EVALUATED',
+            error_code = NULL
+        WHERE id = #{id}
+            AND status = 'EVALUATING'
+    </update>
+
+    <update id="markFailed">
+        UPDATE interview_answer
+        SET
+            status = 'FAILED',
+            error_code = #{errorCode}
+        WHERE id = #{id}
+            AND status = 'EVALUATING'
+    </update>
 </mapper>

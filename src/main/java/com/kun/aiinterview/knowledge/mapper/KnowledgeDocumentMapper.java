@@ -9,15 +9,14 @@ public interface KnowledgeDocumentMapper {
 
     int insertDocument(KnowledgeDocument document);
 
-    KnowledgeDocument selectById(Long id);
+    KnowledgeDocument selectById(@Param("id") Long id);
 
-    int claimProcessing(Long id);
+    int claimProcessing(@Param("id") Long id);
 
-    int markReady(Long id);
+    int markReady(@Param("id") Long id);
 
     int markFailed(
             @Param("id") Long id,
             @Param("errorMessage") String errorMessage
     );
-
 }

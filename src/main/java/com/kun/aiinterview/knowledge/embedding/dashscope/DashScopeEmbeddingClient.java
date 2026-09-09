@@ -27,7 +27,7 @@ public class DashScopeEmbeddingClient implements EmbeddingClient {
             @Qualifier("embeddingRestClient")
             RestClient restClient,
             EmbeddingProperties properties
-    ){
+    ) {
         this.restClient = restClient;
         this.properties = properties;
     }
@@ -92,18 +92,18 @@ public class DashScopeEmbeddingClient implements EmbeddingClient {
     }
 
     private List<String> validateAndCopy(List<String> texts) {
-        if(texts == null){
+        if (texts == null) {
             throw new IllegalArgumentException("Embedding输入文本列表不能为空");
         }
 
-        if(texts.isEmpty()){
+        if (texts.isEmpty()) {
             throw new IllegalArgumentException("Embedding输入文本列表不能是空集合");
         }
 
-        for(int index = 0;index < texts.size();index++){
+        for (int index = 0;index < texts.size();index++) {
             String text = texts.get(index);
 
-            if(text == null || text.isBlank()){
+            if (text == null || text.isBlank()) {
                 throw new IllegalArgumentException("Embedding输入文本不能是空白内容,索引：" + index);
             }
         }
@@ -112,7 +112,7 @@ public class DashScopeEmbeddingClient implements EmbeddingClient {
 
     private DashScopeEmbeddingResponse requestBatch(
             List<String> batchTexts
-    ){
+    ) {
         DashScopeEmbeddingRequest request =
                 new DashScopeEmbeddingRequest(
                         properties.getModel(),
@@ -121,7 +121,7 @@ public class DashScopeEmbeddingClient implements EmbeddingClient {
                         "float"
                 );
 
-        try{
+        try {
             DashScopeEmbeddingResponse response = restClient
                     .post()
                     .uri(EMBEDDINGS_PATH)
@@ -130,12 +130,12 @@ public class DashScopeEmbeddingClient implements EmbeddingClient {
                     .retrieve()
                     .body(DashScopeEmbeddingResponse.class);
 
-            if(response == null){
+            if (response == null) {
                 throw new ExternalServiceException("Embedding服务器返回空响应");
             }
 
             return response;
-        }catch (RestClientException exception){
+        } catch (RestClientException exception) {
             throw new ExternalServiceException(
                     "调用Embedding服务失败",
                     exception
@@ -147,14 +147,14 @@ public class DashScopeEmbeddingClient implements EmbeddingClient {
             DashScopeEmbeddingResponse response,
             int expectedCount,
             int batchStart
-    ){
+    ) {
         validateResponseModel(response);
 
-        if(response.data() == null){
+        if (response.data() == null) {
             throw new ExternalServiceException("Embedding响应缺少data");
         }
 
-        if(response.data().size() != expectedCount){
+        if (response.data().size() != expectedCount) {
             throw new ExternalServiceException(
                     "Embedding响应数量不一致，预期:"
                     + expectedCount
@@ -165,8 +165,8 @@ public class DashScopeEmbeddingClient implements EmbeddingClient {
 
         List<EmbeddingVector> orderedVectors = new ArrayList<>(Collections.nCopies(expectedCount,null));
 
-        for(DashScopeEmbeddingResponse.EmbeddingData data : response.data()){
-            if(data == null) {
+        for (DashScopeEmbeddingResponse.EmbeddingData data : response.data()) {
+            if (data == null) {
                 throw  new ExternalServiceException("Embedding响应包含空数据项");
             }
 
@@ -197,12 +197,12 @@ public class DashScopeEmbeddingClient implements EmbeddingClient {
         return List.copyOf(orderedVectors);
     }
 
-    private void validateResponseModel(DashScopeEmbeddingResponse response){
-        if(response.model() == null || response.model().isBlank()){
+    private void validateResponseModel(DashScopeEmbeddingResponse response) {
+        if (response.model() == null || response.model().isBlank()) {
             throw new ExternalServiceException("Embedding响应缺少模型名称");
         }
 
-        if(!properties.getModel().equals(response.model())){
+        if (!properties.getModel().equals(response.model())) {
             throw new ExternalServiceException(
                     "Embedding响应模型与配置不一致，配置模型："
                     + properties.getModel()
@@ -215,18 +215,18 @@ public class DashScopeEmbeddingClient implements EmbeddingClient {
             Integer localIndex,
             int expectedCount,
             List<EmbeddingVector> orderedVectors
-    ){
-        if(localIndex == null){
+    ) {
+        if (localIndex == null) {
             throw new ExternalServiceException("Embedding响应少向量索引");
         }
 
-        if(localIndex < 0 || localIndex >= expectedCount){
+        if (localIndex < 0 || localIndex >= expectedCount) {
             throw new ExternalServiceException("Embedding响应索引超出范围："
                                                     + localIndex
             );
         }
 
-        if(orderedVectors.get(localIndex) != null){
+        if (orderedVectors.get(localIndex) != null) {
             throw new ExternalServiceException(
                     "Embedding响应包含重复索引"
                             +localIndex
@@ -237,15 +237,15 @@ public class DashScopeEmbeddingClient implements EmbeddingClient {
     private void validateEmbeddingValues(
             List<Float> values,
             int localIndex
-    ){
-        if(values == null){
+    ) {
+        if (values == null) {
             throw new ExternalServiceException(
                     "Embedding响应缺少向量，索引："
                             + localIndex
             );
         }
 
-        if(values.size() != properties.getDimension()){
+        if (values.size() != properties.getDimension()) {
             throw new ExternalServiceException(
                     "Embedding向量维度不一致，索引："
                         + localIndex
@@ -256,11 +256,11 @@ public class DashScopeEmbeddingClient implements EmbeddingClient {
             );
         }
 
-        for(int dimensionIndex = 0;dimensionIndex < values.size();dimensionIndex++){
+        for (int dimensionIndex = 0;dimensionIndex < values.size();dimensionIndex++) {
 
             Float value = values.get(dimensionIndex);
 
-            if(value == null || !Float.isFinite(value)){
+            if (value == null || !Float.isFinite(value)) {
                 throw new ExternalServiceException(
                         "Embedding向量包含非法数值，向量索引："
                             + localIndex
@@ -271,21 +271,21 @@ public class DashScopeEmbeddingClient implements EmbeddingClient {
         }
     }
 
-    private Long extractTokenCount(DashScopeEmbeddingResponse response){
-        if(response.usage() == null){
+    private Long extractTokenCount(DashScopeEmbeddingResponse response) {
+        if (response.usage() == null) {
             return null;
         }
 
         Long promptTokens = response.usage().promptTokens();
         Long totalTokens = response.usage().totalTokens();
 
-        if(promptTokens != null && promptTokens < 0){
+        if (promptTokens != null && promptTokens < 0) {
             throw new ExternalServiceException(
                     "Embedding响应promptTokens非法"
             );
         }
 
-        if(totalTokens != null && totalTokens < 0){
+        if (totalTokens != null && totalTokens < 0) {
             throw new ExternalServiceException(
                     "Embedding响应totalTokens非法"
             );

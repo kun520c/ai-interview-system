@@ -1,6 +1,5 @@
 package com.kun.aiinterview.user.mapper;
 
-import org.springframework.test.context.ActiveProfiles;
 import com.kun.aiinterview.user.entity.User;
 import com.kun.aiinterview.user.enums.UserRole;
 import com.kun.aiinterview.user.enums.UserStatus;
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 
@@ -53,7 +53,7 @@ public class UserMapperTest {
     }
 
     @AfterEach
-    void tearDown(){
+    void tearDown() {
         jdbcTemplate.update(
                 "DELETE FROM `user` WHERE account = ?",
                 testUserAccount
@@ -61,7 +61,7 @@ public class UserMapperTest {
     }
 
     @Test
-    void shouldGetUserByAccount(){
+    void shouldGetUserByAccount() {
         User user = userMapper.getUserByAccount(testUserAccount);
 
         assertNotNull(user);
@@ -72,7 +72,7 @@ public class UserMapperTest {
     }
 
     @Test
-    void shouldGetUserById(){
+    void shouldGetUserById() {
         User inserted = userMapper.getUserByAccount(testUserAccount);
 
         User user = userMapper.getUserById(inserted.getId());
@@ -82,7 +82,7 @@ public class UserMapperTest {
     }
 
     @Test
-    void shouldGetUserByEmail(){
+    void shouldGetUserByEmail() {
         User user = userMapper.getUserByEmail(testUserEmail);
         assertNotNull(user);
         assertEquals(testUserEmail, user.getEmail());

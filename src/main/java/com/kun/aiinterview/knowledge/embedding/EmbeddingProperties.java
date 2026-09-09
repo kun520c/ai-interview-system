@@ -45,14 +45,14 @@ public class EmbeddingProperties {
     private Duration readTimeout;
 
     @AssertTrue(message = "Embedding连接超时时间必须大于0")
-    public boolean isConnectTimeoutPositive(){
+    public boolean isConnectTimeoutPositive() {
         return connectTimeout == null
                 ||(!connectTimeout.isZero())
                 && !connectTimeout.isNegative();
     }
 
     @AssertTrue(message = "Embedding读取超时时间必须大于0")
-    public boolean isReadTimeoutPositive(){
+    public boolean isReadTimeoutPositive() {
         return readTimeout == null
                 ||(!readTimeout.isZero())
                 && !readTimeout.isNegative();

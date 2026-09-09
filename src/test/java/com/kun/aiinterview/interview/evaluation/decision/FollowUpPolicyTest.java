@@ -4,9 +4,9 @@ import com.kun.aiinterview.interview.enums.DecisionAction;
 import com.kun.aiinterview.interview.enums.EvaluationPhase;
 import com.kun.aiinterview.interview.evaluation.EvaluationContext;
 import com.kun.aiinterview.interview.evaluation.EvaluationMode;
-import com.kun.aiinterview.interview.evaluation.ScoringPointSnapshot;
 import com.kun.aiinterview.interview.evaluation.llm.LlmEvaluationSuggestion;
 import com.kun.aiinterview.interview.evaluation.score.EvaluationScore;
+import com.kun.aiinterview.interview.evaluation.ScoringPointSnapshot;
 import com.kun.aiinterview.interview.evaluation.validation.ValidatedEvaluationSuggestion;
 import com.kun.aiinterview.question.enums.QuestionCategory;
 import com.kun.aiinterview.question.enums.QuestionPointType;
@@ -20,17 +20,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FollowUpPolicyTest {
 
-    private final FollowUpPolicy followUpPolicy = new FollowUpPolicy();
+    private final FollowUpPolicy followUpPolicy =
+            new FollowUpPolicy(new FollowUpTargetResolver());
 
     @Test
     void shouldFollowUpForMainAnswerAtScore59WhenLlmRecommends() {
         List<ScoringPointSnapshot> points = List.of(
-                scoringPoint(101L, QuestionPointType.CORE, 100)
+                scoringPoint(101L, QuestionPointType.KEY, 100)
         );
 
         EvaluationDecision decision = followUpPolicy.decide(
                 context(EvaluationMode.MAIN_ANSWER, points),
-                suggestion(true, List.of(scoringResult(101L, true))),
+                suggestion(true, List.of(scoringResult(101L, false))),
                 score(59),
                 true
         );
@@ -39,6 +40,10 @@ class FollowUpPolicyTest {
                 decision,
                 EvaluationPhase.INITIAL,
                 DecisionAction.FOLLOW_UP
+        );
+        assertEquals(
+                List.of(101L),
+                decision.followUpTargetPointIds()
         );
     }
 
@@ -99,6 +104,34 @@ class FollowUpPolicyTest {
                 decision,
                 EvaluationPhase.INITIAL,
                 DecisionAction.FOLLOW_UP
+        );
+        assertEquals(
+                List.of(101L),
+                decision.followUpTargetPointIds()
+        );
+    }
+
+    @Test
+    void shouldUseFinalDecisionWhenNoLegalTargetPointExists() {
+        List<ScoringPointSnapshot> points = List.of(
+                scoringPoint(101L, QuestionPointType.CORE, 100)
+        );
+
+        EvaluationDecision decision = followUpPolicy.decide(
+                context(EvaluationMode.MAIN_ANSWER, points),
+                suggestion(true, List.of(scoringResult(101L, true))),
+                score(40),
+                true
+        );
+
+        assertDecision(
+                decision,
+                EvaluationPhase.FINAL,
+                DecisionAction.NEXT_MAIN
+        );
+        assertEquals(
+                List.of(),
+                decision.followUpTargetPointIds()
         );
     }
 
@@ -394,7 +427,15 @@ class FollowUpPolicyTest {
     ) {
         assertAll(
                 () -> assertEquals(expectedPhase, decision.evaluationPhase()),
-                () -> assertEquals(expectedAction, decision.decisionAction())
+                () -> assertEquals(expectedAction, decision.decisionAction()),
+                () -> {
+                    if (expectedAction != DecisionAction.FOLLOW_UP) {
+                        assertEquals(
+                                List.of(),
+                                decision.followUpTargetPointIds()
+                        );
+                    }
+                }
         );
     }
 }

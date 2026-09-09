@@ -13,10 +13,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.function.Function;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +35,7 @@ public class KnowledgeRetrievalService {
             EmbeddingClient embeddingClient,
             VectorStoreClient vectorStoreClient,
             KnowledgeChunkMapper knowledgeChunkMapper
-    ){
+    ) {
         this.embeddingClient = embeddingClient;
         this.vectorStoreClient = vectorStoreClient;
         this.knowledgeChunkMapper = knowledgeChunkMapper;
@@ -44,14 +44,14 @@ public class KnowledgeRetrievalService {
     public RetrievalResult retrieve(
             String query,
             int topK
-    ){
-        if(query == null || query.isBlank()){
+    ) {
+        if (query == null || query.isBlank()) {
             throw new IllegalArgumentException(
                     "检索Query不能为空"
             );
         }
 
-        if(topK <= 0){
+        if (topK <= 0) {
             throw new IllegalArgumentException(
                     "topK必须大于0"
             );
@@ -64,13 +64,13 @@ public class KnowledgeRetrievalService {
                         List.of(normalizedQuery)
                 );
 
-        if(embeddingResult == null){
+        if (embeddingResult == null) {
             throw new IllegalStateException(
                     "Query Embedding返回结果不能为空"
             );
         }
 
-        if(embeddingResult.vectors().size() != 1){
+        if (embeddingResult.vectors().size() != 1) {
             throw new IllegalStateException(
                     "Query Embedding返回的向量数量异常"
             );
@@ -79,13 +79,13 @@ public class KnowledgeRetrievalService {
         EmbeddingVector queryEmbedding =
                 embeddingResult.vectors().get(0);
 
-        if(queryEmbedding == null){
+        if (queryEmbedding == null) {
             throw new IllegalStateException(
                     "Query Embedding返回的向量不能为空"
             );
         }
 
-        if(queryEmbedding.inputIndex() != 0){
+        if (queryEmbedding.inputIndex() != 0) {
             throw new IllegalStateException(
                     "Query Embedding返回的输入索引异常"
             );
@@ -98,7 +98,7 @@ public class KnowledgeRetrievalService {
                         topK
                 );
 
-        if(hits.isEmpty()){
+        if (hits.isEmpty()) {
             return new RetrievalResult(
                     normalizedQuery,
                     topK,
@@ -135,7 +135,7 @@ public class KnowledgeRetrievalService {
         List<RetrievedChunk> retrievedChunks =
                 new ArrayList<>();
 
-        for(int i = 0;i < hits.size();i++){
+        for (int i = 0;i < hits.size();i++) {
 
             VectorSearchHit hit = hits.get(i);
 
@@ -144,23 +144,23 @@ public class KnowledgeRetrievalService {
                             hit.vectorId()
                     );
 
-            if(row == null){
+            if (row == null) {
                 continue;
             }
 
-            if(!Objects.equals(
+            if (!Objects.equals(
                     row.getDocumentId(),
                     hit.documentId()
-            )){
+            )) {
                 throw new IllegalStateException(
                         "Milvus与Mysql的documentId不一致"
                 );
             }
 
-            if(!Objects.equals(
+            if (!Objects.equals(
                     row.getChunkIndex(),
                     hit.chunkIndex()
-            )){
+            )) {
                 throw new IllegalStateException(
                         "Milvus与Mysql的chunkIndex不一致"
                 );

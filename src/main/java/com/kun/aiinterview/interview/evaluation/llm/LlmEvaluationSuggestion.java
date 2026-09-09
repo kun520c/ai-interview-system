@@ -28,6 +28,6 @@ public record LlmEvaluationSuggestion(
             Boolean covered,
 
             String evidence
-    ){
+    ) {
     }
 }

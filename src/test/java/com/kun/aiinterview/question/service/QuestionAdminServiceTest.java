@@ -16,16 +16,16 @@ import com.kun.aiinterview.question.mapper.QuestionMapper;
 import com.kun.aiinterview.question.mapper.QuestionScoringPointMapper;
 import com.kun.aiinterview.question.vo.AdminQuestionDetailResponse;
 import com.kun.aiinterview.question.vo.AdminScoringPointDetail;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.InOrder;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mock;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.annotation.Transactional;
 

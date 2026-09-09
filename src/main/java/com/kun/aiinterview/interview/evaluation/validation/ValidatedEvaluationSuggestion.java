@@ -19,7 +19,7 @@ public record ValidatedEvaluationSuggestion (
 
         boolean followUpRecommended,
         String suggestedFollowUp
-){
+) {
 
     public ValidatedEvaluationSuggestion{
         strengths = List.copyOf(strengths);

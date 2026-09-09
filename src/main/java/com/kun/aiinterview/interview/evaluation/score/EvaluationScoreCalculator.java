@@ -8,9 +8,9 @@ public class EvaluationScoreCalculator {
 
     public EvaluationScore calculate(
             ValidatedEvaluationSuggestion evaluation
-    ){
+    ) {
 
-        if(evaluation == null){
+        if (evaluation == null) {
             throw new IllegalArgumentException(
                     "已校验评价结果不能为空"
             );

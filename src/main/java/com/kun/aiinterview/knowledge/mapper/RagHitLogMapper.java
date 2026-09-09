@@ -9,12 +9,9 @@ import java.util.List;
 @Mapper
 public interface RagHitLogMapper {
 
-    int batchInsert(
-            @Param("hits")
-            List<RagHitLog> hits
-    );
+    int batchInsert(@Param("hits") List<RagHitLog> hits);
 
     List<RagHitLog> listByBatchId(
-            String retrievalBatchId
+            @Param("retrievalBatchId") String retrievalBatchId
     );
 }

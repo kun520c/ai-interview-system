@@ -1,16 +1,14 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.kun.aiinterview.question.mapper.QuestionMapper">
 
     <insert id="insertQuestion"
-            parameterType = "com.kun.aiinterview.question.entity.Question"
-            useGeneratedKeys = "true"
-            keyProperty = "id">
-        Insert INTO question
-        (
+            parameterType="com.kun.aiinterview.question.entity.Question"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO question (
             category,
             knowledge_point,
             difficulty,
@@ -18,8 +16,7 @@
             reference_answer,
             status
         )
-        VALUES
-        (
+        VALUES (
             #{category},
             #{knowledgePoint},
             #{difficulty},
@@ -27,7 +24,6 @@
             #{referenceAnswer},
             #{status}
         )
-
     </insert>
 
     <select id="getQuestionById"
@@ -55,54 +51,55 @@
         WHERE id = #{id}
     </update>
 
-    <sql id = "QuestionPageFilter">
+    <sql id="QuestionPageFilter">
         <where>
-            <if test = "query.category != null">
+            <if test="query.category != null">
                 AND category = #{query.category}
             </if>
 
-            <if test = "query.difficulty != null">
-                AND difficulty  = #{query.difficulty}
+            <if test="query.difficulty != null">
+                AND difficulty = #{query.difficulty}
             </if>
 
-            <if test = "query.status != null">
+            <if test="query.status != null">
                 AND status = #{query.status}
             </if>
 
-            <if test = "query.keyword != null and query.keyword != ''">
+            <if test="query.keyword != null and query.keyword != ''">
                 AND (
-                    knowledge_point LIKE CONCAT('%',#{query.keyword},'%')
-                    OR question_content LIKE CONCAT('%',#{query.keyword},'%')
+                    knowledge_point LIKE CONCAT('%', #{query.keyword}, '%')
+                    OR question_content LIKE CONCAT('%', #{query.keyword}, '%')
                 )
             </if>
         </where>
     </sql>
 
-    <select id = "countQuestion" resultType = "long">
+    <select id="countQuestion" resultType="long">
         SELECT COUNT(*)
         FROM question
 
         <include refid="QuestionPageFilter"/>
     </select>
 
-    <select id = "selectQuestionPage" resultType = "com.kun.aiinterview.question.vo.AdminQuestionListItem">
-        SELECT  id,
-                category,
-                knowledge_point,
-                difficulty,
-                question_content,
-                status,
-                updated_at
+    <select id="selectQuestionPage" resultType="com.kun.aiinterview.question.vo.AdminQuestionListItem">
+        SELECT
+            id,
+            category,
+            knowledge_point,
+            difficulty,
+            question_content,
+            status,
+            updated_at
         FROM question
 
         <include refid="QuestionPageFilter"/>
 
-        ORDER BY updated_at DESC,id DESC
+        ORDER BY updated_at DESC, id DESC
         LIMIT #{pageSize}
         OFFSET #{offset}
     </select>
 
-    <update id = "updateQuestionStatus">
+    <update id="updateQuestionStatus">
         UPDATE question
         SET status = #{status}
         WHERE id = #{questionId}

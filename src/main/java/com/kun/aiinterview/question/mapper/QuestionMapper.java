@@ -11,22 +11,23 @@ import java.util.List;
 
 @Mapper
 public interface QuestionMapper {
+
     int insertQuestion(Question question);
 
-    Question getQuestionById(Long id);
+    Question getQuestionById(@Param("id") Long id);
 
     int updateQuestion(Question question);
 
-    long countQuestion(@Param("query")QuestionPageQuery query);
+    long countQuestion(@Param("query") QuestionPageQuery query);
 
     List<AdminQuestionListItem> selectQuestionPage(
-            @Param("query")QuestionPageQuery query,
+            @Param("query") QuestionPageQuery query,
             @Param("offset") Long offset,
             @Param("pageSize") int pageSize
-            );
+    );
 
     int updateQuestionStatus(
             @Param("questionId") Long questionId,
-            @Param("status")QuestionStatus status
-            );
+            @Param("status") QuestionStatus status
+    );
 }

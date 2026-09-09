@@ -14,15 +14,12 @@ public interface KnowledgeChunkMapper {
 
     int deleteByDocumentIdAndVersion(
             @Param("documentId") Long documentId,
-
             @Param("documentVersion") Integer documentVersion
-                                     );
+    );
 
     List<KnowledgeRetrievalRow> selectRetrievableByVectorIds(
             @Param("vectorIds") List<String> vectorIds,
             @Param("embeddingModel") String embeddingModel,
             @Param("embeddingVersion") String embeddingVersion
     );
-
-
 }

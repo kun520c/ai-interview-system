@@ -20,17 +20,17 @@ public record EmbeddingBatchResult (
         List<EmbeddingVector> vectors,
         @Min(value = 0,message = "消耗token非null时不能小于0")
         Long totalTokenCount
-){
+) {
     public EmbeddingBatchResult{
-        if(model == null || model.isBlank()){
+        if (model == null || model.isBlank()) {
             throw new IllegalArgumentException("Embedding模型名称不能为空");
         }
 
-        if(profileVersion == null || profileVersion.isBlank()){
+        if (profileVersion == null || profileVersion.isBlank()) {
             throw new IllegalArgumentException("Embedding向量版本不能为空");
         }
 
-        if(dimension <= 0){
+        if (dimension <= 0) {
             throw new IllegalArgumentException("Embedding固定维度必须大于0");
         }
 
@@ -38,17 +38,17 @@ public record EmbeddingBatchResult (
             throw new IllegalArgumentException("Embedding向量集合不能为null");
         }
 
-        if(vectors.isEmpty()){
+        if (vectors.isEmpty()) {
             throw new IllegalArgumentException("Embedding向量集合不能为空集合");
         }
 
-        for(EmbeddingVector vector : vectors){
-            if(vector.values().size() != dimension ){
+        for (EmbeddingVector vector : vectors) {
+            if (vector.values().size() != dimension ) {
                 throw new IllegalArgumentException("Embedding向量维度与批次维度不一致");
             }
         }
 
-        if(totalTokenCount != null && totalTokenCount < 0){
+        if (totalTokenCount != null && totalTokenCount < 0) {
             throw new IllegalArgumentException("消耗token数不能小于0");
         }
 

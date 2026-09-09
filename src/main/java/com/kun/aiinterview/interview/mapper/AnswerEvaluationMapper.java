@@ -2,15 +2,12 @@ package com.kun.aiinterview.interview.mapper;
 
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface AnswerEvaluationMapper {
 
-    int insertEvaluation(
-            AnswerEvaluation evaluation
-    );
+    int insertEvaluation(AnswerEvaluation evaluation);
 
-    AnswerEvaluation getByAnswerId(
-            Long answerId
-    );
+    AnswerEvaluation getByAnswerId(@Param("answerId") Long answerId);
 }
