@@ -42,4 +42,22 @@
         WHERE question_id = #{questionId}
         ORDER BY sort_order ASC
     </select>
+
+    <select id="selectEnabledByQuestionId"
+            resultType="com.kun.aiinterview.question.entity.QuestionScoringPoint">
+        SELECT
+            id,
+            question_id,
+            point_type,
+            content,
+            weight,
+            sort_order,
+            status,
+            created_at,
+            updated_at
+        FROM question_scoring_point
+        WHERE question_id = #{questionId}
+            AND status = 'ENABLED'
+        ORDER BY sort_order ASC,id ASC
+    </select>
 </mapper>

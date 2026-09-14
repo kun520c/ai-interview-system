@@ -391,8 +391,9 @@ Current stage:
 
 ```text
 Interview Workflow core technically complete
-→ Next stage: Interview Session creation/start and one-time MAIN question selection persistence
-→ Then: external Interview API
+Interview Session creation/start and one-time MAIN question plan persistence technically complete
+→ Next stage: external Interview API
+→ Then: report / weakness / history
 ```
 
 The F1-F4 changes have passed their technical verification gate. Determine their commit and push status from the current Git history; do not infer publication state from this document alone.
@@ -804,9 +805,56 @@ Interview Workflow core completed capability on 2026-09-09:
 * Workflow Mapper and transaction tests used the existing real local MySQL test environment to verify Answer CAS, Session version/current-question CAS, generated FOLLOW_UP keys, and transaction rollback.
 * Real DeepSeek, Embedding, and Milvus integrations remained protected and disabled for this regression. The 18 skips are not evidence of real external-service verification.
 
+Interview Session creation/start completed capability on 2026-09-14:
+
+### Session plan and deterministic selection
+
+* The implemented creation chain is `userId + difficulty -> active Session fast idempotency check -> InterviewPlanConfig -> query ENABLED Questions by difficulty -> QuestionPlanSelector -> query ENABLED scoring points -> create CREATED Session draft -> transaction -> lock user row FOR UPDATE -> recheck active Session -> insert Session -> construct all MAIN snapshots -> batch insert all MAIN questions -> reload planOrder=1 MAIN -> first MAIN PENDING -> WAITING_ANSWER -> Session CREATED -> IN_PROGRESS`.
+* All MAIN questions are selected, snapshotted, and persisted once when the Session is created. They are not reselected during the interview.
+* The current MVP planned counts are `EASY = 5`, `MEDIUM = 7`, and `HARD = 9`. `plannedQuestionCount` and `requiredCategories` come only from `InterviewPlanConfig`; `InterviewSessionService` does not maintain a second difficulty-to-plan mapping.
+* Every plan requires a positive question count and a non-empty, duplicate-free, immutable required-category List whose size does not exceed `plannedQuestionCount`.
+* `QuestionPlanSelector` receives the ENABLED candidates for one difficulty. It first selects one question for every required category, then fills the remaining positions from still-unselected candidates in stable input order.
+* Selected Question IDs are unique. An insufficient unique candidate count, a missing required category, or an invalid candidate identity/category fails Session creation before persistence.
+* Selection is currently deterministic. It does not use randomness, user-weakness weighting, recent-question deduplication, or any other recommendation algorithm. The returned selection List is unmodifiable.
+
+### MAIN question snapshots
+
+* Every persisted MAIN freezes `questionId`, `category`, `knowledgePoint`, `questionContent`, `referenceAnswerSnapshot`, `scoringPointsSnapshot`, `planOrder`, and `displayOrder` from the selected question-bank data.
+* A new MAIN always uses `questionType = MAIN`, `parentQuestionId = null`, `followUpTargetPoints = null`, `status = PENDING`, and `displayOrder = planOrder * 2 - 1`. The first MAIN is activated only after all MAIN rows have been inserted.
+* Newly written `scoringPointsSnapshot` JSON contains only `id`, `pointType`, `content`, and `weight`. It does not persist scoring-point `questionId`, `status`, `sortOrder`, `createdAt`, or `updatedAt`.
+* The internal typed record retains its `scoringPointId` accessor for the established Evaluation code. Jackson writes the new `id` field and continues to accept the legacy `scoringPointId` field when historical snapshots are parsed.
+* Snapshot construction fails fast unless scoring points are non-empty; every point has a non-null ID, the same `questionId` as the selected Question, a non-null point type, non-blank content, and positive weight; and the enabled-point weights sum to exactly 100. This prevents invalid question-bank data from entering a formal Interview Plan.
+
+### Idempotency, concurrency, and transaction boundary
+
+* `InterviewSessionService` is intentionally not transactional. It validates the request, obtains the plan rule, loads candidates, performs deterministic selection, loads scoring points, and prepares immutable drafts.
+* Its first `getActiveSessionByUserId(userId)` call is a fast idempotency path that avoids repeating ordinary planning work when the user already has a `CREATED` or `IN_PROGRESS` Session.
+* The real concurrency boundary is `@Transactional -> SELECT user ... FOR UPDATE -> getActiveSessionByUserId(userId) again -> return the existing active Session or create a new one`. The second check runs only after the same user row is exclusively locked and prevents concurrent double creation.
+* This design does not use JVM `synchronized` and did not require a database Schema change.
+* `InterviewSessionTransactionService` keeps user locking, the active-Session recheck, Session INSERT, MAIN snapshot construction, MAIN batch INSERT, first-MAIN activation, and Session start in one local database transaction.
+* The transaction contains no DeepSeek, Embedding, Milvus, RAG, or external HTTP work. Insert counts, generated Session identity, the reloaded first MAIN, activation count, Session-start CAS, and the final database state are all validated before commit.
+* Two real MySQL test threads creating a Session for the same user concurrently returned the same Session ID, and the final number of active `CREATED`/`IN_PROGRESS` Sessions was exactly one.
+
+### Session-creation Mapper capabilities
+
+* `InterviewSessionMapper` provides `getActiveSessionByUserId`, `insertInterviewSession`, and the strict `startSession` CAS update.
+* `InterviewQuestionMapper` provides `batchInsertMainQuestions` and `getMainQuestionByPlanOrder`.
+* `QuestionMapper` provides `selectEnabledQuestionsForInterview` without random ordering or a database LIMIT.
+* `QuestionScoringPointMapper` provides `selectEnabledByQuestionId` ordered by `sort_order` and ID.
+* `UserMapper` provides `getUserByIdForUpdate`, whose SQL contains the real `FOR UPDATE` lock.
+
+### Interview Session creation verification baseline
+
+* Verification date: `2026-09-14`. Java 21 clean compilation completed with `BUILD SUCCESS`.
+* The focused Session Unit/Mock run executed 78 tests with 0 failures, 0 errors, and 0 skips.
+* The final real Mapper/transaction run executed 4 tests with 0 failures, 0 errors, and 0 skips. It covered normal creation, generated keys and real Mapper SQL, transaction rollback, and concurrent double creation.
+* The first real Mapper/transaction attempt executed 4 tests with 0 failures, 4 errors, and 0 skips because that Maven child process had not inherited `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. `${DB_URL}` remained unresolved. This was an execution-environment problem rather than a code regression; after copying the existing Windows User-scope values only into the Maven process, all 4 tests passed.
+* The focused Interview Workflow regression executed 51 tests with 0 failures, 0 errors, and 0 skips, confirming that the new creation path did not break the existing Workflow core.
+* The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1024 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
+* `MILVUS_ENABLED=false`, `DEEPSEEK_ENABLED=false`, and every `RUN_REAL_*` switch remained disabled. The 18 skips are the guarded real external-service Smoke Tests and are not evidence of real DeepSeek, Embedding, or Milvus verification. No real DeepSeek, Embedding, or Milvus call was made for this stage.
+
 The following Evaluation capabilities remain unimplemented:
 
-* Interview Session creation/start and one-time MAIN question selection persistence
 * External Interview Controller/API orchestration
 * Interview reports
 * User-weakness updates
@@ -816,11 +864,10 @@ The following Evaluation capabilities remain unimplemented:
 Next development stage:
 
 ```text
-Interview Session creation/start
-→ select and persist all MAIN questions once when the Session is created
-→ start the Session from its first persisted MAIN question
-→ then expose the Interview API
+External Interview API
 ```
+
+The next stage may expose create/start Session, submit answer, trigger or continue Workflow, and current-question query endpoints with authenticated-user ownership validation. These capabilities are not implemented yet. Report, Weakness, and History remain later stages.
 
 Other capabilities that also remain unimplemented include:
 
@@ -838,4 +885,4 @@ Other capabilities that also remain unimplemented include:
 * Knowledge-document pagination, detail, or enable/disable management
 * Mandatory rejection of duplicate content
 
-Until the developer explicitly authorizes the next stage, do not implement Interview Session creation/start, MAIN question selection persistence, Controller/API orchestration, reports, user weaknesses, password reset, further database changes, or broad unrelated refactoring.
+Until the developer explicitly authorizes the next stage, do not implement external Interview Controller/API orchestration, reports, user weaknesses, interview history, password reset, further database changes, or broad unrelated refactoring.

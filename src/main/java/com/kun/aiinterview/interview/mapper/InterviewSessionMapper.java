@@ -28,4 +28,18 @@ public interface InterviewSessionMapper {
             @Param("expectedVersion") Integer expectedVersion,
             @Param("expectedCurrentQuestionId") Long expectedCurrentQuestionId
     );
+
+    InterviewSession getActiveSessionByUserId(
+            @Param("userId") Long userId
+    );
+
+    int insertInterviewSession(
+            InterviewSession interviewSession
+    );
+
+    int startSession(
+            @Param("id") Long id,
+            @Param("expectedVersion") Integer expectedVersion,
+            @Param("firstQuestionId") Long firstQuestionId
+    );
 }

@@ -19,6 +19,24 @@
         WHERE id = #{id}
     </select>
 
+    <select id="getUserByIdForUpdate"
+            resultType="com.kun.aiinterview.user.entity.User">
+        SELECT
+            id,
+            account,
+            password,
+            username,
+            email,
+            role,
+            status,
+            password_changed_at,
+            created_at,
+            updated_at
+        FROM `user`
+        WHERE id = #{id}
+        FOR UPDATE
+    </select>
+
     <select id="getUserByAccount" resultType="com.kun.aiinterview.user.entity.User">
         SELECT
             id,

@@ -104,4 +104,22 @@
         SET status = #{status}
         WHERE id = #{questionId}
     </update>
+
+    <select id="selectEnabledQuestionsForInterview"
+            resultType="com.kun.aiinterview.question.entity.Question">
+        SELECT
+            id,
+            category,
+            knowledge_point,
+            difficulty,
+            question_content,
+            reference_answer,
+            status,
+            created_at,
+            updated_at
+        FROM question
+        WHERE difficulty = #{difficulty}
+            AND status = 'ENABLED'
+        ORDER BY category ASC,id ASC
+    </select>
 </mapper>

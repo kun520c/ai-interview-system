@@ -11,6 +11,8 @@ public interface UserMapper {
 
     User getUserById(@Param("id") Long id);
 
+    User getUserByIdForUpdate(@Param("id") Long id);
+
     User getUserByAccount(@Param("account") String account);
 
     User getUserByEmail(@Param("email") String email);

@@ -2,6 +2,7 @@ package com.kun.aiinterview.question.mapper;
 
 import com.kun.aiinterview.question.dto.QuestionPageQuery;
 import com.kun.aiinterview.question.entity.Question;
+import com.kun.aiinterview.question.enums.QuestionDifficulty;
 import com.kun.aiinterview.question.enums.QuestionStatus;
 import com.kun.aiinterview.question.vo.AdminQuestionListItem;
 import org.apache.ibatis.annotations.Mapper;
@@ -29,5 +30,9 @@ public interface QuestionMapper {
     int updateQuestionStatus(
             @Param("questionId") Long questionId,
             @Param("status") QuestionStatus status
+    );
+
+    List<Question> selectEnabledQuestionsForInterview(
+            @Param("difficulty") QuestionDifficulty difficulty
     );
 }

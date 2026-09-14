@@ -17,4 +17,8 @@ public interface QuestionScoringPointMapper {
     List<AdminScoringPointDetail> selectDetailByQuestionId(
             @Param("questionId") Long questionId
     );
+
+    List<QuestionScoringPoint> selectEnabledByQuestionId(
+            @Param("questionId") Long questionId
+    );
 }

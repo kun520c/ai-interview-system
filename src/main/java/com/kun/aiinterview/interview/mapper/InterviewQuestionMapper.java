@@ -4,6 +4,8 @@ import com.kun.aiinterview.interview.entity.InterviewQuestion;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface InterviewQuestionMapper {
 
@@ -28,5 +30,15 @@ public interface InterviewQuestionMapper {
 
     InterviewQuestion getFollowUpByParentQuestionId(
             @Param("parentQuestionId") Long parentQuestionId
+    );
+
+    int batchInsertMainQuestions(
+            @Param("questions")
+            List<InterviewQuestion> questions
+    );
+
+    InterviewQuestion getMainQuestionByPlanOrder(
+            @Param("sessionId") Long sessionId,
+            @Param("planOrder") Integer planOrder
     );
 }

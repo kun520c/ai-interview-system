@@ -63,4 +63,73 @@
             AND current_interview_question_id = #{expectedCurrentQuestionId}
             AND completed_question_count &lt; planned_question_count
     </update>
+
+    <select id="getActiveSessionByUserId"
+            resultType="com.kun.aiinterview.interview.entity.InterviewSession">
+        SELECT
+            id,
+            user_id,
+            difficulty,
+            status,
+            current_interview_question_id,
+            planned_question_count,
+            completed_question_count,
+            total_score,
+            report_status,
+            version,
+            started_at,
+            ended_at,
+            created_at,
+            updated_at
+        FROM interview_session
+        WHERE user_id = #{userId}
+            AND status IN('CREATED','IN_PROGRESS')
+        ORDER BY created_at DESC,id DESC
+        LIMIT 1
+    </select>
+
+    <insert id="insertInterviewSession"
+            parameterType="com.kun.aiinterview.interview.entity.InterviewSession"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO interview_session(
+            user_id,
+            difficulty,
+            status,
+            current_interview_question_id,
+            planned_question_count,
+            completed_question_count,
+            total_score,
+            report_status,
+            version,
+            started_at,
+            ended_at
+        )
+        VALUES(
+            #{userId},
+            #{difficulty},
+            #{status},
+            #{currentInterviewQuestionId},
+            #{plannedQuestionCount},
+            #{completedQuestionCount},
+            #{totalScore},
+            #{reportStatus},
+            #{version},
+            #{startedAt},
+            #{endedAt}
+        )
+    </insert>
+
+    <update id="startSession">
+        UPDATE interview_session
+        SET
+            status = 'IN_PROGRESS',
+            current_interview_question_id = #{firstQuestionId},
+            started_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+            AND version = #{expectedVersion}
+            AND status = 'CREATED'
+            AND current_interview_question_id IS NULL
+    </update>
 </mapper>
