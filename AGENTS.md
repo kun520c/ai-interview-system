@@ -390,10 +390,12 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-Interview Workflow core technically complete
-Interview Session creation/start and one-time MAIN question plan persistence technically complete
-→ Next stage: external Interview API
-→ Then: report / weakness / history
+Evaluation Core                COMPLETE
+Interview Workflow             COMPLETE
+Interview Session Creation     COMPLETE
+External Interview API         COMPLETE
+→ Next stage: Interview Report
+→ Then: Weakness → History / Detail → MVP Final Regression / Documentation / Freeze
 ```
 
 The F1-F4 changes have passed their technical verification gate. Determine their commit and push status from the current Git history; do not infer publication state from this document alone.
@@ -853,21 +855,56 @@ Interview Session creation/start completed capability on 2026-09-14:
 * The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1024 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
 * `MILVUS_ENABLED=false`, `DEEPSEEK_ENABLED=false`, and every `RUN_REAL_*` switch remained disabled. The 18 skips are the guarded real external-service Smoke Tests and are not evidence of real DeepSeek, Embedding, or Milvus verification. No real DeepSeek, Embedding, or Milvus call was made for this stage.
 
-The following Evaluation capabilities remain unimplemented:
+External Interview API completed capability on 2026-09-15:
 
-* External Interview Controller/API orchestration
+### External Interview endpoints and data boundary
+
+* `POST /api/interviews` creates an Interview Session by difficulty or resumes the authenticated user's existing active Session. The user identity comes only from JWT-backed `AuthenticatedUser`; clients cannot submit a user ID.
+* Session creation continues through `InterviewSessionService -> InterviewSessionTransactionService`. The existing user-row lock, active-Session recheck, and one-time MAIN plan persistence were not changed.
+* `GET /api/interviews/current` returns the authenticated user's active Session and current question. No active Session is a successful response with `data: null`.
+* `POST /api/interviews/{sessionId}/answers` validates Session ownership, the Question-to-Session relationship, Session state, and the current-question identity before accepting a new answer.
+* External responses use dedicated DTO/VO records rather than exposing Entities. `InterviewQuestionResponse` does not expose reference-answer or scoring-point snapshots, follow-up target points, question-bank IDs, parent IDs, version fields, or internal Question status.
+* The Evaluation response is rebuilt from the persisted `AnswerEvaluation`, including all five dimension scores, total score, level, strengths, missing points, and correction. It is not assembled from the smaller `EvaluationOrchestrationResult`.
+* Persisted `strengths` and `missingPoints` remain JSON Strings and are parsed into API Lists with Jackson. The real next question is always reloaded through the final `InterviewSession.currentInterviewQuestionId`; Workflow or LLM output is not used to guess it.
+
+### Answer submission idempotency and recovery
+
+* A matching `requestId` with an `EVALUATED` Answer does not call AI again. It may be replayed after the Session advances or reaches `COMPLETED`; the API reloads `AnswerEvaluation`, Session, and the real current question to rebuild the response.
+* A matching `SUBMITTED` Answer is reused and sent through the existing Workflow. A matching `FAILED` Answer uses the existing Workflow retry path. A matching `EVALUATING` Answer does not start a second LLM call and returns a controlled retry-later business error.
+* Reusing one `requestId` for another question and submitting a different `requestId` for a question that already has an Answer are rejected.
+* Database `UNIQUE(interview_question_id)` and `UNIQUE(request_id)` constraints remain the final concurrency safety net. A new-Answer `DuplicateKeyException` triggers database re-queries that recover the same idempotent request or reject a conflicting request.
+* The API introduced no JVM `synchronized` block and required no database Schema change.
+* The request and response spelling errors in `SubmitInterviewAnserRequest`, its fields, and `InterviewEvaluationResponse.claritySocre` were corrected. `evaluationPhase` now uses the real `EvaluationPhase` enum. Existing-Answer lookup now precedes new-request current-question validation so a valid EVALUATED replay is not rejected after Session advancement.
+
+### External API transaction and conditional-Bean boundary
+
+* `InterviewService.submitAnswer()` is intentionally not transactional. A new Answer continues to use `InterviewWorkflowTransactionService.submitAnswer()`, whose short transaction inserts `interview_answer` and changes the current question from `WAITING_ANSWER` to `ANSWERED` before committing.
+* Embedding, Milvus, DeepSeek, Evaluation, and later Workflow transitions run outside that Answer-submission transaction.
+* `InterviewService` obtains the conditional `InterviewWorkflowService` through `ObjectProvider`. Create and current-Session APIs work when AI flags are disabled, and a new Answer is not persisted unless the Workflow Bean is available.
+
+### External Interview API verification baseline
+
+* Verification date: `2026-09-15`.
+* The focused `InterviewServiceTest,InterviewControllerTest` run executed 29 tests with 0 failures, 0 errors, and 0 skips.
+* The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1053 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
+* Ordinary real-MySQL Mapper and transaction tests passed. Real DeepSeek, Embedding, and Milvus tests remained protected and disabled; the 18 skips are not evidence of real external-service verification.
+
+The following capabilities remain unimplemented:
+
 * Interview reports
 * User-weakness updates
+* Interview history and detail APIs
 * Real DeepSeek integration verification
 * Similarity-threshold policy and category retrieval filtering
 
-Next development stage:
+Next development stages:
 
 ```text
-External Interview API
+Interview Report
+→ Weakness
+→ History / Detail
+→ MVP Final Regression / Documentation / Freeze
 ```
-
-The next stage may expose create/start Session, submit answer, trigger or continue Workflow, and current-question query endpoints with authenticated-user ownership validation. These capabilities are not implemented yet. Report, Weakness, and History remain later stages.
 
 Other capabilities that also remain unimplemented include:
 
@@ -885,4 +922,4 @@ Other capabilities that also remain unimplemented include:
 * Knowledge-document pagination, detail, or enable/disable management
 * Mandatory rejection of duplicate content
 
-Until the developer explicitly authorizes the next stage, do not implement external Interview Controller/API orchestration, reports, user weaknesses, interview history, password reset, further database changes, or broad unrelated refactoring.
+Until the developer explicitly authorizes the next stage, do not implement Interview Report, user weaknesses, interview history/detail, password reset, further database changes, or broad unrelated refactoring.
