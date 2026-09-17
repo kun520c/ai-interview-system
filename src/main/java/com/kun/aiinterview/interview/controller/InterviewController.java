@@ -3,7 +3,9 @@ package com.kun.aiinterview.interview.controller;
 import com.kun.aiinterview.common.response.Result;
 import com.kun.aiinterview.interview.dto.CreateInterviewRequest;
 import com.kun.aiinterview.interview.dto.SubmitInterviewAnswerRequest;
+import com.kun.aiinterview.interview.service.InterviewReportService;
 import com.kun.aiinterview.interview.service.InterviewService;
+import com.kun.aiinterview.interview.vo.InterviewReportResponse;
 import com.kun.aiinterview.interview.vo.InterviewSessionResponse;
 import com.kun.aiinterview.interview.vo.SubmitInterviewAnswerResponse;
 import com.kun.aiinterview.security.model.AuthenticatedUser;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class InterviewController {
 
     private final InterviewService interviewService;
+    private final InterviewReportService interviewReportService;
 
     @PostMapping
     public Result<InterviewSessionResponse> createInterview(
@@ -61,6 +64,34 @@ public class InterviewController {
                         authenticatedUser.userId(),
                         sessionId,
                         request
+                );
+
+        return Result.success(response);
+    }
+
+    @GetMapping("/{sessionId}/report")
+    public Result<InterviewReportResponse> getReport(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @PathVariable Long sessionId
+    ) {
+        InterviewReportResponse response = interviewReportService
+                .getReport(
+                        authenticatedUser.userId(),
+                        sessionId
+                );
+
+        return Result.success(response);
+    }
+
+    @PostMapping("/{sessionId}/report")
+    public Result<InterviewReportResponse> generateReport(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @PathVariable Long sessionId
+    ) {
+        InterviewReportResponse response = interviewReportService
+                .generateReportForApi(
+                        authenticatedUser.userId(),
+                        sessionId
                 );
 
         return Result.success(response);

@@ -5,6 +5,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -43,6 +45,18 @@ class EvaluationStandardTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> evaluationStandard.resolveLevel(totalScore)
+        );
+    }
+
+    @Test
+    void shouldResolveLevelFromDecimalScoreWithoutDiscardingFraction() {
+        assertEquals(
+                EvaluationLevel.GOOD,
+                evaluationStandard.resolveLevel(new BigDecimal("89.99"))
+        );
+        assertEquals(
+                EvaluationLevel.EXCELLENT,
+                evaluationStandard.resolveLevel(new BigDecimal("90.00"))
         );
     }
 

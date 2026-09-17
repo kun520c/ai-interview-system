@@ -4,11 +4,14 @@ import com.kun.aiinterview.interview.dto.SubmitInterviewAnswerRequest;
 import com.kun.aiinterview.interview.enums.DecisionAction;
 import com.kun.aiinterview.interview.enums.EvaluationPhase;
 import com.kun.aiinterview.interview.enums.InterviewQuestionType;
+import com.kun.aiinterview.interview.enums.InterviewReportStatus;
 import com.kun.aiinterview.interview.enums.InterviewSessionStatus;
 import com.kun.aiinterview.interview.evaluation.standard.EvaluationLevel;
+import com.kun.aiinterview.interview.service.InterviewReportService;
 import com.kun.aiinterview.interview.service.InterviewService;
 import com.kun.aiinterview.interview.vo.InterviewEvaluationResponse;
 import com.kun.aiinterview.interview.vo.InterviewQuestionResponse;
+import com.kun.aiinterview.interview.vo.InterviewReportResponse;
 import com.kun.aiinterview.interview.vo.InterviewSessionResponse;
 import com.kun.aiinterview.interview.vo.SubmitInterviewAnswerResponse;
 import com.kun.aiinterview.question.enums.QuestionCategory;
@@ -34,6 +37,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -61,6 +65,9 @@ class InterviewControllerTest {
 
     @MockitoBean
     private InterviewService interviewService;
+
+    @MockitoBean
+    private InterviewReportService interviewReportService;
 
     @MockitoBean
     private JwtTokenService jwtTokenService;
@@ -97,6 +104,19 @@ class InterviewControllerTest {
                 .andExpect(jsonPath("$.code").value(401));
 
         verifyNoInteractions(interviewService);
+    }
+
+    @Test
+    void shouldRejectUnauthenticatedReportQueries() throws Exception {
+        mockMvc.perform(get("/api/interviews/21/report"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401));
+
+        mockMvc.perform(post("/api/interviews/21/report"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401));
+
+        verifyNoInteractions(interviewReportService);
     }
 
     @Test
@@ -228,6 +248,68 @@ class InterviewControllerTest {
         verifyNoInteractions(interviewService);
     }
 
+    @Test
+    void shouldGetReportUsingAuthenticatedUserWithoutInternalFieldLeak()
+            throws Exception {
+        stubTokenUser("get-report-token");
+        when(interviewReportService.getReport(USER_ID, 21L))
+                .thenReturn(reportResponse());
+
+        mockMvc.perform(get("/api/interviews/21/report")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer get-report-token"
+                        ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.sessionId").value(21))
+                .andExpect(jsonPath("$.data.reportStatus")
+                        .value("READY"))
+                .andExpect(jsonPath("$.data.overallScore")
+                        .value(82.50))
+                .andExpect(jsonPath("$.data.strengths[0]")
+                        .value("Java基础扎实"))
+                .andExpect(jsonPath("$.data.weaknesses[0]")
+                        .value("并发知识不足"))
+                .andExpect(jsonPath("$.data.suggestions[0]")
+                        .value("复习线程池"))
+                .andExpect(jsonPath("$.data.id").doesNotExist())
+                .andExpect(jsonPath("$.data.llmModel").doesNotExist())
+                .andExpect(jsonPath("$.data.promptVersion")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.data.createdAt").doesNotExist())
+                .andExpect(jsonPath("$.data.updatedAt").doesNotExist())
+                .andExpect(jsonPath("$.data.version").doesNotExist())
+                .andExpect(jsonPath("$.data.rawResult").doesNotExist())
+                .andExpect(jsonPath("$.data.retrievalBatchId")
+                        .doesNotExist());
+
+        verify(interviewReportService).getReport(USER_ID, 21L);
+    }
+
+    @Test
+    void shouldGenerateReportUsingJwtUserAndIgnoreForgedUserId()
+            throws Exception {
+        stubTokenUser("post-report-token");
+        when(interviewReportService.generateReportForApi(USER_ID, 21L))
+                .thenReturn(reportResponse());
+
+        mockMvc.perform(post(
+                        "/api/interviews/21/report?userId=999999"
+                )
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer post-report-token"
+                        ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.sessionId").value(21))
+                .andExpect(jsonPath("$.data.reportStatus")
+                        .value("READY"));
+
+        verify(interviewReportService)
+                .generateReportForApi(USER_ID, 21L);
+    }
+
     private void stubTokenUser(String token) {
         Claims claims = mock(Claims.class);
         when(claims.getSubject()).thenReturn(Long.toString(USER_ID));
@@ -284,6 +366,19 @@ class InterviewControllerTest {
                         InterviewQuestionType.MAIN,
                         "类加载过程是什么？"
                 )
+        );
+    }
+
+    private InterviewReportResponse reportResponse() {
+        return new InterviewReportResponse(
+                21L,
+                InterviewReportStatus.READY,
+                new BigDecimal("82.50"),
+                "GOOD",
+                "总体表现良好",
+                List.of("Java基础扎实"),
+                List.of("并发知识不足"),
+                List.of("复习线程池")
         );
     }
 

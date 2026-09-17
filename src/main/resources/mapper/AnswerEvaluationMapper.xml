@@ -21,6 +21,19 @@
                 column="main_interview_question_id"/>
 
         <result
+                property="category"
+                column="category"
+                javaType="com.kun.aiinterview.question.enums.QuestionCategory"/>
+
+        <result
+                property="knowledgePoint"
+                column="knowledge_point"/>
+
+        <result
+                property="questionContent"
+                column="question_content"/>
+
+        <result
                 property="evaluationPhase"
                 column="evaluation_phase"
                 javaType="com.kun.aiinterview.interview.enums.EvaluationPhase"/>
@@ -196,6 +209,89 @@
         created_at
         FROM answer_evaluation
         WHERE answer_id = #{answerId}
+
+    </select>
+
+    <select
+            id="listFinalEffectiveEvaluationsBySessionId"
+            resultMap="AnswerEvaluationResultMap">
+
+        SELECT
+            ranked.id,
+            ranked.answer_id,
+            ranked.main_interview_question_id,
+            ranked.category,
+            ranked.knowledge_point,
+            ranked.question_content,
+            ranked.evaluation_phase,
+            ranked.correctness_score,
+            ranked.completeness_score,
+            ranked.depth_score,
+            ranked.clarity_score,
+            ranked.practice_score,
+            ranked.total_score,
+            ranked.level,
+            ranked.strengths,
+            ranked.missing_points,
+            ranked.correction,
+            ranked.scoring_point_results,
+            ranked.follow_up_recommended,
+            ranked.suggested_follow_up,
+            ranked.decision_action,
+            ranked.retrieval_batch_id,
+            ranked.llm_model,
+            ranked.prompt_version,
+            ranked.evaluation_standard_version,
+            ranked.raw_result,
+            ranked.created_at
+        FROM (
+            SELECT
+                ae.id,
+                ae.answer_id,
+                ae.main_interview_question_id,
+                iq.category,
+                iq.knowledge_point,
+                iq.question_content,
+                ae.evaluation_phase,
+                ae.correctness_score,
+                ae.completeness_score,
+                ae.depth_score,
+                ae.clarity_score,
+                ae.practice_score,
+                ae.total_score,
+                ae.level,
+                ae.strengths,
+                ae.missing_points,
+                ae.correction,
+                ae.scoring_point_results,
+                ae.follow_up_recommended,
+                ae.suggested_follow_up,
+                ae.decision_action,
+                ae.retrieval_batch_id,
+                ae.llm_model,
+                ae.prompt_version,
+                ae.evaluation_standard_version,
+                ae.raw_result,
+                ae.created_at,
+                iq.plan_order,
+                ROW_NUMBER() OVER (
+                    PARTITION BY ae.main_interview_question_id
+                    ORDER BY
+                        CASE ae.evaluation_phase
+                            WHEN 'FINAL' THEN 1
+                            WHEN 'INITIAL' THEN 2
+                        END,
+                        ae.id DESC
+                ) AS evaluation_priority
+            FROM answer_evaluation ae
+            INNER JOIN interview_question iq
+                ON iq.id = ae.main_interview_question_id
+            WHERE iq.session_id = #{sessionId}
+                AND iq.question_type = 'MAIN'
+                AND ae.evaluation_phase IN ('INITIAL', 'FINAL')
+        ) ranked
+        WHERE ranked.evaluation_priority = 1
+        ORDER BY ranked.plan_order ASC
 
     </select>
 

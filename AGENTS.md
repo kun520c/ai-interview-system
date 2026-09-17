@@ -394,8 +394,9 @@ Evaluation Core                COMPLETE
 Interview Workflow             COMPLETE
 Interview Session Creation     COMPLETE
 External Interview API         COMPLETE
-→ Next stage: Interview Report
-→ Then: Weakness → History / Detail → MVP Final Regression / Documentation / Freeze
+Interview Report               COMPLETE
+→ Next stage: Weakness
+→ Then: History / Detail → MVP Final Regression / Documentation / Freeze
 ```
 
 The F1-F4 changes have passed their technical verification gate. Determine their commit and push status from the current Git history; do not infer publication state from this document alone.
@@ -889,9 +890,34 @@ External Interview API completed capability on 2026-09-15:
 * The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1053 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
 * Ordinary real-MySQL Mapper and transaction tests passed. Real DeepSeek, Embedding, and Milvus tests remained protected and disabled; the 18 skips are not evidence of real external-service verification.
 
+Interview Report completed capability on 2026-09-17:
+
+### Report aggregation, generation, and state
+
+* The Report state machine is `NOT_STARTED -> GENERATING -> READY`, with `GENERATING -> FAILED` recovery and `FAILED -> GENERATING` retry. Claim, READY, and FAILED transitions require the expected Session version and valid source state.
+* Report aggregation uses exactly one final effective Evaluation per MAIN question in `plan_order`: FINAL takes priority and INITIAL is used only when that MAIN has no FINAL Evaluation. FOLLOW_UP is not scored as a separate question.
+* Java calculates `overallScore` as the arithmetic mean of the effective MAIN `totalScore` values with `BigDecimal`, two decimal places, and `HALF_UP`. The LLM cannot recalculate or override it.
+* `DeepSeekInterviewReportGenerator` reuses the existing DeepSeek JSON-completion client. It receives Session data, question snapshots from `interview_question`, validated Evaluation fields, and Java's final score; it does not receive persisted raw LLM results or RAG hit data and never writes the database.
+* The Report system prompt treats all supplied question and Evaluation text as untrusted data, rejects embedded instructions, and limits the LLM to summary, strengths, weaknesses, and suggestions. Java validates the JSON and derives `result` from the existing `EvaluationStandard`; model and prompt-version metadata also come from Java configuration/constants.
+* `InterviewReportService` performs DeepSeek work outside a database transaction. `InterviewReportTransactionService` atomically inserts `interview_report` and changes the Session from GENERATING to READY with `total_score`; an affected-row failure rolls both operations back.
+* READY generation requests are idempotent and return the existing Report without calling the Generator. FAILED requests may claim and retry. Failures after a successful claim attempt `GENERATING -> FAILED` without replacing the original exception.
+* The real Generator Bean exists only when `deepseek.enabled=true` and does not depend on Milvus. With DeepSeek disabled, the ordinary ApplicationContext still starts and generation is rejected before claiming GENERATING.
+
+### Report API and external boundary
+
+* `GET /api/interviews/{sessionId}/report` is an ownership-checked, side-effect-free status query. NOT_STARTED, GENERATING, and FAILED return only the Session ID and Report status; READY returns the persisted user-visible Report and treats a missing row as internal inconsistency.
+* `POST /api/interviews/{sessionId}/report` reuses the existing generation state machine for first generation, FAILED retry, READY idempotency, and GENERATING rejection. Both endpoints obtain the user ID only from JWT-backed `AuthenticatedUser`.
+* `InterviewReportResponse` exposes only `sessionId`, `reportStatus`, `overallScore`, `result`, `summary`, `strengths`, `weaknesses`, and `suggestions`. Persisted JSON arrays are parsed with Jackson. Database IDs, version fields, LLM metadata, timestamps, snapshots, raw Evaluation results, and retrieval identifiers are not exposed.
+
+### Interview Report verification baseline
+
+* Verification date: `2026-09-17`.
+* The Report/API focused run executed 78 tests with 0 failures, 0 errors, and 0 skips, and completed with `BUILD SUCCESS`. It included real local MySQL Mapper and transaction tests, including rollback when READY transition failed.
+* The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1117 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
+* `DEEPSEEK_ENABLED=false`, `MILVUS_ENABLED=false`, and every `RUN_REAL_*` switch remained disabled. DeepSeek Report behavior was verified with Mock HTTP only; no real DeepSeek, Embedding, or Milvus request was made, and the skipped tests are not evidence of real external-service verification.
+
 The following capabilities remain unimplemented:
 
-* Interview reports
 * User-weakness updates
 * Interview history and detail APIs
 * Real DeepSeek integration verification
@@ -900,8 +926,7 @@ The following capabilities remain unimplemented:
 Next development stages:
 
 ```text
-Interview Report
-→ Weakness
+Weakness
 → History / Detail
 → MVP Final Regression / Documentation / Freeze
 ```
@@ -922,4 +947,4 @@ Other capabilities that also remain unimplemented include:
 * Knowledge-document pagination, detail, or enable/disable management
 * Mandatory rejection of duplicate content
 
-Until the developer explicitly authorizes the next stage, do not implement Interview Report, user weaknesses, interview history/detail, password reset, further database changes, or broad unrelated refactoring.
+Until the developer explicitly authorizes the next stage, do not implement user weaknesses, interview history/detail, password reset, further database changes, or broad unrelated refactoring.

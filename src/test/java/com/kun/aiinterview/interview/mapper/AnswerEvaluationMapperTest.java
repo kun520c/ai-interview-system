@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.enums.DecisionAction;
 import com.kun.aiinterview.interview.enums.EvaluationPhase;
+import com.kun.aiinterview.question.enums.QuestionCategory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -280,6 +282,189 @@ class AnswerEvaluationMapperTest {
         );
     }
 
+    @Test
+    void shouldReturnInitialEvaluationWhenMainHasNoFinalEvaluation() {
+        MainAnswerFixture fixture = insertMainAnswerFixture();
+        AnswerEvaluation initialEvaluation = evaluation(
+                fixture.mainAnswerId(),
+                fixture.mainQuestionId(),
+                EvaluationPhase.INITIAL,
+                DecisionAction.NEXT_MAIN,
+                false,
+                null,
+                null
+        );
+        assertEquals(
+                1,
+                answerEvaluationMapper.insertEvaluation(initialEvaluation)
+        );
+
+        List<AnswerEvaluation> evaluations = answerEvaluationMapper
+                .listFinalEffectiveEvaluationsBySessionId(fixture.sessionId());
+
+        assertEquals(1, evaluations.size());
+        AnswerEvaluation found = evaluations.getFirst();
+        assertAll(
+                () -> assertEquals(initialEvaluation.getId(), found.getId()),
+                () -> assertEquals(
+                        fixture.mainQuestionId(),
+                        found.getMainInterviewQuestionId()
+                ),
+                () -> assertEquals(
+                        EvaluationPhase.INITIAL,
+                        found.getEvaluationPhase()
+                ),
+                () -> assertEquals(
+                        QuestionCategory.JAVA_COLLECTION,
+                        found.getCategory()
+                ),
+                () -> assertEquals("HashMap", found.getKnowledgePoint()),
+                () -> assertEquals(
+                        "请说明 HashMap 的核心机制",
+                        found.getQuestionContent()
+                )
+        );
+    }
+
+    @Test
+    void shouldReturnOneFinalEffectiveEvaluationPerMainInPlanOrderForSession() {
+        long userId = insertUser();
+        long sessionId = insertInterviewSession(userId, 3);
+
+        long mainQuestion3Id = insertMainInterviewQuestion(
+                sessionId,
+                insertQuestion(),
+                3,
+                4
+        );
+        long mainQuestion1Id = insertMainInterviewQuestion(
+                sessionId,
+                insertQuestion(),
+                1,
+                1
+        );
+        long mainQuestion2Id = insertMainInterviewQuestion(
+                sessionId,
+                insertQuestion(),
+                2,
+                2
+        );
+
+        long mainAnswer1Id = insertInterviewAnswer(
+                mainQuestion1Id,
+                "MAIN 1 回答"
+        );
+        long mainAnswer2Id = insertInterviewAnswer(
+                mainQuestion2Id,
+                "MAIN 2 回答"
+        );
+        long followUpQuestion2Id = insertFollowUpInterviewQuestion(
+                sessionId,
+                mainQuestion2Id,
+                3
+        );
+        long followUpAnswer2Id = insertInterviewAnswer(
+                followUpQuestion2Id,
+                "MAIN 2 的 FOLLOW_UP 回答"
+        );
+        long mainAnswer3Id = insertInterviewAnswer(
+                mainQuestion3Id,
+                "MAIN 3 回答"
+        );
+
+        AnswerEvaluation main1Initial = evaluation(
+                mainAnswer1Id,
+                mainQuestion1Id,
+                EvaluationPhase.INITIAL,
+                DecisionAction.NEXT_MAIN,
+                false,
+                null,
+                null
+        );
+        AnswerEvaluation main2Initial = evaluation(
+                mainAnswer2Id,
+                mainQuestion2Id,
+                EvaluationPhase.INITIAL,
+                DecisionAction.FOLLOW_UP,
+                true,
+                "请继续说明。",
+                null
+        );
+        AnswerEvaluation main2Final = evaluation(
+                followUpAnswer2Id,
+                mainQuestion2Id,
+                EvaluationPhase.FINAL,
+                DecisionAction.NEXT_MAIN,
+                false,
+                null,
+                null
+        );
+        AnswerEvaluation main3Initial = evaluation(
+                mainAnswer3Id,
+                mainQuestion3Id,
+                EvaluationPhase.INITIAL,
+                DecisionAction.FINISH,
+                false,
+                null,
+                null
+        );
+        answerEvaluationMapper.insertEvaluation(main3Initial);
+        answerEvaluationMapper.insertEvaluation(main2Initial);
+        answerEvaluationMapper.insertEvaluation(main1Initial);
+        answerEvaluationMapper.insertEvaluation(main2Final);
+
+        MainAnswerFixture otherSessionFixture = insertMainAnswerFixture();
+        AnswerEvaluation otherSessionEvaluation = evaluation(
+                otherSessionFixture.mainAnswerId(),
+                otherSessionFixture.mainQuestionId(),
+                EvaluationPhase.FINAL,
+                DecisionAction.FINISH,
+                false,
+                null,
+                null
+        );
+        answerEvaluationMapper.insertEvaluation(otherSessionEvaluation);
+
+        List<AnswerEvaluation> evaluations = answerEvaluationMapper
+                .listFinalEffectiveEvaluationsBySessionId(sessionId);
+
+        assertEquals(3, evaluations.size());
+        assertAll(
+                () -> assertEquals(
+                        mainQuestion1Id,
+                        evaluations.get(0).getMainInterviewQuestionId()
+                ),
+                () -> assertEquals(
+                        EvaluationPhase.INITIAL,
+                        evaluations.get(0).getEvaluationPhase()
+                ),
+                () -> assertEquals(
+                        mainQuestion2Id,
+                        evaluations.get(1).getMainInterviewQuestionId()
+                ),
+                () -> assertEquals(
+                        main2Final.getId(),
+                        evaluations.get(1).getId()
+                ),
+                () -> assertEquals(
+                        EvaluationPhase.FINAL,
+                        evaluations.get(1).getEvaluationPhase()
+                ),
+                () -> assertEquals(
+                        mainQuestion3Id,
+                        evaluations.get(2).getMainInterviewQuestionId()
+                ),
+                () -> assertEquals(
+                        EvaluationPhase.INITIAL,
+                        evaluations.get(2).getEvaluationPhase()
+                ),
+                () -> assertTrue(evaluations.stream().noneMatch(
+                        evaluation -> evaluation.getMainInterviewQuestionId()
+                                .equals(otherSessionFixture.mainQuestionId())
+                ))
+        );
+    }
+
     private MainAnswerFixture insertMainAnswerFixture() {
         long userId = insertUser();
         long questionId = insertQuestion();
@@ -292,7 +477,7 @@ class AnswerEvaluationMapperTest {
                 mainQuestionId,
                 "MAIN 回答：HashMap 使用数组、链表和红黑树。"
         );
-        return new MainAnswerFixture(mainQuestionId, mainAnswerId);
+        return new MainAnswerFixture(sessionId, mainQuestionId, mainAnswerId);
     }
 
     private FollowUpAnswerFixture insertFollowUpAnswerFixture() {
@@ -393,14 +578,19 @@ class AnswerEvaluationMapperTest {
     }
 
     private long insertInterviewSession(long userId) {
+        return insertInterviewSession(userId, 1);
+    }
+
+    private long insertInterviewSession(long userId, int plannedQuestionCount) {
         jdbcTemplate.update(
                 """
                 INSERT INTO interview_session
                     (user_id, difficulty, status, planned_question_count,
                      completed_question_count, report_status)
-                VALUES (?, 'MEDIUM', 'CREATED', 1, 0, 'NOT_STARTED')
+                VALUES (?, 'MEDIUM', 'CREATED', ?, 0, 'NOT_STARTED')
                 """,
-                userId
+                userId,
+                plannedQuestionCount
         );
         return requiredId(
                 "SELECT id FROM interview_session WHERE user_id = ?",
@@ -409,6 +599,15 @@ class AnswerEvaluationMapperTest {
     }
 
     private long insertMainInterviewQuestion(long sessionId, long questionId) {
+        return insertMainInterviewQuestion(sessionId, questionId, 1, 1);
+    }
+
+    private long insertMainInterviewQuestion(
+            long sessionId,
+            long questionId,
+            int planOrder,
+            int displayOrder
+    ) {
         jdbcTemplate.update(
                 """
                 INSERT INTO interview_question
@@ -417,26 +616,37 @@ class AnswerEvaluationMapperTest {
                      scoring_points_snapshot, question_type, parent_question_id,
                      follow_up_target_points, plan_order, display_order, status)
                 VALUES (?, ?, 'JAVA_COLLECTION', 'HashMap', ?, ?, ?, 'MAIN',
-                        NULL, NULL, 1, 1, 'ANSWERED')
+                        NULL, NULL, ?, ?, 'ANSWERED')
                 """,
                 sessionId,
                 questionId,
                 "请说明 HashMap 的核心机制",
                 "本场面试参考答案快照",
-                "[{\"scoringPointId\":101,\"weight\":100}]"
+                "[{\"scoringPointId\":101,\"weight\":100}]",
+                planOrder,
+                displayOrder
         );
         return requiredId(
                 """
                 SELECT id FROM interview_question
-                WHERE session_id = ? AND display_order = 1
+                WHERE session_id = ? AND plan_order = ?
                 """,
-                sessionId
+                sessionId,
+                planOrder
         );
     }
 
     private long insertFollowUpInterviewQuestion(
             long sessionId,
             long mainQuestionId
+    ) {
+        return insertFollowUpInterviewQuestion(sessionId, mainQuestionId, 2);
+    }
+
+    private long insertFollowUpInterviewQuestion(
+            long sessionId,
+            long mainQuestionId,
+            int displayOrder
     ) {
         jdbcTemplate.update(
                 """
@@ -446,19 +656,21 @@ class AnswerEvaluationMapperTest {
                      scoring_points_snapshot, question_type, parent_question_id,
                      follow_up_target_points, plan_order, display_order, status)
                 VALUES (?, NULL, 'JAVA_COLLECTION', 'HashMap 扩容', ?, NULL,
-                        NULL, 'FOLLOW_UP', ?, ?, NULL, 2, 'ANSWERED')
+                        NULL, 'FOLLOW_UP', ?, ?, NULL, ?, 'ANSWERED')
                 """,
                 sessionId,
                 "请进一步说明 HashMap 的扩容过程",
                 mainQuestionId,
-                "[101]"
+                "[101]",
+                displayOrder
         );
         return requiredId(
                 """
                 SELECT id FROM interview_question
-                WHERE session_id = ? AND display_order = 2
+                WHERE session_id = ? AND display_order = ?
                 """,
-                sessionId
+                sessionId,
+                displayOrder
         );
     }
 
@@ -494,6 +706,7 @@ class AnswerEvaluationMapperTest {
     }
 
     private record MainAnswerFixture(
+            long sessionId,
             long mainQuestionId,
             long mainAnswerId
     ) {

@@ -53,31 +53,45 @@ public class DeepSeekEvaluationClient {
             );
         }
 
-        DeepSeekChatRequest request =
-                buildRequest(prompt);
-
-        DeepSeekChatResponse response =
-                requestCompletion(request);
-
-        DeepSeekChoice choice =
-                validateResponse(response);
-
-        String rawJson =
-                choice.message().content();
+        DeepSeekJsonCompletionResult completion =
+                completeJson(
+                        prompt.systemPrompt(),
+                        prompt.userPrompt()
+                );
 
         LlmEvaluationSuggestion suggestion =
-                parseSuggestion(rawJson);
+                parseSuggestion(completion.rawJson());
 
         return new DeepSeekEvaluationResult(
-                response.model(),
-                choice.finishReason(),
-                rawJson,
+                completion.model(),
+                completion.finishReason(),
+                completion.rawJson(),
                 suggestion
         );
     }
 
+    public DeepSeekJsonCompletionResult completeJson(
+            String systemPrompt,
+            String userPrompt
+    ) {
+        requirePromptText(systemPrompt, "System Prompt");
+        requirePromptText(userPrompt, "User Prompt");
+
+        DeepSeekChatResponse response = requestCompletion(
+                buildRequest(systemPrompt, userPrompt)
+        );
+        DeepSeekChoice choice = validateResponse(response);
+
+        return new DeepSeekJsonCompletionResult(
+                response.model(),
+                choice.finishReason(),
+                choice.message().content()
+        );
+    }
+
     private DeepSeekChatRequest buildRequest(
-            EvaluationPrompt prompt
+            String systemPrompt,
+            String userPrompt
     ) {
 
         return new DeepSeekChatRequest(
@@ -86,11 +100,11 @@ public class DeepSeekEvaluationClient {
                 List.of(
                         new DeepSeekMessage(
                                 "system",
-                                prompt.systemPrompt()
+                                systemPrompt
                         ),
                         new DeepSeekMessage(
                                 "user",
-                                prompt.userPrompt()
+                                userPrompt
                         )
                 ),
 
@@ -106,6 +120,17 @@ public class DeepSeekEvaluationClient {
 
                 false
         );
+    }
+
+    private void requirePromptText(
+            String value,
+            String fieldName
+    ) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(
+                    fieldName + "不能为空"
+            );
+        }
     }
 
     private DeepSeekChatResponse requestCompletion(

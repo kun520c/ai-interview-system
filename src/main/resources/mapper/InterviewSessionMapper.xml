@@ -132,4 +132,39 @@
             AND status = 'CREATED'
             AND current_interview_question_id IS NULL
     </update>
+
+    <update id="claimReportGeneration">
+        UPDATE interview_session
+        SET
+            report_status = 'GENERATING',
+            version = version + 1
+        WHERE id = #{id}
+            AND version = #{expectedVersion}
+            AND status = 'COMPLETED'
+            AND report_status = #{expectedReportStatus}
+            AND report_status IN ('NOT_STARTED', 'FAILED')
+    </update>
+
+    <update id="markReportReady">
+        UPDATE interview_session
+        SET
+            report_status = 'READY',
+            total_score = #{totalScore},
+            version = version + 1
+        WHERE id = #{id}
+            AND version = #{expectedVersion}
+            AND status = 'COMPLETED'
+            AND report_status = 'GENERATING'
+    </update>
+
+    <update id="markReportFailed">
+        UPDATE interview_session
+        SET
+            report_status = 'FAILED',
+            version = version + 1
+        WHERE id = #{id}
+            AND version = #{expectedVersion}
+            AND status = 'COMPLETED'
+            AND report_status = 'GENERATING'
+    </update>
 </mapper>

@@ -2,6 +2,7 @@ package com.kun.aiinterview.interview.entity;
 
 import com.kun.aiinterview.interview.enums.DecisionAction;
 import com.kun.aiinterview.interview.enums.EvaluationPhase;
+import com.kun.aiinterview.question.enums.QuestionCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,12 @@ public class AnswerEvaluation {
     private Long answerId;
 
     private Long mainInterviewQuestionId;
+
+    private QuestionCategory category;
+
+    private String knowledgePoint;
+
+    private String questionContent;
 
     private EvaluationPhase evaluationPhase;
 

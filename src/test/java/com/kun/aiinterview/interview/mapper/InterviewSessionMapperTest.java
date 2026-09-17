@@ -290,6 +290,259 @@ class InterviewSessionMapperTest {
         );
     }
 
+    @Test
+    void shouldClaimReportGenerationFromNotStartedForCompletedSession() {
+        long sessionId = insertSession(
+                insertUser(),
+                "MEDIUM",
+                "COMPLETED",
+                1,
+                1,
+                null,
+                "NOT_STARTED",
+                3
+        );
+
+        int affectedRows = interviewSessionMapper.claimReportGeneration(
+                sessionId,
+                3,
+                InterviewReportStatus.NOT_STARTED
+        );
+
+        InterviewSession claimed = interviewSessionMapper
+                .getInterviewSessionById(sessionId);
+        assertAll(
+                () -> assertEquals(1, affectedRows),
+                () -> assertEquals(InterviewReportStatus.GENERATING, claimed.getReportStatus()),
+                () -> assertEquals(4, claimed.getVersion())
+        );
+    }
+
+    @Test
+    void shouldClaimReportGenerationFromFailedForCompletedSession() {
+        long sessionId = insertSession(
+                insertUser(),
+                "MEDIUM",
+                "COMPLETED",
+                1,
+                1,
+                null,
+                "FAILED",
+                6
+        );
+
+        int affectedRows = interviewSessionMapper.claimReportGeneration(
+                sessionId,
+                6,
+                InterviewReportStatus.FAILED
+        );
+
+        InterviewSession claimed = interviewSessionMapper
+                .getInterviewSessionById(sessionId);
+        assertAll(
+                () -> assertEquals(1, affectedRows),
+                () -> assertEquals(InterviewReportStatus.GENERATING, claimed.getReportStatus()),
+                () -> assertEquals(7, claimed.getVersion())
+        );
+    }
+
+    @Test
+    void shouldNotClaimReportGenerationWhenAlreadyGenerating() {
+        long sessionId = insertSession(
+                insertUser(),
+                "MEDIUM",
+                "COMPLETED",
+                1,
+                1,
+                null,
+                "GENERATING",
+                2
+        );
+
+        int affectedRows = interviewSessionMapper.claimReportGeneration(
+                sessionId,
+                2,
+                InterviewReportStatus.GENERATING
+        );
+
+        InterviewSession unchanged = interviewSessionMapper
+                .getInterviewSessionById(sessionId);
+        assertAll(
+                () -> assertEquals(0, affectedRows),
+                () -> assertEquals(InterviewReportStatus.GENERATING, unchanged.getReportStatus()),
+                () -> assertEquals(2, unchanged.getVersion())
+        );
+    }
+
+    @Test
+    void shouldNotClaimReportGenerationWhenSessionIsNotCompleted() {
+        long sessionId = insertSession(
+                insertUser(),
+                "MEDIUM",
+                "IN_PROGRESS",
+                1,
+                0,
+                null,
+                "NOT_STARTED",
+                4
+        );
+
+        int affectedRows = interviewSessionMapper.claimReportGeneration(
+                sessionId,
+                4,
+                InterviewReportStatus.NOT_STARTED
+        );
+
+        InterviewSession unchanged = interviewSessionMapper
+                .getInterviewSessionById(sessionId);
+        assertAll(
+                () -> assertEquals(0, affectedRows),
+                () -> assertEquals(InterviewReportStatus.NOT_STARTED, unchanged.getReportStatus()),
+                () -> assertEquals(4, unchanged.getVersion())
+        );
+    }
+
+    @Test
+    void shouldNotClaimReportGenerationWhenExpectedVersionDoesNotMatch() {
+        long sessionId = insertSession(
+                insertUser(),
+                "MEDIUM",
+                "COMPLETED",
+                1,
+                1,
+                null,
+                "NOT_STARTED",
+                5
+        );
+
+        int affectedRows = interviewSessionMapper.claimReportGeneration(
+                sessionId,
+                4,
+                InterviewReportStatus.NOT_STARTED
+        );
+
+        InterviewSession unchanged = interviewSessionMapper
+                .getInterviewSessionById(sessionId);
+        assertAll(
+                () -> assertEquals(0, affectedRows),
+                () -> assertEquals(InterviewReportStatus.NOT_STARTED, unchanged.getReportStatus()),
+                () -> assertEquals(5, unchanged.getVersion())
+        );
+    }
+
+    @Test
+    void shouldMarkGeneratingReportReadyAndStoreTotalScore() {
+        long sessionId = insertSession(
+                insertUser(),
+                "HARD",
+                "COMPLETED",
+                1,
+                1,
+                null,
+                "GENERATING",
+                8
+        );
+        BigDecimal totalScore = new BigDecimal("88.75");
+
+        int affectedRows = interviewSessionMapper.markReportReady(
+                sessionId,
+                8,
+                totalScore
+        );
+
+        InterviewSession ready = interviewSessionMapper
+                .getInterviewSessionById(sessionId);
+        assertAll(
+                () -> assertEquals(1, affectedRows),
+                () -> assertEquals(InterviewReportStatus.READY, ready.getReportStatus()),
+                () -> assertEquals(totalScore, ready.getTotalScore()),
+                () -> assertEquals(9, ready.getVersion())
+        );
+    }
+
+    @Test
+    void shouldMarkGeneratingReportFailed() {
+        long sessionId = insertSession(
+                insertUser(),
+                "HARD",
+                "COMPLETED",
+                1,
+                1,
+                null,
+                "GENERATING",
+                10
+        );
+
+        int affectedRows = interviewSessionMapper.markReportFailed(
+                sessionId,
+                10
+        );
+
+        InterviewSession failed = interviewSessionMapper
+                .getInterviewSessionById(sessionId);
+        assertAll(
+                () -> assertEquals(1, affectedRows),
+                () -> assertEquals(InterviewReportStatus.FAILED, failed.getReportStatus()),
+                () -> assertEquals(11, failed.getVersion())
+        );
+    }
+
+    @Test
+    void shouldNotMarkNotStartedReportReady() {
+        long sessionId = insertSession(
+                insertUser(),
+                "EASY",
+                "COMPLETED",
+                1,
+                1,
+                null,
+                "NOT_STARTED",
+                1
+        );
+
+        int affectedRows = interviewSessionMapper.markReportReady(
+                sessionId,
+                1,
+                new BigDecimal("75.00")
+        );
+
+        InterviewSession unchanged = interviewSessionMapper
+                .getInterviewSessionById(sessionId);
+        assertAll(
+                () -> assertEquals(0, affectedRows),
+                () -> assertEquals(InterviewReportStatus.NOT_STARTED, unchanged.getReportStatus()),
+                () -> assertNull(unchanged.getTotalScore()),
+                () -> assertEquals(1, unchanged.getVersion())
+        );
+    }
+
+    @Test
+    void shouldNotMarkNotStartedReportFailed() {
+        long sessionId = insertSession(
+                insertUser(),
+                "EASY",
+                "COMPLETED",
+                1,
+                1,
+                null,
+                "NOT_STARTED",
+                7
+        );
+
+        int affectedRows = interviewSessionMapper.markReportFailed(
+                sessionId,
+                7
+        );
+
+        InterviewSession unchanged = interviewSessionMapper
+                .getInterviewSessionById(sessionId);
+        assertAll(
+                () -> assertEquals(0, affectedRows),
+                () -> assertEquals(InterviewReportStatus.NOT_STARTED, unchanged.getReportStatus()),
+                () -> assertEquals(7, unchanged.getVersion())
+        );
+    }
+
     private long insertUser() {
         String uniqueValue = uniqueValue();
         String account = "session-" + uniqueValue;

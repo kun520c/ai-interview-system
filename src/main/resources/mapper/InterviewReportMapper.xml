@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kun.aiinterview.interview.mapper.InterviewReportMapper">
+
+    <select id="getBySessionId"
+            resultType="com.kun.aiinterview.interview.entity.InterviewReport">
+        SELECT
+            id,
+            session_id,
+            overall_score,
+            result,
+            summary,
+            strengths,
+            weaknesses,
+            suggestions,
+            llm_model,
+            prompt_version,
+            created_at,
+            updated_at
+        FROM interview_report
+        WHERE session_id = #{sessionId}
+    </select>
+
+    <insert id="insertReport"
+            parameterType="com.kun.aiinterview.interview.entity.InterviewReport"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO interview_report(
+            session_id,
+            overall_score,
+            result,
+            summary,
+            strengths,
+            weaknesses,
+            suggestions,
+            llm_model,
+            prompt_version
+        )
+        VALUES(
+            #{sessionId},
+            #{overallScore},
+            #{result},
+            #{summary},
+            #{strengths},
+            #{weaknesses},
+            #{suggestions},
+            #{llmModel},
+            #{promptVersion}
+        )
+    </insert>
+</mapper>
