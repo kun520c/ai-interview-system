@@ -136,7 +136,8 @@ public class InterviewReportService {
 
             return transactionService.completeReportGeneration(
                     report,
-                    generatingSession
+                    generatingSession,
+                    evaluations
             );
         } catch (RuntimeException original) {
             recoverReportFailure(sessionId, original);

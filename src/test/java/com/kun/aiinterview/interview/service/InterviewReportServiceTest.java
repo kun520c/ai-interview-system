@@ -235,6 +235,7 @@ class InterviewReportServiceTest {
         )).thenReturn(generationResult());
         when(transactionService.completeReportGeneration(
                 any(),
+                any(),
                 any()
         )).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -279,7 +280,8 @@ class InterviewReportServiceTest {
         order.verify(transactionService)
                 .completeReportGeneration(
                         result,
-                        generatingSession()
+                        generatingSession(),
+                        evaluations
                 );
         verify(interviewSessionMapper, never())
                 .markReportFailed(any(), any());
@@ -294,7 +296,7 @@ class InterviewReportServiceTest {
         );
         when(generator.generate(any(), any(), any()))
                 .thenReturn(generationResult());
-        when(transactionService.completeReportGeneration(any(), any()))
+        when(transactionService.completeReportGeneration(any(), any(), any()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         InterviewReport result = service.generateReport(
@@ -438,7 +440,7 @@ class InterviewReportServiceTest {
         );
         when(generator.generate(any(), any(), any()))
                 .thenReturn(generationResult());
-        when(transactionService.completeReportGeneration(any(), any()))
+        when(transactionService.completeReportGeneration(any(), any(), any()))
                 .thenThrow(original);
         when(interviewSessionMapper.markReportFailed(
                 SESSION_ID,
@@ -512,7 +514,7 @@ class InterviewReportServiceTest {
                 .thenReturn(evaluations);
         when(generator.generate(any(), any(), any()))
                 .thenReturn(generationResult());
-        when(transactionService.completeReportGeneration(any(), any()))
+        when(transactionService.completeReportGeneration(any(), any(), any()))
                 .thenThrow(commitSignal);
 
         assertThatThrownBy(

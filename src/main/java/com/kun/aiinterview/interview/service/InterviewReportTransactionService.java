@@ -1,15 +1,18 @@
 package com.kun.aiinterview.interview.service;
 
+import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.entity.InterviewReport;
 import com.kun.aiinterview.interview.entity.InterviewSession;
 import com.kun.aiinterview.interview.enums.InterviewReportStatus;
 import com.kun.aiinterview.interview.enums.InterviewSessionStatus;
 import com.kun.aiinterview.interview.mapper.InterviewReportMapper;
 import com.kun.aiinterview.interview.mapper.InterviewSessionMapper;
+import com.kun.aiinterview.user.service.UserWeaknessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -18,26 +21,35 @@ public class InterviewReportTransactionService {
 
     private final InterviewReportMapper interviewReportMapper;
     private final InterviewSessionMapper interviewSessionMapper;
+    private final UserWeaknessService userWeaknessService;
 
     @Transactional
     public InterviewReport completeReportGeneration(
             InterviewReport report,
-            InterviewSession session
+            InterviewSession session,
+            List<AnswerEvaluation> evaluations
     ) {
         validateArguments(report, session);
 
         int reportRows = interviewReportMapper
                 .insertReport(report);
+
         if (reportRows != 1) {
             throw new IllegalStateException(
                     "InterviewReport写入失败"
             );
         }
+
         if (report.getId() == null) {
             throw new IllegalStateException(
                     "InterviewReport主键未回填"
             );
         }
+
+        userWeaknessService.applySessionEvaluations(
+                session.getUserId(),
+                evaluations
+        );
 
         int sessionRows = interviewSessionMapper
                 .markReportReady(
@@ -45,6 +57,7 @@ public class InterviewReportTransactionService {
                         session.getVersion(),
                         report.getOverallScore()
                 );
+
         if (sessionRows != 1) {
             throw new IllegalStateException(
                     "Session报告状态更新为READY失败"
@@ -67,6 +80,7 @@ public class InterviewReportTransactionService {
         }
         if (session == null
                 || session.getId() == null
+                || session.getUserId() == null
                 || session.getVersion() == null) {
             throw new IllegalArgumentException(
                     "InterviewSession标识和version不能为空"

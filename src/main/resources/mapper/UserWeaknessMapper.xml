@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kun.aiinterview.user.mapper.UserWeaknessMapper">
+
+    <select id="getByUserCategoryAndKnowledgePoint"
+            resultType="com.kun.aiinterview.user.entity.UserWeakness">
+        SELECT
+            id,
+            user_id,
+            category,
+            knowledge_point,
+            weakness_score,
+            discovered_count,
+            last_discovered_at,
+            status,
+            resolved_at,
+            created_at,
+            updated_at
+        FROM user_weakness
+        WHERE user_id = #{userId}
+            AND category = #{category}
+            AND knowledge_point = #{knowledgePoint}
+    </select>
+
+    <insert id="upsertDiscoveredWeakness">
+        INSERT INTO user_weakness (
+            user_id,
+            category,
+            knowledge_point,
+            weakness_score,
+            discovered_count,
+            last_discovered_at,
+            status,
+            resolved_at
+        )
+        VALUES (
+            #{userId},
+            #{category},
+            #{knowledgePoint},
+            #{weaknessScore},
+            1,
+            CURRENT_TIMESTAMP,
+            'ACTIVE',
+            NULL
+        )
+        ON DUPLICATE KEY UPDATE
+            weakness_score = #{weaknessScore},
+            discovered_count = discovered_count + 1,
+            last_discovered_at = CURRENT_TIMESTAMP,
+            status = 'ACTIVE',
+            resolved_at = NULL
+    </insert>
+
+    <update id="resolveActiveWeakness">
+        UPDATE user_weakness
+        SET
+            weakness_score = #{weaknessScore},
+            status = 'RESOLVED',
+            resolved_at = CURRENT_TIMESTAMP
+        WHERE user_id = #{userId}
+            AND category = #{category}
+            AND knowledge_point = #{knowledgePoint}
+            AND status = 'ACTIVE'
+    </update>
+</mapper>

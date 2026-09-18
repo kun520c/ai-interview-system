@@ -395,8 +395,10 @@ Interview Workflow             COMPLETE
 Interview Session Creation     COMPLETE
 External Interview API         COMPLETE
 Interview Report               COMPLETE
-→ Next stage: Weakness
-→ Then: History / Detail → MVP Final Regression / Documentation / Freeze
+User Weakness                  COMPLETE
+
+→ Next stage: History / Detail
+→ Then: MVP Final Regression / Documentation / Freeze
 ```
 
 The F1-F4 changes have passed their technical verification gate. Determine their commit and push status from the current Git history; do not infer publication state from this document alone.
@@ -899,7 +901,7 @@ Interview Report completed capability on 2026-09-17:
 * Java calculates `overallScore` as the arithmetic mean of the effective MAIN `totalScore` values with `BigDecimal`, two decimal places, and `HALF_UP`. The LLM cannot recalculate or override it.
 * `DeepSeekInterviewReportGenerator` reuses the existing DeepSeek JSON-completion client. It receives Session data, question snapshots from `interview_question`, validated Evaluation fields, and Java's final score; it does not receive persisted raw LLM results or RAG hit data and never writes the database.
 * The Report system prompt treats all supplied question and Evaluation text as untrusted data, rejects embedded instructions, and limits the LLM to summary, strengths, weaknesses, and suggestions. Java validates the JSON and derives `result` from the existing `EvaluationStandard`; model and prompt-version metadata also come from Java configuration/constants.
-* `InterviewReportService` performs DeepSeek work outside a database transaction. `InterviewReportTransactionService` atomically inserts `interview_report` and changes the Session from GENERATING to READY with `total_score`; an affected-row failure rolls both operations back.
+* `InterviewReportService` performs DeepSeek work outside a database transaction. `InterviewReportTransactionService` atomically inserts `interview_report` and changes the Session from GENERATING to READY with `total_score`; an affected-row failure rolls both operations back. The later User Weakness stage extended this same short transaction to apply Weakness updates after Report insert and before READY.
 * READY generation requests are idempotent and return the existing Report without calling the Generator. FAILED requests may claim and retry. Failures after a successful claim attempt `GENERATING -> FAILED` without replacing the original exception.
 * The real Generator Bean exists only when `deepseek.enabled=true` and does not depend on Milvus. With DeepSeek disabled, the ordinary ApplicationContext still starts and generation is rejected before claiming GENERATING.
 
@@ -916,9 +918,36 @@ Interview Report completed capability on 2026-09-17:
 * The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1117 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
 * `DEEPSEEK_ENABLED=false`, `MILVUS_ENABLED=false`, and every `RUN_REAL_*` switch remained disabled. DeepSeek Report behavior was verified with Mock HTTP only; no real DeepSeek, Embedding, or Milvus request was made, and the skipped tests are not evidence of real external-service verification.
 
+User Weakness completed capability on 2026-09-18:
+
+### Weakness aggregation and persistence
+
+* Weakness updates use the same final effective MAIN Evaluations as Report generation. FOLLOW_UP is not scored as a separate Weakness source.
+* One Session aggregates those Evaluations by `QuestionCategory + knowledgePoint` before any Mapper call. Multiple MAIN questions that share the same key produce one average and at most one Weakness write, so `discovered_count` increases by at most one per Session per knowledge point.
+* Java calculates `sessionKnowledgeScore` as the arithmetic mean of those MAIN `totalScore` values with `BigDecimal`, two decimal places, and `HALF_UP`. `weaknessScore = 100 - sessionKnowledgeScore`. The LLM cannot recalculate or override either value.
+* Weakness classification reuses `EvaluationStandard`: `FAIR` / `WEAK` (`< 80`) is a discovered Weakness; `GOOD` / `EXCELLENT` (`>= 80`) resolves an ACTIVE Weakness. No second scoring threshold was added.
+* `discovered_count` records how many interview Sessions discovered that knowledge point as a Weakness. Resolving an ACTIVE Weakness does not increment it.
+* Discovery uses MySQL `INSERT ... ON DUPLICATE KEY UPDATE` on `UNIQUE(user_id, category, knowledge_point)`: first discovery inserts `ACTIVE` with `discovered_count = 1`; an existing ACTIVE or RESOLVED row is reactivated as `ACTIVE`, increments `discovered_count`, updates `weakness_score` and `last_discovered_at`, and clears `resolved_at`.
+* `GOOD` / `EXCELLENT` only `UPDATE` an existing `ACTIVE` row to `RESOLVED` with the current `weakness_score` and `resolved_at`. It does not insert, increment `discovered_count`, or change `last_discovered_at`. A missing or already-RESOLVED row is a no-op.
+
+### Transaction boundary and idempotency
+
+* DeepSeek Report generation and Evaluation aggregation remain outside a database transaction. `InterviewReportTransactionService.completeReportGeneration()` is the short `@Transactional` boundary: insert `interview_report`, apply Session Weakness updates, then `markReportReady()`.
+* `UserWeaknessService` has no independent or `REQUIRES_NEW` transaction. Weakness SQL joins the Report transaction. Any RuntimeException rolls back Report insert, Weakness changes, and the READY transition together.
+* READY generation requests remain idempotent and return the existing Report without calling the Generator or `applySessionEvaluations()`, which prevents duplicate `discovered_count` increments. FAILED retry is safe after the previous transaction has rolled back.
+* This stage did not add a Weakness query API, History / Detail APIs, or a Schema change.
+
+### User Weakness verification baseline
+
+* Verification date: `2026-09-18`.
+* `UserWeaknessMapperTest` executed 8 real local MySQL tests with 0 failures, 0 errors, and 0 skipped. Coverage includes first ACTIVE insert, ACTIVE rediscovery `count + 1`, RESOLVED reactivation, ACTIVE resolve without count/`last_discovered_at` changes, resolve of a missing row, no-op resolve of an already-RESOLVED row, and unique-key behaviour.
+* `UserWeaknessServiceTest` executed 18 Unit/Mock tests with 0 failures, 0 errors, and 0 skipped. Coverage includes argument and internal Evaluation validation, single-score upsert/resolve, same-key aggregation, different-category keys, and HALF_UP averaging such as `79 + 80 + 80 -> 79.67`.
+* Real MySQL transaction tests verified Report INSERT + Weakness INSERT + Session READY success; stale-version `markReportReady` rollback of both Report and Weakness; and Weakness SQL failure rollback of Report with the Session left GENERATING.
+* The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1145 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
+* `DEEPSEEK_ENABLED=false`, `MILVUS_ENABLED=false`, and every `RUN_REAL_*` switch remained disabled. No real DeepSeek, Embedding, or Milvus request was made, and the skipped tests are not evidence of real external-service verification.
+
 The following capabilities remain unimplemented:
 
-* User-weakness updates
 * Interview history and detail APIs
 * Real DeepSeek integration verification
 * Similarity-threshold policy and category retrieval filtering
@@ -926,8 +955,7 @@ The following capabilities remain unimplemented:
 Next development stages:
 
 ```text
-Weakness
-→ History / Detail
+History / Detail
 → MVP Final Regression / Documentation / Freeze
 ```
 
@@ -947,4 +975,4 @@ Other capabilities that also remain unimplemented include:
 * Knowledge-document pagination, detail, or enable/disable management
 * Mandatory rejection of duplicate content
 
-Until the developer explicitly authorizes the next stage, do not implement user weaknesses, interview history/detail, password reset, further database changes, or broad unrelated refactoring.
+Until the developer explicitly authorizes the next stage, do not implement interview history/detail, password reset, further database changes, or broad unrelated refactoring.
