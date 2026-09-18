@@ -167,4 +167,36 @@
             AND status = 'COMPLETED'
             AND report_status = 'GENERATING'
     </update>
+
+    <select id="listCompletedSessionsByUserId"
+            resultType="com.kun.aiinterview.interview.entity.InterviewSession">
+        SELECT
+            id,
+            user_id,
+            difficulty,
+            status,
+            current_interview_question_id,
+            planned_question_count,
+            completed_question_count,
+            total_score,
+            report_status,
+            version,
+            started_at,
+            ended_at,
+            created_at,
+            updated_at
+        FROM interview_session
+        WHERE user_id = #{userId}
+            AND status = 'COMPLETED'
+        ORDER BY ended_at DESC, id DESC
+        LIMIT #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <select id="countCompletedSessionsByUserId" resultType="long">
+        SELECT COUNT(*)
+        FROM interview_session
+        WHERE user_id = #{userId}
+            AND status = 'COMPLETED'
+    </select>
 </mapper>

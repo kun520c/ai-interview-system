@@ -41,4 +41,6 @@ public interface InterviewQuestionMapper {
             @Param("sessionId") Long sessionId,
             @Param("planOrder") Integer planOrder
     );
+
+    List<InterviewQuestion> listBySessionId(@Param("sessionId") Long sessionId);
 }

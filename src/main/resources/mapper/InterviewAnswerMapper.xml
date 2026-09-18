@@ -52,6 +52,29 @@
         WHERE request_id = #{requestId}
     </select>
 
+    <select id="listByInterviewQuestionIds"
+            resultType="com.kun.aiinterview.interview.entity.InterviewAnswer">
+        SELECT
+            id,
+            interview_question_id,
+            answer_content,
+            status,
+            request_id,
+            error_code,
+            submitted_at,
+            created_at,
+            updated_at
+        FROM interview_answer
+        WHERE interview_question_id IN
+        <foreach collection="interviewQuestionIds"
+                 item="interviewQuestionId"
+                 open="("
+                 separator=","
+                 close=")">
+            #{interviewQuestionId}
+        </foreach>
+    </select>
+
     <insert id="insertInterviewAnswer"
             parameterType="com.kun.aiinterview.interview.entity.InterviewAnswer"
             useGeneratedKeys="true"

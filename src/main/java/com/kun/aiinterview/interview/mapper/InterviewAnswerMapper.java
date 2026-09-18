@@ -4,6 +4,8 @@ import com.kun.aiinterview.interview.entity.InterviewAnswer;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface InterviewAnswerMapper {
 
@@ -14,6 +16,10 @@ public interface InterviewAnswerMapper {
     );
 
     InterviewAnswer getInterviewAnswerByRequestId(@Param("requestId") String requestId);
+
+    List<InterviewAnswer> listByInterviewQuestionIds(
+            @Param("interviewQuestionIds") List<Long> interviewQuestionIds
+    );
 
     int insertInterviewAnswer(InterviewAnswer interviewAnswer);
 

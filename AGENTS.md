@@ -390,15 +390,19 @@ At the end of each development stage, report:
 Current stage:
 
 ```text
-Evaluation Core                COMPLETE
-Interview Workflow             COMPLETE
-Interview Session Creation     COMPLETE
-External Interview API         COMPLETE
-Interview Report               COMPLETE
-User Weakness                  COMPLETE
+Evaluation Core                 COMPLETE
+Interview Workflow              COMPLETE
+Interview Session Creation      COMPLETE
+External Interview API          COMPLETE
+Interview Report                COMPLETE
+User Weakness                   COMPLETE
+Interview History / Detail      COMPLETE
 
-→ Next stage: History / Detail
-→ Then: MVP Final Regression / Documentation / Freeze
+→ Next stage:
+MVP Full Code Review / Final Regression
+
+→ Then:
+Frontend / Demo / Documentation / Freeze
 ```
 
 The F1-F4 changes have passed their technical verification gate. Determine their commit and push status from the current Git history; do not infer publication state from this document alone.
@@ -946,17 +950,47 @@ User Weakness completed capability on 2026-09-18:
 * The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1145 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
 * `DEEPSEEK_ENABLED=false`, `MILVUS_ENABLED=false`, and every `RUN_REAL_*` switch remained disabled. No real DeepSeek, Embedding, or Milvus request was made, and the skipped tests are not evidence of real external-service verification.
 
+Interview History / Detail completed capability on 2026-09-18:
+
+### History API
+
+* `GET /api/interviews/history?page=1&pageSize=10` returns the authenticated user's completed interview list. The user ID comes only from JWT-backed `AuthenticatedUser`; clients cannot submit or override it.
+* History contains only `COMPLETED` Sessions. `CREATED` / `IN_PROGRESS` remain on `GET /api/interviews/current` and are not mixed into History.
+* Pagination uses MySQL `LIMIT` / `OFFSET` and `COUNT(*)` with no PageHelper dependency. Defaults are `page=1` and `pageSize=10`; `page >= 1` and `1 <= pageSize <= 50`. Invalid values are `BusinessException`.
+* SQL filters `WHERE user_id = ? AND status = 'COMPLETED'` and sorts `ORDER BY ended_at DESC, id DESC` so equal completion times paginate stably.
+* `InterviewHistoryPageResponse` returns `page`, `pageSize`, `total`, `totalPages`, and `items`. Each item exposes only `sessionId`, `difficulty`, `status`, `reportStatus`, `totalScore`, `plannedQuestionCount`, `completedQuestionCount`, `startedAt`, `endedAt`, and `createdAt`. It does not expose `version`, `currentInterviewQuestionId`, snapshots, LLM metadata, or `retrievalBatchId`.
+
+### Detail API
+
+* `GET /api/interviews/{sessionId}` is a side-effect-free ownership-checked query of the Session's current persisted facts. It does not require `COMPLETED`, so an owner may also read an `IN_PROGRESS` Session.
+* Missing Sessions and Sessions owned by another user are rejected before Questions, Answers, or Evaluations are loaded.
+* Detail is a read-only timeline. It does not call DeepSeek, Embedding, or Milvus, and does not regenerate Reports or update Weaknesses.
+* Questions come from `interview_question` snapshots ordered by `display_order ASC, id ASC`, including both MAIN and FOLLOW_UP rows, so the frontend can rebuild the real interview timeline. `parentQuestionId` is not exposed.
+* Each question may include a nested answer and evaluation. Missing answers or evaluations are `null`. MAIN answers show their own INITIAL evaluation when present; FOLLOW_UP answers show their own FINAL evaluation. Detail does not overlay the Report's FINAL-effective evaluation onto the original MAIN question.
+* Batch queries avoid N+1: one Session question list, one Answer `IN` query, and one Evaluation `IN` query. Empty ID lists skip the `IN` query and never generate `IN ()`.
+* External Detail fields are limited to user-visible scoring feedback. Question snapshots (`referenceAnswerSnapshot`, `scoringPointsSnapshot`, `followUpTargetPoints`), Answer `requestId` / `errorCode` / database IDs, and Evaluation `rawResult`, `scoringPointResults`, `retrievalBatchId`, LLM metadata, `followUpRecommended`, `suggestedFollowUp`, and `decisionAction` are not exposed. Persisted `strengths` / `missingPoints` JSON is parsed with Jackson into `List<String>`; illegal JSON is an internal inconsistency.
+
+### Interview History / Detail verification baseline
+
+* Verification date: `2026-09-18`.
+* `InterviewHistoryMapperTest` executed 2 real local MySQL tests with 0 failures, 0 errors, and 0 skipped. Coverage includes user isolation, COMPLETED filtering, exclusion of IN_PROGRESS and other users, `ended_at DESC, id DESC` pagination, and COUNT.
+* `InterviewDetailMapperTest` executed 1 real local MySQL test with 0 failures, 0 errors, and 0 skipped. Coverage includes `display_order` question order, batch Answers, batch Evaluations, and isolation from another Session.
+* `InterviewHistoryServiceTest` executed 16 Unit/Mock tests with 0 failures, 0 errors, and 0 skipped. Coverage includes default and custom pagination, invalid page bounds, empty history, ownership, missing Session, IN_PROGRESS and COMPLETED detail, null answer/evaluation, MAIN INITIAL and FOLLOW_UP FINAL display, JSON list parsing, illegal JSON failure, and read-only mapper interactions.
+* `InterviewControllerTest` executed 14 tests with 0 failures, 0 errors, and 0 skipped after adding unauthenticated History/Detail rejection, JWT user-id forwarding, forged `userId` ignore, default pagination, and Detail field-leak assertions.
+* The History / Detail focused run executed 33 tests with 0 failures, 0 errors, and 0 skipped, and completed with `BUILD SUCCESS`.
+* The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1168 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
+* `DEEPSEEK_ENABLED=false`, `MILVUS_ENABLED=false`, and every `RUN_REAL_*` switch remained disabled. No real DeepSeek, Embedding, or Milvus request was made, and the skipped tests are not evidence of real external-service verification.
+
 The following capabilities remain unimplemented:
 
-* Interview history and detail APIs
 * Real DeepSeek integration verification
 * Similarity-threshold policy and category retrieval filtering
 
 Next development stages:
 
 ```text
-History / Detail
-→ MVP Final Regression / Documentation / Freeze
+MVP Full Code Review / Final Regression
+→ Frontend / Demo / Documentation / Freeze
 ```
 
 Other capabilities that also remain unimplemented include:
@@ -975,4 +1009,4 @@ Other capabilities that also remain unimplemented include:
 * Knowledge-document pagination, detail, or enable/disable management
 * Mandatory rejection of duplicate content
 
-Until the developer explicitly authorizes the next stage, do not implement interview history/detail, password reset, further database changes, or broad unrelated refactoring.
+Until the developer explicitly authorizes the next stage, do not implement frontend, password reset, further database changes, or broad unrelated refactoring.

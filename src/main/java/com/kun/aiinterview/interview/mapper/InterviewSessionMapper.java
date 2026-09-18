@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Mapper
 public interface InterviewSessionMapper {
@@ -63,4 +64,12 @@ public interface InterviewSessionMapper {
             @Param("id") Long id,
             @Param("expectedVersion") Integer expectedVersion
     );
+
+    List<InterviewSession> listCompletedSessionsByUserId(
+            @Param("userId") Long userId,
+            @Param("limit") int limit,
+            @Param("offset") long offset
+    );
+
+    long countCompletedSessionsByUserId(@Param("userId") Long userId);
 }

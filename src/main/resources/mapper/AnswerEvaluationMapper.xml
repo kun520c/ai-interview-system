@@ -295,4 +295,45 @@
 
     </select>
 
+    <select
+            id="listByAnswerIds"
+            resultMap="AnswerEvaluationResultMap">
+
+        SELECT
+            id,
+            answer_id,
+            main_interview_question_id,
+            evaluation_phase,
+            correctness_score,
+            completeness_score,
+            depth_score,
+            clarity_score,
+            practice_score,
+            total_score,
+            level,
+            strengths,
+            missing_points,
+            correction,
+            scoring_point_results,
+            follow_up_recommended,
+            suggested_follow_up,
+            decision_action,
+            retrieval_batch_id,
+            llm_model,
+            prompt_version,
+            evaluation_standard_version,
+            raw_result,
+            created_at
+        FROM answer_evaluation
+        WHERE answer_id IN
+        <foreach collection="answerIds"
+                 item="answerId"
+                 open="("
+                 separator=","
+                 close=")">
+            #{answerId}
+        </foreach>
+
+    </select>
+
 </mapper>

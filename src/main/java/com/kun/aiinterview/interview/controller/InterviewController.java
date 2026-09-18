@@ -5,6 +5,8 @@ import com.kun.aiinterview.interview.dto.CreateInterviewRequest;
 import com.kun.aiinterview.interview.dto.SubmitInterviewAnswerRequest;
 import com.kun.aiinterview.interview.service.InterviewReportService;
 import com.kun.aiinterview.interview.service.InterviewService;
+import com.kun.aiinterview.interview.vo.InterviewDetailResponse;
+import com.kun.aiinterview.interview.vo.InterviewHistoryPageResponse;
 import com.kun.aiinterview.interview.vo.InterviewReportResponse;
 import com.kun.aiinterview.interview.vo.InterviewSessionResponse;
 import com.kun.aiinterview.interview.vo.SubmitInterviewAnswerResponse;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -48,6 +51,36 @@ public class InterviewController {
         InterviewSessionResponse response =
                 interviewService.getCurrent(
                         authenticatedUser.userId()
+                );
+
+        return Result.success(response);
+    }
+
+    @GetMapping("/history")
+    public Result<InterviewHistoryPageResponse> listHistory(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize
+    ) {
+        InterviewHistoryPageResponse response =
+                interviewService.listHistory(
+                        authenticatedUser.userId(),
+                        page,
+                        pageSize
+                );
+
+        return Result.success(response);
+    }
+
+    @GetMapping("/{sessionId}")
+    public Result<InterviewDetailResponse> getDetail(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @PathVariable Long sessionId
+    ) {
+        InterviewDetailResponse response =
+                interviewService.getDetail(
+                        authenticatedUser.userId(),
+                        sessionId
                 );
 
         return Result.success(response);

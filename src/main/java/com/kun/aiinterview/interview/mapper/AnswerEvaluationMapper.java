@@ -16,4 +16,8 @@ public interface AnswerEvaluationMapper {
     List<AnswerEvaluation> listFinalEffectiveEvaluationsBySessionId(
             @Param("sessionId") Long sessionId
     );
+
+    List<AnswerEvaluation> listByAnswerIds(
+            @Param("answerIds") List<Long> answerIds
+    );
 }
