@@ -1,5 +1,6 @@
 package com.kun.aiinterview.knowledge.embedding;
 
+import com.kun.aiinterview.knowledge.embedding.springai.SpringAiEmbeddingClient;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -50,6 +51,8 @@ class RealEmbeddingSmokeTest {
     @Test
     void shouldRequestRealEmbeddingsAndReturnValidVectors() {
         assertExpectedEmbeddingProfile();
+        assertThat(embeddingClient)
+                .isInstanceOf(SpringAiEmbeddingClient.class);
 
         EmbeddingBatchResult result = embeddingClient.embed(List.of(
                 "Java 中 HashMap 的底层数据结构是什么？",

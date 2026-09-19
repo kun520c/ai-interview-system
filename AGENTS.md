@@ -17,6 +17,7 @@ Current core stack:
 * Spring Web and Jakarta Bean Validation
 * Spring RestClient
 * Alibaba Cloud Bailian / DashScope OpenAI-compatible Embeddings API
+* Spring AI 1.1.8 OpenAI embedding integration
 * `qwen3.7-text-embedding`
 * Current embedding dimension: 1024
 * DeepSeek OpenAI-compatible Chat Completions API
@@ -35,9 +36,8 @@ Planned technologies used only when their corresponding modules are developed:
 * Redis
 * Spring Mail
 * Knife4j
-* LangChain4j
 
-Spring AI is not a current dependency. A later version may evaluate a Spring AI implementation, but it must continue to integrate through the project's own `EmbeddingClient` interface. The hand-written DashScope implementation remains the current production implementation.
+Spring AI 1.1.8 is used for OpenAI-compatible embedding integration. The project-owned `EmbeddingClient` remains the business-facing port, and `SpringAiEmbeddingClient` is the production adapter over Spring AI's `EmbeddingModel`. Milvus remains behind the project-owned `VectorStoreClient` and the native Milvus SDK compatibility adapter because the existing collection, schema, search, and compensation contract is intentionally preserved. The project does not use Spring AI's stock Milvus `VectorStore`. LangChain4j is not used.
 
 Do not introduce new technologies unless they solve a concrete project requirement.
 
@@ -477,15 +477,16 @@ Additional first-review cleanup:
 
 Knowledge-base second-stage B1 completed capability:
 
-* The project owns a provider-neutral `EmbeddingClient` interface. `DashScopeEmbeddingClient` is the current hand-written production implementation, and DashScope request and response DTOs are not exposed to upper business layers.
+* The project owns a provider-neutral `EmbeddingClient` interface. `SpringAiEmbeddingClient` is the production adapter over the Spring AI 1.1.8 `EmbeddingModel`; Spring AI types are not exposed to upper business layers.
 * `EmbeddingVector` and `EmbeddingBatchResult` are project-internal result records. Their list values are defensively copied and exposed as unmodifiable lists.
 * `EmbeddingProperties` centrally binds `baseUrl`, `apiKey`, `model`, `dimension`, `batchSize`, `profileVersion`, `connectTimeout`, and `readTimeout`.
-* Configuration validation rejects blank required text, non-positive dimensions and batch sizes, and null or non-positive timeouts. The API key is excluded from the generated `toString()` output.
-* `EmbeddingConfiguration` registers `EmbeddingProperties` and creates a dedicated `embeddingRestClient`.
-* The dedicated client uses `Bearer ` authorization and applies both connection and read timeouts.
-* The OpenAI-compatible request DTO serializes `model`, `input`, `dimensions`, and `encoding_format`.
-* The response DTO deserializes `data[].index`, `data[].embedding`, `model`, `usage.prompt_tokens`, and `usage.total_tokens`, while ignoring unrelated supplier fields.
-* Jackson handles the request JSON serialization and response JSON deserialization.
+* Configuration validation rejects blank required text, non-positive dimensions and batch sizes, batch sizes above the Bailian per-request limit of 20, and null or non-positive timeouts. The API key is excluded from the generated `toString()` output.
+* `EmbeddingConfiguration` registers `EmbeddingProperties` and creates the Spring AI `OpenAiApi`, `OpenAiEmbeddingModel`, and the single project `EmbeddingClient` bean.
+* The dedicated Embedding RestClient copies Jackson settings and enables `FAIL_ON_NULL_FOR_PRIMITIVES` only on that client, so JSON `null` vector values are rejected before they become `0.0F`. The application-wide `ObjectMapper` is not modified.
+* Spring AI's OpenAI-compatible client uses Bearer authorization, the configured base URL plus `/embeddings`, and the configured three-second connection and twenty-second read timeouts.
+* The Spring AI request explicitly sends `model`, `input`, `dimensions`, and `encoding_format=float`.
+* The adapter calls the full `EmbeddingModel.call(EmbeddingRequest)` API so provider result indexes, response model metadata, and usage metadata remain available for project validation.
+* The embedding model uses a one-attempt `RetryTemplate`; migration does not add provider retries.
 * The client rejects a null or empty input list and rejects null, empty, or whitespace-only elements with the corresponding element index in the error message.
 * Valid input is defensively copied, and text content is sent without trimming or other modification.
 * Total input larger than `batchSize` is automatically split into multiple HTTP requests, including correct handling of the final short batch.
@@ -496,12 +497,12 @@ Knowledge-base second-stage B1 completed capability:
 * Multiple batches are merged into one ordered `EmbeddingBatchResult`.
 * Token usage is treated as request-level metadata and accumulated across trustworthy batch responses. If any batch lacks trustworthy usage or `total_tokens`, the complete call's `totalTokenCount` is null.
 * Negative token counts are rejected. `characterCount` is not used as a token count, and token totals are not distributed across individual vectors.
-* RestClient HTTP, response-body, and JSON problems are exposed to callers as `ExternalServiceException`.
+* Spring AI/provider HTTP, timeout, response-body, and deserialization problems are exposed to callers as `ExternalServiceException`.
 
 Knowledge-base second-stage B2 completed capability:
 
 * The project owns a provider-neutral `VectorStoreClient` interface. Its batch insertion, deletion by vector IDs, deletion by document ID, and similarity search operations are implemented by `MilvusVectorStoreClient`.
-* The current implementation uses `io.milvus:milvus-sdk-java:2.6.20` directly rather than Spring AI Milvus VectorStore. Direct SDK use provides explicit control over precomputed vectors, Collection Schema, Java-generated primary keys, and the compensation-deletion boundary. Spring AI remains a later replaceable implementation candidate behind `VectorStoreClient`, not a permanently rejected option.
+* The current implementation uses `io.milvus:milvus-sdk-java:2.6.20` directly rather than Spring AI Milvus VectorStore. Direct SDK use preserves explicit control over precomputed vectors, Collection Schema, Java-generated primary keys, raw hit semantics, and the compensation-deletion boundary. Spring AI's stock Milvus VectorStore is not used.
 * MySQL remains the source of truth for document and chunk content and business processing state. Milvus stores vectors and the minimum retrieval identifiers needed to map a hit back to MySQL.
 * Java generates `vectorId`; Milvus does not generate primary keys for this Collection.
 * `MilvusProperties` binds `enabled`, `uri`, optional `token`, `databaseName`, `collectionName`, `dimension`, `connectTimeout`, and `requestTimeout`. Required values, positive dimensions, and positive timeouts are validated, and `token` is excluded from `toString()`.
@@ -1003,7 +1004,6 @@ Other capabilities that also remain unimplemented include:
 * Document reprocessing
 * READY-document reprocessing
 * A Retrieval Controller outside the future Interview Workflow
-* A Spring AI replacement implementation; it remains only a later candidate behind `EmbeddingClient`
 * Markdown-heading-aware or code-block-aware chunking
 * Semantic chunking
 * Knowledge-document pagination, detail, or enable/disable management

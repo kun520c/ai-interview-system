@@ -1,6 +1,7 @@
 package com.kun.aiinterview.knowledge.embedding;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -20,6 +21,8 @@ import java.time.Duration;
 @ToString(exclude = "apiKey")
 public class EmbeddingProperties {
 
+    public static final int MAX_BATCH_SIZE = 20;
+
     @NotNull(message = "Embedding 服务地址不能为空")
     private URI baseUrl;
 
@@ -33,6 +36,7 @@ public class EmbeddingProperties {
     private int dimension;
 
     @Positive(message = "Embedding 批次大小必须大于 0")
+    @Max(value = MAX_BATCH_SIZE, message = "Embedding 批次大小不能超过百炼单次上限 20")
     private int batchSize;
 
     @NotBlank(message = "Embedding 配置版本不能为空")

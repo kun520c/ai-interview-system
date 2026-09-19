@@ -1,11 +1,11 @@
 package com.kun.aiinterview.knowledge.service;
 
 import com.kun.aiinterview.knowledge.chunk.KnowledgeTextChunker;
-import com.kun.aiinterview.knowledge.embedding.dashscope.DashScopeEmbeddingClient;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingBatchResult;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingClient;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingConfiguration;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingProperties;
+import com.kun.aiinterview.knowledge.embedding.springai.SpringAiEmbeddingClient;
 import com.kun.aiinterview.knowledge.entity.KnowledgeChunk;
 import com.kun.aiinterview.knowledge.entity.KnowledgeDocument;
 import com.kun.aiinterview.knowledge.enums.KnowledgeCategory;
@@ -291,7 +291,7 @@ class RealKnowledgeDocumentProcessingFailureIntegrationTest {
 
     private void assertRealInfrastructureAndFixedProfile() {
         assertThat(embeddingClient)
-                .isInstanceOf(DashScopeEmbeddingClient.class);
+                .isInstanceOf(SpringAiEmbeddingClient.class);
         assertThat(realVectorStoreClient)
                 .isInstanceOf(MilvusVectorStoreClient.class);
         assertThat(embeddingProperties.getModel()).isEqualTo(EXPECTED_MODEL);
@@ -691,7 +691,6 @@ class RealKnowledgeDocumentProcessingFailureIntegrationTest {
     })
     @Import({
             EmbeddingConfiguration.class,
-            DashScopeEmbeddingClient.class,
             MilvusConfiguration.class,
             MilvusCollectionInitializer.class,
             MilvusVectorStoreClient.class,

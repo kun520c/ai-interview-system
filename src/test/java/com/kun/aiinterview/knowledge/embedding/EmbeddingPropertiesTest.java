@@ -84,6 +84,23 @@ class EmbeddingPropertiesTest {
     }
 
     @Test
+    void shouldAcceptProviderMaximumBatchSize() {
+        EmbeddingProperties properties = validProperties();
+        properties.setBatchSize(EmbeddingProperties.MAX_BATCH_SIZE);
+
+        assertThat(validator.validate(properties)).isEmpty();
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {21, 40, 100})
+    void shouldRejectBatchSizeAboveProviderLimit(int batchSize) {
+        EmbeddingProperties properties = validProperties();
+        properties.setBatchSize(batchSize);
+
+        assertViolationOn(properties, "batchSize");
+    }
+
+    @Test
     void shouldRejectMissingConnectTimeout() {
         EmbeddingProperties properties = validProperties();
         properties.setConnectTimeout(null);
