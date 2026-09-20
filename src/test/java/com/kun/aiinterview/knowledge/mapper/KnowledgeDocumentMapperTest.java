@@ -11,6 +11,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -90,6 +92,67 @@ class KnowledgeDocumentMapperTest {
         );
     }
 
+    @Test
+    void shouldClaimFailedProcessingAndReclaimOnlyStaleProcessing() {
+        KnowledgeDocument failed = document("失败重试");
+        KnowledgeDocument stale = document("过期处理");
+        KnowledgeDocument fresh = document("新鲜处理");
+        assertEquals(1, knowledgeDocumentMapper.insertDocument(failed));
+        assertEquals(1, knowledgeDocumentMapper.insertDocument(stale));
+        assertEquals(1, knowledgeDocumentMapper.insertDocument(fresh));
+        assertEquals(1, knowledgeDocumentMapper.claimProcessing(failed.getId()));
+        assertEquals(1, knowledgeDocumentMapper.claimProcessing(stale.getId()));
+        assertEquals(1, knowledgeDocumentMapper.claimProcessing(fresh.getId()));
+        assertEquals(
+                1,
+                knowledgeDocumentMapper.markFailed(failed.getId(), "previous")
+        );
+        LocalDateTime staleAt = LocalDateTime.now().minusMinutes(20);
+        setDocumentUpdatedAt(stale.getId(), staleAt);
+        setDocumentUpdatedAt(fresh.getId(), LocalDateTime.now());
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(15);
+
+        assertEquals(
+                1,
+                knowledgeDocumentMapper.claimFailedProcessing(failed.getId())
+        );
+        assertEquals(
+                KnowledgeProcessingStatus.PROCESSING,
+                knowledgeDocumentMapper.selectById(failed.getId())
+                        .getProcessingStatus()
+        );
+        assertEquals(
+                0,
+                knowledgeDocumentMapper.claimFailedProcessing(failed.getId())
+        );
+        assertEquals(
+                1,
+                knowledgeDocumentMapper.reclaimStaleProcessing(
+                        stale.getId(),
+                        cutoff
+                )
+        );
+        assertEquals(
+                KnowledgeProcessingStatus.PROCESSING,
+                knowledgeDocumentMapper.selectById(stale.getId())
+                        .getProcessingStatus()
+        );
+        assertEquals(
+                0,
+                knowledgeDocumentMapper.reclaimStaleProcessing(
+                        stale.getId(),
+                        cutoff
+                )
+        );
+        assertEquals(
+                0,
+                knowledgeDocumentMapper.reclaimStaleProcessing(
+                        fresh.getId(),
+                        cutoff
+                )
+        );
+    }
+
     private KnowledgeDocument document(String source) {
         return KnowledgeDocument.builder()
                 .title("HashMap 原理")
@@ -103,6 +166,21 @@ class KnowledgeDocumentMapperTest {
                 .processingStatus(KnowledgeProcessingStatus.UPLOADED)
                 .errorMessage(null)
                 .build();
+    }
+
+    private void setDocumentUpdatedAt(long documentId, LocalDateTime updatedAt) {
+        assertEquals(
+                1,
+                jdbcTemplate.update(
+                        """
+                        UPDATE knowledge_document
+                        SET updated_at = ?
+                        WHERE id = ?
+                        """,
+                        Timestamp.valueOf(updatedAt),
+                        documentId
+                )
+        );
     }
 
     private int asInt(Object value) {

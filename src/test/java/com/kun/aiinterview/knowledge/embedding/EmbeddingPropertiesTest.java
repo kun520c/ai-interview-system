@@ -135,6 +135,44 @@ class EmbeddingPropertiesTest {
     }
 
     @Test
+    void shouldAcceptModelLengthAtMysqlLimit() {
+        EmbeddingProperties properties = validProperties();
+        properties.setModel("m".repeat(EmbeddingProperties.MAX_MODEL_LENGTH));
+
+        assertThat(validator.validate(properties)).isEmpty();
+    }
+
+    @Test
+    void shouldRejectModelLongerThanMysqlLimit() {
+        EmbeddingProperties properties = validProperties();
+        properties.setModel(
+                "m".repeat(EmbeddingProperties.MAX_MODEL_LENGTH + 1)
+        );
+
+        assertViolationOn(properties, "model");
+    }
+
+    @Test
+    void shouldAcceptProfileVersionLengthAtMysqlLimit() {
+        EmbeddingProperties properties = validProperties();
+        properties.setProfileVersion(
+                "p".repeat(EmbeddingProperties.MAX_PROFILE_VERSION_LENGTH)
+        );
+
+        assertThat(validator.validate(properties)).isEmpty();
+    }
+
+    @Test
+    void shouldRejectProfileVersionLongerThanMysqlLimit() {
+        EmbeddingProperties properties = validProperties();
+        properties.setProfileVersion(
+                "p".repeat(EmbeddingProperties.MAX_PROFILE_VERSION_LENGTH + 1)
+        );
+
+        assertViolationOn(properties, "profileVersion");
+    }
+
+    @Test
     void shouldNotExposeApiKeyThroughToString() {
         EmbeddingProperties properties = validProperties();
 

@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -195,6 +196,58 @@ class InterviewAnswerMapperTest {
     }
 
     @Test
+    void shouldReclaimStaleEvaluatingOnlyWhenCutoffCoversUpdatedAt() {
+        long staleAnswerId = insertInterviewAnswer(
+                insertMainInterviewQuestion(),
+                "过期 EVALUATING 等待恢复。",
+                "EVALUATING",
+                "STALE_LEASE"
+        );
+        long freshAnswerId = insertInterviewAnswer(
+                insertMainInterviewQuestion(),
+                "仍在窗口内的 EVALUATING。",
+                "EVALUATING",
+                null
+        );
+        LocalDateTime staleAt = LocalDateTime.now().minusMinutes(20);
+        LocalDateTime freshAt = LocalDateTime.now();
+        setAnswerUpdatedAt(staleAnswerId, staleAt);
+        setAnswerUpdatedAt(freshAnswerId, freshAt);
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
+
+        assertEquals(
+                1,
+                interviewAnswerMapper.reclaimStaleEvaluating(
+                        staleAnswerId,
+                        cutoff
+                )
+        );
+        InterviewAnswer reclaimed = interviewAnswerMapper
+                .getInterviewAnswerById(staleAnswerId);
+        assertEquals(InterviewAnswerStatus.EVALUATING, reclaimed.getStatus());
+        assertNull(reclaimed.getErrorCode());
+        assertEquals(
+                0,
+                interviewAnswerMapper.reclaimStaleEvaluating(
+                        staleAnswerId,
+                        cutoff
+                )
+        );
+        assertEquals(
+                0,
+                interviewAnswerMapper.reclaimStaleEvaluating(
+                        freshAnswerId,
+                        cutoff
+                )
+        );
+        assertEquals(
+                InterviewAnswerStatus.EVALUATING,
+                interviewAnswerMapper.getInterviewAnswerById(freshAnswerId)
+                        .getStatus()
+        );
+    }
+
+    @Test
     void shouldReturnNullForMissingAnswerId() {
         assertNull(interviewAnswerMapper.getInterviewAnswerById(Long.MAX_VALUE));
     }
@@ -247,6 +300,21 @@ class InterviewAnswerMapperTest {
         return requiredId(
                 "SELECT id FROM interview_answer WHERE request_id = ?",
                 requestId
+        );
+    }
+
+    private void setAnswerUpdatedAt(long answerId, LocalDateTime updatedAt) {
+        assertEquals(
+                1,
+                jdbcTemplate.update(
+                        """
+                        UPDATE interview_answer
+                        SET updated_at = ?
+                        WHERE id = ?
+                        """,
+                        Timestamp.valueOf(updatedAt),
+                        answerId
+                )
         );
     }
 

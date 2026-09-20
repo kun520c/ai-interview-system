@@ -2,6 +2,8 @@ package com.kun.aiinterview.interview.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kun.aiinterview.common.exception.ConflictException;
+import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
 import com.kun.aiinterview.interview.entity.InterviewAnswer;
 import com.kun.aiinterview.interview.entity.InterviewQuestion;
 import com.kun.aiinterview.interview.entity.InterviewSession;
@@ -29,6 +31,7 @@ import org.mockito.InOrder;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.Mock;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,7 +83,8 @@ class InterviewWorkflowServiceTest {
                 interviewSessionMapper,
                 transactionService,
                 evaluationOrchestrationService,
-                objectMapper
+                objectMapper,
+                new StaleRecoveryProperties()
         );
     }
 
@@ -352,7 +356,7 @@ class InterviewWorkflowServiceTest {
     @ParameterizedTest
     @EnumSource(
             value = InterviewAnswerStatus.class,
-            names = {"EVALUATING", "EVALUATED"}
+            names = {"EVALUATED"}
     )
     void shouldRejectAnswerStatusThatCannotEnterEvaluation(
             InterviewAnswerStatus status
@@ -378,6 +382,153 @@ class InterviewWorkflowServiceTest {
                 evaluationOrchestrationService,
                 transactionService
         );
+        verify(interviewQuestionMapper, never())
+                .findNextPendingMainQuestion(any(), any());
+    }
+
+    @Test
+    void shouldRejectFreshEvaluatingAnswerWithoutReclaiming() {
+        InterviewAnswer answer = answer(
+                InterviewAnswerStatus.EVALUATING,
+                MAIN_QUESTION_ID
+        );
+        answer.setUpdatedAt(LocalDateTime.now());
+        InterviewQuestion main = mainQuestion();
+        when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID))
+                .thenReturn(answer);
+        when(interviewQuestionMapper.getInterviewQuestionById(
+                MAIN_QUESTION_ID
+        )).thenReturn(main);
+        when(interviewSessionMapper.getInterviewSessionById(
+                SESSION_ID
+        )).thenReturn(session(MAIN_QUESTION_ID));
+
+        assertThatThrownBy(
+                () -> service.evaluateAnswer(ANSWER_ID)
+        )
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("答案正在评估中，请稍后重试");
+
+        verifyNoInteractions(evaluationOrchestrationService);
+        verify(transactionService, never()).claimEvaluation(ANSWER_ID);
+        verify(transactionService, never()).retryEvaluation(ANSWER_ID);
+        verify(transactionService, never())
+                .tryReclaimStaleEvaluating(any(), any());
+        verify(interviewQuestionMapper, never())
+                .findNextPendingMainQuestion(any(), any());
+    }
+
+    @Test
+    void shouldResumeStaleEvaluatingThroughPersistedEvaluationWithoutNewClaim() {
+        InterviewAnswer answer = answer(
+                InterviewAnswerStatus.EVALUATING,
+                MAIN_QUESTION_ID
+        );
+        answer.setUpdatedAt(LocalDateTime.now().minusMinutes(11));
+        InterviewQuestion main = mainQuestion();
+        InterviewQuestion nextMain = nextMainQuestion();
+        InterviewSession session = session(MAIN_QUESTION_ID);
+        stubMainWorkflow(
+                InterviewAnswerStatus.EVALUATING,
+                main,
+                session,
+                nextMain
+        );
+        when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID))
+                .thenReturn(answer);
+        when(transactionService.tryReclaimStaleEvaluating(
+                eq(ANSWER_ID),
+                any()
+        )).thenReturn(true);
+        when(evaluationOrchestrationService.evaluate(
+                ANSWER_ID,
+                true
+        )).thenReturn(finalResult(DecisionAction.NEXT_MAIN));
+
+        service.evaluateAnswer(ANSWER_ID);
+
+        verify(transactionService).tryReclaimStaleEvaluating(
+                eq(ANSWER_ID),
+                any()
+        );
+        verify(transactionService, never()).claimEvaluation(ANSWER_ID);
+        verify(transactionService, never()).retryEvaluation(ANSWER_ID);
+        verify(evaluationOrchestrationService).evaluate(ANSWER_ID, true);
+        verify(transactionService).advanceToNextMain(
+                ANSWER_ID,
+                main,
+                session,
+                nextMain
+        );
+    }
+
+    @Test
+    void shouldRetryStaleEvaluatingWhenReclaimLosesAndAnswerIsFailed() {
+        InterviewAnswer stale = answer(
+                InterviewAnswerStatus.EVALUATING,
+                MAIN_QUESTION_ID
+        );
+        stale.setUpdatedAt(LocalDateTime.now().minusMinutes(11));
+        InterviewAnswer failed = answer(
+                InterviewAnswerStatus.FAILED,
+                MAIN_QUESTION_ID
+        );
+        InterviewQuestion main = mainQuestion();
+        InterviewQuestion nextMain = nextMainQuestion();
+        InterviewSession session = session(MAIN_QUESTION_ID);
+        stubMainWorkflow(
+                InterviewAnswerStatus.EVALUATING,
+                main,
+                session,
+                nextMain
+        );
+        when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID))
+                .thenReturn(stale, failed);
+        when(transactionService.tryReclaimStaleEvaluating(
+                eq(ANSWER_ID),
+                any()
+        )).thenReturn(false);
+        when(evaluationOrchestrationService.evaluate(ANSWER_ID, true))
+                .thenReturn(finalResult(DecisionAction.NEXT_MAIN));
+
+        service.evaluateAnswer(ANSWER_ID);
+
+        verify(transactionService, never()).claimEvaluation(ANSWER_ID);
+        verify(transactionService).retryEvaluation(ANSWER_ID);
+        verify(evaluationOrchestrationService).evaluate(ANSWER_ID, true);
+        verify(transactionService).advanceToNextMain(
+                ANSWER_ID,
+                main,
+                session,
+                nextMain
+        );
+    }
+
+    @Test
+    void shouldRejectStaleEvaluatingWhenReclaimLosesAndAnswerStillEvaluating() {
+        InterviewAnswer stale = answer(
+                InterviewAnswerStatus.EVALUATING,
+                MAIN_QUESTION_ID
+        );
+        stale.setUpdatedAt(LocalDateTime.now().minusMinutes(11));
+        InterviewQuestion main = mainQuestion();
+        when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID))
+                .thenReturn(stale);
+        when(interviewQuestionMapper.getInterviewQuestionById(MAIN_QUESTION_ID))
+                .thenReturn(main);
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+                .thenReturn(session(MAIN_QUESTION_ID));
+        when(transactionService.tryReclaimStaleEvaluating(
+                eq(ANSWER_ID),
+                any()
+        )).thenReturn(false);
+
+        assertThatThrownBy(() -> service.evaluateAnswer(ANSWER_ID))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("答案正在评估中，请稍后重试");
+
+        verifyNoInteractions(evaluationOrchestrationService);
+        verify(transactionService, never()).retryEvaluation(ANSWER_ID);
         verify(interviewQuestionMapper, never())
                 .findNextPendingMainQuestion(any(), any());
     }

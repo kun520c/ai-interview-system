@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -22,6 +23,8 @@ import java.time.Duration;
 public class EmbeddingProperties {
 
     public static final int MAX_BATCH_SIZE = 20;
+    public static final int MAX_MODEL_LENGTH = 100;
+    public static final int MAX_PROFILE_VERSION_LENGTH = 50;
 
     @NotNull(message = "Embedding 服务地址不能为空")
     private URI baseUrl;
@@ -30,6 +33,7 @@ public class EmbeddingProperties {
     private String apiKey;
 
     @NotBlank(message = "Embedding 模型名称不能为空")
+    @Size(max = MAX_MODEL_LENGTH, message = "Embedding 模型名称长度不能超过100")
     private String model;
 
     @Positive(message = "Embedding 向量维度必须大于 0")
@@ -40,6 +44,10 @@ public class EmbeddingProperties {
     private int batchSize;
 
     @NotBlank(message = "Embedding 配置版本不能为空")
+    @Size(
+            max = MAX_PROFILE_VERSION_LENGTH,
+            message = "Embedding 配置版本长度不能超过50"
+    )
     private String profileVersion;
 
     @NotNull(message = "Embedding 连接超时时间不能为空")

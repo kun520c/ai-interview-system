@@ -106,4 +106,24 @@
             AND processing_status = 'UPLOADED'
     </update>
 
+    <update id="reclaimStaleProcessing">
+        UPDATE knowledge_document
+        SET
+        error_message = NULL,
+        updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+            AND processing_status = 'PROCESSING'
+            AND updated_at &lt;= #{cutoff}
+    </update>
+
+    <update id="claimFailedProcessing">
+        UPDATE knowledge_document
+        SET
+        processing_status = 'PROCESSING',
+        error_message = NULL,
+        updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+            AND processing_status = 'FAILED'
+    </update>
+
 </mapper>

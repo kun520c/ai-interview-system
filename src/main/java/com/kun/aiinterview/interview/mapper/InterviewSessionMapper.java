@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -52,6 +53,11 @@ public interface InterviewSessionMapper {
             @Param("expectedVersion") Integer expectedVersion,
             @Param("expectedReportStatus")
             InterviewReportStatus expectedReportStatus
+    );
+
+    int reclaimStaleGenerating(
+            @Param("id") Long id,
+            @Param("cutoff") LocalDateTime cutoff
     );
 
     int markReportReady(

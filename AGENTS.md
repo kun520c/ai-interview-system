@@ -397,7 +397,7 @@ External Interview API          COMPLETE
 Interview Report                COMPLETE
 User Weakness                   COMPLETE
 Interview History / Detail      COMPLETE
-Phase 5 Repair Batch 3          COMPLETE
+Phase 5 Repair Batch 4          COMPLETE
 
 → Next stage:
 MVP Full Code Review / Final Regression
@@ -1009,6 +1009,17 @@ Phase 5 Backend Repair Batch 3 completed capability on 2026-09-20:
 * API error semantics are explicit and stable: `400` validation/business input, `401` authentication, `403` real authorization denial on `/api/admin/**`, `404` missing resources and non-disclosing ownership failures (`面试会话不存在` / `面试问题不存在` / `题目不存在`), `405` unsupported method, `409` idempotency and state conflicts including EVALUATING retry and report GENERATING, `413` multipart oversize, `502` sanitized external-dependency failure (`外部服务暂时不可用`), and `500` unexpected server defects. Spring Security filter-chain 401/403 handlers are unchanged. This batch does not implement EVALUATING crash recovery.
 * The first Batch 3 focused run executed 292 tests with 1 failure (WebMvcTest probe controller was not registered, so a missing required parameter returned 404 instead of 400). After registering the probe controller, `HttpErrorTaxonomyControllerTest` reran 13 tests with 0 failures, 0 errors, and 0 skipped. The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1270 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`. All `RUN_REAL_*`, `MILVUS_ENABLED`, and `DEEPSEEK_ENABLED` switches were disabled; no real Bailian, DeepSeek, or Milvus request was made.
 
+Phase 5 Backend Repair Batch 4 completed capability on 2026-09-20:
+
+* Bounded stale recovery is request-driven CAS, not a startup sweep, scheduler, Redis lock, or MQ. Stale means `durable in-progress AND updated_at <= now - threshold`. Central `recovery.*` defaults are EVALUATING 10m, GENERATING 10m, and PROCESSING 15m, with a 1-minute minimum. Fresh in-progress states remain HTTP 409 and are not reclaimed.
+* Stale reclaim is a single-winner conditional UPDATE that stays in the in-progress state and refreshes `updated_at` (report reclaim also increments Session `version`). The loser reloads the current row and follows the actual state. Recovery re-enters the normal lifecycle once; it does not loop or claim exactly-once external side effects.
+* Stale EVALUATING with no `AnswerEvaluation` reclaims then retries evaluation through the existing Workflow path. Stale EVALUATING with a persisted evaluation reuses `EvaluationOrchestrationService.getByAnswerId` and does not call DeepSeek again; Workflow then applies the existing decision. `UNIQUE(answer_id)`, follow-up reuse, and Session version CAS remain the duplicate-side-effect guards.
+* Stale GENERATING with no `interview_report` reclaims then retries generation. A durable report row is reconciled with `markReportReady` and does not call DeepSeek or `applySessionEvaluations()` again. Report insert, Weakness updates, and READY remain one short transaction. `UNIQUE(session_id)` continues to prevent a second report.
+* Knowledge `POST /api/admin/knowledge/documents/{documentId}/process` now occupies `UPLOADED`, `FAILED`, or stale `PROCESSING`. READY and fresh PROCESSING remain rejected (409). After occupy, Java always `deleteByDocumentId` then deletes leftover MySQL chunks for that document version before any new Milvus insert. Exact-ID `deleteByVectorIds` compensation is unchanged; compensation failure still preserves the primary exception, suppresses the delete failure, and marks `FAILED` so a later retry can reconcile by durable `documentId`.
+* `EmbeddingProperties` fail-fast validates `model` max 100 and `profileVersion` max 50, matching the narrowest MySQL VARCHAR contract. Invalid lengths fail at Spring configuration binding, not during processing. MySQL Schema, Milvus Collection, and `vector_id` length were not changed.
+* `application-test.yaml` now sets `deepseek.enabled=false` in addition to `milvus.enabled=false`. `local` then `test` keeps both flags false, so `InterviewWorkflowService` and other dual-flag production beans are not created from a local DeepSeek switch. Guarded `RUN_REAL_*` tests remain opt-in.
+* The Batch 4 focused run executed 259 tests with 0 failures, 0 errors, and 0 skipped, including real MySQL reclaim CAS and concurrent single-winner tests that seed old `updated_at` with JdbcTemplate rather than `Thread.sleep`. The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1308 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`. All `RUN_REAL_*`, `MILVUS_ENABLED`, and `DEEPSEEK_ENABLED` switches were disabled; no real Bailian, DeepSeek, or Milvus request was made.
+
 The following capabilities remain unimplemented:
 
 * Real DeepSeek integration verification
@@ -1026,10 +1037,7 @@ Other capabilities that also remain unimplemented include:
 * Tokenizer integration
 * Trustworthy real-model per-chunk token-count calculation
 * Production or remote Milvus deployment and operations verification
-* FB-004 EVALUATING crash recovery; an EVALUATING answer can still remain stuck after a process crash, and this batch only mapped that state to HTTP 409
-* Reproduction and verification of final-state recovery after a real network-layer timeout; current coverage consists of timeout-ambiguity-aware code, Mock tests, and real Milvus write plus deterministic post-write fault injection
-* FAILED-document retry
-* Document reprocessing
+* Reproduction and verification of final-state recovery after a real network-layer timeout; current coverage consists of timeout-ambiguity-aware code, Mock tests, real Milvus write plus deterministic post-write fault injection, and request-driven CAS stale recovery
 * READY-document reprocessing
 * A Retrieval Controller outside the future Interview Workflow
 * Markdown-heading-aware or code-block-aware chunking

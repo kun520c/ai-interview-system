@@ -108,6 +108,25 @@ public class InterviewWorkflowTransactionService {
     }
 
     @Transactional
+    public boolean tryReclaimStaleEvaluating(
+            Long answerId,
+            LocalDateTime cutoff
+    ) {
+        if (answerId == null || cutoff == null) {
+            throw new IllegalArgumentException(
+                    "answerId和cutoff不能为空"
+            );
+        }
+
+        int affectedRows =
+                interviewAnswerMapper.reclaimStaleEvaluating(
+                        answerId,
+                        cutoff
+                );
+        return affectedRows == 1;
+    }
+
+    @Transactional
     public void markEvaluationFailed(
             Long answerId,
             String errorCode

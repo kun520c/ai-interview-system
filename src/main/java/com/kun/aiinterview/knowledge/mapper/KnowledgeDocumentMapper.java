@@ -4,6 +4,8 @@ import com.kun.aiinterview.knowledge.entity.KnowledgeDocument;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
+
 @Mapper
 public interface KnowledgeDocumentMapper {
 
@@ -12,6 +14,13 @@ public interface KnowledgeDocumentMapper {
     KnowledgeDocument selectById(@Param("id") Long id);
 
     int claimProcessing(@Param("id") Long id);
+
+    int reclaimStaleProcessing(
+            @Param("id") Long id,
+            @Param("cutoff") LocalDateTime cutoff
+    );
+
+    int claimFailedProcessing(@Param("id") Long id);
 
     int markReady(@Param("id") Long id);
 

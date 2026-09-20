@@ -409,7 +409,7 @@ class InterviewServiceTest {
     @ParameterizedTest
     @EnumSource(
             value = InterviewAnswerStatus.class,
-            names = {"SUBMITTED", "FAILED"}
+            names = {"SUBMITTED", "FAILED", "EVALUATING"}
     )
     void shouldContinueWorkflowForRetryableExistingAnswer(
             InterviewAnswerStatus answerStatus
@@ -473,6 +473,10 @@ class InterviewServiceTest {
         when(interviewAnswerMapper.getInterviewAnswerByRequestId(
                 REQUEST_ID
         )).thenReturn(answer(InterviewAnswerStatus.EVALUATING));
+        when(workflowServiceProvider.getIfAvailable())
+                .thenReturn(workflowService);
+        when(workflowService.evaluateAnswer(ANSWER_ID))
+                .thenThrow(new ConflictException("答案正在评估中，请稍后重试"));
 
         assertThatThrownBy(() -> service.submitAnswer(
                 USER_ID,
@@ -481,7 +485,8 @@ class InterviewServiceTest {
         )).isInstanceOf(ConflictException.class)
                 .hasMessage("答案正在评估中，请稍后重试");
 
-        verifyNoInteractions(workflowServiceProvider, workflowService);
+        verify(workflowService).evaluateAnswer(ANSWER_ID);
+        verify(transactionService, never()).submitAnswer(any(), any());
     }
 
     @Test

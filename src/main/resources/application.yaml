@@ -47,6 +47,11 @@ milvus:
   connect-timeout: ${MILVUS_CONNECT_TIMEOUT:5s}
   request-timeout: ${MILVUS_REQUEST_TIMEOUT:10s}
 
+recovery:
+  evaluating-stale-threshold: ${RECOVERY_EVALUATING_STALE_THRESHOLD:10m}
+  generating-stale-threshold: ${RECOVERY_GENERATING_STALE_THRESHOLD:10m}
+  processing-stale-threshold: ${RECOVERY_PROCESSING_STALE_THRESHOLD:15m}
+
 deepseek:
   enabled: ${DEEPSEEK_ENABLED:false}
   base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}

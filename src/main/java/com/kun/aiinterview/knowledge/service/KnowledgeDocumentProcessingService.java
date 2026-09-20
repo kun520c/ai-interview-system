@@ -1,6 +1,9 @@
 package com.kun.aiinterview.knowledge.service;
 
 import com.kun.aiinterview.common.exception.BusinessException;
+import com.kun.aiinterview.common.exception.ConflictException;
+import com.kun.aiinterview.common.exception.ResourceNotFoundException;
+import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
 import com.kun.aiinterview.knowledge.chunk.KnowledgeChunkDraft;
 import com.kun.aiinterview.knowledge.chunk.KnowledgeTextChunker;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingBatchResult;
@@ -10,6 +13,7 @@ import com.kun.aiinterview.knowledge.entity.KnowledgeChunk;
 import com.kun.aiinterview.knowledge.entity.KnowledgeDocument;
 import com.kun.aiinterview.knowledge.enums.KnowledgeChunkStatus;
 import com.kun.aiinterview.knowledge.enums.KnowledgeProcessingStatus;
+import com.kun.aiinterview.knowledge.mapper.KnowledgeChunkMapper;
 import com.kun.aiinterview.knowledge.mapper.KnowledgeDocumentMapper;
 import com.kun.aiinterview.knowledge.vector.VectorStoreClient;
 import com.kun.aiinterview.knowledge.vector.VectorWriteItem;
@@ -33,19 +37,17 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class KnowledgeDocumentProcessingService {
     private final KnowledgeDocumentMapper knowledgeDocumentMapper;
+    private final KnowledgeChunkMapper knowledgeChunkMapper;
     private final KnowledgeTextChunker knowledgeTextChunker;
     private final EmbeddingClient embeddingClient;
     private final VectorStoreClient vectorStoreClient;
     private final KnowledgeDocumentProcessingTransactionService knowledgeDocumentProcessingTransactionService;
+    private final StaleRecoveryProperties staleRecoveryProperties;
 
     public void processDocument(Long documentId) {
         validateDocumentId(documentId);
 
-        int claimedRows = knowledgeDocumentMapper.claimProcessing(documentId);
-
-        if (claimedRows != 1) {
-            throw new BusinessException("文档不存在或当前不允许处理");
-        }
+        KnowledgeDocument occupied = occupyProcessing(documentId);
 
         String failureMessage = "知识文档处理失败";
 
@@ -54,14 +56,12 @@ public class KnowledgeDocumentProcessingService {
         List<String> vectorIds = new ArrayList<>();
 
         try {
-            KnowledgeDocument document = knowledgeDocumentMapper.selectById(documentId);
-
-            validateClaimedDocument(document);
+            reconcileExistingVectors(occupied);
 
             failureMessage = "知识文档切片失败";
 
             List<KnowledgeChunkDraft> drafts = knowledgeTextChunker.split(
-                    document.getContent()
+                    occupied.getContent()
             );
 
             List<String> texts = drafts.stream()
@@ -81,7 +81,7 @@ public class KnowledgeDocumentProcessingService {
 
             ProcessingItems processingItems =
                         buildProcessingItems(
-                                document,
+                                occupied,
                                 drafts,
                                 embeddingResult,
                                 orderedVectors,
@@ -118,6 +118,100 @@ public class KnowledgeDocumentProcessingService {
 
             throw originalException;
         }
+    }
+
+    private KnowledgeDocument occupyProcessing(Long documentId) {
+        KnowledgeDocument document =
+                knowledgeDocumentMapper.selectById(documentId);
+        if (document == null) {
+            throw new ResourceNotFoundException("知识文档不存在");
+        }
+
+        KnowledgeProcessingStatus status =
+                document.getProcessingStatus();
+        if (status == KnowledgeProcessingStatus.READY) {
+            throw new ConflictException(
+                    "文档已处理完成，不能重复处理"
+            );
+        }
+        if (status == KnowledgeProcessingStatus.PROCESSING) {
+            occupyStaleProcessing(document);
+        } else if (status == KnowledgeProcessingStatus.FAILED) {
+            occupyFailedProcessing(documentId);
+        } else if (status == KnowledgeProcessingStatus.UPLOADED) {
+            occupyUploaded(documentId);
+        } else {
+            throw new ConflictException(
+                    "文档当前状态不允许处理"
+            );
+        }
+
+        KnowledgeDocument occupied =
+                knowledgeDocumentMapper.selectById(documentId);
+        validateClaimedDocument(occupied);
+        return occupied;
+    }
+
+    private void occupyUploaded(Long documentId) {
+        int claimedRows =
+                knowledgeDocumentMapper.claimProcessing(documentId);
+        if (claimedRows == 1) {
+            return;
+        }
+        rejectLostProcessingRace(documentId);
+    }
+
+    private void occupyFailedProcessing(Long documentId) {
+        int claimedRows =
+                knowledgeDocumentMapper.claimFailedProcessing(documentId);
+        if (claimedRows == 1) {
+            return;
+        }
+        rejectLostProcessingRace(documentId);
+    }
+
+    private void occupyStaleProcessing(KnowledgeDocument document) {
+        if (!staleRecoveryProperties
+                .isProcessingStale(document.getUpdatedAt())) {
+            throw new ConflictException(
+                    "文档正在处理中，请稍后重试"
+            );
+        }
+
+        int reclaimed =
+                knowledgeDocumentMapper.reclaimStaleProcessing(
+                        document.getId(),
+                        staleRecoveryProperties.processingCutoff()
+                );
+        if (reclaimed == 1) {
+            return;
+        }
+        rejectLostProcessingRace(document.getId());
+    }
+
+    private void rejectLostProcessingRace(Long documentId) {
+        KnowledgeDocument latest =
+                knowledgeDocumentMapper.selectById(documentId);
+        if (latest == null) {
+            throw new ResourceNotFoundException("知识文档不存在");
+        }
+        if (latest.getProcessingStatus()
+                == KnowledgeProcessingStatus.READY) {
+            throw new ConflictException(
+                    "文档已处理完成，不能重复处理"
+            );
+        }
+        throw new ConflictException(
+                "文档正在处理中，请稍后重试"
+        );
+    }
+
+    private void reconcileExistingVectors(KnowledgeDocument document) {
+        vectorStoreClient.deleteByDocumentId(document.getId());
+        knowledgeChunkMapper.deleteByDocumentIdAndVersion(
+                document.getId(),
+                document.getDocumentVersion()
+        );
     }
 
     private ProcessingItems buildProcessingItems(

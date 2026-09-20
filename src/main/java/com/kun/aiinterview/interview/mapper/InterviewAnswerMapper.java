@@ -4,6 +4,7 @@ import com.kun.aiinterview.interview.entity.InterviewAnswer;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -26,6 +27,11 @@ public interface InterviewAnswerMapper {
     int claimEvaluation(@Param("id") Long id);
 
     int retryEvaluation(@Param("id") Long id);
+
+    int reclaimStaleEvaluating(
+            @Param("id") Long id,
+            @Param("cutoff") LocalDateTime cutoff
+    );
 
     int markEvaluated(@Param("id") Long id);
 

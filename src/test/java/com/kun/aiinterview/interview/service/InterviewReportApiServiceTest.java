@@ -2,6 +2,7 @@ package com.kun.aiinterview.interview.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.common.exception.ResourceNotFoundException;
+import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
 import com.kun.aiinterview.interview.entity.InterviewReport;
 import com.kun.aiinterview.interview.entity.InterviewSession;
 import com.kun.aiinterview.interview.enums.InterviewReportStatus;
@@ -62,7 +63,8 @@ class InterviewReportApiServiceTest {
                 answerEvaluationMapper,
                 transactionService,
                 generatorProvider,
-                new ObjectMapper()
+                new ObjectMapper(),
+                new StaleRecoveryProperties()
         );
     }
 

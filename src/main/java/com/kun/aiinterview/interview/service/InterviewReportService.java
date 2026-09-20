@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.common.exception.BusinessException;
 import com.kun.aiinterview.common.exception.ConflictException;
 import com.kun.aiinterview.common.exception.ResourceNotFoundException;
+import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.entity.InterviewReport;
 import com.kun.aiinterview.interview.entity.InterviewSession;
@@ -39,6 +40,7 @@ public class InterviewReportService {
     private final InterviewReportTransactionService transactionService;
     private final ObjectProvider<InterviewReportGenerator> generatorProvider;
     private final ObjectMapper objectMapper;
+    private final StaleRecoveryProperties staleRecoveryProperties;
 
     public InterviewReportResponse getReport(
             Long userId,
@@ -104,45 +106,64 @@ public class InterviewReportService {
             return existingReport;
         }
 
-        InterviewReportGenerator generator = requireGenerator();
-        claimReportGeneration(session);
+        InterviewSession latest = loadOwnedSession(sessionId, userId);
+        validateCompleted(latest);
+        InterviewReportGenerator generator =
+                requireGeneratorFor(latest);
+
+        if (latest.getReportStatus()
+                != InterviewReportStatus.GENERATING) {
+            claimReportGeneration(latest);
+        }
 
         try {
-            InterviewSession generatingSession =
-                    reloadGeneratingSession(sessionId, userId);
-            List<AnswerEvaluation> evaluations =
-                    answerEvaluationMapper
-                            .listFinalEffectiveEvaluationsBySessionId(
-                                    sessionId
-                            );
-            validateEvaluations(
-                    generatingSession,
-                    evaluations
-            );
-
-            BigDecimal overallScore =
-                    calculateOverallScore(evaluations);
-            InterviewReportGenerationResult generationResult =
-                    generator.generate(
-                            generatingSession,
-                            List.copyOf(evaluations),
-                            overallScore
-                    );
-            InterviewReport report = buildReport(
+            return generateClaimedReport(
+                    userId,
                     sessionId,
-                    overallScore,
-                    generationResult
-            );
-
-            return transactionService.completeReportGeneration(
-                    report,
-                    generatingSession,
-                    evaluations
+                    generator
             );
         } catch (RuntimeException original) {
             recoverReportFailure(sessionId, original);
             throw original;
         }
+    }
+
+    private InterviewReport generateClaimedReport(
+            Long userId,
+            Long sessionId,
+            InterviewReportGenerator generator
+    ) {
+        InterviewSession generatingSession =
+                reloadGeneratingSession(sessionId, userId);
+        List<AnswerEvaluation> evaluations =
+                answerEvaluationMapper
+                        .listFinalEffectiveEvaluationsBySessionId(
+                                sessionId
+                        );
+        validateEvaluations(
+                generatingSession,
+                evaluations
+        );
+
+        BigDecimal overallScore =
+                calculateOverallScore(evaluations);
+        InterviewReportGenerationResult generationResult =
+                generator.generate(
+                        generatingSession,
+                        List.copyOf(evaluations),
+                        overallScore
+                );
+        InterviewReport report = buildReport(
+                sessionId,
+                overallScore,
+                generationResult
+        );
+
+        return transactionService.completeReportGeneration(
+                report,
+                generatingSession,
+                evaluations
+        );
     }
 
     private InterviewSession loadOwnedSession(Long sessionId, Long userId) {
@@ -183,11 +204,87 @@ public class InterviewReportService {
                 }
                 yield report;
             }
+            case GENERATING -> recoverGenerating(session);
+            case NOT_STARTED, FAILED -> null;
+        };
+    }
+
+    private InterviewReport recoverGenerating(InterviewSession session) {
+        if (!staleRecoveryProperties
+                .isGeneratingStale(session.getUpdatedAt())) {
+            throw new ConflictException(
+                    "报告正在生成中，请稍后重试"
+            );
+        }
+
+        int reclaimed = interviewSessionMapper.reclaimStaleGenerating(
+                session.getId(),
+                staleRecoveryProperties.generatingCutoff()
+        );
+        if (reclaimed == 1) {
+            return existingReportOrContinue(session);
+        }
+
+        InterviewSession latest = interviewSessionMapper
+                .getInterviewSessionById(session.getId());
+        if (latest == null) {
+            throw new IllegalStateException(
+                    "Report恢复时Session不存在"
+            );
+        }
+        if (!Objects.equals(latest.getUserId(), session.getUserId())) {
+            throw new IllegalStateException(
+                    "Report恢复后Session不属于当前用户"
+            );
+        }
+
+        return switch (latest.getReportStatus()) {
+            case READY -> {
+                InterviewReport report = interviewReportMapper
+                        .getBySessionId(latest.getId());
+                if (report == null) {
+                    throw new IllegalStateException(
+                            "Session为READY但Report不存在"
+                    );
+                }
+                yield report;
+            }
+            case FAILED, NOT_STARTED -> null;
             case GENERATING -> throw new ConflictException(
                     "报告正在生成中，请稍后重试"
             );
-            case NOT_STARTED, FAILED -> null;
         };
+    }
+
+    private InterviewReport existingReportOrContinue(
+            InterviewSession session
+    ) {
+        InterviewReport report = interviewReportMapper
+                .getBySessionId(session.getId());
+        if (report == null) {
+            return null;
+        }
+
+        InterviewSession generating = reloadGeneratingSession(
+                session.getId(),
+                session.getUserId()
+        );
+        if (report.getOverallScore() == null) {
+            throw new IllegalStateException(
+                    "已有Report缺少overallScore"
+            );
+        }
+        int affectedRows = interviewSessionMapper.markReportReady(
+                generating.getId(),
+                generating.getVersion(),
+                report.getOverallScore()
+        );
+        if (affectedRows != 1) {
+            throw new IllegalStateException(
+                    "已有Report时READY状态恢复失败"
+            );
+        }
+        return report;
     }
 
     private InterviewReportGenerator requireGenerator() {
@@ -199,6 +296,20 @@ public class InterviewReportService {
             );
         }
         return generator;
+    }
+
+    private InterviewReportGenerator requireGeneratorFor(
+            InterviewSession session
+    ) {
+        try {
+            return requireGenerator();
+        } catch (BusinessException exception) {
+            if (session.getReportStatus()
+                    == InterviewReportStatus.GENERATING) {
+                recoverReportFailure(session.getId(), exception);
+            }
+            throw exception;
+        }
     }
 
     private void claimReportGeneration(InterviewSession session) {

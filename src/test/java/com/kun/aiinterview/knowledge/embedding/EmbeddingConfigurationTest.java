@@ -63,6 +63,54 @@ class EmbeddingConfigurationTest {
     }
 
     @Test
+    void shouldAcceptModelLengthAtMysqlPersistenceLimit() {
+        contextRunner.withPropertyValues(
+                        "embedding.model=" + "m".repeat(100)
+                )
+                .run(context -> {
+                    assertThat(context).hasNotFailed();
+                    assertThat(context.getBean(EmbeddingProperties.class)
+                            .getModel()).hasSize(100);
+                });
+    }
+
+    @Test
+    void shouldFailFastWhenModelExceedsMysqlPersistenceLimit() {
+        contextRunner.withPropertyValues(
+                        "embedding.model=" + "m".repeat(101)
+                )
+                .run(context -> {
+                    assertThat(context).hasFailed();
+                    assertThat(context.getStartupFailure())
+                            .hasStackTraceContaining("model");
+                });
+    }
+
+    @Test
+    void shouldAcceptProfileVersionLengthAtMysqlPersistenceLimit() {
+        contextRunner.withPropertyValues(
+                        "embedding.profile-version=" + "p".repeat(50)
+                )
+                .run(context -> {
+                    assertThat(context).hasNotFailed();
+                    assertThat(context.getBean(EmbeddingProperties.class)
+                            .getProfileVersion()).hasSize(50);
+                });
+    }
+
+    @Test
+    void shouldFailFastWhenProfileVersionExceedsMysqlPersistenceLimit() {
+        contextRunner.withPropertyValues(
+                        "embedding.profile-version=" + "p".repeat(51)
+                )
+                .run(context -> {
+                    assertThat(context).hasFailed();
+                    assertThat(context.getStartupFailure())
+                            .hasStackTraceContaining("profileVersion");
+                });
+    }
+
+    @Test
     void shouldRejectNullPrimitiveVectorValuesOnDedicatedMapperOnly()
             throws Exception {
         ObjectMapper applicationMapper =

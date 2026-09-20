@@ -34,6 +34,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -189,6 +190,43 @@ class InterviewWorkflowTransactionServiceTest {
                 .hasMessage("Answer评价重试资格抢占失败");
 
         verifyNoInteractions(
+                interviewQuestionMapper,
+                interviewSessionMapper
+        );
+    }
+
+    @Test
+    void shouldReturnWhetherStaleEvaluatingReclaimWon() {
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
+        when(interviewAnswerMapper.reclaimStaleEvaluating(ANSWER_ID, cutoff))
+                .thenReturn(1, 0);
+
+        assertThat(service.tryReclaimStaleEvaluating(ANSWER_ID, cutoff)).isTrue();
+        assertThat(service.tryReclaimStaleEvaluating(ANSWER_ID, cutoff)).isFalse();
+
+        verify(interviewAnswerMapper, times(2))
+                .reclaimStaleEvaluating(ANSWER_ID, cutoff);
+        verifyNoInteractions(
+                interviewQuestionMapper,
+                interviewSessionMapper
+        );
+    }
+
+    @Test
+    void shouldRejectBlankIdentifiersForStaleEvaluatingReclaim() {
+        assertThatThrownBy(
+                () -> service.tryReclaimStaleEvaluating(null, LocalDateTime.now())
+        )
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("answerId和cutoff不能为空");
+        assertThatThrownBy(
+                () -> service.tryReclaimStaleEvaluating(ANSWER_ID, null)
+        )
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("answerId和cutoff不能为空");
+
+        verifyNoInteractions(
+                interviewAnswerMapper,
                 interviewQuestionMapper,
                 interviewSessionMapper
         );

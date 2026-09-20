@@ -1,7 +1,9 @@
 package com.kun.aiinterview.knowledge.service;
 
+import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
 import com.kun.aiinterview.knowledge.chunk.KnowledgeTextChunker;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingClient;
+import com.kun.aiinterview.knowledge.mapper.KnowledgeChunkMapper;
 import com.kun.aiinterview.knowledge.mapper.KnowledgeDocumentMapper;
 import com.kun.aiinterview.knowledge.vector.VectorStoreClient;
 import org.junit.jupiter.api.Test;
@@ -55,6 +57,14 @@ class KnowledgeDocumentProcessingServiceConfigurationTest {
                         () -> mock(
                                 KnowledgeDocumentProcessingTransactionService.class
                         )
+                )
+                .withBean(
+                        KnowledgeChunkMapper.class,
+                        () -> mock(KnowledgeChunkMapper.class)
+                )
+                .withBean(
+                        StaleRecoveryProperties.class,
+                        StaleRecoveryProperties::new
                 )
                 .run(context -> {
                     assertThat(context).hasNotFailed();

@@ -12,6 +12,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -543,6 +545,70 @@ class InterviewSessionMapperTest {
         );
     }
 
+    @Test
+    void shouldReclaimStaleGeneratingAndRejectFreshGenerating() {
+        long staleSessionId = insertSession(
+                insertUser(),
+                "MEDIUM",
+                "COMPLETED",
+                1,
+                1,
+                null,
+                "GENERATING",
+                4
+        );
+        long freshSessionId = insertSession(
+                insertUser(),
+                "MEDIUM",
+                "COMPLETED",
+                1,
+                1,
+                null,
+                "GENERATING",
+                4
+        );
+        LocalDateTime staleAt = LocalDateTime.now().minusMinutes(20);
+        setSessionUpdatedAt(staleSessionId, staleAt);
+        setSessionUpdatedAt(freshSessionId, LocalDateTime.now());
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
+
+        assertEquals(
+                1,
+                interviewSessionMapper.reclaimStaleGenerating(
+                        staleSessionId,
+                        cutoff
+                )
+        );
+        InterviewSession reclaimed = interviewSessionMapper
+                .getInterviewSessionById(staleSessionId);
+        assertAll(
+                () -> assertEquals(
+                        InterviewReportStatus.GENERATING,
+                        reclaimed.getReportStatus()
+                ),
+                () -> assertEquals(5, reclaimed.getVersion())
+        );
+        assertEquals(
+                0,
+                interviewSessionMapper.reclaimStaleGenerating(
+                        staleSessionId,
+                        cutoff
+                )
+        );
+        assertEquals(
+                0,
+                interviewSessionMapper.reclaimStaleGenerating(
+                        freshSessionId,
+                        cutoff
+                )
+        );
+        assertEquals(
+                4,
+                interviewSessionMapper.getInterviewSessionById(freshSessionId)
+                        .getVersion()
+        );
+    }
+
     private long insertUser() {
         String uniqueValue = uniqueValue();
         String account = "session-" + uniqueValue;
@@ -687,6 +753,21 @@ class InterviewSessionMapperTest {
                         WHERE id = ?
                         """,
                         questionId,
+                        sessionId
+                )
+        );
+    }
+
+    private void setSessionUpdatedAt(long sessionId, LocalDateTime updatedAt) {
+        assertEquals(
+                1,
+                jdbcTemplate.update(
+                        """
+                        UPDATE interview_session
+                        SET updated_at = ?
+                        WHERE id = ?
+                        """,
+                        Timestamp.valueOf(updatedAt),
                         sessionId
                 )
         );

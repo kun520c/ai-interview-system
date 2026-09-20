@@ -115,6 +115,16 @@
             AND status = 'FAILED'
     </update>
 
+    <update id="reclaimStaleEvaluating">
+        UPDATE interview_answer
+        SET
+            updated_at = CURRENT_TIMESTAMP,
+            error_code = NULL
+        WHERE id = #{id}
+            AND status = 'EVALUATING'
+            AND updated_at &lt;= #{cutoff}
+    </update>
+
     <update id="markEvaluated">
         UPDATE interview_answer
         SET

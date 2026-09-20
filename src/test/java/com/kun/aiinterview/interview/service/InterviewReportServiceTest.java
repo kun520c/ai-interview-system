@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.common.exception.BusinessException;
 import com.kun.aiinterview.common.exception.ConflictException;
 import com.kun.aiinterview.common.exception.ResourceNotFoundException;
+import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.entity.InterviewReport;
 import com.kun.aiinterview.interview.entity.InterviewSession;
@@ -24,11 +25,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -217,6 +220,74 @@ class InterviewReportServiceTest {
         verifyNoInteractions(generatorProvider, generator);
         verify(interviewSessionMapper, never())
                 .claimReportGeneration(any(), any(), any());
+        verify(interviewSessionMapper, never())
+                .reclaimStaleGenerating(any(), any());
+    }
+
+    @Test
+    void shouldRetryStaleGeneratingWhenReportDoesNotExist() {
+        InterviewSession stale = generatingSession();
+        stale.setUpdatedAt(LocalDateTime.now().minusMinutes(11));
+        stale.setVersion(INITIAL_VERSION);
+        InterviewSession reclaimed = generatingSession();
+        List<AnswerEvaluation> evaluations = evaluations(70, 80, 90);
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+                .thenReturn(stale, reclaimed, reclaimed);
+        when(interviewSessionMapper.reclaimStaleGenerating(eq(SESSION_ID), any()))
+                .thenReturn(1);
+        when(interviewReportMapper.getBySessionId(SESSION_ID)).thenReturn(null);
+        when(generatorProvider.getIfAvailable()).thenReturn(generator);
+        when(answerEvaluationMapper.listFinalEffectiveEvaluationsBySessionId(
+                SESSION_ID
+        )).thenReturn(evaluations);
+        when(generator.generate(any(), any(), any()))
+                .thenReturn(generationResult());
+        when(transactionService.completeReportGeneration(any(), any(), any()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        InterviewReport result = service.generateReport(USER_ID, SESSION_ID);
+
+        assertThat(result.getOverallScore()).isEqualByComparingTo("80.00");
+        verify(interviewSessionMapper).reclaimStaleGenerating(
+                eq(SESSION_ID),
+                any()
+        );
+        verify(interviewSessionMapper, never())
+                .claimReportGeneration(any(), any(), any());
+        verify(generator).generate(any(), any(), any());
+        verify(transactionService).completeReportGeneration(any(), any(), any());
+    }
+
+    @Test
+    void shouldReconcileStaleGeneratingWhenReportAlreadyExistsWithoutCallingGenerator() {
+        InterviewSession stale = generatingSession();
+        stale.setUpdatedAt(LocalDateTime.now().minusMinutes(11));
+        InterviewSession reclaimed = generatingSession();
+        InterviewReport existing = report();
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+                .thenReturn(stale, reclaimed);
+        when(interviewSessionMapper.reclaimStaleGenerating(eq(SESSION_ID), any()))
+                .thenReturn(1);
+        when(interviewReportMapper.getBySessionId(SESSION_ID)).thenReturn(existing);
+        when(interviewSessionMapper.markReportReady(
+                SESSION_ID,
+                GENERATING_VERSION,
+                existing.getOverallScore()
+        )).thenReturn(1);
+
+        InterviewReport result = service.generateReport(USER_ID, SESSION_ID);
+
+        assertThat(result).isSameAs(existing);
+        verify(interviewSessionMapper).markReportReady(
+                SESSION_ID,
+                GENERATING_VERSION,
+                existing.getOverallScore()
+        );
+        verifyNoInteractions(generatorProvider, generator, transactionService);
+        verify(interviewSessionMapper, never())
+                .claimReportGeneration(any(), any(), any());
+        verify(answerEvaluationMapper, never())
+                .listFinalEffectiveEvaluationsBySessionId(any());
     }
 
     @Test
@@ -501,6 +572,9 @@ class InterviewReportServiceTest {
                         initialSession(
                                 InterviewReportStatus.NOT_STARTED
                         ),
+                        initialSession(
+                                InterviewReportStatus.NOT_STARTED
+                        ),
                         generatingSession(),
                         ready
                 );
@@ -557,7 +631,7 @@ class InterviewReportServiceTest {
         when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
                 .thenReturn(
                         initialSession(initialStatus),
-                        generatingSession(),
+                        initialSession(initialStatus),
                         generatingSession()
                 );
         when(generatorProvider.getIfAvailable()).thenReturn(generator);
@@ -580,7 +654,8 @@ class InterviewReportServiceTest {
                 answerEvaluationMapper,
                 transactionService,
                 generatorProvider,
-                objectMapper
+                objectMapper,
+                new StaleRecoveryProperties()
         );
     }
 

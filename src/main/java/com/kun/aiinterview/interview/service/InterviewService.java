@@ -444,10 +444,7 @@ public class InterviewService {
                     session.getId(),
                     answer.getId()
             );
-            case EVALUATING -> throw new ConflictException(
-                    "答案正在评估中，请稍后重试"
-            );
-            case SUBMITTED, FAILED -> {
+            case EVALUATING, SUBMITTED, FAILED -> {
                 validateNormalSubmission(session, question);
                 requireWorkflowService()
                         .evaluateAnswer(answer.getId());

@@ -2,6 +2,8 @@ package com.kun.aiinterview.interview.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kun.aiinterview.common.exception.ConflictException;
+import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
 import com.kun.aiinterview.interview.entity.InterviewAnswer;
 import com.kun.aiinterview.interview.entity.InterviewQuestion;
 import com.kun.aiinterview.interview.entity.InterviewSession;
@@ -40,6 +42,7 @@ public class InterviewWorkflowService {
     private final InterviewWorkflowTransactionService transactionService;
     private final EvaluationOrchestrationService evaluationOrchestrationService;
     private final ObjectMapper objectMapper;
+    private final StaleRecoveryProperties staleRecoveryProperties;
 
     public EvaluationOrchestrationResult evaluateAnswer(Long answerId) {
         if (answerId == null) {
@@ -125,7 +128,7 @@ public class InterviewWorkflowService {
                         session
                 );
 
-        validateAnswerStatus(answer);
+        claimOrRecoverEvaluation(answer);
 
         InterviewQuestion nextMain =
                 interviewQuestionMapper
@@ -135,8 +138,6 @@ public class InterviewWorkflowService {
                         );
 
         boolean hasNextMainQuestion = nextMain != null;
-
-        claimEvaluation(answer);
 
         try {
             EvaluationOrchestrationResult result =
@@ -165,18 +166,7 @@ public class InterviewWorkflowService {
         }
     }
 
-    private void validateAnswerStatus(InterviewAnswer answer) {
-        if (answer.getStatus()
-                != InterviewAnswerStatus.SUBMITTED
-                && answer.getStatus()
-                != InterviewAnswerStatus.FAILED) {
-            throw new IllegalStateException(
-                    "当前Answer状态不允许进入评价"
-            );
-        }
-    }
-
-    private void claimEvaluation(InterviewAnswer answer) {
+    private void claimOrRecoverEvaluation(InterviewAnswer answer) {
         if (answer.getStatus()
                 == InterviewAnswerStatus.SUBMITTED) {
             transactionService.claimEvaluation(
@@ -185,8 +175,58 @@ public class InterviewWorkflowService {
             return;
         }
 
-        transactionService.retryEvaluation(
-                answer.getId()
+        if (answer.getStatus()
+                == InterviewAnswerStatus.FAILED) {
+            transactionService.retryEvaluation(
+                    answer.getId()
+            );
+            return;
+        }
+
+        if (answer.getStatus()
+                != InterviewAnswerStatus.EVALUATING) {
+            throw new IllegalStateException(
+                    "当前Answer状态不允许进入评价"
+            );
+        }
+
+        recoverStaleEvaluating(answer);
+    }
+
+    private void recoverStaleEvaluating(InterviewAnswer answer) {
+        if (!staleRecoveryProperties
+                .isEvaluatingStale(answer.getUpdatedAt())) {
+            throw new ConflictException(
+                    "答案正在评估中，请稍后重试"
+            );
+        }
+
+        boolean reclaimed =
+                transactionService.tryReclaimStaleEvaluating(
+                        answer.getId(),
+                        staleRecoveryProperties.evaluatingCutoff()
+                );
+        if (reclaimed) {
+            return;
+        }
+
+        InterviewAnswer latest =
+                interviewAnswerMapper
+                        .getInterviewAnswerById(answer.getId());
+        if (latest == null) {
+            throw new IllegalStateException(
+                    "过期EVALUATING恢复后Answer不存在"
+            );
+        }
+
+        if (latest.getStatus()
+                == InterviewAnswerStatus.FAILED) {
+            transactionService.retryEvaluation(answer.getId());
+            return;
+        }
+
+        throw new ConflictException(
+                "答案正在评估中，请稍后重试"
         );
     }
 
