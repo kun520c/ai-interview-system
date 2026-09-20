@@ -36,6 +36,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -488,6 +489,8 @@ class AdminQuestionControllerTest {
         Claims claims = mock(Claims.class);
         when(claims.getSubject()).thenReturn("1001");
         when(jwtTokenService.parseAndValidate(token)).thenReturn(claims);
+        when(jwtTokenService.matchesCredentialVersion(any(), any()))
+                .thenReturn(true);
         when(userMapper.getUserById(1001L)).thenReturn(
                 User.builder()
                         .id(1001L)

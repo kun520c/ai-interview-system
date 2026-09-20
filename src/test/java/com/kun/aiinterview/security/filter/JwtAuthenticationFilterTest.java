@@ -121,6 +121,8 @@ class JwtAuthenticationFilterTest {
         when(userMapper.getUserById(USER_ID)).thenReturn(
                 user(UserRole.USER, UserStatus.ENABLED)
         );
+        when(jwtTokenService.matchesCredentialVersion(any(), any()))
+                .thenReturn(true);
         MockHttpServletRequest request = bearerRequest("Bearer " + TOKEN);
         MockHttpServletResponse response = new MockHttpServletResponse();
         FilterChain filterChain = mock(FilterChain.class);
@@ -277,6 +279,33 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
+    void shouldRejectTokenWhenCredentialVersionDoesNotMatchEvenIfIssuedAtSameSecond()
+            throws Exception {
+        LocalDateTime passwordChangedAt = LocalDateTime.of(
+                2026,
+                7,
+                21,
+                10,
+                0
+        );
+        Date issuedAt = toDate(passwordChangedAt);
+        stubPasswordChangeValidation(issuedAt, passwordChangedAt);
+        when(jwtTokenService.matchesCredentialVersion(any(), any()))
+                .thenReturn(false);
+
+        assertAuthenticationFailure("Bearer " + TOKEN);
+    }
+
+    @Test
+    void shouldRejectTokenWhenCredentialVersionClaimIsMissing() throws Exception {
+        stubValidUser(UserRole.USER, UserStatus.ENABLED);
+        when(jwtTokenService.matchesCredentialVersion(any(), any()))
+                .thenReturn(false);
+
+        assertAuthenticationFailure("Bearer " + TOKEN);
+    }
+
+    @Test
     void shouldAllowTokenIssuedAfterPasswordChange() throws Exception {
         LocalDateTime passwordChangedAt = LocalDateTime.of(
                 2026,
@@ -387,6 +416,8 @@ class JwtAuthenticationFilterTest {
     private void stubValidUser(UserRole role, UserStatus status) {
         stubClaims(USER_ID.toString());
         when(userMapper.getUserById(USER_ID)).thenReturn(user(role, status));
+        when(jwtTokenService.matchesCredentialVersion(any(), any()))
+                .thenReturn(true);
     }
 
     private void stubPasswordChangeValidation(
@@ -399,6 +430,8 @@ class JwtAuthenticationFilterTest {
         when(userMapper.getUserById(USER_ID)).thenReturn(
                 user(UserRole.USER, UserStatus.ENABLED, passwordChangedAt)
         );
+        when(jwtTokenService.matchesCredentialVersion(any(), any()))
+                .thenReturn(true);
     }
 
     private void assertPasswordChangeAuthenticationSucceeds(

@@ -167,7 +167,8 @@ class AdminKnowledgeDocumentProcessApiTest {
         return jwtTokenService.generateAccessToken(
                 user.getId(),
                 user.getAccount(),
-                user.getRole()
+                user.getRole(),
+                user.getPassword()
         );
     }
 }

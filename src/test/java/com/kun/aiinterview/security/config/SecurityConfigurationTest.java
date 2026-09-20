@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -161,6 +162,8 @@ class SecurityConfigurationTest {
         Claims claims = mock(Claims.class);
         when(claims.getSubject()).thenReturn("1001");
         when(jwtTokenService.parseAndValidate(token)).thenReturn(claims);
+        when(jwtTokenService.matchesCredentialVersion(any(), any()))
+                .thenReturn(true);
         when(userMapper.getUserById(1001L)).thenReturn(
                 User.builder()
                         .id(1001L)

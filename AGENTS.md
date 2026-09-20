@@ -397,6 +397,7 @@ External Interview API          COMPLETE
 Interview Report                COMPLETE
 User Weakness                   COMPLETE
 Interview History / Detail      COMPLETE
+Phase 5 Repair Batch 3          COMPLETE
 
 → Next stage:
 MVP Full Code Review / Final Regression
@@ -734,16 +735,16 @@ Existing fixed password-change decisions remain unchanged:
 1. The endpoint is `PUT /api/users/me/password`.
 2. The current user id comes from `@AuthenticationPrincipal AuthenticatedUser`, never from the request body.
 3. The request body contains only `currentPassword` and `newPassword`.
-4. The current password is verified with `PasswordEncoder.matches(rawPassword, encodedPassword)`.
+4. The current password is verified with `PasswordEncoder.matches(rawPassword, encodedPassword)` after the user row is locked.
 5. The new password must differ from the current password and is stored only as a BCrypt hash.
 6. `password` and `password_changed_at` are updated together in one database statement and transaction.
 7. The Java service requires exactly one affected database row.
 8. A successful password-change request may complete using the authentication established at the start of that request.
-9. Subsequent protected requests compare JWT `iat` with the current database `password_changed_at` after loading the user and before creating `Authentication`.
-10. If `password_changed_at` is null, no password-change revocation check is required.
-11. If `password_changed_at` is non-null and JWT `iat` is missing, authentication fails with HTTP 401.
-12. If JWT `iat` is before `password_changed_at`, the token is invalid and produces the project's JSON HTTP 401 response.
-13. If JWT `iat` equals or is after `password_changed_at`, the token is accepted.
+9. `UserService.changePassword()` is `@Transactional` and reads the current hash with `UserMapper.getUserByIdForUpdate()` (`SELECT ... FOR UPDATE`) before verify/encode/update, so two concurrent OLD-password changes produce exactly one success.
+10. Access tokens include a HMAC-SHA256 `credential_version` claim derived from the stored BCrypt password hash and the JWT signing key. The raw password hash is never written into the JWT payload.
+11. Subsequent protected requests reload the current database user, compare the token `credential_version` with the current credential marker, and only then apply the existing `iat` vs `password_changed_at` check as defense-in-depth.
+12. A missing `credential_version` claim is HTTP 401. Tokens issued against a previous password hash are invalid immediately, including when JWT `iat` and `password_changed_at` share the same second.
+13. A token issued after a successful password change is valid immediately. A later password change invalidates that token without waiting for the next second.
 14. JWT revocation failures use an `AuthenticationException`, clear the security context, and delegate to `RestAuthenticationEntryPoint`.
 15. The user must log in again with the new password to obtain a new access token.
 
@@ -1000,6 +1001,14 @@ Phase 5 Backend Repair Batch 2 completed capability on 2026-09-20:
 * A deterministic real-MySQL concurrency test pauses the snapshot flow after the candidate SELECT, commits a real administrator Question replacement, resumes the real ScoringPoint SELECT, and verifies `OLD Question + OLD ScoringPoints` rather than a cross-version hybrid.
 * The Batch 2 focused run executed 234 tests with 0 failures, 0 errors, and 0 skipped. The final ordinary regression executed 1234 tests with 0 failures, 0 errors, and 18 guarded real-service skips. All `RUN_REAL_*`, `MILVUS_ENABLED`, and `DEEPSEEK_ENABLED` switches were disabled for the ordinary regression; no real Bailian, DeepSeek, or Milvus request was made.
 
+Phase 5 Backend Repair Batch 3 completed capability on 2026-09-20:
+
+* Password change is serialized with the existing MySQL user-row lock. `changePassword()` calls `getUserByIdForUpdate()` before reading the current BCrypt hash, then verifies, encodes, and updates in the same `@Transactional` boundary. Concurrent `OLD → NEW_A` and `OLD → NEW_B` requests produce exactly one success and one current-password rejection. The losing request does not change the password hash or `password_changed_at`.
+* JWT access tokens are bound to the current credential state through a HMAC-SHA256 `credential_version` claim over the stored BCrypt hash and the JWT signing key. Authentication reloads the database user and rejects a missing or mismatched marker immediately, including when JWT `iat` and `password_changed_at` share the same second. A newly issued token after password change is valid immediately. Tokens without `credential_version` are rejected. The previous `iat` vs `password_changed_at` check remains defense-in-depth. Database status and role remain the authorization source of truth.
+* Registration uniqueness conflicts for duplicate account, duplicate email, and `DuplicateKeyException` races all return the same public message `账号或邮箱已存在`. Internal logs distinguish the reason without recording passwords or request bodies.
+* API error semantics are explicit and stable: `400` validation/business input, `401` authentication, `403` real authorization denial on `/api/admin/**`, `404` missing resources and non-disclosing ownership failures (`面试会话不存在` / `面试问题不存在` / `题目不存在`), `405` unsupported method, `409` idempotency and state conflicts including EVALUATING retry and report GENERATING, `413` multipart oversize, `502` sanitized external-dependency failure (`外部服务暂时不可用`), and `500` unexpected server defects. Spring Security filter-chain 401/403 handlers are unchanged. This batch does not implement EVALUATING crash recovery.
+* The first Batch 3 focused run executed 292 tests with 1 failure (WebMvcTest probe controller was not registered, so a missing required parameter returned 404 instead of 400). After registering the probe controller, `HttpErrorTaxonomyControllerTest` reran 13 tests with 0 failures, 0 errors, and 0 skipped. The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1270 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`. All `RUN_REAL_*`, `MILVUS_ENABLED`, and `DEEPSEEK_ENABLED` switches were disabled; no real Bailian, DeepSeek, or Milvus request was made.
+
 The following capabilities remain unimplemented:
 
 * Real DeepSeek integration verification
@@ -1017,6 +1026,7 @@ Other capabilities that also remain unimplemented include:
 * Tokenizer integration
 * Trustworthy real-model per-chunk token-count calculation
 * Production or remote Milvus deployment and operations verification
+* FB-004 EVALUATING crash recovery; an EVALUATING answer can still remain stuck after a process crash, and this batch only mapped that state to HTTP 409
 * Reproduction and verification of final-state recovery after a real network-layer timeout; current coverage consists of timeout-ambiguity-aware code, Mock tests, and real Milvus write plus deterministic post-write fault injection
 * FAILED-document retry
 * Document reprocessing

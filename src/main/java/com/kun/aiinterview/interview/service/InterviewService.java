@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.common.exception.BusinessException;
+import com.kun.aiinterview.common.exception.ConflictException;
+import com.kun.aiinterview.common.exception.ResourceNotFoundException;
 import com.kun.aiinterview.common.validation.Utf8ByteSize;
 import com.kun.aiinterview.common.validation.Utf8ByteSizeValidator;
 import com.kun.aiinterview.interview.dto.SubmitInterviewAnswerRequest;
@@ -43,6 +45,9 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class InterviewService {
+
+    static final String SESSION_NOT_FOUND = "面试会话不存在";
+    static final String QUESTION_NOT_FOUND = "面试问题不存在";
 
     private static final TypeReference<List<String>> STRING_LIST_TYPE =
             new TypeReference<>() {
@@ -177,8 +182,7 @@ public class InterviewService {
             );
         }
 
-        InterviewSession session = loadSession(sessionId);
-        validateOwnership(session, userId);
+        InterviewSession session = loadOwnedSession(sessionId, userId);
 
         List<InterviewQuestion> questions =
                 interviewQuestionMapper.listBySessionId(sessionId);
@@ -222,8 +226,7 @@ public class InterviewService {
     ) {
         validateSubmitRequest(userId, sessionId, request);
 
-        InterviewSession session = loadSession(sessionId);
-        validateOwnership(session, userId);
+        InterviewSession session = loadOwnedSession(sessionId, userId);
 
         InterviewQuestion question = loadAndValidateQuestion(
                 sessionId,
@@ -255,14 +258,14 @@ public class InterviewService {
                         );
 
         if (existingByQuestion != null) {
-            throw new BusinessException(
+            throw new ConflictException(
                     "当前问题已经使用其他requestId提交过答案"
             );
         }
 
         if (question.getStatus()
                 != InterviewQuestionStatus.WAITING_ANSWER) {
-            throw new BusinessException(
+            throw new ConflictException(
                     "当前问题不可提交答案"
             );
         }
@@ -353,15 +356,13 @@ public class InterviewService {
         }
     }
 
-    private InterviewSession loadSession(Long sessionId) {
+    private InterviewSession loadOwnedSession(Long sessionId, Long userId) {
         InterviewSession session =
                 interviewSessionMapper
                         .getInterviewSessionById(sessionId);
 
-        if (session == null) {
-            throw new BusinessException(
-                    "InterviewSession不存在"
-            );
+        if (session == null || !Objects.equals(session.getUserId(), userId)) {
+            throw new ResourceNotFoundException(SESSION_NOT_FOUND);
         }
 
         return session;
@@ -373,7 +374,7 @@ public class InterviewService {
     ) {
         if (session.getStatus()
                 != InterviewSessionStatus.IN_PROGRESS) {
-            throw new BusinessException(
+            throw new ConflictException(
                     "当前InterviewSession不可提交答案"
             );
         }
@@ -382,7 +383,7 @@ public class InterviewService {
                 session.getCurrentInterviewQuestionId(),
                 question.getId()
         )) {
-            throw new BusinessException(
+            throw new ConflictException(
                     "提交的问题不是当前问题"
             );
         }
@@ -398,19 +399,9 @@ public class InterviewService {
                                 interviewQuestionId
                         );
 
-        if (question == null) {
-            throw new BusinessException(
-                    "InterviewQuestion不存在"
-            );
-        }
-
-        if (!Objects.equals(
-                question.getSessionId(),
-                sessionId
-        )) {
-            throw new BusinessException(
-                    "InterviewQuestion不属于当前Session"
-            );
+        if (question == null
+                || !Objects.equals(question.getSessionId(), sessionId)) {
+            throw new ResourceNotFoundException(QUESTION_NOT_FOUND);
         }
 
         return question;
@@ -427,7 +418,7 @@ public class InterviewService {
                 answer.getInterviewQuestionId(),
                 question.getId()
         )) {
-            throw new BusinessException(
+            throw new ConflictException(
                     "requestId已用于其他问题"
             );
         }
@@ -436,7 +427,7 @@ public class InterviewService {
                 answer.getAnswerContent(),
                 submittedAnswerContent
         )) {
-            throw new BusinessException(
+            throw new ConflictException(
                     "requestId已用于不同的答案内容"
             );
         }
@@ -453,7 +444,7 @@ public class InterviewService {
                     session.getId(),
                     answer.getId()
             );
-            case EVALUATING -> throw new BusinessException(
+            case EVALUATING -> throw new ConflictException(
                     "答案正在评估中，请稍后重试"
             );
             case SUBMITTED, FAILED -> {
@@ -507,8 +498,7 @@ public class InterviewService {
                         );
 
         if (existingByRequestId != null) {
-            InterviewSession latestSession = loadSession(sessionId);
-            validateOwnership(latestSession, userId);
+            InterviewSession latestSession = loadOwnedSession(sessionId, userId);
             return handleExistingAnswer(
                     userId,
                     latestSession,
@@ -525,7 +515,7 @@ public class InterviewService {
                         );
 
         if (existingByQuestion != null) {
-            throw new BusinessException(
+            throw new ConflictException(
                     "当前问题已经使用其他requestId提交过答案",
                     duplicateKeyException
             );
@@ -557,8 +547,7 @@ public class InterviewService {
             );
         }
 
-        InterviewSession latestSession = loadSession(sessionId);
-        validateOwnership(latestSession, userId);
+        InterviewSession latestSession = loadOwnedSession(sessionId, userId);
 
         InterviewQuestionResponse nextQuestion =
                 latestSession.getStatus()
@@ -963,7 +952,7 @@ public class InterviewService {
                 session.getUserId(),
                 userId
         )) {
-            throw new BusinessException(
+            throw new IllegalStateException(
                     "InterviewSession不属于当前用户"
             );
         }

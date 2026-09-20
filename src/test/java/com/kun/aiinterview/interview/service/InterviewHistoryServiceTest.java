@@ -2,6 +2,7 @@ package com.kun.aiinterview.interview.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.common.exception.BusinessException;
+import com.kun.aiinterview.common.exception.ResourceNotFoundException;
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.entity.InterviewAnswer;
 import com.kun.aiinterview.interview.entity.InterviewQuestion;
@@ -225,8 +226,8 @@ class InterviewHistoryServiceTest {
                 .thenReturn(null);
 
         assertThatThrownBy(() -> service.getDetail(USER_ID, SESSION_ID))
-                .isInstanceOf(BusinessException.class)
-                .hasMessage("InterviewSession不存在");
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("面试会话不存在");
 
         verifyNoInteractions(interviewQuestionMapper, interviewAnswerMapper, answerEvaluationMapper);
         verifyNoWriteInteractions();
@@ -238,8 +239,8 @@ class InterviewHistoryServiceTest {
                 .thenReturn(inProgressSession(OTHER_USER_ID));
 
         assertThatThrownBy(() -> service.getDetail(USER_ID, SESSION_ID))
-                .isInstanceOf(BusinessException.class)
-                .hasMessage("InterviewSession不属于当前用户");
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("面试会话不存在");
 
         verifyNoInteractions(interviewQuestionMapper, interviewAnswerMapper, answerEvaluationMapper);
         verifyNoWriteInteractions();

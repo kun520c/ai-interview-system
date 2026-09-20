@@ -48,6 +48,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -482,6 +483,8 @@ class InterviewControllerTest {
         Claims claims = mock(Claims.class);
         when(claims.getSubject()).thenReturn(Long.toString(USER_ID));
         when(jwtTokenService.parseAndValidate(token)).thenReturn(claims);
+        when(jwtTokenService.matchesCredentialVersion(any(), any()))
+                .thenReturn(true);
         when(userMapper.getUserById(USER_ID)).thenReturn(
                 User.builder()
                         .id(USER_ID)

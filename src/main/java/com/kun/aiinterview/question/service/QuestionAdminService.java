@@ -1,6 +1,7 @@
 package com.kun.aiinterview.question.service;
 
 import com.kun.aiinterview.common.exception.BusinessException;
+import com.kun.aiinterview.common.exception.ResourceNotFoundException;
 import com.kun.aiinterview.common.validation.Utf8ByteSize;
 import com.kun.aiinterview.common.validation.Utf8ByteSizeValidator;
 import com.kun.aiinterview.question.dto.CreateQuestionRequest;
@@ -152,7 +153,7 @@ public class QuestionAdminService {
         Question existingQuestion = questionMapper.getQuestionById(questionId);
 
         if (existingQuestion == null) {
-            throw new BusinessException("题目不存在");
+            throw new ResourceNotFoundException("题目不存在");
         }
 
         Question question = Question.builder()
@@ -310,7 +311,7 @@ public class QuestionAdminService {
         Question question = questionMapper.getQuestionById(questionId);
 
         if (question == null) {
-            throw new BusinessException("题目不存在");
+            throw new ResourceNotFoundException("题目不存在");
         }
 
         List<AdminScoringPointDetail> scoringPoints = questionScoringPointMapper.selectDetailByQuestionId(questionId);
@@ -354,7 +355,7 @@ public class QuestionAdminService {
         Question question = questionMapper.getQuestionById(questionId);
 
         if (question == null) {
-            throw new BusinessException("题目不存在");
+            throw new ResourceNotFoundException("题目不存在");
         }
 
         if (question.getStatus() == request.getStatus()) {

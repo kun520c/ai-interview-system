@@ -19,8 +19,10 @@ import javax.crypto.SecretKey;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JwtTokenServiceTest {
 
@@ -32,6 +34,9 @@ class JwtTokenServiceTest {
     private static final Duration ACCESS_TOKEN_EXPIRATION = Duration.ofHours(2);
     private static final Long USER_ID = 1001L;
     private static final String ACCOUNT = "jwt_test_user";
+
+    private static final String PASSWORD_HASH =
+            "$2a$10$credentialVersionTestPasswordHashValue";
 
     private JwtTokenService jwtTokenService;
     private SecretKey secretKey;
@@ -48,7 +53,8 @@ class JwtTokenServiceTest {
         String token = jwtTokenService.generateAccessToken(
                 USER_ID,
                 ACCOUNT,
-                UserRole.USER
+                UserRole.USER,
+                PASSWORD_HASH
         );
 
         Claims claims = jwtTokenService.parseAndValidate(token);
@@ -56,6 +62,10 @@ class JwtTokenServiceTest {
         assertEquals(USER_ID.toString(), claims.getSubject());
         assertEquals(ACCOUNT, claims.get("account", String.class));
         assertEquals(UserRole.USER.name(), claims.get("role", String.class));
+        assertEquals(
+                jwtTokenService.deriveCredentialVersion(PASSWORD_HASH),
+                claims.get(JwtTokenService.CLAIM_CREDENTIAL_VERSION, String.class)
+        );
         assertEquals(TEST_ISSUER, claims.getIssuer());
         assertNotNull(claims.getIssuedAt());
         assertNotNull(claims.getExpiration());
@@ -69,13 +79,26 @@ class JwtTokenServiceTest {
                 jwtTokenService.getAccessTokenExpirationSeconds()
         );
         assertEquals(
-                Set.of("sub", "account", "role", "iss", "iat", "exp"),
+                Set.of(
+                        "sub",
+                        "account",
+                        "role",
+                        "iss",
+                        "iat",
+                        "exp",
+                        JwtTokenService.CLAIM_CREDENTIAL_VERSION
+                ),
                 claims.keySet()
         );
         assertFalse(claims.containsKey("password"));
         assertFalse(claims.containsKey("email"));
         assertFalse(claims.containsKey("username"));
         assertFalse(claims.containsKey("status"));
+        assertFalse(claims.containsKey("passwordHash"));
+        assertNotEquals(
+                PASSWORD_HASH,
+                claims.get(JwtTokenService.CLAIM_CREDENTIAL_VERSION, String.class)
+        );
     }
 
     @Test
@@ -102,7 +125,8 @@ class JwtTokenServiceTest {
         String token = jwtTokenService.generateAccessToken(
                 USER_ID,
                 ACCOUNT,
-                UserRole.USER
+                UserRole.USER,
+                PASSWORD_HASH
         );
         String[] tokenParts = token.split("\\.");
         String signature = tokenParts[2];
@@ -125,7 +149,8 @@ class JwtTokenServiceTest {
         String token = jwtTokenService.generateAccessToken(
                 USER_ID,
                 ACCOUNT,
-                UserRole.USER
+                UserRole.USER,
+                PASSWORD_HASH
         );
         JwtTokenService serviceWithWrongKey = new JwtTokenService(
                 createProperties(WRONG_SECRET, TEST_ISSUER)
@@ -154,6 +179,30 @@ class JwtTokenServiceTest {
                 IncorrectClaimException.class,
                 () -> jwtTokenService.parseAndValidate(wrongIssuerToken)
         );
+    }
+
+    @Test
+    void shouldMatchCredentialVersionForSamePasswordHash() {
+        String credentialVersion = jwtTokenService.deriveCredentialVersion(
+                PASSWORD_HASH
+        );
+
+        assertTrue(jwtTokenService.matchesCredentialVersion(
+                credentialVersion,
+                PASSWORD_HASH
+        ));
+        assertFalse(jwtTokenService.matchesCredentialVersion(
+                credentialVersion,
+                PASSWORD_HASH + "changed"
+        ));
+        assertFalse(jwtTokenService.matchesCredentialVersion(
+                null,
+                PASSWORD_HASH
+        ));
+        assertFalse(jwtTokenService.matchesCredentialVersion(
+                " ",
+                PASSWORD_HASH
+        ));
     }
 
     private JwtProperties createProperties(String secret, String issuer) {

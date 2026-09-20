@@ -2,6 +2,8 @@ package com.kun.aiinterview.interview.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.common.exception.BusinessException;
+import com.kun.aiinterview.common.exception.ConflictException;
+import com.kun.aiinterview.common.exception.ResourceNotFoundException;
 import com.kun.aiinterview.interview.dto.SubmitInterviewAnswerRequest;
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.entity.InterviewAnswer;
@@ -251,8 +253,28 @@ class InterviewServiceTest {
                 USER_ID,
                 SESSION_ID,
                 request()
-        )).isInstanceOf(BusinessException.class)
-                .hasMessage("InterviewSession不属于当前用户");
+        )).isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("面试会话不存在");
+
+        verifyNoInteractions(
+                interviewQuestionMapper,
+                interviewAnswerMapper,
+                transactionService,
+                workflowService
+        );
+    }
+
+    @Test
+    void shouldRejectMissingSessionWithSameMessageAsNonOwner() {
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+                .thenReturn(null);
+
+        assertThatThrownBy(() -> service.submitAnswer(
+                USER_ID,
+                SESSION_ID,
+                request()
+        )).isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("面试会话不存在");
 
         verifyNoInteractions(
                 interviewQuestionMapper,
@@ -286,7 +308,7 @@ class InterviewServiceTest {
                 USER_ID,
                 SESSION_ID,
                 request()
-        )).isInstanceOf(BusinessException.class)
+        )).isInstanceOf(ConflictException.class)
                 .hasMessage("当前InterviewSession不可提交答案");
 
         verifyNoInteractions(transactionService, workflowService);
@@ -314,7 +336,7 @@ class InterviewServiceTest {
                 USER_ID,
                 SESSION_ID,
                 request()
-        )).isInstanceOf(BusinessException.class)
+        )).isInstanceOf(ConflictException.class)
                 .hasMessage("提交的问题不是当前问题");
     }
 
@@ -339,8 +361,8 @@ class InterviewServiceTest {
                 USER_ID,
                 SESSION_ID,
                 request()
-        )).isInstanceOf(BusinessException.class)
-                .hasMessage("InterviewQuestion不属于当前Session");
+        )).isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("面试问题不存在");
 
         verifyNoInteractions(interviewAnswerMapper, transactionService);
     }
@@ -456,7 +478,7 @@ class InterviewServiceTest {
                 USER_ID,
                 SESSION_ID,
                 request()
-        )).isInstanceOf(BusinessException.class)
+        )).isInstanceOf(ConflictException.class)
                 .hasMessage("答案正在评估中，请稍后重试");
 
         verifyNoInteractions(workflowServiceProvider, workflowService);
@@ -488,7 +510,7 @@ class InterviewServiceTest {
                 USER_ID,
                 SESSION_ID,
                 request()
-        )).isInstanceOf(BusinessException.class)
+        )).isInstanceOf(ConflictException.class)
                 .hasMessage("requestId已用于其他问题");
 
         verifyNoInteractions(workflowServiceProvider, workflowService);
@@ -518,7 +540,7 @@ class InterviewServiceTest {
                 USER_ID,
                 SESSION_ID,
                 request()
-        )).isInstanceOf(BusinessException.class)
+        )).isInstanceOf(ConflictException.class)
                 .hasMessage("requestId已用于不同的答案内容");
 
         verifyNoInteractions(
@@ -582,7 +604,7 @@ class InterviewServiceTest {
                 USER_ID,
                 SESSION_ID,
                 request()
-        )).isInstanceOf(BusinessException.class)
+        )).isInstanceOf(ConflictException.class)
                 .hasMessage("当前问题已经使用其他requestId提交过答案");
 
         verifyNoInteractions(workflowServiceProvider, transactionService);
@@ -792,7 +814,7 @@ class InterviewServiceTest {
                 USER_ID,
                 SESSION_ID,
                 request()
-        )).isInstanceOf(BusinessException.class)
+        )).isInstanceOf(ConflictException.class)
                 .hasMessage("requestId已用于不同的答案内容");
 
         verifyNoInteractions(workflowService, answerEvaluationMapper);

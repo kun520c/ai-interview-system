@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.common.exception.BusinessException;
+import com.kun.aiinterview.common.exception.ConflictException;
+import com.kun.aiinterview.common.exception.ResourceNotFoundException;
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.entity.InterviewReport;
 import com.kun.aiinterview.interview.entity.InterviewSession;
@@ -48,8 +50,7 @@ public class InterviewReportService {
             );
         }
 
-        InterviewSession session = loadSession(sessionId);
-        validateOwnership(session, userId);
+        InterviewSession session = loadOwnedSession(sessionId, userId);
 
         InterviewReportStatus reportStatus =
                 session.getReportStatus();
@@ -94,8 +95,7 @@ public class InterviewReportService {
             );
         }
 
-        InterviewSession session = loadSession(sessionId);
-        validateOwnership(session, userId);
+        InterviewSession session = loadOwnedSession(sessionId, userId);
         validateCompleted(session);
 
         InterviewReport existingReport =
@@ -145,32 +145,19 @@ public class InterviewReportService {
         }
     }
 
-    private InterviewSession loadSession(Long sessionId) {
+    private InterviewSession loadOwnedSession(Long sessionId, Long userId) {
         InterviewSession session = interviewSessionMapper
                 .getInterviewSessionById(sessionId);
-        if (session == null) {
-            throw new BusinessException(
-                    "InterviewSession不存在"
-            );
+        if (session == null || !Objects.equals(session.getUserId(), userId)) {
+            throw new ResourceNotFoundException("面试会话不存在");
         }
         return session;
-    }
-
-    private void validateOwnership(
-            InterviewSession session,
-            Long userId
-    ) {
-        if (!Objects.equals(session.getUserId(), userId)) {
-            throw new BusinessException(
-                    "InterviewSession不属于当前用户"
-            );
-        }
     }
 
     private void validateCompleted(InterviewSession session) {
         if (session.getStatus()
                 != InterviewSessionStatus.COMPLETED) {
-            throw new BusinessException(
+            throw new ConflictException(
                     "面试尚未完成，无法生成报告"
             );
         }
@@ -196,7 +183,7 @@ public class InterviewReportService {
                 }
                 yield report;
             }
-            case GENERATING -> throw new BusinessException(
+            case GENERATING -> throw new ConflictException(
                     "报告正在生成中，请稍后重试"
             );
             case NOT_STARTED, FAILED -> null;
@@ -222,7 +209,7 @@ public class InterviewReportService {
                         session.getReportStatus()
                 );
         if (affectedRows != 1) {
-            throw new BusinessException(
+            throw new ConflictException(
                     "报告生成状态已发生变化，请重试"
             );
         }
@@ -240,8 +227,16 @@ public class InterviewReportService {
             );
         }
 
-        validateOwnership(session, userId);
-        validateCompleted(session);
+        if (!Objects.equals(session.getUserId(), userId)) {
+            throw new IllegalStateException(
+                    "Report claim后Session不属于当前用户"
+            );
+        }
+        if (session.getStatus() != InterviewSessionStatus.COMPLETED) {
+            throw new IllegalStateException(
+                    "Report claim后Session状态不是COMPLETED"
+            );
+        }
         if (session.getReportStatus()
                 != InterviewReportStatus.GENERATING) {
             throw new IllegalStateException(

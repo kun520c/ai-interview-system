@@ -69,6 +69,7 @@ public class AuthControllerTest {
     private final String longPassword = "a".repeat(73);
     private final String wrongPassword = "WrongPassword123";
     private final String missingAccount = "controller_login_missing_user";
+    private final String duplicateEmailAccount = "dup_email_account";
 
     @BeforeEach
     void setUp() {
@@ -100,12 +101,13 @@ public class AuthControllerTest {
         jdbcTemplate.update(
                 """
                 DELETE FROM `user`
-                WHERE account IN (?, ?, ?)
+                WHERE account IN (?, ?, ?, ?)
                    OR email IN (?, ?, ?)
                 """,
                 testUserAccount,
                 loginUserAccount,
                 disabledUserAccount,
+                duplicateEmailAccount,
                 testUserEmail,
                 loginUserEmail,
                 disabledUserEmail
@@ -183,7 +185,7 @@ public class AuthControllerTest {
                 .content(objectMapper.writeValueAsString(registerRequest))
         ).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message").value("账号已存在"))
+                .andExpect(jsonPath("$.message").value("账号或邮箱已存在"))
                 .andExpect(jsonPath("$.data").isEmpty());
 
         User user = userMapper.getUserByAccount(testUserAccount);
@@ -193,6 +195,27 @@ public class AuthControllerTest {
         assertEquals(testUserEmail, user.getEmail());
         assertEquals(testUserUsername, user.getUsername());
         assertTrue(passwordEncoder.matches(testUserPassword, user.getPassword()));
+    }
+
+    @Test
+    void shouldRejectDuplicateEmailWithSamePublicContract() throws Exception {
+        RegisterRequest duplicateEmail = new RegisterRequest(
+                duplicateEmailAccount,
+                loginUserUsername,
+                loginUserPassword,
+                loginUserEmail
+        );
+
+        mockMvc.perform(
+                post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(duplicateEmail))
+        ).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("账号或邮箱已存在"))
+                .andExpect(jsonPath("$.data").isEmpty());
+
+        assertNull(userMapper.getUserByAccount(duplicateEmailAccount));
     }
 
     @Test

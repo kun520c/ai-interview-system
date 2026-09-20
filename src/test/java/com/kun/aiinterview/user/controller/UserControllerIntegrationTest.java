@@ -2,12 +2,16 @@ package com.kun.aiinterview.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.auth.dto.LoginRequest;
+import com.kun.aiinterview.security.jwt.JwtProperties;
 import com.kun.aiinterview.security.jwt.JwtTokenService;
 import com.kun.aiinterview.user.dto.ChangePasswordRequest;
 import com.kun.aiinterview.user.entity.User;
 import com.kun.aiinterview.user.enums.UserRole;
 import com.kun.aiinterview.user.enums.UserStatus;
 import com.kun.aiinterview.user.mapper.UserMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,8 +24,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,6 +68,9 @@ class UserControllerIntegrationTest {
     @Autowired
     private JwtTokenService jwtTokenService;
 
+    @Autowired
+    private JwtProperties jwtProperties;
+
     @Test
     void shouldReturnUnauthorizedWhenTokenIsMissing() throws Exception {
         mockMvc.perform(get("/api/users/me"))
@@ -78,7 +88,8 @@ class UserControllerIntegrationTest {
         String accessToken = jwtTokenService.generateAccessToken(
                 user.getId(),
                 user.getAccount(),
-                user.getRole()
+                user.getRole(),
+                user.getPassword()
         );
 
         mockMvc.perform(
@@ -347,6 +358,161 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.userId").value(user.getId()));
     }
 
+    @Test
+    void shouldRejectOldCredentialTokenEvenWhenIssuedAtMatchesPasswordChangedAtSecond()
+            throws Exception {
+        User user = createEnabledUser();
+        String oldAccessToken = generateAccessToken(user);
+        LocalDateTime tokenIssuedAt = LocalDateTime.ofInstant(
+                jwtTokenService.parseAndValidate(oldAccessToken)
+                        .getIssuedAt()
+                        .toInstant(),
+                ZoneId.systemDefault()
+        ).withNano(0);
+
+        assertEquals(
+                1,
+                userMapper.updatePassword(
+                        user.getId(),
+                        passwordEncoder.encode(NEW_PASSWORD),
+                        tokenIssuedAt
+                )
+        );
+
+        mockMvc.perform(
+                        get("/api/users/me")
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + oldAccessToken
+                                )
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(
+                        MediaType.APPLICATION_JSON
+                ))
+                .andExpect(jsonPath("$.code").value(401))
+                .andExpect(jsonPath("$.message").value("未认证或访问令牌无效"));
+    }
+
+    @Test
+    void shouldRejectAccessTokenMissingCredentialVersionClaim() throws Exception {
+        User user = createEnabledUser();
+        String tokenWithoutClaim = tokenWithoutCredentialVersion(user);
+
+        mockMvc.perform(
+                        get("/api/users/me")
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + tokenWithoutClaim
+                                )
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401))
+                .andExpect(jsonPath("$.message").value("未认证或访问令牌无效"));
+    }
+
+    @Test
+    void shouldRejectPreviousTokenImmediatelyAfterSecondPasswordChange()
+            throws Exception {
+        User user = createEnabledUser();
+        String originalToken = generateAccessToken(user);
+        mockMvc.perform(
+                        authenticatedPut(
+                                originalToken,
+                                changePasswordRequest(
+                                        CURRENT_PASSWORD,
+                                        NEW_PASSWORD
+                                )
+                        )
+                )
+                .andExpect(status().isOk());
+
+        String firstNewToken = loginAccessToken(user.getAccount(), NEW_PASSWORD);
+        mockMvc.perform(
+                        get("/api/users/me")
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + firstNewToken
+                                )
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        String laterPassword = "LaterPassword789!";
+        mockMvc.perform(
+                        authenticatedPut(
+                                firstNewToken,
+                                changePasswordRequest(NEW_PASSWORD, laterPassword)
+                        )
+                )
+                .andExpect(status().isOk());
+
+        mockMvc.perform(
+                        get("/api/users/me")
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + firstNewToken
+                                )
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401));
+
+        String secondNewToken = loginAccessToken(
+                user.getAccount(),
+                laterPassword
+        );
+        mockMvc.perform(
+                        get("/api/users/me")
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + secondNewToken
+                                )
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.userId").value(user.getId()));
+    }
+
+    private String loginAccessToken(String account, String password)
+            throws Exception {
+        LoginRequest loginRequest = new LoginRequest(account, password);
+        String loginResponseBody = mockMvc.perform(
+                        post("/api/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(
+                                        loginRequest
+                                ))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        return objectMapper.readTree(loginResponseBody)
+                .path("data")
+                .path("accessToken")
+                .asText();
+    }
+
+    private String tokenWithoutCredentialVersion(User user) {
+        Instant issuedAt = Instant.now();
+        SecretKey secretKey = Keys.hmacShaKeyFor(
+                Decoders.BASE64.decode(jwtProperties.getSecret())
+        );
+        return Jwts.builder()
+                .subject(user.getId().toString())
+                .claim("account", user.getAccount())
+                .claim("role", user.getRole().name())
+                .issuer(jwtProperties.getIssuer())
+                .issuedAt(Date.from(issuedAt))
+                .expiration(Date.from(
+                        issuedAt.plus(jwtProperties.getAccessTokenExpiration())
+                ))
+                .signWith(secretKey)
+                .compact();
+    }
+
     private MockHttpServletRequestBuilder authenticatedPut(
             String accessToken,
             ChangePasswordRequest request
@@ -368,7 +534,8 @@ class UserControllerIntegrationTest {
         return jwtTokenService.generateAccessToken(
                 user.getId(),
                 user.getAccount(),
-                user.getRole()
+                user.getRole(),
+                user.getPassword()
         );
     }
 

@@ -44,7 +44,7 @@ public class UserService {
 
     @Transactional
     public void changePassword(Long userId, ChangePasswordRequest changePasswordRequest) {
-        User user = userMapper.getUserById(userId);
+        User user = userMapper.getUserByIdForUpdate(userId);
         if (user == null) {
             throw new BusinessException("用户不存在");
         }

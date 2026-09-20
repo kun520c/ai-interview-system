@@ -1,6 +1,7 @@
 package com.kun.aiinterview.question.service;
 
 import com.kun.aiinterview.common.exception.BusinessException;
+import com.kun.aiinterview.common.exception.ResourceNotFoundException;
 import com.kun.aiinterview.question.dto.CreateQuestionRequest;
 import com.kun.aiinterview.question.dto.ScoringPointRequest;
 import com.kun.aiinterview.question.dto.UpdateQuestionRequest;
@@ -410,8 +411,8 @@ class QuestionAdminServiceTest {
         UpdateQuestionRequest request = validUpdateRequest();
         when(questionMapper.getQuestionById(101L)).thenReturn(null);
 
-        BusinessException exception = assertThrows(
-                BusinessException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> questionAdminService.updateQuestion(101L, request)
         );
 
@@ -644,8 +645,8 @@ class QuestionAdminServiceTest {
     void givenMissingQuestion_whenGettingDetail_thenDoesNotQueryScoringPoints() {
         when(questionMapper.getQuestionById(404L)).thenReturn(null);
 
-        BusinessException exception = assertThrows(
-                BusinessException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> questionAdminService.getQuestionScoringPointDetail(404L)
         );
 
@@ -783,8 +784,8 @@ class QuestionAdminServiceTest {
     void givenMissingQuestion_whenUpdatingStatus_thenDoesNotExecuteUpdate() {
         when(questionMapper.getQuestionById(404L)).thenReturn(null);
 
-        BusinessException exception = assertThrows(
-                BusinessException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> questionAdminService.updateQuestionStatus(
                         404L,
                         statusRequest(QuestionStatus.DISABLED)

@@ -73,7 +73,8 @@ class AdminQuestionControllerIntegrationTest {
         String accessToken = jwtTokenService.generateAccessToken(
                 admin.getId(),
                 admin.getAccount(),
-                admin.getRole()
+                admin.getRole(),
+                admin.getPassword()
         );
         CreateQuestionRequest request = validRequest();
 
@@ -238,7 +239,7 @@ class AdminQuestionControllerIntegrationTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenAdminUpdatesMissingQuestion()
+    void shouldReturnNotFoundWhenAdminUpdatesMissingQuestion()
             throws Exception {
         User admin = createAdmin();
 
@@ -251,8 +252,8 @@ class AdminQuestionControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(
                                 replacementRequest()
                         )))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404))
                 .andExpect(jsonPath("$.message").value("题目不存在"));
     }
 
@@ -389,7 +390,7 @@ class AdminQuestionControllerIntegrationTest {
     }
 
     @Test
-    void givenAdminAndMissingQuestion_whenGettingDetail_thenReturnsBusinessError()
+    void givenAdminAndMissingQuestion_whenGettingDetail_thenReturnsNotFound()
             throws Exception {
         User admin = createAdmin();
 
@@ -398,8 +399,8 @@ class AdminQuestionControllerIntegrationTest {
                                 HttpHeaders.AUTHORIZATION,
                                 "Bearer " + accessToken(admin)
                         ))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404))
                 .andExpect(jsonPath("$.message").value("题目不存在"));
     }
 
@@ -541,7 +542,8 @@ class AdminQuestionControllerIntegrationTest {
         return jwtTokenService.generateAccessToken(
                 user.getId(),
                 user.getAccount(),
-                user.getRole()
+                user.getRole(),
+                user.getPassword()
         );
     }
 

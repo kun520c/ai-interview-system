@@ -133,7 +133,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Long userId = extractUserId(claims);
         User user = loadEnabledUser(userId);
 
-        validatePasswordChange(claims,user);
+        validateCredentialVersion(claims, user);
+        validatePasswordChange(claims, user);
 
         Authentication authentication = createAuthentication(user);
 
@@ -209,6 +210,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return new SimpleGrantedAuthority(ROLE_PREFIX + role.name());
+    }
+
+    private void validateCredentialVersion(
+            Claims claims,
+            User user
+    ) {
+        String tokenCredentialVersion = claims.get(
+                JwtTokenService.CLAIM_CREDENTIAL_VERSION,
+                String.class
+        );
+
+        if (!jwtTokenService.matchesCredentialVersion(
+                tokenCredentialVersion,
+                user.getPassword()
+        )) {
+            throw new BadCredentialsException(
+                    "访问令牌已因密码修改而失效"
+            );
+        }
     }
 
     private void validatePasswordChange(

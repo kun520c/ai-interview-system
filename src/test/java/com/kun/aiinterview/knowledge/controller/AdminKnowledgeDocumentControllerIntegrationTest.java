@@ -301,7 +301,8 @@ class AdminKnowledgeDocumentControllerIntegrationTest {
         return jwtTokenService.generateAccessToken(
                 user.getId(),
                 user.getAccount(),
-                user.getRole()
+                user.getRole(),
+                user.getPassword()
         );
     }
 

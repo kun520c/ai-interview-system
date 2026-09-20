@@ -306,6 +306,8 @@ class AdminQuestionPaginationControllerTest {
         Claims claims = org.mockito.Mockito.mock(Claims.class);
         when(claims.getSubject()).thenReturn("1001");
         when(jwtTokenService.parseAndValidate(token)).thenReturn(claims);
+        when(jwtTokenService.matchesCredentialVersion(any(), any()))
+                .thenReturn(true);
         when(userMapper.getUserById(1001L)).thenReturn(
                 User.builder()
                         .id(1001L)

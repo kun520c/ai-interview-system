@@ -159,7 +159,7 @@ public class AuthServiceTest {
                 () -> authService.register(registerRequest)
         );
 
-        assertEquals("账号已存在", exception.getMessage());
+        assertEquals("账号或邮箱已存在", exception.getMessage());
     }
 
     @Test
@@ -171,7 +171,7 @@ public class AuthServiceTest {
                 () -> authService.register(registerRequest)
         );
 
-        assertEquals("邮箱已被注册", exception.getMessage());
+        assertEquals("账号或邮箱已存在", exception.getMessage());
     }
 
     @Test
@@ -228,6 +228,14 @@ public class AuthServiceTest {
         assertEquals(savedUser.getId().toString(), claims.getSubject());
         assertEquals(LOGIN_ACCOUNT, claims.get("account", String.class));
         assertEquals(UserRole.USER.name(), claims.get("role", String.class));
+        assertEquals(
+                jwtTokenService.deriveCredentialVersion(savedUser.getPassword()),
+                claims.get(JwtTokenService.CLAIM_CREDENTIAL_VERSION, String.class)
+        );
+        assertNotEquals(savedUser.getPassword(), claims.get(
+                JwtTokenService.CLAIM_CREDENTIAL_VERSION,
+                String.class
+        ));
         assertEquals(jwtProperties.getIssuer(), claims.getIssuer());
     }
 
