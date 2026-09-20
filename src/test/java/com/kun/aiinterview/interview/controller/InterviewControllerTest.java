@@ -270,6 +270,34 @@ class InterviewControllerTest {
     }
 
     @Test
+    void shouldValidateOversizedAnswerBeforeCallingService()
+            throws Exception {
+        stubTokenUser("oversized-answer-token");
+        String requestBody = """
+                {
+                  "interviewQuestionId": 31,
+                  "answerContent": "%s",
+                  "requestId": "request-31"
+                }
+                """.formatted("😀".repeat(16_384));
+
+        mockMvc.perform(post("/api/interviews/21/answers")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer oversized-answer-token"
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value(
+                        "answerContent不能超过65535个UTF-8字节"
+                ));
+
+        verifyNoInteractions(interviewService);
+    }
+
+    @Test
     void shouldGetReportUsingAuthenticatedUserWithoutInternalFieldLeak()
             throws Exception {
         stubTokenUser("get-report-token");

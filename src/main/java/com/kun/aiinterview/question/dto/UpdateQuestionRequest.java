@@ -1,5 +1,6 @@
 package com.kun.aiinterview.question.dto;
 
+import com.kun.aiinterview.common.validation.Utf8ByteSize;
 import com.kun.aiinterview.question.enums.QuestionCategory;
 import com.kun.aiinterview.question.enums.QuestionDifficulty;
 import jakarta.validation.constraints.NotBlank;
@@ -30,9 +31,15 @@ public class UpdateQuestionRequest {
     private QuestionDifficulty difficulty;
 
     @NotBlank(message = "题目内容不能为空")
+    @Size(max = Utf8ByteSize.MYSQL_TEXT_MAX_BYTES,
+            message = "题目内容长度不能超过65535位")
+    @Utf8ByteSize(message = "题目内容不能超过65535个UTF-8字节")
     private String questionContent;
 
     @NotBlank(message = "参考答案不能为空")
+    @Size(max = Utf8ByteSize.MYSQL_TEXT_MAX_BYTES,
+            message = "参考答案长度不能超过65535位")
+    @Utf8ByteSize(message = "参考答案不能超过65535个UTF-8字节")
     private String referenceAnswer;
 
     @NotEmpty(message = "题目至少需要一个评分点")

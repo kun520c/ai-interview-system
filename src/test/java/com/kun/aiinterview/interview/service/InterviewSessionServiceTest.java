@@ -10,8 +10,6 @@ import com.kun.aiinterview.question.entity.QuestionScoringPoint;
 import com.kun.aiinterview.question.enums.QuestionCategory;
 import com.kun.aiinterview.question.enums.QuestionDifficulty;
 import com.kun.aiinterview.question.enums.QuestionPointType;
-import com.kun.aiinterview.question.mapper.QuestionMapper;
-import com.kun.aiinterview.question.mapper.QuestionScoringPointMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +22,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -34,10 +31,8 @@ import static org.mockito.Mockito.when;
 class InterviewSessionServiceTest {
 
     @Mock private InterviewSessionMapper interviewSessionMapper;
-    @Mock private QuestionMapper questionMapper;
-    @Mock private QuestionScoringPointMapper scoringPointMapper;
     @Mock private InterviewPlanConfig planConfig;
-    @Mock private QuestionPlanSelector selector;
+    @Mock private InterviewQuestionPlanSnapshotService snapshotService;
     @Mock private InterviewSessionTransactionService transactionService;
 
     private InterviewSessionService service;
@@ -46,10 +41,8 @@ class InterviewSessionServiceTest {
     void setUp() {
         service = new InterviewSessionService(
                 interviewSessionMapper,
-                questionMapper,
-                scoringPointMapper,
                 planConfig,
-                selector,
+                snapshotService,
                 transactionService
         );
     }
@@ -62,8 +55,7 @@ class InterviewSessionServiceTest {
 
         assertThat(service.createSession(1L, QuestionDifficulty.EASY))
                 .isSameAs(existing);
-        verifyNoInteractions(questionMapper, scoringPointMapper, planConfig,
-                selector, transactionService);
+        verifyNoInteractions(planConfig, snapshotService, transactionService);
     }
 
     @Test
@@ -76,11 +68,13 @@ class InterviewSessionServiceTest {
         QuestionScoringPoint point = scoringPoint(20L, 10L);
         InterviewSession expected = InterviewSession.builder().id(100L).build();
         when(planConfig.getRule(QuestionDifficulty.EASY)).thenReturn(rule);
-        when(questionMapper.selectEnabledQuestionsForInterview(QuestionDifficulty.EASY))
-                .thenReturn(List.of(question));
-        when(selector.select(any(), eq(rule))).thenReturn(List.of(question));
-        when(scoringPointMapper.selectEnabledByQuestionId(10L))
-                .thenReturn(List.of(point));
+        when(snapshotService.prepareSnapshot(QuestionDifficulty.EASY, rule))
+                .thenReturn(List.of(
+                        new InterviewMainQuestionDraft(
+                                question,
+                                List.of(point)
+                        )
+                ));
         when(transactionService.createAndStartSession(any(), any()))
                 .thenReturn(expected);
 
@@ -117,46 +111,29 @@ class InterviewSessionServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> service.createSession(1L, null))
                 .isInstanceOf(IllegalArgumentException.class);
-        verifyNoInteractions(interviewSessionMapper, questionMapper,
-                scoringPointMapper, planConfig, selector, transactionService);
+        verifyNoInteractions(interviewSessionMapper, planConfig,
+                snapshotService, transactionService);
     }
 
     @Test
-    void shouldRejectMissingScoringPointsWithoutStartingTransaction() {
-        var rule = new InterviewPlanConfig.InterviewPlanRule(
-                1,
-                List.of(QuestionCategory.JAVA_BASIC)
-        );
-        Question question = question(10L);
-        when(planConfig.getRule(QuestionDifficulty.EASY)).thenReturn(rule);
-        when(questionMapper.selectEnabledQuestionsForInterview(QuestionDifficulty.EASY))
-                .thenReturn(List.of(question));
-        when(selector.select(any(), eq(rule))).thenReturn(List.of(question));
-        when(scoringPointMapper.selectEnabledByQuestionId(10L))
-                .thenReturn(List.of());
-
-        assertThatThrownBy(() -> service.createSession(1L, QuestionDifficulty.EASY))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("no enabled scoring points");
-        verify(transactionService, never()).createAndStartSession(any(), any());
-    }
-
-    @Test
-    void shouldRejectSelectorResultWithWrongSizeWithoutStartingTransaction() {
+    void shouldRejectSnapshotResultWithWrongSizeWithoutStartingTransaction() {
         var rule = new InterviewPlanConfig.InterviewPlanRule(
                 2,
                 List.of(QuestionCategory.JAVA_BASIC)
         );
-        Question question = question(10L);
         when(planConfig.getRule(QuestionDifficulty.EASY)).thenReturn(rule);
-        when(questionMapper.selectEnabledQuestionsForInterview(QuestionDifficulty.EASY))
-                .thenReturn(List.of(question));
-        when(selector.select(any(), eq(rule))).thenReturn(List.of(question));
+        when(snapshotService.prepareSnapshot(QuestionDifficulty.EASY, rule))
+                .thenReturn(List.of(
+                        new InterviewMainQuestionDraft(
+                                question(10L),
+                                List.of(scoringPoint(20L, 10L))
+                        )
+                ));
 
         assertThatThrownBy(() -> service.createSession(1L, QuestionDifficulty.EASY))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("selected question count");
-        verifyNoInteractions(scoringPointMapper, transactionService);
+                .hasMessage("question draft count must equal plannedQuestionCount");
+        verify(transactionService, never()).createAndStartSession(any(), any());
     }
 
     private Question question(long id) {

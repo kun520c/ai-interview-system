@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.common.exception.BusinessException;
+import com.kun.aiinterview.common.validation.Utf8ByteSize;
+import com.kun.aiinterview.common.validation.Utf8ByteSizeValidator;
 import com.kun.aiinterview.interview.dto.SubmitInterviewAnswerRequest;
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.entity.InterviewAnswer;
@@ -239,7 +241,8 @@ public class InterviewService {
                     userId,
                     session,
                     question,
-                    existingByRequestId
+                    existingByRequestId,
+                    request.answerContent()
             );
         }
 
@@ -327,6 +330,15 @@ public class InterviewService {
             );
         }
 
+        if (!Utf8ByteSizeValidator.isWithinLimit(
+                request.answerContent(),
+                Utf8ByteSize.MYSQL_TEXT_MAX_BYTES
+        )) {
+            throw new BusinessException(
+                    "answerContent不能超过65535个UTF-8字节"
+            );
+        }
+
         if (request.requestId() == null
                 || request.requestId().isBlank()) {
             throw new BusinessException(
@@ -408,7 +420,8 @@ public class InterviewService {
             Long userId,
             InterviewSession session,
             InterviewQuestion question,
-            InterviewAnswer answer
+            InterviewAnswer answer,
+            String submittedAnswerContent
     ) {
         if (!Objects.equals(
                 answer.getInterviewQuestionId(),
@@ -416,6 +429,15 @@ public class InterviewService {
         )) {
             throw new BusinessException(
                     "requestId已用于其他问题"
+            );
+        }
+
+        if (!Objects.equals(
+                answer.getAnswerContent(),
+                submittedAnswerContent
+        )) {
+            throw new BusinessException(
+                    "requestId已用于不同的答案内容"
             );
         }
 
@@ -491,7 +513,8 @@ public class InterviewService {
                     userId,
                     latestSession,
                     question,
-                    existingByRequestId
+                    existingByRequestId,
+                    request.answerContent()
             );
         }
 

@@ -52,6 +52,8 @@ class InterviewServiceTest {
     private static final long NEXT_QUESTION_ID = 32L;
     private static final long ANSWER_ID = 41L;
     private static final String REQUEST_ID = "request-41";
+    private static final String ANSWER_CONTENT =
+            "HashMap使用数组、链表和红黑树。";
 
     @Mock
     private InterviewSessionService interviewSessionService;
@@ -493,6 +495,69 @@ class InterviewServiceTest {
     }
 
     @Test
+    void shouldRejectRequestIdReplayedWithDifferentAnswerContent() {
+        InterviewSession completed = session(
+                InterviewSessionStatus.COMPLETED,
+                null,
+                USER_ID
+        );
+        InterviewQuestion answered = question(
+                QUESTION_ID,
+                SESSION_ID,
+                InterviewQuestionStatus.ANSWERED,
+                InterviewQuestionType.MAIN
+        );
+        stubInitialSessionAndQuestion(completed, answered);
+        InterviewAnswer existing = answer(InterviewAnswerStatus.EVALUATED);
+        existing.setAnswerContent("不同答案");
+        when(interviewAnswerMapper.getInterviewAnswerByRequestId(
+                REQUEST_ID
+        )).thenReturn(existing);
+
+        assertThatThrownBy(() -> service.submitAnswer(
+                USER_ID,
+                SESSION_ID,
+                request()
+        )).isInstanceOf(BusinessException.class)
+                .hasMessage("requestId已用于不同的答案内容");
+
+        verifyNoInteractions(
+                workflowServiceProvider,
+                workflowService,
+                transactionService,
+                answerEvaluationMapper
+        );
+    }
+
+    @Test
+    void shouldRejectOversizedAnswerBeforeDatabaseOrEvaluationAccess() {
+        SubmitInterviewAnswerRequest oversizedRequest =
+                new SubmitInterviewAnswerRequest(
+                        QUESTION_ID,
+                        "😀".repeat(16_384),
+                        REQUEST_ID
+                );
+
+        assertThatThrownBy(() -> service.submitAnswer(
+                USER_ID,
+                SESSION_ID,
+                oversizedRequest
+        )).isInstanceOf(BusinessException.class)
+                .hasMessage("answerContent不能超过65535个UTF-8字节");
+
+        verifyNoInteractions(
+                interviewSessionService,
+                interviewSessionMapper,
+                interviewQuestionMapper,
+                interviewAnswerMapper,
+                transactionService,
+                answerEvaluationMapper,
+                workflowServiceProvider,
+                workflowService
+        );
+    }
+
+    @Test
     void shouldRejectDifferentRequestForQuestionThatAlreadyHasAnswer() {
         InterviewSession session = session(
                 InterviewSessionStatus.IN_PROGRESS,
@@ -692,6 +757,47 @@ class InterviewServiceTest {
         verifyNoInteractions(workflowService);
     }
 
+    @Test
+    void shouldRejectDifferentPayloadAfterDuplicateKeyRace() {
+        InterviewSession initial = session(
+                InterviewSessionStatus.IN_PROGRESS,
+                QUESTION_ID,
+                USER_ID
+        );
+        InterviewQuestion current = question(
+                QUESTION_ID,
+                SESSION_ID,
+                InterviewQuestionStatus.WAITING_ANSWER,
+                InterviewQuestionType.MAIN
+        );
+        stubInitialSessionAndQuestion(initial, current);
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+                .thenReturn(initial, initial);
+        InterviewAnswer conflicting = answer(
+                InterviewAnswerStatus.EVALUATED
+        );
+        conflicting.setAnswerContent("并发请求中的不同答案");
+        when(interviewAnswerMapper.getInterviewAnswerByRequestId(
+                REQUEST_ID
+        )).thenReturn(null, conflicting);
+        when(interviewAnswerMapper.getInterviewAnswerByInterviewQuestionId(
+                QUESTION_ID
+        )).thenReturn(null);
+        when(workflowServiceProvider.getIfAvailable())
+                .thenReturn(workflowService);
+        when(transactionService.submitAnswer(any(), any()))
+                .thenThrow(new DuplicateKeyException("duplicate"));
+
+        assertThatThrownBy(() -> service.submitAnswer(
+                USER_ID,
+                SESSION_ID,
+                request()
+        )).isInstanceOf(BusinessException.class)
+                .hasMessage("requestId已用于不同的答案内容");
+
+        verifyNoInteractions(workflowService, answerEvaluationMapper);
+    }
+
     private void assertDatabaseQuestionAfterWorkflow(
             DecisionAction action,
             InterviewQuestionType nextType
@@ -776,7 +882,7 @@ class InterviewServiceTest {
     private SubmitInterviewAnswerRequest request() {
         return new SubmitInterviewAnswerRequest(
                 QUESTION_ID,
-                "HashMap使用数组、链表和红黑树。",
+                ANSWER_CONTENT,
                 REQUEST_ID
         );
     }
@@ -823,7 +929,7 @@ class InterviewServiceTest {
         return InterviewAnswer.builder()
                 .id(ANSWER_ID)
                 .interviewQuestionId(QUESTION_ID)
-                .answerContent("已保存答案")
+                .answerContent(ANSWER_CONTENT)
                 .requestId(REQUEST_ID)
                 .status(status)
                 .build();

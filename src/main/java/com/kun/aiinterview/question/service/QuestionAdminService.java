@@ -1,6 +1,8 @@
 package com.kun.aiinterview.question.service;
 
 import com.kun.aiinterview.common.exception.BusinessException;
+import com.kun.aiinterview.common.validation.Utf8ByteSize;
+import com.kun.aiinterview.common.validation.Utf8ByteSizeValidator;
 import com.kun.aiinterview.question.dto.CreateQuestionRequest;
 import com.kun.aiinterview.question.dto.QuestionPageQuery;
 import com.kun.aiinterview.question.dto.ScoringPointRequest;
@@ -40,6 +42,12 @@ public class QuestionAdminService {
         if (scoringPointRequests == null || scoringPointRequests.isEmpty()) {
             throw new BusinessException("题目至少需要一个评分点");
         }
+
+        validateTextFields(
+                request.getQuestionContent(),
+                request.getReferenceAnswer(),
+                scoringPointRequests
+        );
 
         long totalWeight = 0;
 
@@ -113,6 +121,12 @@ public class QuestionAdminService {
         if (scoringPointRequests == null || scoringPointRequests.isEmpty()) {
             throw new BusinessException("题目至少需要一个评分点");
         }
+
+        validateTextFields(
+                request.getQuestionContent(),
+                request.getReferenceAnswer(),
+                scoringPointRequests
+        );
 
         long totalWeight = 0;
 
@@ -195,6 +209,35 @@ public class QuestionAdminService {
             scoringPoints.add(questionScoringPoint);
         }
         return scoringPoints;
+    }
+
+    private void validateTextFields(
+            String questionContent,
+            String referenceAnswer,
+            List<ScoringPointRequest> scoringPointRequests
+    ) {
+        validateTextField(questionContent, "题目内容");
+        validateTextField(referenceAnswer, "参考答案");
+
+        for (ScoringPointRequest scoringPointRequest : scoringPointRequests) {
+            if (scoringPointRequest != null) {
+                validateTextField(
+                        scoringPointRequest.getContent(),
+                        "评分点内容"
+                );
+            }
+        }
+    }
+
+    private void validateTextField(String value, String fieldName) {
+        if (!Utf8ByteSizeValidator.isWithinLimit(
+                value,
+                Utf8ByteSize.MYSQL_TEXT_MAX_BYTES
+        )) {
+            throw new BusinessException(
+                    fieldName + "不能超过65535个UTF-8字节"
+            );
+        }
     }
 
     @Transactional(readOnly = true)

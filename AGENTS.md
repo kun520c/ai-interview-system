@@ -991,6 +991,15 @@ Interview History / Detail completed capability on 2026-09-18:
 * The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1168 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
 * `DEEPSEEK_ENABLED=false`, `MILVUS_ENABLED=false`, and every `RUN_REAL_*` switch remained disabled. No real DeepSeek, Embedding, or Milvus request was made, and the skipped tests are not evidence of real external-service verification.
 
+Phase 5 Backend Repair Batch 2 completed capability on 2026-09-20:
+
+* Interview Question and enabled ScoringPoint snapshots are prepared through an independent Spring `REPEATABLE_READ`, read-only transaction. Candidate selection and all selected ScoringPoint reads therefore use one consistent MySQL view before the existing short Session write transaction begins.
+* The existing Session creation concurrency boundary remains unchanged: the write transaction still locks the user row with `FOR UPDATE`, rechecks the active Session under that lock, and only then inserts the new Session snapshots.
+* An idempotent answer replay now requires the same `requestId`, the same `interviewQuestionId`, and exact `String` equality of `answerContent`. Both the normal pre-check and `DuplicateKeyException` recovery reject changed payloads without overwriting or reevaluating the original Answer.
+* Client-controlled `answerContent`, Question `questionContent` / `referenceAnswer`, and ScoringPoint `content` now enforce the MySQL `TEXT` limit of 65,535 UTF-8 bytes through shared Bean Validation and Service-boundary checks before persistence.
+* A deterministic real-MySQL concurrency test pauses the snapshot flow after the candidate SELECT, commits a real administrator Question replacement, resumes the real ScoringPoint SELECT, and verifies `OLD Question + OLD ScoringPoints` rather than a cross-version hybrid.
+* The Batch 2 focused run executed 234 tests with 0 failures, 0 errors, and 0 skipped. The final ordinary regression executed 1234 tests with 0 failures, 0 errors, and 18 guarded real-service skips. All `RUN_REAL_*`, `MILVUS_ENABLED`, and `DEEPSEEK_ENABLED` switches were disabled for the ordinary regression; no real Bailian, DeepSeek, or Milvus request was made.
+
 The following capabilities remain unimplemented:
 
 * Real DeepSeek integration verification

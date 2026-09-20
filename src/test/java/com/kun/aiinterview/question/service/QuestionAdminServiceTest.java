@@ -208,6 +208,35 @@ class QuestionAdminServiceTest {
     }
 
     @Test
+    void shouldRejectOversizedQuestionContentBeforeDatabaseWrite() {
+        CreateQuestionRequest request = requestWith(validScoringPoint());
+        request.setQuestionContent("😀".repeat(16_384));
+
+        assertThrows(
+                BusinessException.class,
+                () -> questionAdminService.createQuestion(request)
+        );
+
+        verifyNoInteractions(questionMapper, questionScoringPointMapper);
+    }
+
+    @Test
+    void shouldRejectOversizedScoringPointBeforeDatabaseWrite() {
+        CreateQuestionRequest request = requestWith(new ScoringPointRequest(
+                QuestionPointType.CORE,
+                "a".repeat(65_536),
+                100
+        ));
+
+        assertThrows(
+                BusinessException.class,
+                () -> questionAdminService.createQuestion(request)
+        );
+
+        verifyNoInteractions(questionMapper, questionScoringPointMapper);
+    }
+
+    @Test
     void shouldRejectUnexpectedQuestionInsertCount() {
         CreateQuestionRequest request = requestWith(
                 validScoringPoint()
@@ -276,6 +305,19 @@ class QuestionAdminServiceTest {
         assertThrows(
                 BusinessException.class,
                 () -> questionAdminService.updateQuestion(101L, null)
+        );
+
+        verifyNoInteractions(questionMapper, questionScoringPointMapper);
+    }
+
+    @Test
+    void shouldRejectOversizedReferenceAnswerBeforeUpdateDatabaseAccess() {
+        UpdateQuestionRequest request = validUpdateRequest();
+        request.setReferenceAnswer("a".repeat(65_536));
+
+        assertThrows(
+                BusinessException.class,
+                () -> questionAdminService.updateQuestion(101L, request)
         );
 
         verifyNoInteractions(questionMapper, questionScoringPointMapper);

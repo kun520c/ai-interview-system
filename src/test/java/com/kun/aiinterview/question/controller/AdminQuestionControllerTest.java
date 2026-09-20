@@ -174,6 +174,31 @@ class AdminQuestionControllerTest {
     }
 
     @Test
+    void shouldValidateOversizedUpdateTextBeforeCallingService()
+            throws Exception {
+        stubTokenUser("oversized-update-admin-token", UserRole.ADMIN);
+        String requestBody = validUpdateJson().replace(
+                "请说明类加载过程",
+                "😀".repeat(16_384)
+        );
+
+        mockMvc.perform(put("/api/admin/questions/77")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer oversized-update-admin-token"
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value(
+                        "题目内容不能超过65535个UTF-8字节"
+                ));
+
+        verifyNoInteractions(questionAdminService);
+    }
+
+    @Test
     void shouldPassPathIdAndValidatedRequestToUpdateService()
             throws Exception {
         stubTokenUser("valid-update-admin-token", UserRole.ADMIN);
