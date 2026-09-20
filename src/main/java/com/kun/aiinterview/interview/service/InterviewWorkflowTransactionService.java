@@ -84,27 +84,17 @@ public class InterviewWorkflowTransactionService {
     }
 
     @Transactional
-    public void claimEvaluation(Long answerId) {
+    public boolean tryClaimEvaluation(Long answerId) {
         int affectedRows =
                 interviewAnswerMapper.claimEvaluation(answerId);
-
-        if (affectedRows != 1) {
-            throw new IllegalStateException(
-                    "Answer评价资格抢占失败"
-            );
-        }
+        return affectedRows == 1;
     }
 
     @Transactional
-    public void retryEvaluation(Long answerId) {
+    public boolean tryRetryEvaluation(Long answerId) {
         int affectedRows =
                 interviewAnswerMapper.retryEvaluation(answerId);
-
-        if (affectedRows != 1) {
-            throw new IllegalStateException(
-                    "Answer评价重试资格抢占失败"
-            );
-        }
+        return affectedRows == 1;
     }
 
     @Transactional

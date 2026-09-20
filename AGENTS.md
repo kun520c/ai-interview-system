@@ -398,6 +398,7 @@ Interview Report                COMPLETE
 User Weakness                   COMPLETE
 Interview History / Detail      COMPLETE
 Phase 5 Repair Batch 4          COMPLETE
+Phase 6 PH6-P2-001              COMPLETE
 
 → Next stage:
 MVP Full Code Review / Final Regression
@@ -1019,6 +1020,11 @@ Phase 5 Backend Repair Batch 4 completed capability on 2026-09-20:
 * `EmbeddingProperties` fail-fast validates `model` max 100 and `profileVersion` max 50, matching the narrowest MySQL VARCHAR contract. Invalid lengths fail at Spring configuration binding, not during processing. MySQL Schema, Milvus Collection, and `vector_id` length were not changed.
 * `application-test.yaml` now sets `deepseek.enabled=false` in addition to `milvus.enabled=false`. `local` then `test` keeps both flags false, so `InterviewWorkflowService` and other dual-flag production beans are not created from a local DeepSeek switch. Guarded `RUN_REAL_*` tests remain opt-in.
 * The Batch 4 focused run executed 259 tests with 0 failures, 0 errors, and 0 skipped, including real MySQL reclaim CAS and concurrent single-winner tests that seed old `updated_at` with JdbcTemplate rather than `Thread.sleep`. The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1308 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`. All `RUN_REAL_*`, `MILVUS_ENABLED`, and `DEEPSEEK_ENABLED` switches were disabled; no real Bailian, DeepSeek, or Milvus request was made.
+
+Phase 6 Micro Repair PH6-P2-001 completed capability on 2026-09-20:
+
+* Evaluation `SUBMITTED` claim and `FAILED` retry CAS misses are observable lost-race results, not internal faults. The Workflow reloads the actual Answer state: fresh `EVALUATING` is HTTP 409, stale `EVALUATING` reuses the Batch 4 reclaim contract, and `EVALUATED` replays the persisted evaluation without a second provider call. Only the CAS winner evaluates. Expected concurrency is not mapped to HTTP 500.
+* The focused PH6-P2-001 run executed 121 tests with 0 failures, 0 errors, and 0 skipped, including real MySQL concurrent claim/retry CAS. The ordinary `.\mvnw.cmd -B -ntp test` regression executed 1318 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`. All `RUN_REAL_*`, `MILVUS_ENABLED`, and `DEEPSEEK_ENABLED` switches were disabled; no real Bailian, DeepSeek, or Milvus request was made.
 
 The following capabilities remain unimplemented:
 

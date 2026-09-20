@@ -213,6 +213,30 @@ class HttpErrorTaxonomyControllerTest {
     }
 
     @Test
+    void shouldReturn409WhenLostEvaluationClaimConflicts() throws Exception {
+        stubTokenUser("lost-claim-token", UserRole.USER);
+        when(interviewService.submitAnswer(any(), any(), any()))
+                .thenThrow(new ConflictException("答案正在评估中，请稍后重试"));
+
+        mockMvc.perform(post("/api/interviews/21/answers")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer lost-claim-token"
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "interviewQuestionId": 31,
+                                  "answerContent": "数组",
+                                  "requestId": "request-31"
+                                }
+                                """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value(409))
+                .andExpect(jsonPath("$.message").value("答案正在评估中，请稍后重试"));
+    }
+
+    @Test
     void shouldReturn409WhenIdempotentPayloadConflicts() throws Exception {
         stubTokenUser("payload-conflict-token", UserRole.USER);
         when(interviewService.submitAnswer(any(), any(), any()))

@@ -128,7 +128,11 @@ public class InterviewWorkflowService {
                         session
                 );
 
-        claimOrRecoverEvaluation(answer);
+        EvaluationClaim claim =
+                claimOrRecoverEvaluation(answer);
+        if (claim == EvaluationClaim.REPLAY) {
+            return null;
+        }
 
         InterviewQuestion nextMain =
                 interviewQuestionMapper
@@ -166,21 +170,27 @@ public class InterviewWorkflowService {
         }
     }
 
-    private void claimOrRecoverEvaluation(InterviewAnswer answer) {
+    private EvaluationClaim claimOrRecoverEvaluation(
+            InterviewAnswer answer
+    ) {
         if (answer.getStatus()
                 == InterviewAnswerStatus.SUBMITTED) {
-            transactionService.claimEvaluation(
+            if (transactionService.tryClaimEvaluation(
                     answer.getId()
-            );
-            return;
+            )) {
+                return EvaluationClaim.OWNED;
+            }
+            return resolveLostEvaluationClaim(answer.getId());
         }
 
         if (answer.getStatus()
                 == InterviewAnswerStatus.FAILED) {
-            transactionService.retryEvaluation(
+            if (transactionService.tryRetryEvaluation(
                     answer.getId()
-            );
-            return;
+            )) {
+                return EvaluationClaim.OWNED;
+            }
+            return resolveLostEvaluationClaim(answer.getId());
         }
 
         if (answer.getStatus()
@@ -190,10 +200,48 @@ public class InterviewWorkflowService {
             );
         }
 
-        recoverStaleEvaluating(answer);
+        return recoverStaleEvaluating(answer);
     }
 
-    private void recoverStaleEvaluating(InterviewAnswer answer) {
+    private EvaluationClaim resolveLostEvaluationClaim(Long answerId) {
+        InterviewAnswer latest = requireReloadedAnswer(
+                answerId,
+                "评价资格冲突后Answer不存在"
+        );
+
+        return switch (latest.getStatus()) {
+            case EVALUATED -> EvaluationClaim.REPLAY;
+            case EVALUATING -> recoverStaleEvaluating(latest);
+            case FAILED -> retryAfterLostClaim(latest);
+            case SUBMITTED -> throw new IllegalStateException(
+                    "评价资格抢占失败后Answer仍为SUBMITTED"
+            );
+        };
+    }
+
+    private EvaluationClaim retryAfterLostClaim(InterviewAnswer latest) {
+        if (transactionService.tryRetryEvaluation(latest.getId())) {
+            return EvaluationClaim.OWNED;
+        }
+        return resolveLostRetry(latest.getId());
+    }
+
+    private EvaluationClaim resolveLostRetry(Long answerId) {
+        InterviewAnswer latest = requireReloadedAnswer(
+                answerId,
+                "评价重试资格冲突后Answer不存在"
+        );
+
+        return switch (latest.getStatus()) {
+            case EVALUATED -> EvaluationClaim.REPLAY;
+            case EVALUATING -> recoverStaleEvaluating(latest);
+            default -> throw new IllegalStateException(
+                    "评价重试资格抢占失败后Answer状态非法"
+            );
+        };
+    }
+
+    private EvaluationClaim recoverStaleEvaluating(InterviewAnswer answer) {
         if (!staleRecoveryProperties
                 .isEvaluatingStale(answer.getUpdatedAt())) {
             throw new ConflictException(
@@ -207,27 +255,47 @@ public class InterviewWorkflowService {
                         staleRecoveryProperties.evaluatingCutoff()
                 );
         if (reclaimed) {
-            return;
+            return EvaluationClaim.OWNED;
         }
 
         InterviewAnswer latest =
-                interviewAnswerMapper
-                        .getInterviewAnswerById(answer.getId());
-        if (latest == null) {
-            throw new IllegalStateException(
-                    "过期EVALUATING恢复后Answer不存在"
-            );
-        }
+                requireReloadedAnswer(
+                        answer.getId(),
+                        "过期EVALUATING恢复后Answer不存在"
+                );
 
         if (latest.getStatus()
                 == InterviewAnswerStatus.FAILED) {
-            transactionService.retryEvaluation(answer.getId());
-            return;
+            return retryAfterLostClaim(latest);
+        }
+
+        if (latest.getStatus()
+                == InterviewAnswerStatus.EVALUATED) {
+            return EvaluationClaim.REPLAY;
         }
 
         throw new ConflictException(
                 "答案正在评估中，请稍后重试"
         );
+    }
+
+    private InterviewAnswer requireReloadedAnswer(
+            Long answerId,
+            String missingMessage
+    ) {
+        InterviewAnswer latest =
+                interviewAnswerMapper
+                        .getInterviewAnswerById(answerId);
+        if (latest == null
+                || !Objects.equals(latest.getId(), answerId)) {
+            throw new IllegalStateException(missingMessage);
+        }
+        return latest;
+    }
+
+    private enum EvaluationClaim {
+        OWNED,
+        REPLAY
     }
 
     private void markEvaluationFailed(

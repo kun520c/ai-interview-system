@@ -121,7 +121,7 @@ class InterviewWorkflowServiceTest {
                 evaluationOrchestrationService
         );
         order.verify(transactionService)
-                .claimEvaluation(ANSWER_ID);
+                .tryClaimEvaluation(ANSWER_ID);
         order.verify(evaluationOrchestrationService)
                 .evaluate(ANSWER_ID, true);
         order.verify(transactionService)
@@ -178,7 +178,7 @@ class InterviewWorkflowServiceTest {
                 evaluationOrchestrationService
         );
         order.verify(transactionService)
-                .claimEvaluation(ANSWER_ID);
+                .tryClaimEvaluation(ANSWER_ID);
         order.verify(evaluationOrchestrationService)
                 .evaluate(ANSWER_ID, true);
         order.verify(transactionService)
@@ -313,7 +313,7 @@ class InterviewWorkflowServiceTest {
                 evaluationOrchestrationService
         );
         order.verify(transactionService)
-                .claimEvaluation(ANSWER_ID);
+                .tryClaimEvaluation(ANSWER_ID);
         order.verify(evaluationOrchestrationService)
                 .evaluate(ANSWER_ID, false);
         order.verify(transactionService)
@@ -342,15 +342,142 @@ class InterviewWorkflowServiceTest {
 
         service.evaluateAnswer(ANSWER_ID);
 
-        verify(transactionService).retryEvaluation(ANSWER_ID);
+        verify(transactionService).tryRetryEvaluation(ANSWER_ID);
         verify(transactionService, never())
-                .claimEvaluation(ANSWER_ID);
+                .tryClaimEvaluation(ANSWER_ID);
         verify(transactionService).advanceToNextMain(
                 ANSWER_ID,
                 main,
                 session,
                 nextMain
         );
+    }
+
+    @Test
+    void shouldConflictWhenSubmittedClaimMissesAndAnswerIsStillEvaluating() {
+        InterviewAnswer submitted = answer(
+                InterviewAnswerStatus.SUBMITTED,
+                MAIN_QUESTION_ID
+        );
+        InterviewAnswer evaluating = answer(
+                InterviewAnswerStatus.EVALUATING,
+                MAIN_QUESTION_ID
+        );
+        evaluating.setUpdatedAt(LocalDateTime.now());
+        InterviewQuestion main = mainQuestion();
+        when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID))
+                .thenReturn(submitted, evaluating);
+        when(interviewQuestionMapper.getInterviewQuestionById(MAIN_QUESTION_ID))
+                .thenReturn(main);
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+                .thenReturn(session(MAIN_QUESTION_ID));
+        when(transactionService.tryClaimEvaluation(ANSWER_ID))
+                .thenReturn(false);
+
+        assertThatThrownBy(() -> service.evaluateAnswer(ANSWER_ID))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("答案正在评估中，请稍后重试");
+
+        verify(transactionService).tryClaimEvaluation(ANSWER_ID);
+        verifyNoInteractions(evaluationOrchestrationService);
+        verify(transactionService, never())
+                .tryReclaimStaleEvaluating(any(), any());
+        verify(interviewQuestionMapper, never())
+                .findNextPendingMainQuestion(any(), any());
+        verifyNoDecisionTransitions();
+    }
+
+    @Test
+    void shouldConflictWhenFailedRetryMissesAndAnswerIsStillEvaluating() {
+        InterviewAnswer failed = answer(
+                InterviewAnswerStatus.FAILED,
+                MAIN_QUESTION_ID
+        );
+        InterviewAnswer evaluating = answer(
+                InterviewAnswerStatus.EVALUATING,
+                MAIN_QUESTION_ID
+        );
+        evaluating.setUpdatedAt(LocalDateTime.now());
+        InterviewQuestion main = mainQuestion();
+        when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID))
+                .thenReturn(failed, evaluating);
+        when(interviewQuestionMapper.getInterviewQuestionById(MAIN_QUESTION_ID))
+                .thenReturn(main);
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+                .thenReturn(session(MAIN_QUESTION_ID));
+        when(transactionService.tryRetryEvaluation(ANSWER_ID))
+                .thenReturn(false);
+
+        assertThatThrownBy(() -> service.evaluateAnswer(ANSWER_ID))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("答案正在评估中，请稍后重试");
+
+        verify(transactionService).tryRetryEvaluation(ANSWER_ID);
+        verify(transactionService, never()).tryClaimEvaluation(ANSWER_ID);
+        verifyNoInteractions(evaluationOrchestrationService);
+        verify(interviewQuestionMapper, never())
+                .findNextPendingMainQuestion(any(), any());
+        verifyNoDecisionTransitions();
+    }
+
+    @Test
+    void shouldReplayWhenSubmittedClaimMissesAndAnswerIsAlreadyEvaluated() {
+        InterviewAnswer submitted = answer(
+                InterviewAnswerStatus.SUBMITTED,
+                MAIN_QUESTION_ID
+        );
+        InterviewAnswer evaluated = answer(
+                InterviewAnswerStatus.EVALUATED,
+                MAIN_QUESTION_ID
+        );
+        InterviewQuestion main = mainQuestion();
+        when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID))
+                .thenReturn(submitted, evaluated);
+        when(interviewQuestionMapper.getInterviewQuestionById(MAIN_QUESTION_ID))
+                .thenReturn(main);
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+                .thenReturn(session(MAIN_QUESTION_ID));
+        when(transactionService.tryClaimEvaluation(ANSWER_ID))
+                .thenReturn(false);
+
+        EvaluationOrchestrationResult actual =
+                service.evaluateAnswer(ANSWER_ID);
+
+        assertThat(actual).isNull();
+        verify(transactionService).tryClaimEvaluation(ANSWER_ID);
+        verifyNoInteractions(evaluationOrchestrationService);
+        verify(interviewQuestionMapper, never())
+                .findNextPendingMainQuestion(any(), any());
+        verifyNoDecisionTransitions();
+    }
+
+    @Test
+    void shouldReplayWhenFailedRetryMissesAndAnswerIsAlreadyEvaluated() {
+        InterviewAnswer failed = answer(
+                InterviewAnswerStatus.FAILED,
+                MAIN_QUESTION_ID
+        );
+        InterviewAnswer evaluated = answer(
+                InterviewAnswerStatus.EVALUATED,
+                MAIN_QUESTION_ID
+        );
+        InterviewQuestion main = mainQuestion();
+        when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID))
+                .thenReturn(failed, evaluated);
+        when(interviewQuestionMapper.getInterviewQuestionById(MAIN_QUESTION_ID))
+                .thenReturn(main);
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+                .thenReturn(session(MAIN_QUESTION_ID));
+        when(transactionService.tryRetryEvaluation(ANSWER_ID))
+                .thenReturn(false);
+
+        EvaluationOrchestrationResult actual =
+                service.evaluateAnswer(ANSWER_ID);
+
+        assertThat(actual).isNull();
+        verify(transactionService).tryRetryEvaluation(ANSWER_ID);
+        verifyNoInteractions(evaluationOrchestrationService);
+        verifyNoDecisionTransitions();
     }
 
     @ParameterizedTest
@@ -410,8 +537,8 @@ class InterviewWorkflowServiceTest {
                 .hasMessage("答案正在评估中，请稍后重试");
 
         verifyNoInteractions(evaluationOrchestrationService);
-        verify(transactionService, never()).claimEvaluation(ANSWER_ID);
-        verify(transactionService, never()).retryEvaluation(ANSWER_ID);
+        verify(transactionService, never()).tryClaimEvaluation(ANSWER_ID);
+        verify(transactionService, never()).tryRetryEvaluation(ANSWER_ID);
         verify(transactionService, never())
                 .tryReclaimStaleEvaluating(any(), any());
         verify(interviewQuestionMapper, never())
@@ -451,8 +578,8 @@ class InterviewWorkflowServiceTest {
                 eq(ANSWER_ID),
                 any()
         );
-        verify(transactionService, never()).claimEvaluation(ANSWER_ID);
-        verify(transactionService, never()).retryEvaluation(ANSWER_ID);
+        verify(transactionService, never()).tryClaimEvaluation(ANSWER_ID);
+        verify(transactionService, never()).tryRetryEvaluation(ANSWER_ID);
         verify(evaluationOrchestrationService).evaluate(ANSWER_ID, true);
         verify(transactionService).advanceToNextMain(
                 ANSWER_ID,
@@ -490,11 +617,13 @@ class InterviewWorkflowServiceTest {
         )).thenReturn(false);
         when(evaluationOrchestrationService.evaluate(ANSWER_ID, true))
                 .thenReturn(finalResult(DecisionAction.NEXT_MAIN));
+        when(transactionService.tryRetryEvaluation(ANSWER_ID))
+                .thenReturn(true);
 
         service.evaluateAnswer(ANSWER_ID);
 
-        verify(transactionService, never()).claimEvaluation(ANSWER_ID);
-        verify(transactionService).retryEvaluation(ANSWER_ID);
+        verify(transactionService, never()).tryClaimEvaluation(ANSWER_ID);
+        verify(transactionService).tryRetryEvaluation(ANSWER_ID);
         verify(evaluationOrchestrationService).evaluate(ANSWER_ID, true);
         verify(transactionService).advanceToNextMain(
                 ANSWER_ID,
@@ -528,7 +657,7 @@ class InterviewWorkflowServiceTest {
                 .hasMessage("答案正在评估中，请稍后重试");
 
         verifyNoInteractions(evaluationOrchestrationService);
-        verify(transactionService, never()).retryEvaluation(ANSWER_ID);
+        verify(transactionService, never()).tryRetryEvaluation(ANSWER_ID);
         verify(interviewQuestionMapper, never())
                 .findNextPendingMainQuestion(any(), any());
     }
@@ -842,6 +971,7 @@ class InterviewWorkflowServiceTest {
                 SESSION_ID,
                 MAIN_PLAN_ORDER
         )).thenReturn(nextMain);
+        stubSuccessfulEvaluationClaim(answerStatus);
     }
 
     private void stubFollowUpWorkflow(
@@ -863,6 +993,20 @@ class InterviewWorkflowServiceTest {
                 SESSION_ID,
                 MAIN_PLAN_ORDER
         )).thenReturn(nextMain);
+        stubSuccessfulEvaluationClaim(answerStatus);
+    }
+
+    private void stubSuccessfulEvaluationClaim(
+            InterviewAnswerStatus answerStatus
+    ) {
+        if (answerStatus == InterviewAnswerStatus.SUBMITTED) {
+            when(transactionService.tryClaimEvaluation(ANSWER_ID))
+                    .thenReturn(true);
+        }
+        if (answerStatus == InterviewAnswerStatus.FAILED) {
+            when(transactionService.tryRetryEvaluation(ANSWER_ID))
+                    .thenReturn(true);
+        }
     }
 
     private void stubCurrentQuestionBeforeParentResolution(

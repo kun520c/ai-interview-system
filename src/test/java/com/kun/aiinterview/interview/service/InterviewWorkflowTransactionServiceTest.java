@@ -167,8 +167,8 @@ class InterviewWorkflowTransactionServiceTest {
         when(interviewAnswerMapper.retryEvaluation(ANSWER_ID))
                 .thenReturn(1);
 
-        service.claimEvaluation(ANSWER_ID);
-        service.retryEvaluation(ANSWER_ID);
+        assertThat(service.tryClaimEvaluation(ANSWER_ID)).isTrue();
+        assertThat(service.tryRetryEvaluation(ANSWER_ID)).isTrue();
 
         verify(interviewAnswerMapper).claimEvaluation(ANSWER_ID);
         verify(interviewAnswerMapper).retryEvaluation(ANSWER_ID);
@@ -179,16 +179,17 @@ class InterviewWorkflowTransactionServiceTest {
     }
 
     @Test
-    void shouldRejectFailedEvaluationRetryCas() {
+    void shouldReturnFalseWhenEvaluationClaimOrRetryCasMisses() {
+        when(interviewAnswerMapper.claimEvaluation(ANSWER_ID))
+                .thenReturn(0);
         when(interviewAnswerMapper.retryEvaluation(ANSWER_ID))
                 .thenReturn(0);
 
-        assertThatThrownBy(
-                () -> service.retryEvaluation(ANSWER_ID)
-        )
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Answer评价重试资格抢占失败");
+        assertThat(service.tryClaimEvaluation(ANSWER_ID)).isFalse();
+        assertThat(service.tryRetryEvaluation(ANSWER_ID)).isFalse();
 
+        verify(interviewAnswerMapper).claimEvaluation(ANSWER_ID);
+        verify(interviewAnswerMapper).retryEvaluation(ANSWER_ID);
         verifyNoInteractions(
                 interviewQuestionMapper,
                 interviewSessionMapper

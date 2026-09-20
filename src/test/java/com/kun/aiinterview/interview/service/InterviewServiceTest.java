@@ -457,6 +457,53 @@ class InterviewServiceTest {
     }
 
     @Test
+    void shouldReplayPersistedEvaluationWhenWorkflowSignalsAlreadyCompleted() {
+        InterviewSession currentSession = session(
+                InterviewSessionStatus.IN_PROGRESS,
+                QUESTION_ID,
+                USER_ID
+        );
+        InterviewSession completed = session(
+                InterviewSessionStatus.COMPLETED,
+                null,
+                USER_ID
+        );
+        InterviewQuestion answered = question(
+                QUESTION_ID,
+                SESSION_ID,
+                InterviewQuestionStatus.ANSWERED,
+                InterviewQuestionType.MAIN
+        );
+        stubInitialSessionAndQuestion(currentSession, answered);
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+                .thenReturn(currentSession, completed);
+        when(interviewAnswerMapper.getInterviewAnswerByRequestId(
+                REQUEST_ID
+        )).thenReturn(answer(InterviewAnswerStatus.SUBMITTED));
+        when(workflowServiceProvider.getIfAvailable())
+                .thenReturn(workflowService);
+        when(workflowService.evaluateAnswer(ANSWER_ID))
+                .thenReturn(null);
+        when(answerEvaluationMapper.getByAnswerId(ANSWER_ID))
+                .thenReturn(evaluation(
+                        DecisionAction.FINISH,
+                        EvaluationPhase.FINAL
+                ));
+
+        SubmitInterviewAnswerResponse response = service.submitAnswer(
+                USER_ID,
+                SESSION_ID,
+                request()
+        );
+
+        assertThat(response.sessionStatus())
+                .isEqualTo(InterviewSessionStatus.COMPLETED);
+        assertCompleteEvaluation(response);
+        verify(workflowService).evaluateAnswer(ANSWER_ID);
+        verify(transactionService, never()).submitAnswer(any(), any());
+    }
+
+    @Test
     void shouldRejectEvaluatingAnswerWithoutStartingSecondWorkflow() {
         InterviewSession session = session(
                 InterviewSessionStatus.IN_PROGRESS,
@@ -473,6 +520,39 @@ class InterviewServiceTest {
         when(interviewAnswerMapper.getInterviewAnswerByRequestId(
                 REQUEST_ID
         )).thenReturn(answer(InterviewAnswerStatus.EVALUATING));
+        when(workflowServiceProvider.getIfAvailable())
+                .thenReturn(workflowService);
+        when(workflowService.evaluateAnswer(ANSWER_ID))
+                .thenThrow(new ConflictException("答案正在评估中，请稍后重试"));
+
+        assertThatThrownBy(() -> service.submitAnswer(
+                USER_ID,
+                SESSION_ID,
+                request()
+        )).isInstanceOf(ConflictException.class)
+                .hasMessage("答案正在评估中，请稍后重试");
+
+        verify(workflowService).evaluateAnswer(ANSWER_ID);
+        verify(transactionService, never()).submitAnswer(any(), any());
+    }
+
+    @Test
+    void shouldPropagateLostEvaluationClaimAsConflict() {
+        InterviewSession session = session(
+                InterviewSessionStatus.IN_PROGRESS,
+                QUESTION_ID,
+                USER_ID
+        );
+        InterviewQuestion answered = question(
+                QUESTION_ID,
+                SESSION_ID,
+                InterviewQuestionStatus.ANSWERED,
+                InterviewQuestionType.MAIN
+        );
+        stubInitialSessionAndQuestion(session, answered);
+        when(interviewAnswerMapper.getInterviewAnswerByRequestId(
+                REQUEST_ID
+        )).thenReturn(answer(InterviewAnswerStatus.SUBMITTED));
         when(workflowServiceProvider.getIfAvailable())
                 .thenReturn(workflowService);
         when(workflowService.evaluateAnswer(ANSWER_ID))

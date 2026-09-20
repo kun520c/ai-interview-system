@@ -246,6 +246,28 @@ class InterviewControllerTest {
     }
 
     @Test
+    void shouldReturnReplayEvaluationWithoutHttp500() throws Exception {
+        stubTokenUser("replay-token");
+        when(interviewService.submitAnswer(
+                org.mockito.ArgumentMatchers.eq(USER_ID),
+                org.mockito.ArgumentMatchers.eq(21L),
+                org.mockito.ArgumentMatchers.any()
+        )).thenReturn(submitResponse());
+
+        mockMvc.perform(post("/api/interviews/21/answers")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer replay-token"
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validAnswerJson()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.evaluation.totalScore").value(80))
+                .andExpect(jsonPath("$.data.nextAction").value("NEXT_MAIN"));
+    }
+
+    @Test
     void shouldValidateBlankAnswerBeforeCallingService() throws Exception {
         stubTokenUser("invalid-answer-token");
 
