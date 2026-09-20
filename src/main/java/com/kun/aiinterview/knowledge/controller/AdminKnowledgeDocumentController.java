@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,5 +29,11 @@ public class AdminKnowledgeDocumentController {
                 knowledgeDocumentAdminService.uploadDocument(request);
 
         return Result.success(response);
+    }
+
+    @PostMapping("/{documentId}/process")
+    public Result<Void> processDocument(@PathVariable Long documentId) {
+        knowledgeDocumentAdminService.processDocument(documentId);
+        return Result.success();
     }
 }

@@ -32,6 +32,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,6 +44,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -294,6 +296,99 @@ class AdminKnowledgeDocumentControllerTest {
                 .andExpect(jsonPath("$.code").value(400));
 
         verifyNoInteractions(knowledgeDocumentAdminService);
+    }
+
+    @Test
+    void givenNoToken_whenProcessing_thenReturnsUnifiedUnauthorizedJson()
+            throws Exception {
+        mockMvc.perform(post(ENDPOINT + "/12/process"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value(401));
+
+        verifyNoInteractions(knowledgeDocumentAdminService);
+    }
+
+    @Test
+    void givenDatabaseUserRole_whenProcessing_thenReturnsForbidden()
+            throws Exception {
+        stubTokenUser("process-user-token", UserRole.USER);
+
+        mockMvc.perform(post(ENDPOINT + "/12/process")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer process-user-token"
+                        ))
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value(403));
+
+        verifyNoInteractions(knowledgeDocumentAdminService);
+    }
+
+    @Test
+    void givenAdmin_whenProcessing_thenInvokesAdminProcessDocument()
+            throws Exception {
+        stubTokenUser("process-admin-token", UserRole.ADMIN);
+
+        mockMvc.perform(post(ENDPOINT + "/12/process")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer process-admin-token"
+                        ))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("success"));
+
+        verify(knowledgeDocumentAdminService).processDocument(12L);
+    }
+
+    @Test
+    void givenAdminAndNonPositiveDocumentId_whenProcessing_thenReturnsControlledRejection()
+            throws Exception {
+        stubTokenUser("invalid-id-admin-token", UserRole.ADMIN);
+        org.mockito.Mockito.doThrow(new BusinessException("文档ID必须大于0"))
+                .when(knowledgeDocumentAdminService)
+                .processDocument(0L);
+
+        mockMvc.perform(post(ENDPOINT + "/0/process")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer invalid-id-admin-token"
+                        ))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("文档ID必须大于0"));
+    }
+
+    @Test
+    void givenAdminAndFileBetweenOneMbAndFiveMib_whenUploading_thenReachesService()
+            throws Exception {
+        stubTokenUser("large-file-admin-token", UserRole.ADMIN);
+        byte[] content = new byte[1024 * 1024 + 1];
+        Arrays.fill(content, (byte) 'a');
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "large.md",
+                "text/markdown",
+                content
+        );
+
+        mockMvc.perform(multipart(ENDPOINT)
+                        .file(file)
+                        .param("title", "大文件")
+                        .param("category", "JAVA_COLLECTION")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer large-file-admin-token"
+                        ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(knowledgeDocumentAdminService).uploadDocument(any(
+                UploadKnowledgeDocumentRequest.class
+        ));
     }
 
     private org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder

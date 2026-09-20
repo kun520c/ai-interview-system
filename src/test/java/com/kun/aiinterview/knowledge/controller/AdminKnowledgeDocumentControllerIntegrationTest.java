@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -183,6 +184,58 @@ class AdminKnowledgeDocumentControllerIntegrationTest {
                 .andExpect(jsonPath("$.code").value(400));
 
         assertEquals(beforeCount, documentCount(), scenario);
+    }
+
+    @Test
+    void givenMilvusDisabled_whenAdminProcessesDocument_thenReturnsControlledUnavailableError()
+            throws Exception {
+        User admin = createUser(UserRole.ADMIN);
+
+        mockMvc.perform(post(ENDPOINT + "/12/process")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer " + accessToken(admin)
+                        ))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("知识文档处理服务当前不可用"));
+    }
+
+    @Test
+    void givenNonPositiveDocumentId_whenAdminProcessesDocument_thenReturnsControlledRejection()
+            throws Exception {
+        User admin = createUser(UserRole.ADMIN);
+
+        mockMvc.perform(post(ENDPOINT + "/0/process")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer " + accessToken(admin)
+                        ))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("文档ID必须大于0"));
+    }
+
+    @Test
+    void givenDatabaseUser_whenProcessing_thenReturnsForbidden()
+            throws Exception {
+        User user = createUser(UserRole.USER);
+
+        mockMvc.perform(post(ENDPOINT + "/12/process")
+                        .header(
+                                HttpHeaders.AUTHORIZATION,
+                                "Bearer " + accessToken(user)
+                        ))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+    }
+
+    @Test
+    void givenNoToken_whenProcessing_thenReturnsUnauthorized()
+            throws Exception {
+        mockMvc.perform(post(ENDPOINT + "/12/process"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401));
     }
 
     private static Stream<Arguments> invalidDocuments() {

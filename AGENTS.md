@@ -436,6 +436,14 @@ Knowledge-base first-stage completed capability:
 * An independent response VO that does not expose content, content hash, or error details
 * Existing `/api/admin/**` authorization: no token is HTTP 401 and a current database `USER` is HTTP 403
 
+Knowledge-base first-time processing trigger and multipart contract (Phase 5 Batch 1):
+
+* Upload still only creates an `UPLOADED` document. It does not start chunking, Embedding, or Milvus write.
+* `POST /api/admin/knowledge/documents/{documentId}/process` is the ADMIN explicit first-time processing trigger. It validates a positive document ID, obtains the existing `KnowledgeDocumentProcessingService` through `ObjectProvider`, and calls `processDocument(documentId)`.
+* First-time processing still requires Milvus-enabled infrastructure (`milvus.enabled=true`). When the processing bean is absent, the Admin controller still starts and the process endpoint returns the controlled business error `知识文档处理服务当前不可用`.
+* Repeated process requests against `PROCESSING`, `READY`, or `FAILED` continue to be rejected by the existing `claimProcessing` CAS. This batch does not add FAILED retry or READY reprocessing.
+* The 5 MiB business upload contract is explicitly configured in `application.yaml`: `spring.servlet.multipart.max-file-size=5MB` (Spring `DataSize` uses 1024-based `MB`, so this equals `5 * 1024 * 1024` bytes) and `max-request-size=6MB` for the file plus form metadata. `server.tomcat.max-swallow-size=6MB` so an oversize request can return HTTP 413 instead of aborting the connection. `MaxUploadSizeExceededException` is mapped to HTTP 413 with `上传文件不能超过5MB`. `KnowledgeDocumentAdminService.MAX_FILE_SIZE` remains `5 * 1024 * 1024`.
+
 Knowledge-base second-stage A completed capability:
 
 * A reusable, stateless Spring `@Component` named `KnowledgeTextChunker` accepts normalized document content as a `String`.
@@ -552,6 +560,7 @@ Knowledge-base C1 completed capability:
 * Compensation or `markFailed` failures never replace the primary pipeline exception; they are retained as suppressed exceptions when applicable.
 * The design does not claim a distributed transaction, exactly-once delivery, or automatic Collection-wide cleanup. It never drops or clears the Collection during compensation.
 * `KnowledgeDocumentProcessingService` is created only when `milvus.enabled=true`; with Milvus disabled, the processing bean is not created and ordinary test contexts remain isolated.
+* Production first-time processing is started by `POST /api/admin/knowledge/documents/{documentId}/process`. The Admin API obtains the conditional processing bean through `ObjectProvider` and does not constructor-inject it. Upload remains an `UPLOADED` persist step; the explicit process endpoint is required to enter `UPLOADED -> PROCESSING -> READY / FAILED`.
 * C1-7 completed Existing-Collection Schema and index validation. The real local `knowledge_chunk_vectors_local` Collection passed validation, and a test-owned temporary dimension-mismatch Collection failed fast and was cleaned up without changing the real Collection.
 
 Synchronized test scope and current result through C1-8:

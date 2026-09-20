@@ -19,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.Mock;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,6 +52,13 @@ class KnowledgeDocumentAdminServiceTest {
 
     @Mock
     private KnowledgeDocumentMapper knowledgeDocumentMapper;
+
+    @Mock
+    private ObjectProvider<KnowledgeDocumentProcessingService>
+            knowledgeDocumentProcessingServiceProvider;
+
+    @Mock
+    private KnowledgeDocumentProcessingService knowledgeDocumentProcessingService;
 
     @InjectMocks
     private KnowledgeDocumentAdminService knowledgeDocumentAdminService;
@@ -331,6 +339,59 @@ class KnowledgeDocumentAdminServiceTest {
 
         verify(file, never()).getBytes();
         verifyNoInteractions(knowledgeDocumentMapper);
+    }
+
+    @Test
+    void givenUploadedDocument_whenProcessing_thenInvokesExistingProcessingService() {
+        stubSuccessfulInsert();
+        when(knowledgeDocumentProcessingServiceProvider.getIfAvailable())
+                .thenReturn(knowledgeDocumentProcessingService);
+
+        UploadKnowledgeDocumentResponse uploaded =
+                knowledgeDocumentAdminService.uploadDocument(
+                        request("HashMap.md", "正文", "HashMap 原理", null)
+                );
+
+        knowledgeDocumentAdminService.processDocument(uploaded.getDocumentId());
+
+        assertAll(
+                () -> assertEquals(101L, uploaded.getDocumentId()),
+                () -> assertEquals(
+                        KnowledgeProcessingStatus.UPLOADED,
+                        uploaded.getProcessingStatus()
+                )
+        );
+        verify(knowledgeDocumentProcessingService).processDocument(101L);
+    }
+
+    @Test
+    void givenProcessingServiceUnavailable_whenProcessing_thenRejectsWithoutCallingPipeline() {
+        when(knowledgeDocumentProcessingServiceProvider.getIfAvailable())
+                .thenReturn(null);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> knowledgeDocumentAdminService.processDocument(12L)
+        );
+
+        assertEquals("知识文档处理服务当前不可用", exception.getMessage());
+        verifyNoInteractions(knowledgeDocumentProcessingService);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(longs = {0L, -1L})
+    void givenNonPositiveDocumentId_whenProcessing_thenRejectsWithoutObtainingService(
+            Long documentId
+    ) {
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> knowledgeDocumentAdminService.processDocument(documentId)
+        );
+
+        assertEquals("文档ID必须大于0", exception.getMessage());
+        verifyNoInteractions(knowledgeDocumentProcessingServiceProvider);
+        verifyNoInteractions(knowledgeDocumentProcessingService);
     }
 
     @ParameterizedTest

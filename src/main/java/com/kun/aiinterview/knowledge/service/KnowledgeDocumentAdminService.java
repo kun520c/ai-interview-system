@@ -8,6 +8,7 @@ import com.kun.aiinterview.knowledge.enums.KnowledgeProcessingStatus;
 import com.kun.aiinterview.knowledge.mapper.KnowledgeDocumentMapper;
 import com.kun.aiinterview.knowledge.vo.UploadKnowledgeDocumentResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +33,8 @@ public class KnowledgeDocumentAdminService {
     private static final int MAX_SOURCE_LENGTH = 255;
 
     private final KnowledgeDocumentMapper knowledgeDocumentMapper;
+    private final ObjectProvider<KnowledgeDocumentProcessingService>
+            knowledgeDocumentProcessingServiceProvider;
 
     public UploadKnowledgeDocumentResponse uploadDocument(
             UploadKnowledgeDocumentRequest request
@@ -109,6 +112,21 @@ public class KnowledgeDocumentAdminService {
                 .documentVersion(document.getDocumentVersion())
                 .processingStatus(document.getProcessingStatus())
                 .build();
+    }
+
+    public void processDocument(Long documentId) {
+        if (documentId == null || documentId <= 0) {
+            throw new BusinessException("文档ID必须大于0");
+        }
+
+        KnowledgeDocumentProcessingService processingService =
+                knowledgeDocumentProcessingServiceProvider.getIfAvailable();
+
+        if (processingService == null) {
+            throw new BusinessException("知识文档处理服务当前不可用");
+        }
+
+        processingService.processDocument(documentId);
     }
 
     private String cleanFileName(String originalFileName) {
