@@ -18,3 +18,7 @@ milvus:
 
 deepseek:
   enabled: false
+
+ai:
+  judge:
+    provider: deepseek

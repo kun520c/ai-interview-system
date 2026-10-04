@@ -728,10 +728,6 @@ class KnowledgeDocumentProcessingServiceTest {
         assertThat(new HashSet<>(insertedIds)).hasSize(insertedIds.size());
     }
 
-    private static KnowledgeDocument validDocument() {
-        return processingDocument(null);
-    }
-
     private static KnowledgeDocument uploadedDocument() {
         return document(KnowledgeProcessingStatus.UPLOADED, null);
     }

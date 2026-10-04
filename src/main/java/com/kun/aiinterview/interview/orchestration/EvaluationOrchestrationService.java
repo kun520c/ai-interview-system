@@ -11,8 +11,7 @@ import com.kun.aiinterview.interview.evaluation.decision.FollowUpTargetResolver;
 import com.kun.aiinterview.interview.evaluation.EvaluationContext;
 import com.kun.aiinterview.interview.evaluation.EvaluationRetrievalAdapter;
 import com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult;
-import com.kun.aiinterview.interview.evaluation.llm.deepseek.DeepSeekEvaluationClient;
-import com.kun.aiinterview.interview.evaluation.llm.DeepSeekEvaluationResult;
+import com.kun.aiinterview.interview.evaluation.judge.JudgeProvider;
 import com.kun.aiinterview.interview.evaluation.llm.LlmEvaluationSuggestion;
 import com.kun.aiinterview.interview.evaluation.prompt.EvaluationPrompt;
 import com.kun.aiinterview.interview.evaluation.prompt.EvaluationPromptBuilder;
@@ -54,7 +53,7 @@ public class EvaluationOrchestrationService {
 
     private final EvaluationPromptBuilder promptBuilder;
 
-    private final DeepSeekEvaluationClient deepSeekEvaluationClient;
+    private final JudgeProvider judgeProvider;
 
     private final LlmEvaluationValidator validator;
 
@@ -76,7 +75,7 @@ public class EvaluationOrchestrationService {
             EvaluationContextService contextService,
             EvaluationRetrievalAdapter retrievalAdapter,
             EvaluationPromptBuilder promptBuilder,
-            DeepSeekEvaluationClient deepSeekEvaluationClient,
+            JudgeProvider judgeProvider,
             LlmEvaluationValidator validator,
             EvaluationScoreCalculator scoreCalculator,
             EvaluationStandard evaluationStandard,
@@ -89,8 +88,7 @@ public class EvaluationOrchestrationService {
         this.contextService = contextService;
         this.retrievalAdapter = retrievalAdapter;
         this.promptBuilder = promptBuilder;
-        this.deepSeekEvaluationClient =
-                deepSeekEvaluationClient;
+        this.judgeProvider = judgeProvider;
         this.validator = validator;
         this.scoreCalculator = scoreCalculator;
         this.evaluationStandard = evaluationStandard;
@@ -151,8 +149,9 @@ public class EvaluationOrchestrationService {
                         retrievalResult
                 );
 
-        DeepSeekEvaluationResult llmResult =
-                deepSeekEvaluationClient.evaluate(
+        JudgeProvider.Result llmResult =
+                judgeProvider.evaluate(
+                        context,
                         prompt
                 );
 
@@ -188,7 +187,6 @@ public class EvaluationOrchestrationService {
                         level,
                         decision,
                         retrievalBatchId,
-                        prompt,
                         llmResult
                 );
 
@@ -221,8 +219,7 @@ public class EvaluationOrchestrationService {
             EvaluationLevel level,
             EvaluationDecision decision,
             String retrievalBatchId,
-            EvaluationPrompt prompt,
-            DeepSeekEvaluationResult llmResult
+            JudgeProvider.Result llmResult
     ) {
         return AnswerEvaluation.builder()
 
@@ -310,7 +307,7 @@ public class EvaluationOrchestrationService {
                 )
 
                 .promptVersion(
-                        prompt.promptVersion()
+                        llmResult.promptVersion()
                 )
 
                 .evaluationStandardVersion(

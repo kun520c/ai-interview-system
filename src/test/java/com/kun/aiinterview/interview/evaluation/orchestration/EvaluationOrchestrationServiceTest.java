@@ -13,6 +13,8 @@ import com.kun.aiinterview.interview.evaluation.EvaluationMode;
 import com.kun.aiinterview.interview.evaluation.EvaluationRetrievalAdapter;
 import com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult;
 import com.kun.aiinterview.interview.evaluation.llm.deepseek.DeepSeekEvaluationClient;
+import com.kun.aiinterview.interview.evaluation.judge.DeepSeekJudgeProvider;
+import com.kun.aiinterview.interview.evaluation.judge.JudgeProvider;
 import com.kun.aiinterview.interview.evaluation.llm.DeepSeekEvaluationResult;
 import com.kun.aiinterview.interview.evaluation.llm.LlmEvaluationSuggestion;
 import com.kun.aiinterview.interview.evaluation.prompt.EvaluationPrompt;
@@ -659,12 +661,39 @@ class EvaluationOrchestrationServiceTest {
         verify(answerEvaluationMapper, never()).insertEvaluation(any());
     }
 
+    @Test
+    void shouldPersistSelectedJudgeMetadataRatherThanOriginalDeepSeekPromptVersion() {
+        EvaluationScore score = new EvaluationScore(17, 17, 17, 17, 17, 85);
+        EvaluationDecision decision = new EvaluationDecision(
+                EvaluationPhase.FINAL, DecisionAction.NEXT_MAIN, List.of());
+        stubHappyPipeline(ANSWER_ID, EvaluationMode.MAIN_ANSWER, score,
+                EvaluationLevel.GOOD, decision, false);
+        populateGeneratedKey(9002L);
+        String combinedRaw = "{\"provider\":\"jev\",\"judge\":{},\"generation\":{}}";
+        JudgeProvider selectedJudge = (context, prompt) -> new JudgeProvider.Result(
+                "jev-1.13.0", "jev-judge-v1", combinedRaw,
+                deepSeekEvaluationClient.evaluate(prompt).suggestion());
+        service = serviceWith(objectMapper, selectedJudge);
+
+        service.evaluate(ANSWER_ID, true);
+
+        var captor = ArgumentCaptor.forClass(AnswerEvaluation.class);
+        verify(answerEvaluationMapper).insertEvaluation(captor.capture());
+        assertThat(captor.getValue().getLlmModel()).isEqualTo("jev-1.13.0");
+        assertThat(captor.getValue().getPromptVersion()).isEqualTo("jev-judge-v1");
+        assertThat(captor.getValue().getRawResult()).isEqualTo(combinedRaw);
+    }
+
     private EvaluationOrchestrationService serviceWith(ObjectMapper mapper) {
+        return serviceWith(mapper, new DeepSeekJudgeProvider(deepSeekEvaluationClient));
+    }
+
+    private EvaluationOrchestrationService serviceWith(ObjectMapper mapper, JudgeProvider selectedJudge) {
         return new EvaluationOrchestrationService(
                 contextService,
                 retrievalAdapter,
                 promptBuilder,
-                deepSeekEvaluationClient,
+                selectedJudge,
                 validator,
                 scoreCalculator,
                 evaluationStandard,
