@@ -60,7 +60,7 @@ FRONTEND_API_CHANGED=NO
 | 测试 `interview/evaluation/judge/DeepSeekJudgeProviderTest.java` | 新增 | 经真实原 Client 与 Mock HTTP 验证默认策略保持旧 prompt/JSON/分数/元数据 |
 | 测试 `interview/evaluation/judge/JudgeConfigurationTest.java` | 新增 | 验证默认策略、显式 Jev、按需配置、参数绑定、无效配置失败、key 不进入 toString |
 | 测试 `interview/evaluation/orchestration/EvaluationOrchestrationServiceTest.java` | 修改 | 原测试通过 DeepSeek 适配器继续运行，没有删除或弱化断言；新增选中策略的 model/promptVersion/rawJson 落库测试 |
-| `JEV_INTEGRATION_LEARNING_REPORT.md` | 新增 | 保存审查、调用链、设计解释、学习清单、执行记录与验收边界 |
+| `Jev-Judge接入学习报告.md` | 新增 | 保存审查、调用链、设计解释、学习清单、执行记录与验收边界 |
 
 ## 3. 修改前实际调用链
 
