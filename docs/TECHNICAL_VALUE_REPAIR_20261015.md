@@ -1,6 +1,6 @@
-# Jev 可靠性与 Spring AI 接入价值验证（2026-10-15，本地实验记录）
+# Jev 可靠性与 Spring AI 接入价值验证（2026-10-15，源码及离线验证）
 
-> **发布状态：本地实验，尚未合入 GitHub `main`。** 本节和专项报告记录 2026-10-15 本地工作区的 Jev 可靠性改动、Spring AI 契约测试及其回归日志。`main` 当前不包含 Jev 反馈重试、共享请求预算和对应新增测试；不能将以下离线结果视为 GitHub 版本已实现的能力。
+> **发布状态：源码已合入 GitHub `main`，真实模型收益仍未验证。** Jev 反馈重试、请求预算、诊断及 Spring AI 离线契约测试已包含在源码中。以下回归结果来自 2026-10-15 本地测试日志，本次提交未重新执行 Maven 测试；Mock 恢复不代表真实模型质量改善。
 
 面向 Java 后端实习、校招及初级岗位的模拟面试项目。Java 21、Spring Boot 3.5.16、MyBatis、MySQL、Spring AI 1.1.8、Milvus 和 DeepSeek；Jev 是显式选择的评分策略。开发与验收资料见[文档导航](README.md)。
 
@@ -100,7 +100,7 @@ Jev 成功结果的既有内部 raw JSON 增加 `execution` 元数据；原有 j
 
 执行前清除所有 `RUN_REAL_*` 与 `MILVUS_ENABLED`，保留 test profile 的服务隔离配置，并为 Maven 进程提供测试库凭据。受限 Windows 环境还需要本机回环权限；本次运行额外使用 Mockito/Byte Buddy premain，避免沙箱阻断动态 attach，未修改项目依赖或 POM。日志与机器可读的三组回放摘要位于忽略的 `target/value-repair/`。
 
-### 本地变更文件清单（尚未合入 main）
+### 已合入 main 的专项文件清单
 
 | 状态 | 文件 | 用途 |
 |---|---|---|
@@ -114,9 +114,9 @@ Jev 成功结果的既有内部 raw JSON 增加 `execution` 元数据；原有 j
 | 新增 | `../src/test/java/com/kun/aiinterview/interview/evaluation/judge/jev/JevRequestBudgetTest.java` | 累计预算、迟到结果与本机 JDK 慢响应取消 |
 | 新增 | `../src/test/java/com/kun/aiinterview/knowledge/embedding/springai/EmbeddingProviderSwitchContractTest.java` | 两个兼容服务配置切换及不兼容输出拒绝 |
 | 修改 | `../src/test/java/com/kun/aiinterview/interview/evaluation/judge/JudgeConfigurationTest.java`、`../src/test/java/com/kun/aiinterview/interview/evaluation/judge/jev/JevFeedbackPromptHardeningTest.java` | 预算绑定/非法配置测试；原有严格拒绝测试纳入有限重试次数 |
-| 记录 | 本专项文档；项目主页引用此报告 | 历史实验与本地验证边界（不代表代码已发布） |
+| 记录 | 本专项文档；项目主页引用此报告 | 历史实验与本地验证边界（源码已发布，真实模型质量未复验） |
 
-## 两段面试讲解（应明确区分本地已验证与 GitHub 已发布能力）
+## 两段面试讲解（需区分离线验证与真实模型效果）
 
 **Spring AI：**“我用 Spring AI 收敛 OpenAI 兼容 Embeddings 的协议和响应映射，业务层仍只依赖自己的 EmbeddingClient。分批、乱序索引恢复、模型与维度校验、版本和异常处理属于项目适配器。两个离线兼容服务的契约测试证明，同协议内切换配置不需要改检索业务；换模型仍须更新 profile 和重建向量。我保留原生 Milvus 适配器，因为现有 schema 和补偿边界已经稳定，迁移收益不足。”
 

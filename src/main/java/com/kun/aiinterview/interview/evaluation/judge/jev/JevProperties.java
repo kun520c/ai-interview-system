@@ -7,6 +7,8 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -37,6 +39,15 @@ public class JevProperties {
     @DecimalMin("0.0")
     @DecimalMax("1.0")
     private Double minConfidence = 0.0;
+    @Min(0)
+    @Max(1)
+    private int feedbackMaxRetries = 1;
+    @NotNull
+    private Duration requestTimeout = Duration.ofSeconds(80);
+    @NotNull
+    private Duration feedbackTimeout = Duration.ofSeconds(20);
+    @NotNull
+    private Duration fallbackTimeout = Duration.ofSeconds(25);
     @Valid
     @NotNull
     private ProxySettings proxy = new ProxySettings();
@@ -88,5 +99,19 @@ public class JevProperties {
     @AssertTrue(message = "Jev confidence阈值必须是有限数值")
     public boolean isConfidenceFinite() {
         return minConfidence == null || Double.isFinite(minConfidence);
+    }
+
+    @AssertTrue(message = "Jev预算须为正且总预算不超过180s，反馈和降级不超过60s，总预算须容纳降级与2s反馈窗口")
+    public boolean isRequestBudgetValid() {
+        if (requestTimeout == null || feedbackTimeout == null || fallbackTimeout == null) {
+            return true; // @NotNull reports the missing property.
+        }
+        return requestTimeout.compareTo(Duration.ZERO) > 0
+                && requestTimeout.compareTo(Duration.ofSeconds(180)) <= 0
+                && feedbackTimeout.compareTo(Duration.ZERO) > 0
+                && feedbackTimeout.compareTo(Duration.ofSeconds(60)) <= 0
+                && fallbackTimeout.compareTo(Duration.ZERO) > 0
+                && fallbackTimeout.compareTo(Duration.ofSeconds(60)) <= 0
+                && requestTimeout.compareTo(fallbackTimeout.plusSeconds(2)) > 0;
     }
 }

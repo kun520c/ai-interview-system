@@ -159,7 +159,7 @@ class JevFeedbackPromptHardeningTest {
         server.expect(requestTo("http://localhost/v1/systemone"))
                 .andRespond(withSuccess(row.path("nativeResponse").toString(), MediaType.APPLICATION_JSON));
         var result = provider.evaluate(context, prompt);
-        verify(generation, times(1)).completeJson(argThat(system -> system.contains("一个非空连续原文片段")
+        verify(generation, times(valid ? 1 : 2)).completeJson(argThat(system -> system.contains("一个非空连续原文片段")
                 && system.contains("不改字词、空白或标点") && system.contains("已由MAIN覆盖的点仍从MAIN摘录")
                 && system.contains("按JSON规则转义")), anyString());
         assertThat(prompt.promptVersion()).isEqualTo("evaluation-prompt-v3");

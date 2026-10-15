@@ -3,6 +3,7 @@ package com.kun.aiinterview.interview.evaluation.judge.jev;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.kun.aiinterview.common.exception.ExternalServiceException;
 import com.kun.aiinterview.interview.evaluation.EvaluationContext;
 import com.kun.aiinterview.interview.evaluation.EvaluationMode;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.kun.aiinterview.interview.evaluation.judge.jev.JevStageException.Failure.*;
+import static com.kun.aiinterview.interview.evaluation.judge.jev.JevEvaluationTrace.Stage.*;
 
 /** Local model composition. No persistence, state transitions or total-score calculation. */
 public class JevJudgeProvider implements JudgeProvider {
@@ -87,6 +92,7 @@ public class JevJudgeProvider implements JudgeProvider {
                 .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
                 .disable(DeserializationFeature.ACCEPT_FLOAT_AS_INT)
+                .disable(MapperFeature.ALLOW_COERCION_OF_SCALARS)
                 .configure(com.fasterxml.jackson.core.JsonParser.Feature.STRICT_DUPLICATE_DETECTION, true);
         this.validator = validator;
     }
@@ -96,30 +102,103 @@ public class JevJudgeProvider implements JudgeProvider {
         if (context == null || prompt == null) {
             throw new IllegalArgumentException("评价上下文和Prompt不能为空");
         }
+        var budget = new JevRequestBudget(properties.getRequestTimeout());
+        var trace = new JevEvaluationTrace();
         try {
             JevRequest request = buildRequest(context, prompt);
-            JevResponse response = client.evaluate(request);
-            validateAnswers(request, response);
-            LlmEvaluationSuggestion decision = mapDecision(context, response);
-            var generation = generationClient.completeJson(FEEDBACK_SYSTEM,
-                    prompt.userPrompt() + "\n===== judgeDecision =====\n" + toJson(decision));
-            Feedback feedback = parseFeedback(generation.rawJson());
-            LlmEvaluationSuggestion merged = mergeFeedback(context, decision, feedback);
-            try {
-                validator.validate(context, merged);
-            } catch (IllegalArgumentException | IllegalStateException exception) {
-                throw new ExternalServiceException("Jev与生成反馈无法形成合法评价");
+            var nativeDecision = trace.invoke(JEV_NATIVE, budget,
+                    min(properties.getReadTimeout(), budget.available(properties.getFallbackTimeout())), () -> {
+                        JevResponse response = client.evaluate(request);
+                        try {
+                            validateAnswers(request, response);
+                            return new NativeDecision(response, mapDecision(context, response));
+                        } catch (ExternalServiceException exception) {
+                            throw new JevStageException(NATIVE_DECISION_INVALID);
+                        }
+                    });
+            return generateFeedback(context, prompt, nativeDecision, budget, trace);
+        } catch (JevStageException exception) {
+            trace.failure = exception.failure.name();
+            trace.outcome = "FAILED";
+            trace.actualProvider = "none";
+            if (exception.failure == INTERRUPTED || Thread.currentThread().isInterrupted()) {
+                throw exception; // A cancelled caller must never start a new paid request.
             }
-            // Use existing JSON storage for both sources and uncertainty; no schema extension.
-            String raw = toJson(Map.of("provider", "jev", "judge", response,
-                    "generation", generation, "suggestion", merged));
-            return new Result(response.model(), PROMPT_VERSION, raw, merged);
-        } catch (ExternalServiceException exception) {
-            // Do not log exception messages, bodies, prompts, keys, answers or identities.
-            log.warn("Jev evaluation unavailable or invalid; using DeepSeek judge fallback");
-            return fallback.evaluate(context, prompt);
+            trace.fallbackStage = trace.stage.name();
+            var result = trace.invoke(DEEPSEEK_FALLBACK, budget, properties.getFallbackTimeout(),
+                    () -> fallback.evaluate(context, prompt));
+            trace.actualProvider = "deepseek";
+            trace.outcome = "FALLBACK_RETURNED"; // Still untrusted; orchestration performs Java validation.
+            return result;
+        } finally {
+            // Fixed codes and numeric values only. Never log exception objects or model text.
+            log.info("judge_execution {}", toJson(trace.snapshot(budget)));
         }
     }
+
+    private Result generateFeedback(EvaluationContext context, EvaluationPrompt prompt, NativeDecision nativeDecision,
+                                    JevRequestBudget budget, JevEvaluationTrace trace) {
+        String userPrompt = prompt.userPrompt() + "\n===== judgeDecision =====\n" + toJson(nativeDecision.decision());
+        JevStageException lastFailure = null;
+        for (int attempt = 0; attempt <= properties.getFeedbackMaxRetries(); attempt++) {
+            Duration available = budget.available(properties.getFallbackTimeout());
+            if (available.isZero() || (attempt > 0 && available.compareTo(Duration.ofSeconds(2)) < 0)) {
+                trace.stage = DEEPSEEK_FEEDBACK;
+                trace.retryStopReason = "INSUFFICIENT_BUDGET";
+                if (lastFailure != null) throw lastFailure;
+                trace.failure = REQUEST_BUDGET_EXHAUSTED.name();
+                throw new JevStageException(REQUEST_BUDGET_EXHAUSTED);
+            }
+            // Regenerate feedback from the original inputs and frozen decision. Never echo/repair invalid output.
+            String system = FEEDBACK_SYSTEM + (lastFailure == null ? "" : "\n上次反馈被Java拒绝，错误类别："
+                    + lastFailure.failure.name() + "。重新输出完整合法JSON，严格逐字引用回答；不能改动judgeDecision。");
+            try {
+                var feedbackResult = trace.invoke(DEEPSEEK_FEEDBACK, budget,
+                        min(properties.getFeedbackTimeout(), available), () -> {
+                            var generation = generationClient.completeJson(system, userPrompt);
+                            Feedback feedback = parseFeedback(generation.rawJson());
+                            var merged = mergeFeedback(context, nativeDecision.decision(), feedback);
+                            try {
+                                validator.validate(context, merged);
+                            } catch (IllegalArgumentException | IllegalStateException exception) {
+                                throw new JevStageException(FEEDBACK_VALIDATION_FAILED);
+                            }
+                            return new FeedbackResult(generation, merged);
+                        });
+                trace.actualProvider = "jev+deepseek-feedback";
+                trace.outcome = "VALIDATED";
+                trace.retryStopReason = attempt == 0 ? "NOT_NEEDED" : "RECOVERED";
+                String raw = toJson(Map.of("provider", "jev", "judge", nativeDecision.response(),
+                        "generation", feedbackResult.generation(), "suggestion", feedbackResult.suggestion(),
+                        "execution", trace.snapshot(budget)));
+                if (budget.available(Duration.ZERO).isZero()) {
+                    throw new JevStageException(REQUEST_BUDGET_EXHAUSTED);
+                }
+                return new Result(nativeDecision.response().model(), PROMPT_VERSION, raw, feedbackResult.suggestion());
+            } catch (JevStageException exception) {
+                lastFailure = exception;
+                if (!exception.failure.retryable) {
+                    trace.retryStopReason = "NON_RETRYABLE";
+                    throw exception;
+                }
+                if (attempt == properties.getFeedbackMaxRetries()) {
+                    trace.retryStopReason = "MAX_RETRIES";
+                    throw exception;
+                }
+            }
+        }
+        throw new IllegalStateException("Jev feedback attempt configuration invalid");
+    }
+
+    private static Duration min(Duration first, Duration second) {
+        return first.compareTo(second) < 0 ? first : second;
+    }
+
+    private record NativeDecision(JevResponse response, LlmEvaluationSuggestion decision) { }
+
+    private record FeedbackResult(
+            com.kun.aiinterview.interview.evaluation.llm.deepseek.DeepSeekJsonCompletionResult generation,
+            LlmEvaluationSuggestion suggestion) { }
 
     JevRequest buildRequest(EvaluationContext context, EvaluationPrompt prompt) {
         Map<String, JevRequest.Question> questions = new LinkedHashMap<>();
@@ -284,27 +363,29 @@ public class JevJudgeProvider implements JudgeProvider {
     private LlmEvaluationSuggestion mergeFeedback(EvaluationContext context,
                                                    LlmEvaluationSuggestion decision, Feedback feedback) {
         if (feedback == null || feedback.pointEvidence() == null) {
-            throw new ExternalServiceException("生成反馈缺少评分点证据");
+            throw new JevStageException(FEEDBACK_EVIDENCE_MISSING);
         }
         Map<Long, String> evidence = new HashMap<>();
         Set<Long> ids = decision.scoringPointResults().stream()
                 .map(LlmEvaluationSuggestion.ScoringPointResult::scoringPointId).collect(Collectors.toSet());
         for (PointEvidence point : feedback.pointEvidence()) {
             if (point == null || !ids.contains(point.scoringPointId()) || evidence.containsKey(point.scoringPointId())) {
-                throw new ExternalServiceException("生成反馈评分点非法或重复");
+                throw new JevStageException(FEEDBACK_SCHEMA_INVALID);
             }
             evidence.put(point.scoringPointId(), point.evidence());
         }
         if (!evidence.keySet().equals(ids)) {
-            throw new ExternalServiceException("生成反馈评分点不完整");
+            throw new JevStageException(FEEDBACK_EVIDENCE_MISSING);
         }
         var points = new ArrayList<LlmEvaluationSuggestion.ScoringPointResult>();
         for (var point : decision.scoringPointResults()) {
             String quote = evidence.get(point.scoringPointId());
-            if (point.covered() && (quote == null || quote.isBlank()
-                    || (!context.mainAnswerContent().contains(quote)
-                    && (context.followUpAnswerContent() == null || !context.followUpAnswerContent().contains(quote))))) {
-                throw new ExternalServiceException("生成反馈证据不是候选人回答原文");
+            if (point.covered() && (quote == null || quote.isBlank())) {
+                throw new JevStageException(FEEDBACK_EVIDENCE_MISSING);
+            }
+            if (point.covered() && (!context.mainAnswerContent().contains(quote)
+                    && (context.followUpAnswerContent() == null || !context.followUpAnswerContent().contains(quote)))) {
+                throw new JevStageException(FEEDBACK_EVIDENCE_MISMATCH);
             }
             points.add(new LlmEvaluationSuggestion.ScoringPointResult(point.scoringPointId(),
                     point.covered(), point.covered() ? quote : null));
@@ -319,7 +400,7 @@ public class JevJudgeProvider implements JudgeProvider {
         try {
             return objectMapper.readValue(json, Feedback.class);
         } catch (JsonProcessingException exception) {
-            throw new ExternalServiceException("生成反馈JSON非法");
+            throw new JevStageException(FEEDBACK_JSON_INVALID);
         }
     }
 

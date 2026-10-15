@@ -120,4 +120,31 @@ class JudgeConfigurationTest {
         runner.withPropertyValues("deepseek.enabled=true", "ai.judge.provider=unknown")
                 .run(context -> assertThat(context).hasFailed());
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ai.judge.jev.feedback-max-retries=-1", "ai.judge.jev.feedback-max-retries=2",
+            "ai.judge.jev.request-timeout=0s", "ai.judge.jev.request-timeout=181s",
+            "ai.judge.jev.feedback-timeout=0s", "ai.judge.jev.feedback-timeout=61s",
+            "ai.judge.jev.fallback-timeout=-1s", "ai.judge.jev.fallback-timeout=61s",
+            "ai.judge.jev.request-timeout=27s"})
+    void rejectsUnboundedRetryOrInvalidRequestBudget(String invalidProperty) {
+        runner.withPropertyValues("deepseek.enabled=true", "ai.judge.provider=jev",
+                "ai.judge.jev.api-key=offline-key", invalidProperty)
+                .run(context -> assertThat(context).hasFailed());
+    }
+
+    @Test
+    void bindsFeedbackRetryAndRequestBudgetWithoutChangingDefaultProvider() {
+        runner.withPropertyValues("deepseek.enabled=true", "ai.judge.provider=jev",
+                "ai.judge.jev.api-key=offline-key", "ai.judge.jev.feedback-max-retries=0",
+                "ai.judge.jev.request-timeout=70s", "ai.judge.jev.feedback-timeout=15s",
+                "ai.judge.jev.fallback-timeout=20s").run(context -> {
+            assertThat(context).hasNotFailed();
+            var properties = context.getBean(JevProperties.class);
+            assertThat(properties.getFeedbackMaxRetries()).isZero();
+            assertThat(properties.getRequestTimeout()).hasSeconds(70);
+            assertThat(properties.getFeedbackTimeout()).hasSeconds(15);
+            assertThat(properties.getFallbackTimeout()).hasSeconds(20);
+        });
+    }
 }
