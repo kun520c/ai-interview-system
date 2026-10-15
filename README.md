@@ -1,8 +1,8 @@
 # AI 模拟面试系统
 
-面向 Java 后端实习、校招和初级岗位的模拟面试后端。围绕固定题库完成「创建面试 → 回答 → 知识检索 → 评分与追问 → 面试报告」，重点解决 AI 调用参与业务流程时的数据一致性、重复请求和失败恢复问题。
+面向 Java 后端实习、校招和初级岗位的模拟面试系统。围绕固定题库完成「创建面试 → 回答 → 知识检索 → 评分与追问 → 面试报告」，重点解决 AI 调用参与业务流程时的数据一致性、重复请求和失败恢复问题。
 
-**当前公开仓库：后端 MVP 源码与测试，提供 REST API；尚无公开前端或线上演示。** RAG 检索质量与模型评分质量仍需独立验证，不能由单元测试通过推导出准确率。
+**当前发布范围：后端 MVP、REST API 与 Vue 前端源码及测试；尚无线上演示。** RAG 检索质量与模型评分质量仍需独立验证，不能由单元测试通过推导出准确率。
 
 ## 核心功能
 
@@ -216,12 +216,23 @@ $env:DEEPSEEK_API_KEY = [System.Net.NetworkCredential]::new('', $deepseekKey).Pa
 | 验证层次 | 已有证据与范围 |
 | --- | --- |
 | 单元 / Mock HTTP | 2026-10-14 基于公开源码复跑 29 个测试类、457 项聚焦测试，失败 0、错误 0、跳过 0；覆盖快照、幂等载荷校验、状态机、评分校验、追问、检索过滤、入库补偿和 Jev fallback |
-| 真实 MySQL | 历史 Mapper / 事务测试验证唯一约束、CAS、并发创建、一致性快照及报告 / 弱项回滚；[已提交验证记录](JEV_JAVA_STRUCTURE_AUDIT_REPORT.md)记录完整回归为 1411 项，失败 0、错误 0、跳过 18 项受保护的外部服务测试 |
+| 真实 MySQL | 历史 Mapper / 事务测试验证唯一约束、CAS、并发创建、一致性快照及报告 / 弱项回滚；[历史验证记录](docs/evaluation/Jev-Java结构与无效代码审计.md)记录完整回归为 1411 项，失败 0、错误 0、跳过 18 项受保护的外部服务测试 |
 | 真实 Embedding / Milvus | [历史记录](AGENTS.md)包含本地真实入库、检索与指定向量删除补偿；故障注入验证不等于真实网络超时验证，也不等于检索准确率验证 |
 | 真实模型评价 | DeepSeek / Jev 的接口适配有离线测试；公开证据未完成完整真实评分链路与质量基准验收 |
 
 本次还通过 Java 21 编译与 JAR 打包，并验证 Maven Wrapper 的基础启动、未认证请求 `401` 和注册 / 登录非法参数 `400`。启动检查使用占位配置，未连接真实数据库或 AI 服务；未复跑历史真实服务验收。
 
-普通全量回归命令为 `.\mvnw.cmd -B -ntp test`，但其中包含真实 MySQL 测试。请将 `DB_URL` 指向**专用测试库**，使用建表脚本建同结构表时替换数据库创建与 `USE` 目标；不要直接在演示数据或真实业务库运行。全量回归前移除 `RUN_REAL_*`、`MILVUS_ENABLED`、`DEEPSEEK_ENABLED` 和 `AI_JUDGE_PROVIDER` 环境变量，保留测试配置隔离。
+普通全量回归命令为 `.\mvnw.cmd -B -ntp test`，其中包含真实 MySQL Mapper/事务测试。测试数据库必须为 **`ai_interview_test`**：从 `sql/ai_interview.sql` 建同结构表时，仅在私有工作副本中替换数据库创建与 `USE` 目标。默认测试 URL 为 `jdbc:mysql://localhost:3306/ai_interview_test`；可用 `TEST_DB_URL` 指定另一独立实例上的同名库。凭据用 `TEST_DB_USERNAME` / `TEST_DB_PASSWORD`，未设置时回退到 `DB_USERNAME` / `DB_PASSWORD`。不得使用演示或业务数据；空测试库可直接运行回归，测试自行创建所需数据。
 
-当前尚无公开前端、在线演示、正式部署与运维验证；没有 Redis 缓存、消息队列或微服务。知识库尚不支持 `READY` 文档重处理、文档分页与启停管理，切片未实现 tokenizer 或 Markdown 结构感知。未提交的本地实验与前端工作不计入本 README 的公开实现范围。
+运行前使用 `Remove-Item Env:变量名` 真正移除 `RUN_REAL_*`、`MILVUS_ENABLED`、`DEEPSEEK_ENABLED`、`AI_JUDGE_PROVIDER` 等临时开关，不能仅置为空字符串。test profile 的模型开关保持 false；受保护真实模型、Embedding、Milvus测试默认跳过。
+
+当前提供 Vue 前端源码及测试，尚无在线演示、正式部署与运维验证；没有 Redis 缓存、消息队列或微服务。知识库尚不支持 `READY` 文档重处理、文档分页与启停管理，切片未实现 tokenizer 或 Markdown 结构感知。`tools/` 中的独立实验不属于生产默认实现，其历史证据依赖和失败结论见 [工具说明](tools/README.md)。
+
+2026-10-15 发布准备回归：在全新临时 MySQL 8.0.45 实例的 `ai_interview_test` 上，后端 1616 项测试，0 failures、0 errors、19 项受保护测试跳过。前端类型检查、Lint、构建通过，289 项测试通过。Git 导出的干净文件集独立 RAG 回归为 Java 28、Python 9、合成候选 Gate 54，失败与错误均为 0。这些结果包含真实 SQL 和 Mock 外部端口，不是收费模型或检索质量重新验收。
+
+
+## Current release additions
+
+The Vue application is in `frontend/`; see [frontend setup](frontend/README.md). Public offline RAG tests use an authored synthetic fixture and require no historical provider evidence. [Current release scope](docs/RELEASE_SCOPE.md) describes the environment, model configuration and experimental boundaries.
+
+Current configuration defaults to `deepseek-flash`. COSINE threshold filtering remains opt-in and disabled by default; standalone Rerank/Semantic Gate experiments are not production strategies. Historical quality failures and stopped runs remain unchanged.

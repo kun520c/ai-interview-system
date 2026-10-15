@@ -22,7 +22,7 @@ Current core stack:
 * Current embedding dimension: 1024
 * DeepSeek OpenAI-compatible Chat Completions API
 * Structured JSON evaluation output
-* Default DeepSeek model: `deepseek-v4-flash`
+* Default DeepSeek model: `deepseek-flash`
 * MyBatis 3.0.5
 * MySQL 8.0.45
 * `io.milvus:milvus-sdk-java:2.6.20`
@@ -331,7 +331,9 @@ Report the actual test, failure, error, and skipped counts for each relevant run
 
 ### Real external Smoke Tests
 
-The guarded real-service integration / Smoke Tests listed below are opt-in tests. They are not Mock tests or ordinary unit tests, and they must be skipped during an ordinary `mvn test` run unless explicitly enabled. Ordinary real-MySQL Mapper and transaction tests, including the F1/F4 tests, are not controlled by these `RUN_REAL_*` switches and may run in the ordinary full regression when `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` are available.
+Phase 0.5 canonical targets: normal `local` uses MySQL `ai_interview` and Milvus `default/knowledge_chunk_vectors_local`; automated tests use `ai_interview_test` and `knowledge_chunk_vectors_test`; AI baseline uses only the `evaluation` profile, `ai_interview_evaluation`, and `knowledge_chunk_vectors_evaluation`. Never override test/evaluation targets to formal local. `EnvironmentIsolationInitializer` validates resolved settings before datasource or Milvus initialization; do not bypass it. Historical verification records below describe their original environments and are not current startup instructions.
+
+The guarded real-service integration / Smoke Tests listed below are opt-in tests. They are not Mock tests or ordinary unit tests, and they must be skipped during an ordinary `mvn test` run unless explicitly enabled. Ordinary real-MySQL Mapper and transaction tests, including the F1/F4 tests, use the dedicated test schema and are not controlled by these `RUN_REAL_*` switches. `TEST_DB_URL` defaults to localhost:3306/ai_interview_test; credentials use `TEST_DB_USERNAME/PASSWORD`, falling back to `DB_USERNAME/PASSWORD`.
 
 Their explicit opt-in switches are:
 
@@ -344,9 +346,9 @@ Their explicit opt-in switches are:
 
 All of these tests must retain two layers of protection: `@EnabledIfEnvironmentVariable` and `Assumptions.assumeTrue(...)`. Agents must not remove or weaken either layer, make the tests run by default, store `RUN_REAL_*` in Git-managed configuration, persist the switches in Windows user or system environment variables, or enable them during an ordinary full test run. Clear temporary switches promptly after the real test finishes.
 
-Formal real Smoke Test verification must use Maven / Surefire with a temporary `RUN_REAL_*` environment variable and the test's own `@ActiveProfiles("local")`. Do not use an IntelliJ IDEA forced run of a conditionally disabled JUnit test as formal evidence: IDEA may inject `-Djunit.jupiter.conditions.deactivate=org.junit.*Enabled*Condition`, bypassing the `@EnabledIfEnvironmentVariable` layer.
+Formal real Smoke Test verification must use Maven / Surefire with a temporary `RUN_REAL_*` environment variable and the test's own `@ActiveProfiles({"local", "test-real"})`. Local supplies credentials; test-real supplies isolated data targets. Do not use an IntelliJ IDEA forced run of a conditionally disabled JUnit test as formal evidence: IDEA may inject `-Djunit.jupiter.conditions.deactivate=org.junit.*Enabled*Condition`, bypassing the `@EnabledIfEnvironmentVariable` layer.
 
-`application-local.yaml` is the local real-service configuration file. It must remain ignored and outside Git. Agents must not expose secrets read from it or copy real API keys, database passwords, JWT secrets, Milvus tokens, or other local credentials into `application-test.yaml` merely to make tests pass. The real Smoke Tests use `@ActiveProfiles("local")`; ordinary automated tests must retain the isolated test configuration.
+`application-local.yaml` is the local real-service configuration file. It must remain ignored and outside Git. Agents must not expose secrets read from it or copy real API keys, database passwords, JWT secrets, Milvus tokens, or other local credentials into `application-test.yaml` merely to make tests pass. Guarded Smoke Tests use `local,test-real`; ordinary tests retain the isolated `test` configuration. No persistent `RUN_REAL_*` switch belongs in an IDEA saved configuration.
 
 Before an ordinary full test run, ensure all switches listed above and `MILVUS_ENABLED` are unset, then use:
 
