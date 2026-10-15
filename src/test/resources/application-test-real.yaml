@@ -1,0 +1,13 @@
+# Guarded real-service tests may read local credentials, but never use local data targets.
+spring:
+  datasource:
+    url: ${TEST_DB_URL:jdbc:mysql://localhost:3306/ai_interview_test?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
+    username: ${TEST_DB_USERNAME:${DB_USERNAME}}
+    password: ${TEST_DB_PASSWORD:${DB_PASSWORD}}
+
+milvus:
+  database-name: ${TEST_MILVUS_DATABASE_NAME:default}
+  collection-name: ${TEST_MILVUS_COLLECTION_NAME:knowledge_chunk_vectors_test}
+
+deepseek:
+  enabled: false

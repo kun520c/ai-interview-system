@@ -74,7 +74,7 @@ class JevJudgeProviderTest {
         stubFeedback(validFeedback("CAS保护状态推进", "请解释并发冲突"));
         var result = provider.evaluate(context, prompt);
         assertThat(result.model()).isEqualTo("jev-1.13.0");
-        assertThat(result.promptVersion()).isEqualTo("jev-judge-v1");
+        assertThat(result.promptVersion()).isEqualTo("jev-judge-v3");
         var validated = validator.validate(context, result.suggestion());
         var score = new EvaluationScoreCalculator().calculate(validated);
         assertThat(score.totalScore()).isEqualTo(85);
@@ -90,6 +90,24 @@ class JevJudgeProviderTest {
         verify(deepSeek, never()).evaluate(any());
         verify(deepSeek).completeJson(argThat(system -> system.contains("不能重评或覆盖")),
                 argThat(user -> user.contains("\"correctnessScore\":17")));
+    }
+
+    @Test
+    void feedbackSourceConstraintsDoNotAlterJevNumericRubricsOrState() {
+        var request = provider.buildRequest(context, prompt);
+        assertThat(request.state()).isEqualTo(prompt.userPrompt());
+        assertThat(request.questions().get("correctnessScore").criteria()).isEqualTo(List.of(
+                "无正确技术内容或关键结论错误", "少量正确内容但有重大错误", "基本结论正确但有明显不准确处",
+                "关键结论与机制正确，仅少量瑕疵", "技术事实与机制准确，无实质错误"));
+        expectResponse(validResponse().toString());
+        stubFeedback(validFeedback("CAS保护状态推进", "请解释并发冲突"));
+        provider.evaluate(context, prompt);
+        verify(deepSeek).completeJson(argThat(system -> system.contains("不能添加候选人未说的机制或场景")
+                        && system.contains("不能把未出现的错误观点归给候选人")
+                        && system.contains("不能再称为遗漏")
+                        && system.contains("必要时strengths或missingPoints输出空数组")
+                        && system.contains("连续原文")), anyString());
+        verify(deepSeek, never()).evaluate(any());
     }
 
     @Test
@@ -214,11 +232,27 @@ class JevJudgeProviderTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {401, 429, 500, 529})
+    @ValueSource(ints = {401, 429, 451, 500, 529})
     void httpFailureFallsBackOnceToOriginalDeepSeekJudge(int status) {
         server.expect(requestTo("http://localhost/v1/systemone"))
                 .andRespond(withStatus(HttpStatusCode.valueOf(status)).body("private-data"));
         assertFallback();
+        verify(deepSeek, never()).completeJson(anyString(), anyString());
+    }
+
+    @Test
+    void region451FallbackCanPassExistingJavaEvaluationValidation() {
+        server.expect(requestTo("http://localhost/v1/systemone"))
+                .andRespond(withStatus(HttpStatusCode.valueOf(451))
+                        .body("{\"title\":\"Typesafe is not available in your region.\",\"status\":451}"));
+        var suggestion = new LlmEvaluationSuggestion(10, 11, 12, 13, 14, List.of(), List.of(), null,
+                List.of(new LlmEvaluationSuggestion.ScoringPointResult(101L, true, "CAS保护状态推进"),
+                        new LlmEvaluationSuggestion.ScoringPointResult(102L, false, null)), false, null);
+        when(deepSeek.evaluate(prompt)).thenReturn(new DeepSeekEvaluationResult("offline-deepseek", "stop", "{}", suggestion));
+        var result = provider.evaluate(context, prompt);
+        assertThat(result.model()).isEqualTo("offline-deepseek");
+        assertThatCode(() -> validator.validate(context, result.suggestion())).doesNotThrowAnyException();
+        verify(deepSeek, times(1)).evaluate(prompt);
         verify(deepSeek, never()).completeJson(anyString(), anyString());
     }
 

@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         replace = AutoConfigureTestDatabase.Replace.NONE
 )
 @Import(KnowledgeDocumentProcessingTransactionService.class)
-@ActiveProfiles("local")
+@ActiveProfiles({"local", "test-real"})
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @Tag("real-database")
 @EnabledIfEnvironmentVariable(

@@ -6,6 +6,7 @@ import com.kun.aiinterview.knowledge.entity.RagRetrievalBatch;
 import com.kun.aiinterview.knowledge.mapper.RagHitLogMapper;
 import com.kun.aiinterview.knowledge.mapper.RagRetrievalBatchMapper;
 import com.kun.aiinterview.knowledge.retrieval.RetrievedChunk;
+import com.kun.aiinterview.knowledge.retrieval.RetrievalProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +15,7 @@ import java.util.List;
 @Service
 public class RagTracePersistenceService {
 
-    private static final String FILTER_SNAPSHOT = """
+    private static final String FILTER_SNAPSHOT_V1 = """
             {
               "filterVersion": "evaluation-rag-filter-v1",
               "milvus": {
@@ -30,18 +31,43 @@ public class RagTracePersistenceService {
             }
             """;
 
+    private static final String FILTER_SNAPSHOT_V2 = """
+            {
+              "filterVersion": "evaluation-rag-filter-v2",
+              "cosineCandidate": {
+                "enabled": true,
+                "metric": "COSINE",
+                "minScore": %s,
+                "scorePrecision": "FLOAT32"
+              },
+              "milvus": {
+                "requireEmbeddingVersionMatch": true
+              },
+              "mysql": {
+                "chunkStatus": "ACTIVE",
+                "documentProcessingStatus": "READY",
+                "requireCurrentDocumentVersion": true,
+                "requireEmbeddingModelMatch": true,
+                "requireEmbeddingVersionMatch": true
+              }
+            }
+            """;
+
     private final RagRetrievalBatchMapper ragRetrievalBatchMapper;
     private final RagHitLogMapper ragHitLogMapper;
+    private final RetrievalProperties retrievalProperties;
 
     public RagTracePersistenceService(
             RagRetrievalBatchMapper ragRetrievalBatchMapper,
-            RagHitLogMapper ragHitLogMapper
+            RagHitLogMapper ragHitLogMapper,
+            RetrievalProperties retrievalProperties
     ) {
         this.ragRetrievalBatchMapper =
                 ragRetrievalBatchMapper;
 
         this.ragHitLogMapper =
                 ragHitLogMapper;
+        this.retrievalProperties = retrievalProperties;
     }
 
     @Transactional
@@ -120,7 +146,7 @@ public class RagTracePersistenceService {
                 )
 
                 .filterSnapshot(
-                        FILTER_SNAPSHOT
+                        filterSnapshot()
                 )
 
                 .embeddingModel(
@@ -200,7 +226,7 @@ public class RagTracePersistenceService {
                 )
 
                 .filterSnapshot(
-                        FILTER_SNAPSHOT
+                        filterSnapshot()
                 )
 
                 .embeddingModel(
@@ -241,5 +267,14 @@ public class RagTracePersistenceService {
                     "EvaluationRetrievalResult不能为空"
             );
         }
+    }
+
+    private String filterSnapshot() {
+        if (!retrievalProperties.isCosineThresholdEnabled()) {
+            return FILTER_SNAPSHOT_V1;
+        }
+        return FILTER_SNAPSHOT_V2.formatted(
+                Float.toString(retrievalProperties.getMinCosineScore())
+        );
     }
 }

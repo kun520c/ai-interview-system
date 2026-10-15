@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "milvus.enabled=false",
         "spring.main.web-application-type=none"
 })
-@ActiveProfiles("local")
+@ActiveProfiles({"local", "test-real"})
 @Tag("real-external")
 @EnabledIfEnvironmentVariable(
         named = "RUN_REAL_EMBEDDING_TEST",

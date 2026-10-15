@@ -40,7 +40,7 @@ class EvaluationPromptBuilderTest {
         );
 
         assertThat(prompt.promptVersion())
-                .isEqualTo("evaluation-prompt-v1");
+                .isEqualTo("evaluation-prompt-v3");
         assertThat(prompt.userPrompt())
                 .contains(
                         "MAIN_ANSWER",
@@ -105,6 +105,31 @@ class EvaluationPromptBuilderTest {
                 "RAG-SOURCE-FOLLOW-UP",
                 "RAG-CONTENT-FOLLOW-UP"
         );
+    }
+
+    @Test
+    void followUpSystemListsAllMainIdsAndSeparatesTargetsFromOutputContract() {
+        var context = followUpContext();
+        var prompt = promptBuilder.build(context, retrievalResult(List.of(), List.of()));
+        assertThat(context.followUpTargetPointIds()).containsExactly(102L);
+        assertThat(prompt.systemPrompt()).contains(
+                "完整MAIN评分点ID列表：[101, 102]",
+                "包括已在MAIN回答覆盖的评分点",
+                "followUpTargetPointIds仅表示追问目标，不决定输出ID集合；禁止只输出targets",
+                "仍使用同一JSON格式");
+        assertThat(prompt.userPrompt()).doesNotContain("输出完整性检查");
+    }
+
+    @Test
+    void judgeSystemRequiresCandidateSupportedFeedbackInBothModes() {
+        for (var context : List.of(mainContext(), followUpContext())) {
+            var prompt = promptBuilder.build(context, retrievalResult(List.of(), List.of()));
+            assertThat(prompt.systemPrompt()).contains(
+                    "用户回答明确支持的优点", "不能将未出现的错误观点归给用户",
+                    "missingPoints不能列出MAIN或FOLLOW_UP已经正确说明的机制");
+        }
+        assertThat(promptBuilder.build(mainContext(), retrievalResult(List.of(), List.of())).systemPrompt())
+                .doesNotContain("完整MAIN评分点ID列表");
     }
 
     @Test

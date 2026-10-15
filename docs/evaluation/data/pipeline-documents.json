@@ -1,0 +1,44 @@
+[
+  {
+    "key": "equals",
+    "title": "EVAL_BASELINE equals/hashCode 与 HashMap",
+    "category": "JAVA_BASIC",
+    "content": "# equals、hashCode 与 HashMap 值对象键\n\nequals 表示逻辑相等，应满足自反、对称、传递、一致，并且对 null 返回 false。两个对象 equals 为 true 时，hashCode 必须相同。反过来，hashCode 相同不保证 equals 为 true，因为可能发生哈希碰撞。散列值必须保持与逻辑相等使用的字段一致。这是集合正确性的基本约定，不是要求不同对象一定有不同哈希值。\n\nHashMap 用 key 的 hashCode 经扰动后定位桶，再在桶内通过 equals 判定是不是同一个逻辑键。它不是仅靠哈希值就断定键相同，也不是每次遍历所有桶查找。若只实现 equals 而沿用 Object 的身份哈希，不同实例虽然逻辑相等，却可能定位到不同桶。put 一个实例之后，用另一个逻辑相等实例执行 get 可能找不到原值。因此值对象作为 HashMap 或 HashSet 的键时，应该同时重写 equals 和 hashCode。\n\n示例：UserKey 的逻辑身份由 userId 决定，equals 比较 userId，hashCode 也必须根据 userId 生成。不能让 equals 只看 userId，而 hashCode 同时加入昵称；昵称不同会导致相等对象的散列值不同。两个 userId 不同的键即使发生哈希碰撞，也仍能通过 equals 区分。碰撞影响桶内比较开销，但不会自动让不同逻辑键相等。\n\n放入 HashMap 后，参与 equals 与 hashCode 的字段应保持稳定。如果把 UserKey.userId 从 1 改成 2，对象依然在插入时的桶内，而新计算的哈希可能定位到另一个桶，导致 get 或 remove 失效。实践中可以使用不可变值对象、final 字段或合理定义的 Java record，降低键发生变化的风险。选择不可变键是正确性与可维护性的权衡，不是单纯为了代码短。\n\n默认 Object.equals 近似按引用身份判断，Object.hashCode 配套支持这一约定。只需要身份语义时，未必要自行重写。需要逻辑相等时，应完整实现协议并测试。比如两个独立构造的 UserKey(7) 应满足 equals 为 true、hashCode 相同，把第一个作为键 put 后应能用第二个 get。同样应测试不同 userId 与 null。不能只测两个相同引用的实例，因为那样掩盖值对象实现缺陷。\n\n哈希碰撞与线程安全是不同问题。HashMap 不保证并发修改安全；ConcurrentHashMap 用于多线程访问，但它仍需要键遵守 equals/hashCode 协议。换成并发 Map 不能修复错误的相等约定。对于面试题，应先解释散列选桶和桶内 equals，再讨论实践中的不可变键。不能把“相同哈希值必然相等”当成优化，不能把“重写 equals 不用重写 hashCode”当成合理结论。\n\n当调试逻辑相等键查找失败时，可以打印受控测试键的 equals 与 hashCode，检查比较字段是否一致，确认键是否在插入后变化。数据库主键、业务标识和 Java 对象相等并非自动同一概念，必须明确希望表达的业务身份。将可变集合、数组或可变名称加入哈希计算时，应评估变动风险。数组内容比较应使用适当的数组比较方式，不要无意按数组引用判断逻辑相等。\n\n继承也可能破坏 equals 的对称或传递约定。例如父类只比较编号而子类额外比较颜色，父子实例的比较可能不对称。可以优先选择组合或 final 值对象，并明确使用 getClass 或 instanceof 的语义取舍。无论采用哪种方式，hashCode 都应与最终的 equals 等价关系一致。面试评分不应要求背诵唯一实现模板，而应看是否准确理解相等对象同哈希、碰撞不等于相等、键查找与不可变性。\n\n总结这个技术事实：HashMap 首先用 hashCode 定位桶，然后用 equals 比较键；相等对象必须有相同 hashCode；相同 hashCode 可以对应不相等对象。值对象 key 同时实现 equals/hashCode，并保持比较字段稳定，可以避免跨桶查找失败。这些结论也适用于 HashSet 的逻辑元素去重。\n",
+    "verificationQuery": "HashMap equals hashCode 相等对象哈希约定 值对象键查询失败"
+  },
+  {
+    "key": "arraylist",
+    "title": "EVAL_BASELINE ArrayList 与 LinkedList",
+    "category": "JAVA_COLLECTION",
+    "content": "# List 存储与复杂度\n\nArrayList 是动态数组，LinkedList 是双向链表。ArrayList get(index) O(1)，缓存局部性好；尾部 add 均摊 O(1)，扩容时 O(n)，头部或中间插入因搬移 O(n)。LinkedList 按下标查找 O(n)，首尾直接增删 O(1)；已持有节点位置的插入便宜，但先按下标定位仍要 O(n)，并且每个节点有额外指针和对象内存。比如遍历和随机读取用户列表优先 ArrayList，双端队列通常也可选 ArrayDeque；不是一看到插入就选 LinkedList，要算上定位成本。\n\n按索引插入到 LinkedList 需要先定位；应区分已持有迭代器节点的修改成本和总操作成本。LinkedList 不会因为名称含链表就适合所有插入任务。",
+    "verificationQuery": "ArrayList 动态数组 LinkedList 双向链表 随机访问头尾插入复杂度"
+  },
+  {
+    "key": "ioc",
+    "title": "EVAL_BASELINE Spring IoC 与构造器注入",
+    "category": "SPRING",
+    "content": "# IoC 与依赖注入\n\nIoC 控制反转是把对象的创建和生命周期及依赖装配交给 Spring 容器，DI 依赖注入是实现这一思想的方式。容器读 Bean 定义，创建对象，再通过构造方法等方式传入依赖。构造器注入能显式声明必需依赖，保证对象构建时完整，依赖字段可 final，也便于不用容器直接 new 并传入测试替身。比如 OrderService 的构造器接收 OrderRepository，业务测试可传入测试实现；字段注入隐藏依赖且对象构造后未必完整。IoC 不等于 AOP，后者处理日志事务等横切增强。构造器循环依赖应优先重划职责，而不是靠字段注入掩盖。",
+    "verificationQuery": "Spring IoC 容器创建对象 装配依赖 构造器注入 单元测试"
+  },
+  {
+    "key": "index",
+    "title": "EVAL_BASELINE InnoDB 索引与回表",
+    "category": "MYSQL",
+    "content": "# InnoDB 索引\n\nInnoDB 用 B+ 树索引，主键索引是聚簇索引，叶子节点保存完整行，数据依主键组织。二级索引的叶子保存索引列和主键值。若先按普通索引找到主键，还需去聚簇索引拿查询所需列，这叫回表；若所有查询列已在二级索引中就是覆盖索引，可避免回表。比如 users 上有 name 索引，select id,name 能覆盖，而 select * 一般需要回表。顺序短主键可减少页分裂和二级索引体积；是否回表要结合实际索引与投影看 explain，不能断言走二级索引一定回表。",
+    "verificationQuery": "InnoDB 聚簇主键索引 二级索引叶子 主键值 回表 覆盖索引"
+  },
+  {
+    "key": "tcp",
+    "title": "EVAL_BASELINE TCP 建连与最终 ACK",
+    "category": "NETWORK",
+    "content": "# TCP 三次握手\n\n客户端发送 SYN，带初始序列号 x；服务端回复 SYN+ACK，带自己的序列号 y 并确认 x+1；客户端回复 ACK，确认 y+1，服务端收到后进入 ESTABLISHED。双方确认了各自发送的 SYN 序列号，而不是确认 ACK 是否被 ACK。只有两次，服务端还不知道客户端是否收到自己的 SYN，也可能因旧的重复 SYN 分配无效连接；第三次能验证客户端接受当前服务端序列号。最后 ACK 丢失，服务端可重传 SYN+ACK，客户端再 ACK；应用层还需超时与连接管理，握手不是永远不丢包的保证。排查连接问题可以抓包核对 SYN、SYN+ACK 和最终 ACK 以及重传。\n\n关闭连接与建立连接不同，FIN 的四次交换不能代替 SYN 建立连接。最终 ACK 确认服务端的 SYN 序列号；不能声称第三次 ACK 让客户端知道该 ACK 已被对方收到。",
+    "verificationQuery": "TCP SYN SYN+ACK ACK 三次握手 两次 序列号 过期SYN"
+  },
+  {
+    "key": "confusion",
+    "title": "EVAL_BASELINE HashMap、ConcurrentHashMap 与 Redis Hash 的区别",
+    "category": "REDIS",
+    "content": "# 相似名称的不同机制\n\nRedis Hash 是 Redis 服务端保存字段和值的结构，常用于对象字段读写，不依赖 Java equals 方法完成字段比较。Redis String 可用于简单值、计数和缓存。Java ConcurrentHashMap 是 JVM 内线程安全的映射容器；HashMap 是普通非线程安全映射。Redis 数据结构、Java 集合对象协议与并发控制分属不同层，不可互相混用为解释。",
+    "verificationQuery": "Redis Hash String 字段读写 Java ConcurrentHashMap 区别"
+  }
+]

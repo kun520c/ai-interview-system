@@ -9,10 +9,30 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import java.net.InetSocketAddress;
+import java.net.ProxySelector;
+import java.net.http.HttpClient;
+
 /** One HTTP attempt. Provider fallback, rather than HTTP retry, bounds latency. */
 public class JevClient {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
+
+    /** Only this client uses the configured proxy; never changes the JVM default selector. */
+    public static HttpClient createHttpClient(JevProperties properties) {
+        var proxy = properties.getProxy();
+        if (proxy == null || !proxy.isConfigurationValid()) {
+            throw new IllegalArgumentException("Jev代理配置非法");
+        }
+        var builder = HttpClient.newBuilder().connectTimeout(properties.getConnectTimeout())
+                .followRedirects(HttpClient.Redirect.NEVER);
+        if (proxy.isEnabled()) {
+            // This fixed selector returns only the HTTP proxy, including for loopback destinations.
+            // A failed connection propagates to business fallback, never to a direct Jev attempt.
+            builder.proxy(ProxySelector.of(new InetSocketAddress(proxy.getHost(), proxy.getPort())));
+        }
+        return builder.build();
+    }
 
     public JevClient(RestClient restClient, ObjectMapper objectMapper) {
         this.restClient = restClient;

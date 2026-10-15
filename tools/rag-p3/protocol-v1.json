@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "rag-p3-preregistered-protocol-v1",
+  "holdoutUsedForTuning": false,
+  "scanNewHoldoutThresholds": false,
+  "retries": 0,
+  "maxCalls": {
+    "embedding": 12,
+    "milvusSearch": 12,
+    "rerank": 12,
+    "deepseek": 0,
+    "jev": 0
+  },
+  "embeddingModel": "qwen3.7-text-embedding",
+  "embeddingDimension": 1024,
+  "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+  "rerankModel": "qwen3.7-text-rerank",
+  "queryPolicy": "EXACT_QUESTION_TEXT_FOR_BOTH; not production scoring-point query parity",
+  "topK": 5,
+  "rerankTopN": 5,
+  "maxQueryUtf8Bytes": 2048,
+  "maxDocumentUtf8Bytes": 8192,
+  "framingTokenByteReservePerPair": 256,
+  "budgetReferenceCny": "0.50",
+  "embeddingPriceCnyPerMillion": "0.50",
+  "rerankPriceCnyPerMillion": "0.50",
+  "endpointRegion": "cn-beijing",
+  "frozenMySqlSchema": "ai_interview_test",
+  "frozenMySqlRows": 191,
+  "milvusCollection": "default/knowledge_chunk_vectors_test",
+  "frozenMilvusVectors": 52,
+  "humanLabelRubric": {
+    "2": "Direct answer-bearing explanation of an asked mechanism; not automatic full-question sufficiency",
+    "1": "Actually answers part of an asked mechanism, useful but incomplete",
+    "0": "No answer-bearing support; shared product/keywords/background/reference lists alone are insufficient",
+    "U": "Uncertain; excluded from formal pass"
+  },
+  "formalQualityPrerequisites": {
+    "all60HumanChunkLabels": true,
+    "all12HumanCoverageConfirmations": true,
+    "all12PrimaryEvidenceSufficiencyVerdicts": true,
+    "coverageChallengeBlocksPass": true
+  },
+  "qualityAcceptance": {
+    "coveredUsefulQueriesMinimum": 6,
+    "coveredDirectQueriesMinimum": 6,
+    "outsideCorrectRejectMinimum": 6,
+    "irrelevantChunksAdmittedMaximum": 0,
+    "usefulRetentionRelativeToFixedRerankTop2Minimum": 0.9,
+    "directRetentionRelativeToFixedRerankTop2Minimum": 0.9,
+    "zeroToTwoEvidenceEveryQuery": true
+  },
+  "sufficiencyVerdictValues": [
+    "SUFFICIENT",
+    "PARTIAL",
+    "NONE",
+    "U"
+  ],
+  "formalOutcomeScope": "PASS_ON_THIS_12_CASE_HOLDOUT_ONLY; no calibrated probability or broad generalization claim; propose a separately reviewed Java increment only, no automatic production integration",
+  "ifRuleFails": "Report failure under the frozen configuration; do not tune and relabel same holdout PASS; consider independent semantic sufficiency model only in a separately authorized next experiment"
+}

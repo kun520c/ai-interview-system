@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAG P1 独立检索 · 人工标注</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f1f5f9;color:#172033;font:16px/1.65 system-ui,"Microsoft YaHei",sans-serif}header,main{max-width:1100px;margin:auto;padding:24px}header{padding-bottom:12px}h1{font-size:26px;margin:0}h2{font-size:19px;margin:0 0 10px}.muted{color:#536176;font-size:14px}.toolbar{position:sticky;top:0;z-index:2;padding:12px 24px;background:#fff;border-bottom:1px solid #d7dfeb;display:flex;align-items:center;gap:12px;flex-wrap:wrap}button,select{font:inherit;border:1px solid #b8c5d8;border-radius:6px;background:white;padding:6px 12px;cursor:pointer}button{color:#174ea6}button:hover{background:#eff6ff}.query{background:white;border:1px solid #d7dfeb;border-radius:10px;padding:22px;margin-bottom:24px}.hit{border:1px solid #d8e0ec;border-left:5px solid #8593a8;border-radius:6px;padding:16px;margin:14px 0}.hit.kept{border-left-color:#17815d}.hit.filtered{border-left-color:#c18126}.badge{display:inline-block;font-size:13px;border-radius:4px;padding:2px 8px;background:#eaf1fa;margin-right:8px}.kept .status{background:#e1f5eb;color:#126448}.filtered .status{background:#fff0d9;color:#815111}.knowledge{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;margin:12px 0}.meta{overflow-wrap:anywhere;font-size:13px;color:#59667a}.label{display:flex;align-items:center;gap:10px;flex-wrap:wrap}textarea{width:100%;margin-top:8px;padding:8px;border:1px solid #cbd5e1;border-radius:4px;font:inherit}details{margin-top:12px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}#metrics{background:#eaf1fa;padding:16px;border-radius:6px;white-space:pre-wrap}nav a{margin-right:12px;color:#174ea6}#message{color:#126448;font-size:14px}.warning{color:#9a4f00}table{border-collapse:collapse;width:100%;font-size:14px}td,th{border-bottom:1px solid #d7dfeb;padding:6px;text-align:left}@media print{.toolbar{position:static}button{display:none}}
+</style></head><body>
+<header><h1>RAG P1 · 16 题独立检索人工审查</h1><p>V0/V1 共用同一批真实 TopK5，只需标注一次。2＝直接相关，1＝部分相关，0＝完全无关，U＝无法判断。标签初始为空，无 AI 预填。</p><p class="muted">保存只修改浏览器本地标注；导出 JSON 将标签与原始检索证据分开。首次使用请导出备份，本地文件的浏览器存储支持可能不同。U 不计作无关。</p><div id="run" class="muted"></div><nav id="nav"></nav></header>
+<div class="toolbar"><button id="save">保存到浏览器</button><button id="export">导出人工标签 JSON</button><button id="exportEvidence">导出原始证据 JSON</button><button id="import">导入人工标签 JSON</button><input id="file" type="file" accept="application/json" hidden><span id="progress"></span><span id="message" role="status"></span></div>
+<main><div id="metrics"></div><div id="queries"></div></main>
+<script>
+'use strict';
+const rawBytes=Uint8Array.from(atob('__RESULTS_BASE64__'),c=>c.charCodeAt(0));
+const rawText=new TextDecoder().decode(rawBytes);
+const evidence=JSON.parse(rawText), evidenceSha='__RESULTS_SHA256__';
+const storageKey='rag-p1-human-'+evidenceSha, labels={};
+const typeNames={INDEPENDENT_PARAPHRASE:'已覆盖知识的新问法',BOUNDARY_FOLLOW_UP:'技术细节追问',OUT_OF_COVERAGE:'知识库外问题'};
+const keys=new Set();
+const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e};
+const key=(q,h)=>q.queryId+'/'+h.rank+'/'+h.vectorId;
+const message=t=>document.getElementById('message').textContent=t;
+document.getElementById('run').textContent='运行状态：'+evidence.INDEPENDENT_RETRIEVAL_RUN+' · 原始结果 SHA256：'+evidenceSha;
+for(const q of evidence.queries||[]){
+ const section=el('section',undefined,'query');section.id=q.queryId;
+ const a=el('a',q.queryId);a.href='#'+q.queryId;document.getElementById('nav').append(a);
+ section.append(el('h2',q.queryId+' · '+(typeNames[q.testType]||q.testType)),el('p',q.questionText));
+ section.append(el('p','状态：'+q.status+' · V0 证据数：'+(q.v0EvidenceCount??'未完成')+' · V1 证据数：'+(q.v1EvidenceCount??'未完成'),'muted'));
+ const contract=el('details');contract.append(el('summary','查看实际 Embedding 查询与 usage'),el('pre',q.actualQueryText+'\nSHA256: '+q.querySha256+'\n'+JSON.stringify(q.embedding||{},null,2)));section.append(contract);
+ if(!q.rawTopK5?.length)section.append(el('p',q.status==='COMPLETE'?'真实 TopK5 为零条。':'此题未获得完整检索证据。','warning'));
+ for(const h of q.rawTopK5||[]){
+  const k=key(q,h);keys.add(k);const item=el('article',undefined,'hit '+(h.v1Retained?'kept':'filtered'));
+  item.append(el('span','Rank '+h.rank,'badge'),el('span','COSINE '+Number(h.cosineFloat32).toPrecision(9),'badge'),el('span',h.v1Retained?'V1 保留':h.sqlEligible===undefined?'水合未完成':'V1 过滤','badge status'));
+  item.append(el('h3',h.knowledge?.title||'未找到知识正文'),el('p','vectorId: '+h.vectorId+' · chunkId: '+(h.knowledge?.chunkId??'未知')+' · documentId: '+h.documentId,'meta'));
+  item.append(el('p','SQL 资格：'+(h.sqlEligible===true?'通过':h.sqlEligible===false?'拒绝':'未完成')+' · 拒绝原因：'+(h.sqlRejectionReasons?.join(', ')||'无')+' · Float32 bits：'+h.cosineFloat32Bits,'meta'));
+  item.append(el('div',h.knowledge?.content||'此处无已保存的知识正文。','knowledge'));
+  item.append(el('p','知识正文 SHA256：'+(h.contentSha256??'未取得'),'meta'));
+  const field=el('div',undefined,'label'),caption=el('label','人工相关性：'),select=el('select');select.dataset.key=k;select.setAttribute('aria-label',q.queryId+' Rank '+h.rank+' 人工相关性');
+  for(const [v,t] of [['','未标注'],['2','2 · 直接相关'],['1','1 · 部分相关'],['0','0 · 完全无关'],['U','U · 无法判断']]){const o=el('option',t);o.value=v;select.append(o)}
+  select.addEventListener('change',()=>{labels[k]={label:select.value,note:labels[k]?.note||''};save();refresh()});caption.append(select);field.append(caption);item.append(field);
+  const note=el('textarea');note.rows=2;note.placeholder='可选：相关性理由、正文缺失或 Chunk 边界问题';note.dataset.note=k;note.setAttribute('aria-label',q.queryId+' Rank '+h.rank+' 备注');note.addEventListener('input',()=>{labels[k]={label:labels[k]?.label||'',note:note.value};save()});item.append(note);section.append(item);
+ }
+ document.getElementById('queries').append(section);
+}
+function payload(){const m=metrics();return {schemaVersion:'rag-p1-human-annotations-v1',evidenceSha256:evidenceSha,datasetSha256:evidence.datasetSha256,exportedAtUtc:new Date().toISOString(),humanLabels:Object.fromEntries(Object.entries(labels).filter(([,v])=>v.label||v.note)),aiSuggestions:[],groundTruthSource:'HUMAN_ONLY',metrics:m.status==='COMPLETE_HUMAN_LABELS'?m:{status:m.status,unlabeled:m.unlabeled,undecidable:m.undecidable}}}
+function save(){try{localStorage.setItem(storageKey,JSON.stringify(payload()));message('已保存到浏览器；请导出 JSON 备份。')}catch(e){message('浏览器本地保存不可用，请导出 JSON。')}}
+function apply(p){if(p.evidenceSha256!==evidenceSha||p.schemaVersion!=='rag-p1-human-annotations-v1')throw Error('结果 SHA 或标注格式不匹配');const next={};for(const [k,v] of Object.entries(p.humanLabels||{})){if(!keys.has(k)||!v||!['','0','1','2','U'].includes(v.label??'')||typeof(v.note??'')!=='string')throw Error('标签或命中 ID 无效');next[k]={label:v.label||'',note:v.note||''}}for(const k of Object.keys(labels))delete labels[k];Object.assign(labels,next);document.querySelectorAll('select[data-key]').forEach(e=>e.value=labels[e.dataset.key]?.label||'');document.querySelectorAll('textarea[data-note]').forEach(e=>e.value=labels[e.dataset.note]?.note||'');refresh()}
+function metrics(){
+ const rows=[],tot={V0:{direct:0,partial:0,irrelevant:0},V1:{direct:0,partial:0,irrelevant:0}};let unknown=0,blank=0,usefulDeleted=0,directDeleted=0,partialDeleted=0;
+ for(const q of evidence.queries||[]){let d0=0,p0=0,d1=0,p1=0,irrelevant0=0,irrelevant1=0;for(const h of q.rawTopK5||[]){const v=labels[key(q,h)]?.label;if(!v){blank++;continue}if(v==='U'){unknown++;continue}for(const [name,keep] of [['V0',h.v0Retained],['V1',h.v1Retained]])if(keep)tot[name][v==='2'?'direct':v==='1'?'partial':'irrelevant']++;if(h.v0Retained){if(v==='2')d0++;if(v==='1')p0++;if(v==='0')irrelevant0++}if(h.v1Retained){if(v==='2')d1++;if(v==='1')p1++;if(v==='0')irrelevant1++}if(h.v0Retained&&!h.v1Retained&&(v==='2'||v==='1')){usefulDeleted++;if(v==='2')directDeleted++;else partialDeleted++}}
+ rows.push({queryId:q.queryId,testType:q.testType,v0EvidenceCount:q.v0EvidenceCount,v1EvidenceCount:q.v1EvidenceCount,v0Direct:d0,v0Partial:p0,v1Direct:d1,v1Partial:p1,v0UsefulCoverage:d0+p0>0,v1UsefulCoverage:d1+p1>0,v0Irrelevant:irrelevant0,v1Irrelevant:irrelevant1});}
+ const ready=blank===0&&unknown===0&&(evidence.queries||[]).every(q=>q.status==='COMPLETE');
+ return {status:ready?'COMPLETE_HUMAN_LABELS':'PENDING_COMPLETE_HUMAN_LABELS',unlabeled:blank,undecidable:unknown,totals:tot,usefulDeleted,directDeleted,partialDeleted,irrelevantRetentionRatio:tot.V0.irrelevant?tot.V1.irrelevant/tot.V0.irrelevant:null,irrelevantRetainedShareV0:(tot.V0.direct+tot.V0.partial+tot.V0.irrelevant)?tot.V0.irrelevant/(tot.V0.direct+tot.V0.partial+tot.V0.irrelevant):null,irrelevantRetainedShareV1:(tot.V1.direct+tot.V1.partial+tot.V1.irrelevant)?tot.V1.irrelevant/(tot.V1.direct+tot.V1.partial+tot.V1.irrelevant):null,outsideCoverage:rows.filter(r=>r.testType==='OUT_OF_COVERAGE'),queries:rows,thresholdRecommendation:'REQUIRES_HUMAN_REVIEW; no automatic quality conclusion'};
+}
+function refresh(){const m=metrics();document.getElementById('progress').textContent='已标注 '+(keys.size-m.unlabeled)+' / '+keys.size;document.getElementById('metrics').textContent='客观计数（真实运行）：\n'+JSON.stringify(evidence.objectiveSummary||{},null,2)+(m.status==='COMPLETE_HUMAN_LABELS'?'\n人工相关性指标：\n'+JSON.stringify(m,null,2):'\n人工质量指标暂不发布：尚有 '+m.unlabeled+' 条未标注、'+m.undecidable+' 条 U。证据减少不能证明准确率提高。');}
+function download(name,bytes,type){const url=URL.createObjectURL(new Blob([bytes],{type}));const a=el('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+document.getElementById('save').onclick=save;
+document.getElementById('export').onclick=()=>{download('human-annotations.json',JSON.stringify(payload(),null,2),'application/json');message('已导出标签 JSON；原始证据未修改。')};
+document.getElementById('exportEvidence').onclick=()=>download('results.json',rawBytes,'application/json');
+document.getElementById('import').onclick=()=>document.getElementById('file').click();
+document.getElementById('file').onchange=async e=>{try{const f=e.target.files[0];if(f){apply(JSON.parse(await f.text()));save()}}catch(err){message('导入失败：'+err.message)}finally{e.target.value=''}};
+try{const saved=localStorage.getItem(storageKey);if(saved){apply(JSON.parse(saved));message('已恢复本浏览器的已有人工标签。')}}catch(e){message('未恢复本地标签；可手动导入 JSON。')}
+refresh();
+</script></body></html>

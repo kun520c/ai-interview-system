@@ -7,6 +7,7 @@ import com.kun.aiinterview.knowledge.enums.KnowledgeCategory;
 import com.kun.aiinterview.knowledge.mapper.KnowledgeChunkMapper;
 import com.kun.aiinterview.knowledge.retrieval.KnowledgeRetrievalRow;
 import com.kun.aiinterview.knowledge.retrieval.RetrievalResult;
+import com.kun.aiinterview.knowledge.retrieval.RetrievalProperties;
 import com.kun.aiinterview.knowledge.retrieval.RetrievedChunk;
 import com.kun.aiinterview.knowledge.vector.VectorSearchHit;
 import com.kun.aiinterview.knowledge.vector.VectorStoreClient;
@@ -53,7 +54,8 @@ class KnowledgeRetrievalServiceTest {
         retrievalService = new KnowledgeRetrievalService(
                 embeddingClient,
                 vectorStoreClient,
-                knowledgeChunkMapper
+                knowledgeChunkMapper,
+                new RetrievalProperties()
         );
     }
 

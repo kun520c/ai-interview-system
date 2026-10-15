@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.kun.aiinterview.config.EnvironmentIsolationInitializer;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
@@ -43,9 +44,10 @@ import static org.awaitility.Awaitility.await;
 @ContextConfiguration(
         classes = RealMilvusSchemaValidationSmokeTest
                 .SchemaTestConfiguration.class,
-        initializers = ConfigDataApplicationContextInitializer.class
+        initializers = {ConfigDataApplicationContextInitializer.class,
+                EnvironmentIsolationInitializer.class}
 )
-@ActiveProfiles("local")
+@ActiveProfiles({"local", "test-real"})
 @TestPropertySource(properties = {
         "milvus.enabled=true",
         "spring.main.web-application-type=none"

@@ -1,0 +1,1535 @@
+[
+  {
+    "caseId": "E02-EXCELLENT",
+    "context": {
+      "currentAnswerId": 10001,
+      "currentInterviewQuestionId": 20001,
+      "mainAnswerId": 10001,
+      "mainInterviewQuestionId": 20001,
+      "mode": "MAIN_ANSWER",
+      "category": "JAVA_COLLECTION",
+      "knowledgePoint": "arraylist_vs_linkedlist",
+      "mainQuestionContent": "ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？",
+      "referenceAnswerSnapshot": "ArrayList 底层是可扩容数组，因此根据下标随机访问通常很快，`get` 是 O(1)。尾部追加通常也比较高效，但中间插入或删除往往需要移动后面的元素。\n\nLinkedList 是双向链表，根据下标查找需要从链表中遍历，因此随机访问是 O(n)。如果已经拿到了目标节点附近的位置，链表插入和删除不需要搬移大量元素。\n\n实际开发里不能简单说“增删多就一定用 LinkedList”。很多业务仍然更适合 ArrayList，因为它随机访问好、内存布局更紧凑；只有确实需要大量链表式操作时才考虑 LinkedList。",
+      "scoringPoints": [
+        {
+          "id": 2480,
+          "pointType": "CORE",
+          "content": "能说明 ArrayList 基于动态数组，而 LinkedList 基于双向链表，两者底层存储结构不同。",
+          "weight": 30
+        },
+        {
+          "id": 2481,
+          "pointType": "KEY",
+          "content": "能说明 ArrayList 根据下标随机访问通常为 O(1)，而 LinkedList 按下标访问通常需要遍历，为 O(n)。",
+          "weight": 25
+        },
+        {
+          "id": 2482,
+          "pointType": "KEY",
+          "content": "能说明 ArrayList 中间插入或删除通常需要移动元素；LinkedList 在已经定位到节点后修改链接本身开销较低，但定位节点仍可能需要 O(n)。",
+          "weight": 25
+        },
+        {
+          "id": 2483,
+          "pointType": "PRINCIPLE",
+          "content": "能结合实际访问模式选择集合，而不是机械地认为“增删多就用 LinkedList、查询多就用 ArrayList”。",
+          "weight": 20
+        }
+      ],
+      "mainAnswerContent": "我日常装查询结果会先选 ArrayList，它用能扩容的数组装引用，下标 get 可以直接算位置，是 O(1)。LinkedList 每个节点带前后指针，是双向链表，按下标得从某一头走过去，最坏 O(n)。ArrayList 尾部追加摊还 O(1)，扩容那一次要复制；在中间删一个还要挪后面的引用。链表若迭代器已经走到位置，摘接节点是 O(1)，但按索引插入先找位置的成本不能省。比如反复按下标读取或整体扫描，我一般用 ArrayList，局部反复用迭代器删插才会评估 LinkedList，还会看节点额外内存和实测耗时，不能只看增删次数。",
+      "followUpQuestionContent": null,
+      "followUpAnswerContent": null,
+      "followUpTargetPointIds": []
+    },
+    "retrieval": {
+      "query": "主问题：ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？\n评分点：\n- 能说明 ArrayList 基于动态数组，而 LinkedList 基于双向链表，两者底层存储结构不同。\n- 能说明 ArrayList 根据下标随机访问通常为 O(1)，而 LinkedList 按下标访问通常需要遍历，为 O(n)。\n- 能说明 ArrayList 中间插入或删除通常需要移动元素；LinkedList 在已经定位到节点后修改链接本身开销较低，但定位节点仍可能需要 O(n)。\n- 能结合实际访问模式选择集合，而不是机械地认为“增删多就用 LinkedList、查询多就用 ArrayList”。",
+      "requestedTopK": 5,
+      "embeddingModel": "qwen3.7-text-embedding",
+      "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+      "rawHits": [
+        {
+          "vectorId": "17b11e96-ce9a-4a99-b283-52bc7171bf3f",
+          "documentId": 582,
+          "chunkIndex": 1,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.9089177250862122
+        },
+        {
+          "vectorId": "19228507-3403-483a-aaf5-0b5cf124487a",
+          "documentId": 582,
+          "chunkIndex": 2,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.8020434975624084
+        },
+        {
+          "vectorId": "21386f00-d4e2-4c78-a756-78e726f2e4c5",
+          "documentId": 589,
+          "chunkIndex": 1,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.4486461579799652
+        },
+        {
+          "vectorId": "165d0ecd-574a-4d7e-a1aa-c5216b19a341",
+          "documentId": 581,
+          "chunkIndex": 2,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.42009007930755615
+        },
+        {
+          "vectorId": "62ac2ccb-059b-4cb6-8f21-f694e8d6b9ce",
+          "documentId": 581,
+          "chunkIndex": 1,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.4143732786178589
+        }
+      ],
+      "evidence": [
+        {
+          "vectorRank": 1,
+          "similarityScore": 0.9089177250862122,
+          "chunkId": 527,
+          "documentId": 582,
+          "documentVersion": 1,
+          "chunkIndex": 1,
+          "vectorId": "17b11e96-ce9a-4a99-b283-52bc7171bf3f",
+          "title": "ArrayList 与 LinkedList：访问与修改成本",
+          "category": "JAVA_COLLECTION",
+          "source": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html",
+          "content": "# ArrayList 与 LinkedList：访问与修改成本\n\n> Title: ArrayList 与 LinkedList：访问与修改成本\n> Bank ID: E02\n> Knowledge category: JAVA_COLLECTION\n> Knowledge point: arraylist_vs_linkedlist\n> Difficulty: EASY\n> Target question: ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？\n> Version scope: Java SE 21 ArrayList/LinkedList API；操作成本有前提，实际性能须测量。\n> Primary official source: [ARRAY]\n> Secondary official sources: LINKED（见 S5）\n> Authoring status: PHASE_4D2_AUTHORED_NOT_INGESTED\n\n## 1. Core model\n\nArrayList 是可调整容量的数组实现；LinkedList 是双向链表实现，同时实现 List 与 Deque。前者通过数组下标访问元素，后者沿节点链接定位元素。底层结构决定基本成本，但接口都叫 List 并不意味着任意操作都有相同复杂度。[ARRAY][LINKED]\n\n## 2. Main mechanism\n\nArrayList 的 get(index) 等下标访问为 O(1)；尾部 add 的成本是摊还 O(1)，不能把一次需要扩容的追加也说成恒定成本。中间插入要把后续元素向后移动，中间删除要把后续元素向前移动，通常随剩余元素数增长。[ARRAY]\n\nLinkedList 的下标操作从较近的头端或尾端遍历到目标位置；随机下标访问通常为 O(n)。插入或删除已定位节点时，调整相邻链接本身成本较低，但调用 add(index, value) 前的定位可能仍为 O(n)。已有 ListIterator 在当前游标位置修改与每次重新按下标定位，必须分开分析。[LINKED]\n\n## 3. Important boundary\n\n下面是访问模式的区别，而非性能测试：\n\n```java\narray.get(i);             // 数组下标访问\nlinked.add(i, value);     // 包括定位目标位置\niterator.add(value);      // 已有 LinkedList 游标位置\nlinked.addFirst(value);   // 两端操作\n```"
+        },
+        {
+          "vectorRank": 2,
+          "similarityScore": 0.8020434975624084,
+          "chunkId": 528,
+          "documentId": 582,
+          "documentVersion": 1,
+          "chunkIndex": 2,
+          "vectorId": "19228507-3403-483a-aaf5-0b5cf124487a",
+          "title": "ArrayList 与 LinkedList：访问与修改成本",
+          "category": "JAVA_COLLECTION",
+          "source": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html",
+          "content": "// 数组下标访问\nlinked.add(i, value);     // 包括定位目标位置\niterator.add(value);      // 已有 LinkedList 游标位置\nlinked.addFirst(value);   // 两端操作\n```\n\n两端操作与中间按下标修改不是同一种需求。顺序遍历链表应沿 iterator 前进，反复用 get(i) 会不断重新定位。链表修改的优势需要“位置已知或只操作两端”等条件，不能由“写操作次数多”直接推出整体更快。[ARRAY][LINKED]\n\n## 4. Common misconceptions\n\n工程选择应看随机访问比例、修改位置、是否已有游标、数据规模与内存限制：频繁随机访问通常优先 ArrayList；已有游标的局部修改或双端使用可考虑 LinkedList。结合完整业务路径做测量，不能只比较链接修改与数组移动而漏掉查找节点的成本。\n\n“增删多就一定用 LinkedList”没有说明增删位置和定位方式；“ArrayList 每次都按固定倍数扩容”把某个实现细节当作 API 契约。Java 21 API 明确给出摊还追加成本，并未规定一个可依赖的固定增长倍数。[ARRAY][LINKED]\n\n## 5. Official references\n\n- [ARRAY] ArrayList API，Java SE 21，类说明及 get/add/remove\n- [LINKED] LinkedList API，Java SE 21，类说明、下标遍历及 ListIterator/Deque\n\n[ARRAY]: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html\n[LINKED]: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/LinkedList.html"
+        },
+        {
+          "vectorRank": 3,
+          "similarityScore": 0.4486461579799652,
+          "chunkId": 543,
+          "documentId": 589,
+          "documentVersion": 1,
+          "chunkIndex": 1,
+          "vectorId": "21386f00-d4e2-4c78-a756-78e726f2e4c5",
+          "title": "Redis 五类常用数据结构与选择",
+          "category": "REDIS",
+          "source": "https://redis.io/docs/latest/develop/data-types/",
+          "content": "# Redis 五类常用数据结构与选择\n\n> Title: Redis 五类常用数据结构与选择\n> Bank ID: M07\n> Knowledge category: REDIS\n> Knowledge point: redis_data_structures\n> Difficulty: MEDIUM\n> Target question: Redis 常用数据结构有哪些？如果要分别实现对象缓存、元素去重、按顺序保存数据和排行榜，你会选择什么数据结构？为什么？\n> Version scope: Redis 官方文档，核验日期 2026-10-06；仅经典结构与单元素命令，不声明项目 Redis 运行版本或依赖。\n> Primary official source: [REDISTYPES]\n> Secondary official sources: STRING, HASH, LPUSH, RPOP, SET, ZSET（见 S5）\n> Authoring status: PHASE_4D2_AUTHORED_NOT_INGESTED\n\n## 1. Core model\n\nString、Hash、List、Set、Sorted Set 是 Redis 常见的五类通用数据结构，并非 Redis 全部类型的穷尽清单。选择需区分单值、字段、序列、唯一成员和带 score 的成员。Redis 并不只是保存字符串的简单 Key-Value。[REDISTYPES]\n\n## 2. Main mechanism\n\nString 适合普通缓存值，也可以用 INCR 表达整数计数器；计数操作以符合命令要求的数值字符串为前提。Hash 是 field-value 集合，适合保存对象的多个字段，使用 HSET/HGET 可单独写读字段，避免每次都按一个整体值处理。[STRING][HASH]\n\nList 是有序序列，适合从两端操作元素。单元素 LPUSH 在头部插入，RPOP 从尾部取出并移除，配合可形成按入队顺序消费的简单队列。List 可以有重复元素，不能用序列自动替代去重需求。[REDISTYPES][LPUSH][RPOP]\n\n```text\nINCR visits\nHSET profile:1 name Kun\nLPUSH tasks taskA\nRPOP tasks\n```\n\n\n## 3. Important boundary\n\nSet 的成员唯一且无序，适合去重、成员判断和交集、并集、差集：重复加入同一成员不会产生第二份成员。Sorted Set 同样保持成员唯一，但每个成员关联 score 并按 score 排序，适合排行榜或按权重、时间排序。不同成员可以有相同 score，此时按成员的字典序区分，不是 score 也必须唯一。[SET][ZSET]"
+        },
+        {
+          "vectorRank": 4,
+          "similarityScore": 0.42009007930755615,
+          "chunkId": 526,
+          "documentId": 581,
+          "documentVersion": 1,
+          "chunkIndex": 2,
+          "vectorId": "165d0ecd-574a-4d7e-a1aa-c5216b19a341",
+          "title": "Java 21 接口与抽象类：契约、状态与选择",
+          "category": "JAVA_BASIC",
+          "source": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html",
+          "content": "## 4. Common misconceptions\n\n“接口不能有方法体”遗漏 default、static、private 方法；“抽象类只能有抽象方法”遗漏普通实现和构造过程；“接口总比抽象类好”忽略共享状态需求。选择应先说明调用者依赖什么、哪些状态需要复用，再判断继承或实现关系。不要仅因两个类有一段相似代码就建立不合理的基类关系，也不要把接口常量当作对象字段。\n\n## 5. Official references\n\n- [JLS9] JLS 21 Interfaces，§9.3 字段、§9.4 接口方法\n- [JLS8] JLS 21 Classes，§8.1.1.1、§8.1.4–8.1.5、§8.3–8.4、§8.8\n\n[JLS9]: https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html\n[JLS8]: https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html"
+        },
+        {
+          "vectorRank": 5,
+          "similarityScore": 0.4143732786178589,
+          "chunkId": 525,
+          "documentId": 581,
+          "documentVersion": 1,
+          "chunkIndex": 1,
+          "vectorId": "62ac2ccb-059b-4cb6-8f21-f694e8d6b9ce",
+          "title": "Java 21 接口与抽象类：契约、状态与选择",
+          "category": "JAVA_BASIC",
+          "source": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html",
+          "content": "# Java 21 接口与抽象类：契约、状态与选择\n\n> Title: Java 21 接口与抽象类：契约、状态与选择\n> Bank ID: E01\n> Knowledge category: JAVA_BASIC\n> Knowledge point: interface_vs_abstract_class\n> Difficulty: EASY\n> Target question: Java 中接口和抽象类有什么区别？实际开发中应该如何选择？\n> Version scope: Java SE 21；语言规则依据 JLS 8/9，设计选择是基于这些规则的工程判断。\n> Primary official source: [JLS9]\n> Secondary official sources: JLS8（见 S5）\n> Authoring status: PHASE_4D2_AUTHORED_NOT_INGESTED\n\n## 1. Core model\n\n接口主要描述某种行为契约或能力，让调用者面向共同约定使用不同实现；抽象类适合表达具有共同基础特征的类层次，把共享状态与公共实现放进基类。这是设计含义，具体能力由 Java 21 的类与接口规则决定，不是编译器自动替开发者选择继承关系。[JLS8][JLS9]\n\n## 2. Main mechanism\n\n一个类只能直接继承一个类，但可以实现多个接口；接口也可以继承多个接口。因此支付方式、通知渠道等多实现契约适合用接口组合，不能为了增加第二种能力再继承第二个基类。[JLS8][JLS9]\n\n抽象类不能直接实例化，但可以有实例字段和构造器；创建具体子类对象时仍会执行基类构造过程。它可以同时声明抽象方法与有方法体的具体方法，向子类提供公共状态初始化和行为实现。接口没有普通对象实例字段；其字段隐含为 public static final，不能拿来保存每个实现对象各自的可变状态。[JLS8][JLS9]\n\n## 3. Important boundary\n\nJava 21 接口并非只有抽象方法：default 方法可提供实现，static 方法属于接口，private 方法可供接口内部复用代码。这些方法体不会使接口变成带普通实例字段和构造器的基类；default 的代码可以调用实现类的方法，但不等于接口自身拥有共享实例状态。[JLS9]\n\n若多个实现必须共享状态、初始化规则与紧密相关的基类行为，可以考虑抽象类；若重点是稳定调用契约、替换实现、隔离调用者与实现细节，或组合多种能力，则优先考虑接口。也可由抽象基类实现接口，让契约与共享实现各负其责；该建议依据语言能力推导，不是要求所有项目增加两层抽象。[JLS8][JLS9]\n\n## 4. Common misconceptions"
+        }
+      ]
+    },
+    "nativeResponse": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "practiceScore": {
+          "type": "score",
+          "score": 3.82,
+          "confidence": 0.85,
+          "legend": {
+            "0": "无有效实践内容",
+            "1": "仅有泛泛场景描述",
+            "2": "有合理使用场景或基本示例",
+            "3": "能结合实践解释问题与方案",
+            "4": "实践示例具体，能说明限制、风险与适用条件"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.01,
+            "3": 0.16,
+            "4": 0.83
+          }
+        },
+        "followUp": {
+          "type": "choice",
+          "choice": "no",
+          "confidence": 0.9,
+          "probabilities": {
+            "no": 0.95,
+            "yes": 0.05
+          }
+        },
+        "point_2480": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 0.0,
+            "covered": 1.0
+          }
+        },
+        "point_2481": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 0.0,
+            "covered": 1.0
+          }
+        },
+        "depthScore": {
+          "type": "score",
+          "score": 3.83,
+          "confidence": 0.86,
+          "legend": {
+            "0": "无机制说明",
+            "1": "仅复述术语或结论",
+            "2": "能解释基本机制",
+            "3": "解释关键原理与边界",
+            "4": "深入解释原理、边界与设计权衡"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.0,
+            "3": 0.17,
+            "4": 0.83
+          }
+        },
+        "point_2482": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 0.0,
+            "covered": 1.0
+          }
+        },
+        "point_2483": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 0.0,
+            "covered": 1.0
+          }
+        },
+        "completenessScore": {
+          "type": "score",
+          "score": 3.96,
+          "confidence": 0.97,
+          "legend": {
+            "0": "未回答题目要求",
+            "1": "仅覆盖少量评分点",
+            "2": "覆盖主要内容但遗漏重要评分点",
+            "3": "覆盖大部分评分点，少量遗漏",
+            "4": "完整覆盖题目要求与评分点"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.0,
+            "3": 0.03,
+            "4": 0.97
+          }
+        },
+        "clarityScore": {
+          "type": "score",
+          "score": 3.53,
+          "confidence": 0.61,
+          "legend": {
+            "0": "表达无法理解",
+            "1": "结构混乱、含糊",
+            "2": "基本可理解但结构或术语不清晰",
+            "3": "表达清楚、结构合理",
+            "4": "表达精准连贯、层次清晰"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.02,
+            "3": 0.43,
+            "4": 0.55
+          }
+        },
+        "correctnessScore": {
+          "type": "score",
+          "score": 3.85,
+          "confidence": 0.88,
+          "legend": {
+            "0": "无正确技术内容或关键结论错误",
+            "1": "少量正确内容但有重大错误",
+            "2": "基本结论正确但有明显不准确处",
+            "3": "关键结论与机制正确，仅少量瑕疵",
+            "4": "技术事实与机制准确，无实质错误"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.0,
+            "3": 0.14,
+            "4": 0.86
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 7105,
+        "output_tokens": 262
+      }
+    },
+    "feedbackContent": "{\n  \"strengths\": [\n    \"明确区分了 ArrayList 基于可扩容数组、LinkedList 基于带前后指针的双向链表，底层存储结构说明准确。\",\n    \"正确说明了 ArrayList 下标 get 为 O(1)，LinkedList 按下标访问需从头或尾遍历、最坏为 O(n)。\",\n    \"准确指出 ArrayList 尾部追加是摊还 O(1)、扩容时需复制，中间删除需移动后续引用；LinkedList 在迭代器已定位到节点时摘接节点为 O(1)，但按索引插入仍需先定位。\",\n    \"能结合实际访问模式说明选择思路：反复按下标读取或整体扫描用 ArrayList，局部反复用迭代器删插才会评估 LinkedList，并考虑节点额外内存和实测耗时，不只看增删次数。\"\n  ],\n  \"missingPoints\": [],\n  \"correction\": null,\n  \"pointEvidence\": [\n    {\n      \"scoringPointId\": 2480,\n      \"evidence\": \"它用能扩容的数组装引用；LinkedList 每个节点带前后指针，是双向链表\"\n    },\n    {\n      \"scoringPointId\": 2481,\n      \"evidence\": \"下标 get 可以直接算位置，是 O(1)。LinkedList……按下标得从某一头走过去，最坏 O(n)\"\n    },\n    {\n      \"scoringPointId\": 2482,\n      \"evidence\": \"ArrayList 尾部追加摊还 O(1)，扩容那一次要复制；在中间删一个还要挪后面的引用。链表若迭代器已经走到位置，摘接节点是 O(1)，但按索引插入先找位置的成本不能省\"\n    },\n    {\n      \"scoringPointId\": 2483,\n      \"evidence\": \"比如反复按下标读取或整体扫描，我一般用 ArrayList，局部反复用迭代器删插才会评估 LinkedList，还会看节点额外内存和实测耗时，不能只看增删次数\"\n    }\n  ],\n  \"suggestedFollowUp\": null\n}",
+    "nativeRawSha256": "b82283f232e70c6b36e6a6195fe9eef250a2405b4c74b2d49a4896032e38115b",
+    "feedbackRawSha256": "bc07aa4679a4b08751faed721b96feb264e33c135ed2d19858b592e29a84426b"
+  },
+  {
+    "caseId": "E02-OFF_TOPIC",
+    "context": {
+      "currentAnswerId": 10005,
+      "currentInterviewQuestionId": 20005,
+      "mainAnswerId": 10005,
+      "mainInterviewQuestionId": 20005,
+      "mode": "MAIN_ANSWER",
+      "category": "JAVA_COLLECTION",
+      "knowledgePoint": "arraylist_vs_linkedlist",
+      "mainQuestionContent": "ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？",
+      "referenceAnswerSnapshot": "ArrayList 底层是可扩容数组，因此根据下标随机访问通常很快，`get` 是 O(1)。尾部追加通常也比较高效，但中间插入或删除往往需要移动后面的元素。\n\nLinkedList 是双向链表，根据下标查找需要从链表中遍历，因此随机访问是 O(n)。如果已经拿到了目标节点附近的位置，链表插入和删除不需要搬移大量元素。\n\n实际开发里不能简单说“增删多就一定用 LinkedList”。很多业务仍然更适合 ArrayList，因为它随机访问好、内存布局更紧凑；只有确实需要大量链表式操作时才考虑 LinkedList。",
+      "scoringPoints": [
+        {
+          "id": 2480,
+          "pointType": "CORE",
+          "content": "能说明 ArrayList 基于动态数组，而 LinkedList 基于双向链表，两者底层存储结构不同。",
+          "weight": 30
+        },
+        {
+          "id": 2481,
+          "pointType": "KEY",
+          "content": "能说明 ArrayList 根据下标随机访问通常为 O(1)，而 LinkedList 按下标访问通常需要遍历，为 O(n)。",
+          "weight": 25
+        },
+        {
+          "id": 2482,
+          "pointType": "KEY",
+          "content": "能说明 ArrayList 中间插入或删除通常需要移动元素；LinkedList 在已经定位到节点后修改链接本身开销较低，但定位节点仍可能需要 O(n)。",
+          "weight": 25
+        },
+        {
+          "id": 2483,
+          "pointType": "PRINCIPLE",
+          "content": "能结合实际访问模式选择集合，而不是机械地认为“增删多就用 LinkedList、查询多就用 ArrayList”。",
+          "weight": 20
+        }
+      ],
+      "mainAnswerContent": "我们接口返回数据一般会先定义 DTO，再加分页参数，查库只取必要字段。我觉得还应该统一异常码，前端用相同结构处理失败，这样维护起来比较方便。",
+      "followUpQuestionContent": null,
+      "followUpAnswerContent": null,
+      "followUpTargetPointIds": []
+    },
+    "retrieval": {
+      "query": "主问题：ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？\n评分点：\n- 能说明 ArrayList 基于动态数组，而 LinkedList 基于双向链表，两者底层存储结构不同。\n- 能说明 ArrayList 根据下标随机访问通常为 O(1)，而 LinkedList 按下标访问通常需要遍历，为 O(n)。\n- 能说明 ArrayList 中间插入或删除通常需要移动元素；LinkedList 在已经定位到节点后修改链接本身开销较低，但定位节点仍可能需要 O(n)。\n- 能结合实际访问模式选择集合，而不是机械地认为“增删多就用 LinkedList、查询多就用 ArrayList”。",
+      "requestedTopK": 5,
+      "embeddingModel": "qwen3.7-text-embedding",
+      "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+      "rawHits": [
+        {
+          "vectorId": "17b11e96-ce9a-4a99-b283-52bc7171bf3f",
+          "documentId": 582,
+          "chunkIndex": 1,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.9089177250862122
+        },
+        {
+          "vectorId": "19228507-3403-483a-aaf5-0b5cf124487a",
+          "documentId": 582,
+          "chunkIndex": 2,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.8020434975624084
+        },
+        {
+          "vectorId": "21386f00-d4e2-4c78-a756-78e726f2e4c5",
+          "documentId": 589,
+          "chunkIndex": 1,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.4486461579799652
+        },
+        {
+          "vectorId": "165d0ecd-574a-4d7e-a1aa-c5216b19a341",
+          "documentId": 581,
+          "chunkIndex": 2,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.42009007930755615
+        },
+        {
+          "vectorId": "62ac2ccb-059b-4cb6-8f21-f694e8d6b9ce",
+          "documentId": 581,
+          "chunkIndex": 1,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.4143732786178589
+        }
+      ],
+      "evidence": [
+        {
+          "vectorRank": 1,
+          "similarityScore": 0.9089177250862122,
+          "chunkId": 527,
+          "documentId": 582,
+          "documentVersion": 1,
+          "chunkIndex": 1,
+          "vectorId": "17b11e96-ce9a-4a99-b283-52bc7171bf3f",
+          "title": "ArrayList 与 LinkedList：访问与修改成本",
+          "category": "JAVA_COLLECTION",
+          "source": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html",
+          "content": "# ArrayList 与 LinkedList：访问与修改成本\n\n> Title: ArrayList 与 LinkedList：访问与修改成本\n> Bank ID: E02\n> Knowledge category: JAVA_COLLECTION\n> Knowledge point: arraylist_vs_linkedlist\n> Difficulty: EASY\n> Target question: ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？\n> Version scope: Java SE 21 ArrayList/LinkedList API；操作成本有前提，实际性能须测量。\n> Primary official source: [ARRAY]\n> Secondary official sources: LINKED（见 S5）\n> Authoring status: PHASE_4D2_AUTHORED_NOT_INGESTED\n\n## 1. Core model\n\nArrayList 是可调整容量的数组实现；LinkedList 是双向链表实现，同时实现 List 与 Deque。前者通过数组下标访问元素，后者沿节点链接定位元素。底层结构决定基本成本，但接口都叫 List 并不意味着任意操作都有相同复杂度。[ARRAY][LINKED]\n\n## 2. Main mechanism\n\nArrayList 的 get(index) 等下标访问为 O(1)；尾部 add 的成本是摊还 O(1)，不能把一次需要扩容的追加也说成恒定成本。中间插入要把后续元素向后移动，中间删除要把后续元素向前移动，通常随剩余元素数增长。[ARRAY]\n\nLinkedList 的下标操作从较近的头端或尾端遍历到目标位置；随机下标访问通常为 O(n)。插入或删除已定位节点时，调整相邻链接本身成本较低，但调用 add(index, value) 前的定位可能仍为 O(n)。已有 ListIterator 在当前游标位置修改与每次重新按下标定位，必须分开分析。[LINKED]\n\n## 3. Important boundary\n\n下面是访问模式的区别，而非性能测试：\n\n```java\narray.get(i);             // 数组下标访问\nlinked.add(i, value);     // 包括定位目标位置\niterator.add(value);      // 已有 LinkedList 游标位置\nlinked.addFirst(value);   // 两端操作\n```"
+        },
+        {
+          "vectorRank": 2,
+          "similarityScore": 0.8020434975624084,
+          "chunkId": 528,
+          "documentId": 582,
+          "documentVersion": 1,
+          "chunkIndex": 2,
+          "vectorId": "19228507-3403-483a-aaf5-0b5cf124487a",
+          "title": "ArrayList 与 LinkedList：访问与修改成本",
+          "category": "JAVA_COLLECTION",
+          "source": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html",
+          "content": "// 数组下标访问\nlinked.add(i, value);     // 包括定位目标位置\niterator.add(value);      // 已有 LinkedList 游标位置\nlinked.addFirst(value);   // 两端操作\n```\n\n两端操作与中间按下标修改不是同一种需求。顺序遍历链表应沿 iterator 前进，反复用 get(i) 会不断重新定位。链表修改的优势需要“位置已知或只操作两端”等条件，不能由“写操作次数多”直接推出整体更快。[ARRAY][LINKED]\n\n## 4. Common misconceptions\n\n工程选择应看随机访问比例、修改位置、是否已有游标、数据规模与内存限制：频繁随机访问通常优先 ArrayList；已有游标的局部修改或双端使用可考虑 LinkedList。结合完整业务路径做测量，不能只比较链接修改与数组移动而漏掉查找节点的成本。\n\n“增删多就一定用 LinkedList”没有说明增删位置和定位方式；“ArrayList 每次都按固定倍数扩容”把某个实现细节当作 API 契约。Java 21 API 明确给出摊还追加成本，并未规定一个可依赖的固定增长倍数。[ARRAY][LINKED]\n\n## 5. Official references\n\n- [ARRAY] ArrayList API，Java SE 21，类说明及 get/add/remove\n- [LINKED] LinkedList API，Java SE 21，类说明、下标遍历及 ListIterator/Deque\n\n[ARRAY]: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html\n[LINKED]: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/LinkedList.html"
+        },
+        {
+          "vectorRank": 3,
+          "similarityScore": 0.4486461579799652,
+          "chunkId": 543,
+          "documentId": 589,
+          "documentVersion": 1,
+          "chunkIndex": 1,
+          "vectorId": "21386f00-d4e2-4c78-a756-78e726f2e4c5",
+          "title": "Redis 五类常用数据结构与选择",
+          "category": "REDIS",
+          "source": "https://redis.io/docs/latest/develop/data-types/",
+          "content": "# Redis 五类常用数据结构与选择\n\n> Title: Redis 五类常用数据结构与选择\n> Bank ID: M07\n> Knowledge category: REDIS\n> Knowledge point: redis_data_structures\n> Difficulty: MEDIUM\n> Target question: Redis 常用数据结构有哪些？如果要分别实现对象缓存、元素去重、按顺序保存数据和排行榜，你会选择什么数据结构？为什么？\n> Version scope: Redis 官方文档，核验日期 2026-10-06；仅经典结构与单元素命令，不声明项目 Redis 运行版本或依赖。\n> Primary official source: [REDISTYPES]\n> Secondary official sources: STRING, HASH, LPUSH, RPOP, SET, ZSET（见 S5）\n> Authoring status: PHASE_4D2_AUTHORED_NOT_INGESTED\n\n## 1. Core model\n\nString、Hash、List、Set、Sorted Set 是 Redis 常见的五类通用数据结构，并非 Redis 全部类型的穷尽清单。选择需区分单值、字段、序列、唯一成员和带 score 的成员。Redis 并不只是保存字符串的简单 Key-Value。[REDISTYPES]\n\n## 2. Main mechanism\n\nString 适合普通缓存值，也可以用 INCR 表达整数计数器；计数操作以符合命令要求的数值字符串为前提。Hash 是 field-value 集合，适合保存对象的多个字段，使用 HSET/HGET 可单独写读字段，避免每次都按一个整体值处理。[STRING][HASH]\n\nList 是有序序列，适合从两端操作元素。单元素 LPUSH 在头部插入，RPOP 从尾部取出并移除，配合可形成按入队顺序消费的简单队列。List 可以有重复元素，不能用序列自动替代去重需求。[REDISTYPES][LPUSH][RPOP]\n\n```text\nINCR visits\nHSET profile:1 name Kun\nLPUSH tasks taskA\nRPOP tasks\n```\n\n\n## 3. Important boundary\n\nSet 的成员唯一且无序，适合去重、成员判断和交集、并集、差集：重复加入同一成员不会产生第二份成员。Sorted Set 同样保持成员唯一，但每个成员关联 score 并按 score 排序，适合排行榜或按权重、时间排序。不同成员可以有相同 score，此时按成员的字典序区分，不是 score 也必须唯一。[SET][ZSET]"
+        },
+        {
+          "vectorRank": 4,
+          "similarityScore": 0.42009007930755615,
+          "chunkId": 526,
+          "documentId": 581,
+          "documentVersion": 1,
+          "chunkIndex": 2,
+          "vectorId": "165d0ecd-574a-4d7e-a1aa-c5216b19a341",
+          "title": "Java 21 接口与抽象类：契约、状态与选择",
+          "category": "JAVA_BASIC",
+          "source": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html",
+          "content": "## 4. Common misconceptions\n\n“接口不能有方法体”遗漏 default、static、private 方法；“抽象类只能有抽象方法”遗漏普通实现和构造过程；“接口总比抽象类好”忽略共享状态需求。选择应先说明调用者依赖什么、哪些状态需要复用，再判断继承或实现关系。不要仅因两个类有一段相似代码就建立不合理的基类关系，也不要把接口常量当作对象字段。\n\n## 5. Official references\n\n- [JLS9] JLS 21 Interfaces，§9.3 字段、§9.4 接口方法\n- [JLS8] JLS 21 Classes，§8.1.1.1、§8.1.4–8.1.5、§8.3–8.4、§8.8\n\n[JLS9]: https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html\n[JLS8]: https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html"
+        },
+        {
+          "vectorRank": 5,
+          "similarityScore": 0.4143732786178589,
+          "chunkId": 525,
+          "documentId": 581,
+          "documentVersion": 1,
+          "chunkIndex": 1,
+          "vectorId": "62ac2ccb-059b-4cb6-8f21-f694e8d6b9ce",
+          "title": "Java 21 接口与抽象类：契约、状态与选择",
+          "category": "JAVA_BASIC",
+          "source": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html",
+          "content": "# Java 21 接口与抽象类：契约、状态与选择\n\n> Title: Java 21 接口与抽象类：契约、状态与选择\n> Bank ID: E01\n> Knowledge category: JAVA_BASIC\n> Knowledge point: interface_vs_abstract_class\n> Difficulty: EASY\n> Target question: Java 中接口和抽象类有什么区别？实际开发中应该如何选择？\n> Version scope: Java SE 21；语言规则依据 JLS 8/9，设计选择是基于这些规则的工程判断。\n> Primary official source: [JLS9]\n> Secondary official sources: JLS8（见 S5）\n> Authoring status: PHASE_4D2_AUTHORED_NOT_INGESTED\n\n## 1. Core model\n\n接口主要描述某种行为契约或能力，让调用者面向共同约定使用不同实现；抽象类适合表达具有共同基础特征的类层次，把共享状态与公共实现放进基类。这是设计含义，具体能力由 Java 21 的类与接口规则决定，不是编译器自动替开发者选择继承关系。[JLS8][JLS9]\n\n## 2. Main mechanism\n\n一个类只能直接继承一个类，但可以实现多个接口；接口也可以继承多个接口。因此支付方式、通知渠道等多实现契约适合用接口组合，不能为了增加第二种能力再继承第二个基类。[JLS8][JLS9]\n\n抽象类不能直接实例化，但可以有实例字段和构造器；创建具体子类对象时仍会执行基类构造过程。它可以同时声明抽象方法与有方法体的具体方法，向子类提供公共状态初始化和行为实现。接口没有普通对象实例字段；其字段隐含为 public static final，不能拿来保存每个实现对象各自的可变状态。[JLS8][JLS9]\n\n## 3. Important boundary\n\nJava 21 接口并非只有抽象方法：default 方法可提供实现，static 方法属于接口，private 方法可供接口内部复用代码。这些方法体不会使接口变成带普通实例字段和构造器的基类；default 的代码可以调用实现类的方法，但不等于接口自身拥有共享实例状态。[JLS9]\n\n若多个实现必须共享状态、初始化规则与紧密相关的基类行为，可以考虑抽象类；若重点是稳定调用契约、替换实现、隔离调用者与实现细节，或组合多种能力，则优先考虑接口。也可由抽象基类实现接口，让契约与共享实现各负其责；该建议依据语言能力推导，不是要求所有项目增加两层抽象。[JLS8][JLS9]\n\n## 4. Common misconceptions"
+        }
+      ]
+    },
+    "nativeResponse": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "practiceScore": {
+          "type": "score",
+          "score": 0.32,
+          "confidence": 0.73,
+          "legend": {
+            "0": "无有效实践内容",
+            "1": "仅有泛泛场景描述",
+            "2": "有合理使用场景或基本示例",
+            "3": "能结合实践解释问题与方案",
+            "4": "实践示例具体，能说明限制、风险与适用条件"
+          },
+          "probabilities": {
+            "0": 0.71,
+            "1": 0.27,
+            "2": 0.01,
+            "3": 0.01,
+            "4": 0.0
+          }
+        },
+        "followUp": {
+          "type": "choice",
+          "choice": "yes",
+          "confidence": 0.58,
+          "probabilities": {
+            "no": 0.21,
+            "yes": 0.79
+          }
+        },
+        "point_2480": {
+          "type": "choice",
+          "choice": "uncovered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 1.0,
+            "covered": 0.0
+          }
+        },
+        "point_2481": {
+          "type": "choice",
+          "choice": "uncovered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 1.0,
+            "covered": 0.0
+          }
+        },
+        "depthScore": {
+          "type": "score",
+          "score": 0.01,
+          "confidence": 0.99,
+          "legend": {
+            "0": "无机制说明",
+            "1": "仅复述术语或结论",
+            "2": "能解释基本机制",
+            "3": "解释关键原理与边界",
+            "4": "深入解释原理、边界与设计权衡"
+          },
+          "probabilities": {
+            "0": 1.0,
+            "1": 0.0,
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0
+          }
+        },
+        "point_2482": {
+          "type": "choice",
+          "choice": "uncovered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 1.0,
+            "covered": 0.0
+          }
+        },
+        "point_2483": {
+          "type": "choice",
+          "choice": "uncovered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 1.0,
+            "covered": 0.0
+          }
+        },
+        "completenessScore": {
+          "type": "score",
+          "score": 0.0,
+          "confidence": 1.0,
+          "legend": {
+            "0": "未回答题目要求",
+            "1": "仅覆盖少量评分点",
+            "2": "覆盖主要内容但遗漏重要评分点",
+            "3": "覆盖大部分评分点，少量遗漏",
+            "4": "完整覆盖题目要求与评分点"
+          },
+          "probabilities": {
+            "0": 1.0,
+            "1": 0.0,
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0
+          }
+        },
+        "clarityScore": {
+          "type": "score",
+          "score": 1.44,
+          "confidence": 0.35,
+          "legend": {
+            "0": "表达无法理解",
+            "1": "结构混乱、含糊",
+            "2": "基本可理解但结构或术语不清晰",
+            "3": "表达清楚、结构合理",
+            "4": "表达精准连贯、层次清晰"
+          },
+          "probabilities": {
+            "0": 0.17,
+            "1": 0.41,
+            "2": 0.22,
+            "3": 0.18,
+            "4": 0.02
+          }
+        },
+        "correctnessScore": {
+          "type": "score",
+          "score": 0.01,
+          "confidence": 0.99,
+          "legend": {
+            "0": "无正确技术内容或关键结论错误",
+            "1": "少量正确内容但有重大错误",
+            "2": "基本结论正确但有明显不准确处",
+            "3": "关键结论与机制正确，仅少量瑕疵",
+            "4": "技术事实与机制准确，无实质错误"
+          },
+          "probabilities": {
+            "0": 1.0,
+            "1": 0.0,
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 6938,
+        "output_tokens": 274
+      }
+    },
+    "feedbackContent": "{\"strengths\":[],\"miss我完全没回答关于ArrayList和LinkedList的问题，请追问底层结构和操作的差异。\",\"missingPoints\":[\"ArrayList 基于动态数组、LinkedList 基于双向链表的底层存储结构差异未说明\",\"ArrayList 按下标随机访问通常 O(1)、LinkedList 按下标访问通常 O(n) 的复杂度未说明\",\"ArrayList 中间插入或删除通常需要移动元素；LinkedList 在已定位节点后修改链接开销较低但定位仍可能 O(n) 未说明\",\"未结合实际访问模式说明如何选择集合，也未能纠正“增删多就用 LinkedList”的机械认知\"],\"correction\":null,\"pointEvidence\":[{\"scoringPointId\":2480,\"evidence\":null},{\"scoringPointId\":2481,\"evidence\":null},{\"scoringPointId\":2482,\"evidence\":null},{\"scoringPointId\":2483,\"evidence\":null}],\"suggestedFollowUp\":\"请分别说明 ArrayList 和 LinkedList 的底层数据结构，以及 get(index)、中间 add(index, value) 和删除操作在两者中的大致时间复杂度。\"}",
+    "nativeRawSha256": "2dc1dc5e0b2903f9170f14cbb0fad55fbc2da31164041a21d1e8bd3744505df8",
+    "feedbackRawSha256": "98e483c5e48c20e1ef29252d9ed7b564f7c8c4c99bb91d720de1bc6a3a425cfc"
+  },
+  {
+    "caseId": "H05-BOUNDARY",
+    "context": {
+      "currentAnswerId": 10021,
+      "currentInterviewQuestionId": 20021,
+      "mainAnswerId": 10021,
+      "mainInterviewQuestionId": 20021,
+      "mode": "MAIN_ANSWER",
+      "category": "SPRING",
+      "knowledgePoint": "transaction_boundary",
+      "mainQuestionContent": "Spring 事务有哪些常见失效场景？如果一个业务方法同时调用多个数据库操作，应该如何设计事务边界和异常回滚策略？",
+      "referenceAnswerSnapshot": "Spring 声明式事务通常依赖 AOP 代理，因此调用必须真正经过代理。常见问题包括同类内部自调用绕过代理、某些无法被代理的方法形式，以及错误的事务配置。\n\n另一个很常见的问题是异常处理。Spring 默认情况下，`RuntimeException` 和 `Error` 会触发回滚，而 checked exception 默认不触发回滚；如果业务需要，应该显式配置 `rollbackFor` 等回滚规则。\n\n如果事务内部把异常 catch 住以后正常返回，外层事务基础设施可能不知道应该回滚，所以异常处理和 rollback 语义必须一起设计。\n\n事务边界一般应该围绕一个完整业务用例，让必须保持原子一致的数据库操作处于同一个事务中。同时不应该随意把耗时远程调用放进长数据库事务，否则可能长时间占用数据库连接和锁。\n\n如果不同资源之间不能靠单数据库事务保证一致性，就需要另外设计消息、补偿或最终一致性机制，而不是扩大一个本地事务就认为问题解决了。",
+      "scoringPoints": [
+        {
+          "id": 2549,
+          "pointType": "CORE",
+          "content": "能说明 Spring 声明式事务主要建立在代理拦截之上，并识别 self-invocation 等绕过代理导致 @Transactional 不生效的情况。",
+          "weight": 20
+        },
+        {
+          "id": 2550,
+          "pointType": "KEY",
+          "content": "能说明 Spring 默认 rollback 规则与异常类型有关，RuntimeException/Error 默认触发回滚，而 checked exception 默认不触发回滚；业务需要时可配置 rollbackFor 等规则。",
+          "weight": 20
+        },
+        {
+          "id": 2551,
+          "pointType": "KEY",
+          "content": "能认识到 catch 后吞掉异常、错误的事务管理器或错误的调用边界都可能使实际事务行为与开发者预期不同。",
+          "weight": 20
+        },
+        {
+          "id": 2552,
+          "pointType": "PRINCIPLE",
+          "content": "能按照完整业务用例定义事务边界，使必须共同成功或失败的数据库操作位于同一事务，并避免不必要地扩大事务范围。",
+          "weight": 25
+        },
+        {
+          "id": 2553,
+          "pointType": "ADVANCED",
+          "content": "能意识到长时间远程调用、跨资源操作不能简单依赖单数据库本地事务解决，并能提出缩短事务或采用消息、补偿等一致性方案。",
+          "weight": 15
+        }
+      ],
+      "mainAnswerContent": "不能只看方法是不是 public。Spring 6 的类代理在合适条件下也能处理 protected 或包可见的方法，但接口代理的入口、private 方法以及 final 导致无法覆盖的方法要分别判断，核心仍是实际调用要经过代理，this 自调用不会经过。默认 RuntimeException 和 Error 回滚，checked exception 要看 rollbackFor。事务内部 catch 并吞掉异常正常返回，会让提交行为与预期不同，应按业务重抛或显式设置 rollback-only。一次用例中订单和明细必须同成同败，我会放在同一个事务，把无关查询移出以缩短边界。",
+      "followUpQuestionContent": null,
+      "followUpAnswerContent": null,
+      "followUpTargetPointIds": []
+    },
+    "retrieval": {
+      "query": "主问题：Spring 事务有哪些常见失效场景？如果一个业务方法同时调用多个数据库操作，应该如何设计事务边界和异常回滚策略？\n评分点：\n- 能说明 Spring 声明式事务主要建立在代理拦截之上，并识别 self-invocation 等绕过代理导致 @Transactional 不生效的情况。\n- 能说明 Spring 默认 rollback 规则与异常类型有关，RuntimeException/Error 默认触发回滚，而 checked exception 默认不触发回滚；业务需要时可配置 rollbackFor 等规则。\n- 能认识到 catch 后吞掉异常、错误的事务管理器或错误的调用边界都可能使实际事务行为与开发者预期不同。\n- 能按照完整业务用例定义事务边界，使必须共同成功或失败的数据库操作位于同一事务，并避免不必要地扩大事务范围。\n- 能意识到长时间远程调用、跨资源操作不能简单依赖单数据库本地事务解决，并能提出缩短事务或采用消息、补偿等一致性方案。",
+      "requestedTopK": 5,
+      "embeddingModel": "qwen3.7-text-embedding",
+      "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+      "rawHits": [
+        {
+          "vectorId": "a0996773-7871-4531-850e-8c4e5695b848",
+          "documentId": 594,
+          "chunkIndex": 1,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.865795373916626
+        },
+        {
+          "vectorId": "47dde9c6-96ef-432c-a35c-4c8921d4bf59",
+          "documentId": 594,
+          "chunkIndex": 2,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.7892861366271973
+        },
+        {
+          "vectorId": "739582b8-6da4-44e9-9547-c35c88f46ddb",
+          "documentId": 578,
+          "chunkIndex": 2,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.7190213203430176
+        },
+        {
+          "vectorId": "1d7f249b-5f7c-4515-b5c0-10b3fe6ccdb5",
+          "documentId": 594,
+          "chunkIndex": 3,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.6778504848480225
+        },
+        {
+          "vectorId": "dcb2c373-d228-494c-ada8-d65f2e8a8aba",
+          "documentId": 578,
+          "chunkIndex": 3,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.6113986968994141
+        }
+      ],
+      "evidence": [
+        {
+          "vectorRank": 1,
+          "similarityScore": 0.865795373916626,
+          "chunkId": 555,
+          "documentId": 594,
+          "documentVersion": 1,
+          "chunkIndex": 1,
+          "vectorId": "a0996773-7871-4531-850e-8c4e5695b848",
+          "title": "Spring 6.2 事务边界与回滚规则",
+          "category": "SPRING",
+          "source": "https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html",
+          "content": "# Spring 6.2 事务边界与回滚规则\n\n> Title: Spring 6.2 事务边界与回滚规则\n> Bank ID: H05\n> Knowledge category: SPRING\n> Knowledge point: transaction_boundary\n> Difficulty: HARD\n> Target question: Spring 事务有哪些常见失效场景？如果一个业务方法同时调用多个数据库操作，应该如何设计事务边界和异常回滚策略？\n> Version scope: Spring Framework 6.2 官方参考，项目规划版本 6.2.19；未覆盖时才适用默认回滚规则。\n> Primary official source: [TX]\n> Secondary official sources: ROLLBACK, TXRESOURCE, COMMIT（见 S5）\n> Authoring status: PHASE_4D2_AUTHORED_NOT_INGESTED\n\n## 1. Core model\n\n业务事务边界应围绕完整用例：必须共同成功或失败的数据库操作，放入同一个受正确事务管理器控制的事务，检查每步结果再决定提交或回滚。不是每个 DAO 调用都独立提交后再期待整体原子，也不是把一次用户流程中的所有外部动作都无限纳入一个长事务。[TXRESOURCE][COMMIT]\n\n## 2. Main mechanism\n\nSpring 声明式事务在默认 proxy 模式下由代理拦截外部调用。对象内部 this.method() 的 self-invocation 绕过代理，内部方法即使有 @Transactional，也不会因此额外触发事务拦截；若外层已有事务，它仍可能在已有事务中运行，不能把这说成内部数据库操作必然完全无事务。[TX]\n\n未自定义时，RuntimeException 与 Error 默认触发回滚，checked exception 默认不触发。业务可设置 rollbackFor/noRollbackFor。示意入口应由外部经代理调用，异常须按既定契约传播或显式标记回滚：\n\n```java\n@Transactional(rollbackFor = BusinessException.class)\npublic void completeUseCase() throws BusinessException {\n    // 多个必须共同提交的数据库步骤及结果检查\n}\n```\n\nBusinessException 只是示意名称，没有新增生产类。[TX][ROLLBACK]\n\n## 3. Important boundary"
+        },
+        {
+          "vectorRank": 2,
+          "similarityScore": 0.7892861366271973,
+          "chunkId": 556,
+          "documentId": 594,
+          "documentVersion": 1,
+          "chunkIndex": 2,
+          "vectorId": "47dde9c6-96ef-432c-a35c-4c8921d4bf59",
+          "title": "Spring 6.2 事务边界与回滚规则",
+          "category": "SPRING",
+          "source": "https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html",
+          "content": "throws BusinessException {\n    // 多个必须共同提交的数据库步骤及结果检查\n}\n```\n\nBusinessException 只是示意名称，没有新增生产类。[TX][ROLLBACK]\n\n## 3. Important boundary\n\nSpring 6.2 可通过 @EnableTransactionManagement(rollbackOn=ALL_EXCEPTIONS) 改变全局默认，包括 checked exception；方法具体规则还可覆盖默认。因此“checked exception 永不回滚”不成立，应核对实际配置。[TX]\n\ncatch 后吞掉异常，代理通常看不到这个异常，可能按正常返回提交；但已有 rollback-only 标记时仍可能回滚，不能反推“catch 必定提交”。错误的事务管理器、未覆盖目标 DataSource 的资源绑定，或绕过代理的调用边界，同样可使行为与预期不符。[TX][ROLLBACK][TXRESOURCE]\n\n## 4. Common misconceptions\n\n应把数据库原子阶段尽量缩短，避免在持锁期间等待长时间远程调用；只把必须原子提交的相关数据库操作组合进事务。缩短范围不能拆散必须共同成功的步骤，原子性与持锁时长需要一起考虑。[COMMIT][TXRESOURCE]\n\n单数据库本地 JDBC 事务不能原子回滚任意 HTTP 请求、邮件或另一资源上的效果。工程上可根据业务需要设计事务后触发、消息可靠交付或补偿，并明确失败恢复责任；这些是候选一致性方案，不是本仓库已经引入消息系统的声明。[TXRESOURCE]\n\n## 5. Official references\n\n- [TX] Spring 6.2，Using @Transactional，代理/回滚/管理器\n- [ROLLBACK] Spring 6.2，Rolling Back，异常与 rollbackFor\n- [TXRESOURCE] Spring 6.2，Transaction Abstraction，本地/全局资源\n- [COMMIT] MySQL 8.0，§15.3.1 事务提交与回滚"
+        },
+        {
+          "vectorRank": 3,
+          "similarityScore": 0.7190213203430176,
+          "chunkId": 517,
+          "documentId": 578,
+          "documentVersion": 1,
+          "chunkIndex": 2,
+          "vectorId": "739582b8-6da4-44e9-9547-c35c88f46ddb",
+          "title": "Spring Framework 6.2：AOP 代理与 self-invocation",
+          "category": "SPRING",
+          "source": "https://docs.spring.io/spring-framework/reference/6.2/core/aop/proxying.html",
+          "content": "或隐式 `otherMethod()` 调用同一对象的另一个方法，接收者是目标对象自身，而不是外部代理。内部调用不会重新绕回 proxy，所以绑定在被调用方法上的 advice 在这条调用路径上没有机会运行。问题的核心是调用是否穿过代理边界，不是被调用方法是否有注解。\n\nSpring Framework 6.2 的声明式事务文档说明，`@Transactional` 默认使用 proxy 模式；在该模式下，只有通过代理进入的外部方法调用才会被拦截。因此，目标对象内部 self-invocation 到另一个 `@Transactional` 方法时，该方法上的事务 advice 不会因这次调用而生效。这个结论解释的是 proxy 模式下的调用边界；不要把它泛化成所有事务问题的唯一成因，也不要把 proxy 模式结论套用到 AspectJ weaving。\n\n## 3. Important boundary\n\n优先通过重构调用边界来处理 self-invocation：将需要独立 advice 的职责放到另一个 Spring Bean / Service，再由调用方通过注入的 Bean 发起调用，使请求经过代理。Spring 文档还列出 self injection 作为备选方式，即通过自身代理引用调用；`AopContext.currentProxy()` 也可取得当前代理，但会让业务代码依赖 AOP 上下文，通常不是首选。无论使用 JDK proxy 还是 CGLIB，只要调用仍在目标对象内部直接发生，proxy-based AOP 的 self-invocation 限制仍然存在。\n\nAspectJ weaving 不通过同一个外部代理拦截模型处理方法执行，因此不应说 AspectJ 模式与 proxy 模式有相同的 self-invocation 限制。本文讨论的是 Spring AOP 与默认声明式事务 proxy 模式。重构调用边界通常更清楚，也便于把事务 advice 的触发点显式放在 Bean 之间的调用路径上。\n\n## 4. Common misconceptions\n\n类中声明 `@Transactional` 不意味着目标对象内部的每条调用都会自动经过事务代理。`this` 调用不会自动回到外部 proxy；给内部方法再加注解也不会改变接收者。JDK dynamic proxy 与 CGLIB 的代理目标不同，但都不能让目标对象对自身的直接调用自动穿过外部代理。分析这类问题时，先确认运行模式和调用路径，再判断 advice 是否有机会执行。\n\n## Official references"
+        },
+        {
+          "vectorRank": 4,
+          "similarityScore": 0.6778504848480225,
+          "chunkId": 557,
+          "documentId": 594,
+          "documentVersion": 1,
+          "chunkIndex": 3,
+          "vectorId": "1d7f249b-5f7c-4515-b5c0-10b3fe6ccdb5",
+          "title": "Spring 6.2 事务边界与回滚规则",
+          "category": "SPRING",
+          "source": "https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html",
+          "content": "- [ROLLBACK] Spring 6.2，Rolling Back，异常与 rollbackFor\n- [TXRESOURCE] Spring 6.2，Transaction Abstraction，本地/全局资源\n- [COMMIT] MySQL 8.0，§15.3.1 事务提交与回滚\n\n[TX]: https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html\n[ROLLBACK]: https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/rolling-back.html\n[TXRESOURCE]: https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/strategies.html\n[COMMIT]: https://dev.mysql.com/doc/refman/8.0/en/commit.html"
+        },
+        {
+          "vectorRank": 5,
+          "similarityScore": 0.6113986968994141,
+          "chunkId": 518,
+          "documentId": 578,
+          "documentVersion": 1,
+          "chunkIndex": 3,
+          "vectorId": "dcb2c373-d228-494c-ada8-d65f2e8a8aba",
+          "title": "Spring Framework 6.2：AOP 代理与 self-invocation",
+          "category": "SPRING",
+          "source": "https://docs.spring.io/spring-framework/reference/6.2/core/aop/proxying.html",
+          "content": "dynamic proxy 与 CGLIB 的代理目标不同，但都不能让目标对象对自身的直接调用自动穿过外部代理。分析这类问题时，先确认运行模式和调用路径，再判断 advice 是否有机会执行。\n\n## Official references\n\n- Primary: [Spring Framework 6.2 Reference — Proxying Mechanisms](https://docs.spring.io/spring-framework/reference/6.2/core/aop/proxying.html) — JDK proxy、CGLIB、self-invocation 与建议的处理方式。\n- Secondary: [Spring Framework 6.2 Reference — Using `@Transactional`](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html) — 声明式事务的 proxy 模式与外部调用限制。"
+        }
+      ]
+    },
+    "nativeResponse": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "point_2549": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 1.0,
+          "probabilities": {
+            "covered": 1.0,
+            "uncovered": 0.0
+          }
+        },
+        "point_2550": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 1.0,
+          "probabilities": {
+            "covered": 1.0,
+            "uncovered": 0.0
+          }
+        },
+        "point_2551": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 0.82,
+          "probabilities": {
+            "covered": 0.91,
+            "uncovered": 0.09
+          }
+        },
+        "point_2552": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 1.0,
+          "probabilities": {
+            "covered": 1.0,
+            "uncovered": 0.0
+          }
+        },
+        "point_2553": {
+          "type": "choice",
+          "choice": "uncovered",
+          "confidence": 0.64,
+          "probabilities": {
+            "covered": 0.18,
+            "uncovered": 0.82
+          }
+        },
+        "correctnessScore": {
+          "type": "score",
+          "score": 3.04,
+          "confidence": 0.65,
+          "legend": {
+            "0": "无正确技术内容或关键结论错误",
+            "1": "少量正确内容但有重大错误",
+            "2": "基本结论正确但有明显不准确处",
+            "3": "关键结论与机制正确，仅少量瑕疵",
+            "4": "技术事实与机制准确，无实质错误"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.02,
+            "2": 0.15,
+            "3": 0.6,
+            "4": 0.23
+          }
+        },
+        "depthScore": {
+          "type": "score",
+          "score": 3.57,
+          "confidence": 0.63,
+          "legend": {
+            "0": "无机制说明",
+            "1": "仅复述术语或结论",
+            "2": "能解释基本机制",
+            "3": "解释关键原理与边界",
+            "4": "深入解释原理、边界与设计权衡"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.01,
+            "3": 0.42,
+            "4": 0.57
+          }
+        },
+        "practiceScore": {
+          "type": "score",
+          "score": 3.39,
+          "confidence": 0.62,
+          "legend": {
+            "0": "无有效实践内容",
+            "1": "仅有泛泛场景描述",
+            "2": "有合理使用场景或基本示例",
+            "3": "能结合实践解释问题与方案",
+            "4": "实践示例具体，能说明限制、风险与适用条件"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.03,
+            "3": 0.55,
+            "4": 0.42
+          }
+        },
+        "completenessScore": {
+          "type": "score",
+          "score": 2.76,
+          "confidence": 0.78,
+          "legend": {
+            "0": "未回答题目要求",
+            "1": "仅覆盖少量评分点",
+            "2": "覆盖主要内容但遗漏重要评分点",
+            "3": "覆盖大部分评分点，少量遗漏",
+            "4": "完整覆盖题目要求与评分点"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.25,
+            "3": 0.74,
+            "4": 0.01
+          }
+        },
+        "followUp": {
+          "type": "choice",
+          "choice": "yes",
+          "confidence": 0.32,
+          "probabilities": {
+            "yes": 0.66,
+            "no": 0.34
+          }
+        },
+        "clarityScore": {
+          "type": "score",
+          "score": 3.04,
+          "confidence": 0.64,
+          "legend": {
+            "0": "表达无法理解",
+            "1": "结构混乱、含糊",
+            "2": "基本可理解但结构或术语不清晰",
+            "3": "表达清楚、结构合理",
+            "4": "表达精准连贯、层次清晰"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.01,
+            "2": 0.18,
+            "3": 0.58,
+            "4": 0.23
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 7093,
+        "output_tokens": 301
+      }
+    },
+    "feedbackContent": "{\"strengths\":[\"能说明代理模式下 this 自调用绕过代理导致 @Transactional 不生效，并正确指出核心是实际调用要经过代理。\",\"能说明 RuntimeException 和 Error 默认回滚，checked exception 需要看 rollbackFor 配置。\",\"能指出事务内部 catch 并吞掉异常正常返回会使提交行为与预期不同，并给出重抛或显式设置 rollback-only 的处理方向。\",\"能按完整业务用例定义事务边界，举例订单和明细必须同成同败放在同一事务，并把无关查询移出以缩短边界。\"],\"missingPoints\":[\"未提及长时间远程调用或跨资源操作不能简单依赖单数据库本地事务保证一致性，也未提出消息、补偿或最终一致性等方案。\"],\"correction\":null,\"pointEvidence\":[{\"scoringPointId\":2549,\"evidence\":\"不能只看方法是不是 public。Spring 6 的类代理在合适条件下也能处理 protected 或包可见的方法，但接口代理的入口、private 方法以及 final 导致无法覆盖的方法要分别判断，核心仍是实际调用要经过代理，this 自调用不会经过。\"},{\"scoringPointId\":2550,\"evidence\":\"默认 RuntimeException 和 Error 回滚，checked exception 要看 rollbackFor。\"},{\"scoringPointId\":2551,\"evidence\":\"事务内部 catch 并吞掉异常正常返回，会让提交行为与预期不同，应按业务重抛或显式设置 rollback-only。\"},{\"scoringPointId=2552,\"evidence\":\"一次用例中订单和明细必须同成同败，我会放在同一个事务，把无关查询移出以缩短边界。\"},{\"scoringPointId=2553,\"evidence\":null}],\"suggestedFollowUp\":\"如果一个业务方法需要同时写本地数据库和发送 MQ 消息，本地事务提交成功但消息发送失败，你会如何设计一致性方案？请具体说明是否会缩短本地事务、采用事务后触发或补偿机制。\"}",
+    "nativeRawSha256": "c19d1417e9e1b18152da66c23895bd70f5ef2d8246bb100016e59f20a101daa7",
+    "feedbackRawSha256": "7815a8d3249ddb3f064f33049cfa7bab9d8ee1b4f861a056c526c4a27abe68b5"
+  },
+  {
+    "caseId": "E02-REPAIR",
+    "context": {
+      "currentAnswerId": 10031,
+      "currentInterviewQuestionId": 20031,
+      "mainAnswerId": 30031,
+      "mainInterviewQuestionId": 40031,
+      "mode": "FOLLOW_UP_ANSWER",
+      "category": "JAVA_COLLECTION",
+      "knowledgePoint": "arraylist_vs_linkedlist",
+      "mainQuestionContent": "ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？",
+      "referenceAnswerSnapshot": "ArrayList 底层是可扩容数组，因此根据下标随机访问通常很快，`get` 是 O(1)。尾部追加通常也比较高效，但中间插入或删除往往需要移动后面的元素。\n\nLinkedList 是双向链表，根据下标查找需要从链表中遍历，因此随机访问是 O(n)。如果已经拿到了目标节点附近的位置，链表插入和删除不需要搬移大量元素。\n\n实际开发里不能简单说“增删多就一定用 LinkedList”。很多业务仍然更适合 ArrayList，因为它随机访问好、内存布局更紧凑；只有确实需要大量链表式操作时才考虑 LinkedList。",
+      "scoringPoints": [
+        {
+          "id": 2480,
+          "pointType": "CORE",
+          "content": "能说明 ArrayList 基于动态数组，而 LinkedList 基于双向链表，两者底层存储结构不同。",
+          "weight": 30
+        },
+        {
+          "id": 2481,
+          "pointType": "KEY",
+          "content": "能说明 ArrayList 根据下标随机访问通常为 O(1)，而 LinkedList 按下标访问通常需要遍历，为 O(n)。",
+          "weight": 25
+        },
+        {
+          "id": 2482,
+          "pointType": "KEY",
+          "content": "能说明 ArrayList 中间插入或删除通常需要移动元素；LinkedList 在已经定位到节点后修改链接本身开销较低，但定位节点仍可能需要 O(n)。",
+          "weight": 25
+        },
+        {
+          "id": 2483,
+          "pointType": "PRINCIPLE",
+          "content": "能结合实际访问模式选择集合，而不是机械地认为“增删多就用 LinkedList、查询多就用 ArrayList”。",
+          "weight": 20
+        }
+      ],
+      "mainAnswerContent": "ArrayList 是一个容量不够会扩容的数组，LinkedList 是节点前后串起来的双向链表。我知道 get(index) 在 ArrayList 上是 O(1)，链表要沿节点找过去，按下标最坏 O(n)。至于修改元素和业务里到底选哪个，我还没有形成清楚的判断。",
+      "followUpQuestionContent": "如果通过索引在中间删插，与已经定位的迭代器操作有什么区别？你会怎样按业务访问模式选这两个集合？",
+      "followUpAnswerContent": "ArrayList 在中间插入或删除要移动后面的引用，LinkedList 如果迭代器已经定位，修改相邻节点链接本身是 O(1)，但按下标调用还是先遍历找位置，最坏 O(n)。我们展示列表反复按下标读取，我会用 ArrayList；若确实在当前位置连续用迭代器删插才考虑 LinkedList，还要看额外节点内存和实测表现，不能光看增删次数。",
+      "followUpTargetPointIds": [
+        2482,
+        2483
+      ]
+    },
+    "retrieval": {
+      "query": "主问题：ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？\n追问：如果通过索引在中间删插，与已经定位的迭代器操作有什么区别？你会怎样按业务访问模式选这两个集合？\n追问目标评分点：\n- 能说明 ArrayList 中间插入或删除通常需要移动元素；LinkedList 在已经定位到节点后修改链接本身开销较低，但定位节点仍可能需要 O(n)。\n- 能结合实际访问模式选择集合，而不是机械地认为“增删多就用 LinkedList、查询多就用 ArrayList”。",
+      "requestedTopK": 5,
+      "embeddingModel": "qwen3.7-text-embedding",
+      "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+      "rawHits": [
+        {
+          "vectorId": "17b11e96-ce9a-4a99-b283-52bc7171bf3f",
+          "documentId": 582,
+          "chunkIndex": 1,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.8943518400192261
+        },
+        {
+          "vectorId": "19228507-3403-483a-aaf5-0b5cf124487a",
+          "documentId": 582,
+          "chunkIndex": 2,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.8148374557495117
+        },
+        {
+          "vectorId": "21386f00-d4e2-4c78-a756-78e726f2e4c5",
+          "documentId": 589,
+          "chunkIndex": 1,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.43432092666625977
+        },
+        {
+          "vectorId": "62ac2ccb-059b-4cb6-8f21-f694e8d6b9ce",
+          "documentId": 581,
+          "chunkIndex": 1,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.4264708161354065
+        },
+        {
+          "vectorId": "165d0ecd-574a-4d7e-a1aa-c5216b19a341",
+          "documentId": 581,
+          "chunkIndex": 2,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.42454782128334045
+        }
+      ],
+      "evidence": [
+        {
+          "vectorRank": 1,
+          "similarityScore": 0.8943518400192261,
+          "chunkId": 527,
+          "documentId": 582,
+          "documentVersion": 1,
+          "chunkIndex": 1,
+          "vectorId": "17b11e96-ce9a-4a99-b283-52bc7171bf3f",
+          "title": "ArrayList 与 LinkedList：访问与修改成本",
+          "category": "JAVA_COLLECTION",
+          "source": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html",
+          "content": "# ArrayList 与 LinkedList：访问与修改成本\n\n> Title: ArrayList 与 LinkedList：访问与修改成本\n> Bank ID: E02\n> Knowledge category: JAVA_COLLECTION\n> Knowledge point: arraylist_vs_linkedlist\n> Difficulty: EASY\n> Target question: ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？\n> Version scope: Java SE 21 ArrayList/LinkedList API；操作成本有前提，实际性能须测量。\n> Primary official source: [ARRAY]\n> Secondary official sources: LINKED（见 S5）\n> Authoring status: PHASE_4D2_AUTHORED_NOT_INGESTED\n\n## 1. Core model\n\nArrayList 是可调整容量的数组实现；LinkedList 是双向链表实现，同时实现 List 与 Deque。前者通过数组下标访问元素，后者沿节点链接定位元素。底层结构决定基本成本，但接口都叫 List 并不意味着任意操作都有相同复杂度。[ARRAY][LINKED]\n\n## 2. Main mechanism\n\nArrayList 的 get(index) 等下标访问为 O(1)；尾部 add 的成本是摊还 O(1)，不能把一次需要扩容的追加也说成恒定成本。中间插入要把后续元素向后移动，中间删除要把后续元素向前移动，通常随剩余元素数增长。[ARRAY]\n\nLinkedList 的下标操作从较近的头端或尾端遍历到目标位置；随机下标访问通常为 O(n)。插入或删除已定位节点时，调整相邻链接本身成本较低，但调用 add(index, value) 前的定位可能仍为 O(n)。已有 ListIterator 在当前游标位置修改与每次重新按下标定位，必须分开分析。[LINKED]\n\n## 3. Important boundary\n\n下面是访问模式的区别，而非性能测试：\n\n```java\narray.get(i);             // 数组下标访问\nlinked.add(i, value);     // 包括定位目标位置\niterator.add(value);      // 已有 LinkedList 游标位置\nlinked.addFirst(value);   // 两端操作\n```"
+        },
+        {
+          "vectorRank": 2,
+          "similarityScore": 0.8148374557495117,
+          "chunkId": 528,
+          "documentId": 582,
+          "documentVersion": 1,
+          "chunkIndex": 2,
+          "vectorId": "19228507-3403-483a-aaf5-0b5cf124487a",
+          "title": "ArrayList 与 LinkedList：访问与修改成本",
+          "category": "JAVA_COLLECTION",
+          "source": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html",
+          "content": "// 数组下标访问\nlinked.add(i, value);     // 包括定位目标位置\niterator.add(value);      // 已有 LinkedList 游标位置\nlinked.addFirst(value);   // 两端操作\n```\n\n两端操作与中间按下标修改不是同一种需求。顺序遍历链表应沿 iterator 前进，反复用 get(i) 会不断重新定位。链表修改的优势需要“位置已知或只操作两端”等条件，不能由“写操作次数多”直接推出整体更快。[ARRAY][LINKED]\n\n## 4. Common misconceptions\n\n工程选择应看随机访问比例、修改位置、是否已有游标、数据规模与内存限制：频繁随机访问通常优先 ArrayList；已有游标的局部修改或双端使用可考虑 LinkedList。结合完整业务路径做测量，不能只比较链接修改与数组移动而漏掉查找节点的成本。\n\n“增删多就一定用 LinkedList”没有说明增删位置和定位方式；“ArrayList 每次都按固定倍数扩容”把某个实现细节当作 API 契约。Java 21 API 明确给出摊还追加成本，并未规定一个可依赖的固定增长倍数。[ARRAY][LINKED]\n\n## 5. Official references\n\n- [ARRAY] ArrayList API，Java SE 21，类说明及 get/add/remove\n- [LINKED] LinkedList API，Java SE 21，类说明、下标遍历及 ListIterator/Deque\n\n[ARRAY]: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html\n[LINKED]: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/LinkedList.html"
+        },
+        {
+          "vectorRank": 3,
+          "similarityScore": 0.43432092666625977,
+          "chunkId": 543,
+          "documentId": 589,
+          "documentVersion": 1,
+          "chunkIndex": 1,
+          "vectorId": "21386f00-d4e2-4c78-a756-78e726f2e4c5",
+          "title": "Redis 五类常用数据结构与选择",
+          "category": "REDIS",
+          "source": "https://redis.io/docs/latest/develop/data-types/",
+          "content": "# Redis 五类常用数据结构与选择\n\n> Title: Redis 五类常用数据结构与选择\n> Bank ID: M07\n> Knowledge category: REDIS\n> Knowledge point: redis_data_structures\n> Difficulty: MEDIUM\n> Target question: Redis 常用数据结构有哪些？如果要分别实现对象缓存、元素去重、按顺序保存数据和排行榜，你会选择什么数据结构？为什么？\n> Version scope: Redis 官方文档，核验日期 2026-10-06；仅经典结构与单元素命令，不声明项目 Redis 运行版本或依赖。\n> Primary official source: [REDISTYPES]\n> Secondary official sources: STRING, HASH, LPUSH, RPOP, SET, ZSET（见 S5）\n> Authoring status: PHASE_4D2_AUTHORED_NOT_INGESTED\n\n## 1. Core model\n\nString、Hash、List、Set、Sorted Set 是 Redis 常见的五类通用数据结构，并非 Redis 全部类型的穷尽清单。选择需区分单值、字段、序列、唯一成员和带 score 的成员。Redis 并不只是保存字符串的简单 Key-Value。[REDISTYPES]\n\n## 2. Main mechanism\n\nString 适合普通缓存值，也可以用 INCR 表达整数计数器；计数操作以符合命令要求的数值字符串为前提。Hash 是 field-value 集合，适合保存对象的多个字段，使用 HSET/HGET 可单独写读字段，避免每次都按一个整体值处理。[STRING][HASH]\n\nList 是有序序列，适合从两端操作元素。单元素 LPUSH 在头部插入，RPOP 从尾部取出并移除，配合可形成按入队顺序消费的简单队列。List 可以有重复元素，不能用序列自动替代去重需求。[REDISTYPES][LPUSH][RPOP]\n\n```text\nINCR visits\nHSET profile:1 name Kun\nLPUSH tasks taskA\nRPOP tasks\n```\n\n\n## 3. Important boundary\n\nSet 的成员唯一且无序，适合去重、成员判断和交集、并集、差集：重复加入同一成员不会产生第二份成员。Sorted Set 同样保持成员唯一，但每个成员关联 score 并按 score 排序，适合排行榜或按权重、时间排序。不同成员可以有相同 score，此时按成员的字典序区分，不是 score 也必须唯一。[SET][ZSET]"
+        },
+        {
+          "vectorRank": 4,
+          "similarityScore": 0.4264708161354065,
+          "chunkId": 525,
+          "documentId": 581,
+          "documentVersion": 1,
+          "chunkIndex": 1,
+          "vectorId": "62ac2ccb-059b-4cb6-8f21-f694e8d6b9ce",
+          "title": "Java 21 接口与抽象类：契约、状态与选择",
+          "category": "JAVA_BASIC",
+          "source": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html",
+          "content": "# Java 21 接口与抽象类：契约、状态与选择\n\n> Title: Java 21 接口与抽象类：契约、状态与选择\n> Bank ID: E01\n> Knowledge category: JAVA_BASIC\n> Knowledge point: interface_vs_abstract_class\n> Difficulty: EASY\n> Target question: Java 中接口和抽象类有什么区别？实际开发中应该如何选择？\n> Version scope: Java SE 21；语言规则依据 JLS 8/9，设计选择是基于这些规则的工程判断。\n> Primary official source: [JLS9]\n> Secondary official sources: JLS8（见 S5）\n> Authoring status: PHASE_4D2_AUTHORED_NOT_INGESTED\n\n## 1. Core model\n\n接口主要描述某种行为契约或能力，让调用者面向共同约定使用不同实现；抽象类适合表达具有共同基础特征的类层次，把共享状态与公共实现放进基类。这是设计含义，具体能力由 Java 21 的类与接口规则决定，不是编译器自动替开发者选择继承关系。[JLS8][JLS9]\n\n## 2. Main mechanism\n\n一个类只能直接继承一个类，但可以实现多个接口；接口也可以继承多个接口。因此支付方式、通知渠道等多实现契约适合用接口组合，不能为了增加第二种能力再继承第二个基类。[JLS8][JLS9]\n\n抽象类不能直接实例化，但可以有实例字段和构造器；创建具体子类对象时仍会执行基类构造过程。它可以同时声明抽象方法与有方法体的具体方法，向子类提供公共状态初始化和行为实现。接口没有普通对象实例字段；其字段隐含为 public static final，不能拿来保存每个实现对象各自的可变状态。[JLS8][JLS9]\n\n## 3. Important boundary\n\nJava 21 接口并非只有抽象方法：default 方法可提供实现，static 方法属于接口，private 方法可供接口内部复用代码。这些方法体不会使接口变成带普通实例字段和构造器的基类；default 的代码可以调用实现类的方法，但不等于接口自身拥有共享实例状态。[JLS9]\n\n若多个实现必须共享状态、初始化规则与紧密相关的基类行为，可以考虑抽象类；若重点是稳定调用契约、替换实现、隔离调用者与实现细节，或组合多种能力，则优先考虑接口。也可由抽象基类实现接口，让契约与共享实现各负其责；该建议依据语言能力推导，不是要求所有项目增加两层抽象。[JLS8][JLS9]\n\n## 4. Common misconceptions"
+        },
+        {
+          "vectorRank": 5,
+          "similarityScore": 0.42454782128334045,
+          "chunkId": 526,
+          "documentId": 581,
+          "documentVersion": 1,
+          "chunkIndex": 2,
+          "vectorId": "165d0ecd-574a-4d7e-a1aa-c5216b19a341",
+          "title": "Java 21 接口与抽象类：契约、状态与选择",
+          "category": "JAVA_BASIC",
+          "source": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html",
+          "content": "## 4. Common misconceptions\n\n“接口不能有方法体”遗漏 default、static、private 方法；“抽象类只能有抽象方法”遗漏普通实现和构造过程；“接口总比抽象类好”忽略共享状态需求。选择应先说明调用者依赖什么、哪些状态需要复用，再判断继承或实现关系。不要仅因两个类有一段相似代码就建立不合理的基类关系，也不要把接口常量当作对象字段。\n\n## 5. Official references\n\n- [JLS9] JLS 21 Interfaces，§9.3 字段、§9.4 接口方法\n- [JLS8] JLS 21 Classes，§8.1.1.1、§8.1.4–8.1.5、§8.3–8.4、§8.8\n\n[JLS9]: https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html\n[JLS8]: https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html"
+        }
+      ]
+    },
+    "nativeResponse": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "depthScore": {
+          "type": "score",
+          "score": 3.12,
+          "confidence": 0.73,
+          "legend": {
+            "0": "无机制说明",
+            "1": "仅复述术语或结论",
+            "2": "能解释基本机制",
+            "3": "解释关键原理与边界",
+            "4": "深入解释原理、边界与设计权衡"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.1,
+            "3": 0.68,
+            "4": 0.22
+          }
+        },
+        "completenessScore": {
+          "type": "score",
+          "score": 3.12,
+          "confidence": 0.63,
+          "legend": {
+            "0": "未回答题目要求",
+            "1": "仅覆盖少量评分点",
+            "2": "覆盖主要内容但遗漏重要评分点",
+            "3": "覆盖大部分评分点，少量遗漏",
+            "4": "完整覆盖题目要求与评分点"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.01,
+            "2": 0.14,
+            "3": 0.57,
+            "4": 0.28
+          }
+        },
+        "correctnessScore": {
+          "type": "score",
+          "score": 3.34,
+          "confidence": 0.61,
+          "legend": {
+            "0": "无正确技术内容或关键结论错误",
+            "1": "少量正确内容但有重大错误",
+            "2": "基本结论正确但有明显不准确处",
+            "3": "关键结论与机制正确，仅少量瑕疵",
+            "4": "技术事实与机制准确，无实质错误"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.06,
+            "3": 0.53,
+            "4": 0.41
+          }
+        },
+        "point_2480": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 0.0,
+            "covered": 1.0
+          }
+        },
+        "point_2481": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 0.0,
+            "covered": 1.0
+          }
+        },
+        "point_2482": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 0.96,
+          "probabilities": {
+            "uncovered": 0.02,
+            "covered": 0.98
+          }
+        },
+        "point_2483": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 0.82,
+          "probabilities": {
+            "uncovered": 0.09,
+            "covered": 0.91
+          }
+        },
+        "clarityScore": {
+          "type": "score",
+          "score": 2.97,
+          "confidence": 0.77,
+          "legend": {
+            "0": "表达无法理解",
+            "1": "结构混乱、含糊",
+            "2": "基本可理解但结构或术语不清晰",
+            "3": "表达清楚、结构合理",
+            "4": "表达精准连贯、层次清晰"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.15,
+            "3": 0.72,
+            "4": 0.13
+          }
+        },
+        "practiceScore": {
+          "type": "score",
+          "score": 3.4,
+          "confidence": 0.52,
+          "legend": {
+            "0": "无有效实践内容",
+            "1": "仅有泛泛场景描述",
+            "2": "有合理使用场景或基本示例",
+            "3": "能结合实践解释问题与方案",
+            "4": "实践示例具体，能说明限制、风险与适用条件"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.01,
+            "2": 0.07,
+            "3": 0.4,
+            "4": 0.52
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 6978,
+        "output_tokens": 231
+      }
+    },
+    "feedbackContent": "{\n  \"strengths\": [\n    \"LinkedList 如果迭代器已定位，修改相邻节点链接本身是 O(1)，但按下标调用仍需先遍历定位，最坏 O(n)，并指出展示列表反复按下标读取应选 ArrayList。\",\n    \"业务选择上结合访问模式说明：反复按下标读取用 ArrayList，确实在当前位置连续用迭代器删插才考虑 LinkedList，还要看额外节点内存和实测表现，不能光看增删次数。\"\n  ],\n  \"missingPoints\": [],\n  \"correction\": null,\n  \"pointEvidence\": [\n    {\n      \"scoringPointId\": 2480,\n      \"evidence\": \"\"\n    },\n    {\n      \"scoringPointId\": 2481,\n      \"evidence\": \"\"\n    },\n    {\n      \"scoringPointId\": 2482,\n      \"evidence\": \"LinkedList 如果迭代器已经定位，修改相邻节点链接本身是 O(1)，但按下标调用还是先遍历找位置，最坏 O(n)\"\n    },\n    {\n      \"scoringPointId\": 2483,\n      \"evidence\": \"我们展示列表反复按下标读取，我会用 ArrayList；若确实在当前位置连续用迭代器删插才考虑 LinkedList，还要看额外节点内存和实测表现，不能光看增删次数。\"\n    }\n  ],\n  \"suggestedFollowUp\": null\n}",
+    "nativeRawSha256": "b5f84473a863851e24e6d702eb017a5699237c88387c5f6cf447e81621d86519",
+    "feedbackRawSha256": "ff6e4911a2affd1d4f4c272a8e298d9b15f5138734e5569a3e5bda7eb7997631"
+  },
+  {
+    "caseId": "H09-FAILED_REPAIR",
+    "context": {
+      "currentAnswerId": 10038,
+      "currentInterviewQuestionId": 20038,
+      "mainAnswerId": 30038,
+      "mainInterviewQuestionId": 40038,
+      "mode": "FOLLOW_UP_ANSWER",
+      "category": "PROJECT_SCENARIO",
+      "knowledgePoint": "concurrent_inventory_idempotency",
+      "mainQuestionContent": "假设库存最终以 MySQL 为事实来源，当前库存只剩 1 个，同时来了很多个扣减请求，而且客户端还可能因为超时重复请求。你会如何设计，保证不超卖、不重复扣减，并能够正确处理失败和重试？",
+      "referenceAnswerSnapshot": "我会先把两个问题分开：一个是并发请求导致超卖，另一个是同一个业务请求因为重试导致重复扣减。\n\n对防超卖，如果库存最终以 MySQL 为准，可以使用数据库原子条件更新，例如：\n\n```sql\nUPDATE product\nSET stock = stock - 1\nWHERE id = ?\n  AND stock > 0;\n```\n\n然后检查 affected rows，只有更新成功的请求才算扣减成功。\n\n也可以使用带 version 的乐观锁。另一种正确方案是在一个事务里先通过 `SELECT ... FOR UPDATE` 锁住对应库存行，确认库存大于 0 后再扣减。关键点是库存检查和扣减必须受到同一个原子数据库操作或事务行锁临界区保护，不能无锁地先 SELECT，再在 Java 里判断后单独 UPDATE。\n\n对重复请求，我会让一次业务操作携带稳定的 requestId 或业务幂等键，并在数据库建立唯一约束。第一次请求创建处理记录并执行扣减；同一个 requestId 再进来时不能再次扣库存，而是返回之前的处理状态或结果。\n\n库存扣减、幂等记录以及与业务强相关的订单状态，应该设计清楚事务边界。事务中任何关键步骤失败，就不要留下“库存已经扣了但业务记录没成功”这种半完成状态。\n\n对数据库死锁、锁等待超时或者网络超时，可以设计有限重试，但重试必须继续携带同一个幂等键。特别是客户端或网络超时并不代表数据库操作一定失败，因此不能简单生成一个新的 requestId 再执行一次扣减，而应先结合已有幂等状态判断前一次操作结果。",
+      "scoringPoints": [
+        {
+          "id": 2569,
+          "pointType": "CORE",
+          "content": "能把库存检查和扣减放进同一次原子数据库操作，或者同一个数据库事务保护的行锁临界区，避免无锁地先查询库存、在 Java 中判断后再单独更新。条件 UPDATE 并检查更新行数、version 乐观锁、事务内 SELECT ... FOR UPDATE 后检查并扣减，任一正确方案均可覆盖。",
+          "weight": 30
+        },
+        {
+          "id": 2570,
+          "pointType": "KEY",
+          "content": "能为一次业务操作设计稳定的 requestId 或幂等键，并通过数据库唯一约束或等价的持久化机制保证同一业务请求即使被客户端重复提交，也不会再次执行库存扣减。",
+          "weight": 25
+        },
+        {
+          "id": 2571,
+          "pointType": "PRINCIPLE",
+          "content": "能明确设计事务边界，使库存变更、幂等状态以及必须保持一致的核心业务记录不会留下部分成功状态；事务失败时能够整体回滚或进入明确的可恢复状态。",
+          "weight": 20
+        },
+        {
+          "id": 2572,
+          "pointType": "ADVANCED",
+          "content": "能正确处理失败与重试语义：认识到客户端或网络超时不等于数据库操作失败；对死锁、锁等待超时等可重试失败采用有限重试；重试继续复用同一个业务幂等键，并能够根据已有处理状态避免重复扣减。",
+          "weight": 25
+        }
+      ],
+      "mainAnswerContent": "防超卖我会让数据库执行 UPDATE product SET stock=stock-1 WHERE id=? AND stock>0，然后检查影响行数，返回 1 才算抢到，0 就失败。同一次业务操作一直携带相同 requestId，数据库处理记录对这个键做唯一约束，重复进来就读已有结果，不再扣库存。至于订单、处理记录和扣库存怎么组合事务，超时后该怎么确认，我还没有完整想清楚。",
+      "followUpQuestionContent": "库存、幂等处理记录和订单如何共同提交？客户端超时或数据库死锁后怎样确认结果并重试？",
+      "followUpAnswerContent": "事务和超时这块我没有想好，不知道怎么确认上次到底执行了没有，暂时不能补出可靠做法。",
+      "followUpTargetPointIds": [
+        2571,
+        2572
+      ]
+    },
+    "retrieval": {
+      "query": "主问题：假设库存最终以 MySQL 为事实来源，当前库存只剩 1 个，同时来了很多个扣减请求，而且客户端还可能因为超时重复请求。你会如何设计，保证不超卖、不重复扣减，并能够正确处理失败和重试？\n追问：库存、幂等处理记录和订单如何共同提交？客户端超时或数据库死锁后怎样确认结果并重试？\n追问目标评分点：\n- 能明确设计事务边界，使库存变更、幂等状态以及必须保持一致的核心业务记录不会留下部分成功状态；事务失败时能够整体回滚或进入明确的可恢复状态。\n- 能正确处理失败与重试语义：认识到客户端或网络超时不等于数据库操作失败；对死锁、锁等待超时等可重试失败采用有限重试；重试继续复用同一个业务幂等键，并能够根据已有处理状态避免重复扣减。",
+      "requestedTopK": 5,
+      "embeddingModel": "qwen3.7-text-embedding",
+      "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+      "rawHits": [
+        {
+          "vectorId": "d76dad6b-bfe4-4537-8772-6725557c1aae",
+          "documentId": 596,
+          "chunkIndex": 1,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.8740071654319763
+        },
+        {
+          "vectorId": "f03c5447-d038-4541-a707-31a2c1f15bd6",
+          "documentId": 596,
+          "chunkIndex": 2,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.8657210469245911
+        },
+        {
+          "vectorId": "d6f8ab60-7e3e-4bd3-aa4c-213b473328c4",
+          "documentId": 596,
+          "chunkIndex": 3,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.6160246729850769
+        },
+        {
+          "vectorId": "ed530c30-f53a-437c-87d6-e5a70ea9d04e",
+          "documentId": 584,
+          "chunkIndex": 2,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.5899398326873779
+        },
+        {
+          "vectorId": "fd3e23c5-b267-4443-910d-2836acb3cf61",
+          "documentId": 584,
+          "chunkIndex": 1,
+          "embeddingVersion": "qwen3.7-text-embedding-1024-dense-v1",
+          "similarityScore": 0.5357445478439331
+        }
+      ],
+      "evidence": [
+        {
+          "vectorRank": 1,
+          "similarityScore": 0.8740071654319763,
+          "chunkId": 560,
+          "documentId": 596,
+          "documentVersion": 1,
+          "chunkIndex": 1,
+          "vectorId": "d76dad6b-bfe4-4537-8772-6725557c1aae",
+          "title": "MySQL 库存与幂等：假设场景与项目事实边界",
+          "category": "PROJECT_SCENARIO",
+          "source": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html",
+          "content": "# MySQL 库存与幂等：假设场景与项目事实边界\n\n> Title: MySQL 库存与幂等：假设场景与项目事实边界\n> Bank ID: H09\n> Knowledge category: PROJECT_SCENARIO\n> Knowledge point: concurrent_inventory_idempotency\n> Difficulty: HARD\n> Target question: 假设库存最终以 MySQL 为事实来源，当前库存只剩 1 个，同时来了很多个扣减请求，而且客户端还可能因为超时重复请求。你会如何设计，保证不超卖、不重复扣减，并能够正确处理失败和重试？\n> Version scope: MySQL 8.0 InnoDB + RFC 9293；仓库只作类比，不是库存实现。\n> Primary official source: [LOCK]\n> Secondary official sources: UPDATE, UNIQUE, COMMIT, ACID, DEADLOCK, ERROR, TCP（见 S5）\n> Authoring status: PHASE_4D2_AUTHORED_NOT_INGESTED\n\n## 1. Core model\n\n这是假设 MySQL 库存设计；当前仓库没有库存、商品、订单模块。表、状态与恢复流程仅为设计示意。\n\n## 2. Main mechanism\n\n数量 q 必须为正，id 唯一定位一行，用同一次条件更新检查并扣减，检查影响行数为 1 才算成功；0 表示没有完成扣减，可能库存不足或记录不存在。也可在事务内 FOR UPDATE 锁定后检查和扣减，锁持续到提交/回滚；不能无锁先查后单独写。[LOCK][UPDATE]\n\n```sql\nUPDATE inventory SET stock = stock - :q\nWHERE id = :id AND stock >= :q;\n```\n\n上例为参数化 SQL 示意。使用稳定非空 requestId，在业务范围内定义 NOT NULL UNIQUE 幂等键并保存结果；UNIQUE 允许多个 NULL，不能漏掉非空条件。先取得唯一请求记录处理权再扣减；重复键不得再扣，应等待或读取持久状态，重放完成结果。[UNIQUE]\n\n## 3. Important boundary\n\n库存变更、幂等状态及必须共同提交的同一 MySQL 事务性资源记录处于同一事务；失败整体回滚，结果与扣减一并提交。唯一冲突路径先结束本次失败事务，再恢复原请求状态，不能 catch 后继续扣减。此方案不覆盖任意远程副作用。[COMMIT][ACID]"
+        },
+        {
+          "vectorRank": 2,
+          "similarityScore": 0.8657210469245911,
+          "chunkId": 561,
+          "documentId": 596,
+          "documentVersion": 1,
+          "chunkIndex": 2,
+          "vectorId": "f03c5447-d038-4541-a707-31a2c1f15bd6",
+          "title": "MySQL 库存与幂等：假设场景与项目事实边界",
+          "category": "PROJECT_SCENARIO",
+          "source": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html",
+          "content": "Important boundary\n\n库存变更、幂等状态及必须共同提交的同一 MySQL 事务性资源记录处于同一事务；失败整体回滚，结果与扣减一并提交。唯一冲突路径先结束本次失败事务，再恢复原请求状态，不能 catch 后继续扣减。此方案不覆盖任意远程副作用。[COMMIT][ACID]\n\nPROJECT ANALOGY ONLY / NOT INVENTORY IMPLEMENTATION EVIDENCE：项目面试提交的 requestId 仅作幂等类比，不是库存或库存恢复证据。\n\n## 4. Common misconceptions\n\n死锁使被选中的事务整体回滚；锁等待超时默认可能只回滚失败语句，启用 innodb_rollback_on_timeout 才改变该范围。本设计锁等待失败时回滚整个业务事务后，对可重试失败有限重试并退避，复用同一业务键。[DEADLOCK][ERROR]\n\n客户端/网络超时不证明数据库失败：可能已提交而响应未收到，这是工程推理。结果不明时先查询/恢复持久化幂等状态；已完成则返回原结果，仍处理中则等待或恢复，暂未查到也不能直接断定失败。后续尝试仍先竞争同一唯一键，由事务与唯一约束协调，不能盲目再扣一次。[TCP][UNIQUE]\n\n## 5. Official references\n\n- [LOCK] MySQL 8.0，§17.7.2.4 Locking Reads\n- [UPDATE] MySQL 8.0，§15.2.17 UPDATE，条件/行数\n- [UNIQUE] MySQL 8.0，§15.1.20 CREATE TABLE，UNIQUE\n- [COMMIT] MySQL 8.0，§15.3.1 COMMIT/ROLLBACK\n- [ACID] MySQL 8.0，§17.2 InnoDB ACID\n- [DEADLOCK] MySQL 8.0，§17.7.5.3 死锁事务重试\n- [ERROR] MySQL 8.0，§17.21.5 InnoDB Error Handling\n- [TCP] RFC 9293，§3.8.3 连接失败"
+        },
+        {
+          "vectorRank": 3,
+          "similarityScore": 0.6160246729850769,
+          "chunkId": 562,
+          "documentId": 596,
+          "documentVersion": 1,
+          "chunkIndex": 3,
+          "vectorId": "d6f8ab60-7e3e-4bd3-aa4c-213b473328c4",
+          "title": "MySQL 库存与幂等：假设场景与项目事实边界",
+          "category": "PROJECT_SCENARIO",
+          "source": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html",
+          "content": "MySQL 8.0，§17.2 InnoDB ACID\n- [DEADLOCK] MySQL 8.0，§17.7.5.3 死锁事务重试\n- [ERROR] MySQL 8.0，§17.21.5 InnoDB Error Handling\n- [TCP] RFC 9293，§3.8.3 连接失败\n\n[LOCK]: https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html\n[UPDATE]: https://dev.mysql.com/doc/refman/8.0/en/update.html\n[UNIQUE]: https://dev.mysql.com/doc/refman/8.0/en/create-table.html\n[COMMIT]: https://dev.mysql.com/doc/refman/8.0/en/commit.html\n[ACID]: https://dev.mysql.com/doc/refman/8.0/en/mysql-acid.html\n[DEADLOCK]: https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html\n[ERROR]: https://dev.mysql.com/doc/refman/8.0/en/innodb-error-handling.html\n[TCP]: https://www.rfc-editor.org/rfc/rfc9293.html\n\n项目类比：InterviewService.java、隔离 schema；非库存证据，路径见内容审查。"
+        },
+        {
+          "vectorRank": 4,
+          "similarityScore": 0.5899398326873779,
+          "chunkId": 532,
+          "documentId": 584,
+          "documentVersion": 1,
+          "chunkIndex": 2,
+          "vectorId": "ed530c30-f53a-437c-87d6-e5a70ea9d04e",
+          "title": "MySQL 8.0 InnoDB 事务与 ACID",
+          "category": "MYSQL",
+          "source": "https://dev.mysql.com/doc/refman/8.0/en/mysql-acid.html",
+          "content": "Important boundary\n\n持久性要求成功提交的结果被可靠保存。InnoDB 相关保证还依赖日志刷新设置、是否使用二进制日志及相应同步配置，以及操作系统、存储设备是否兑现写入持久化要求。不能从“已调用 COMMIT”推导在任意错误配置或任意硬件损坏下数据都绝不丢失。[ACID]\n\n原子性说明一个事务的整体性，隔离性说明事务之间的影响；数据库并不为了原子性而禁止所有并发。以下仅为未执行的事务结构示意，失败路径应选择 ROLLBACK，不能在中途提交后还指望撤销全部步骤：\n\n```sql\nSTART TRANSACTION;\n-- 同一事务性资源内的扣款、入账与结果检查\n-- 全部符合业务条件时 COMMIT；否则 ROLLBACK\n```\n\n\n## 4. Common misconceptions\n\n“事务自动保证所有业务一致性”遗漏应用逻辑；“任意表的写入都能回滚”遗漏非事务表边界。本文的工作单元限定 InnoDB 事务性操作，不把可能隐式提交的 DDL 或外部调用纳入同一回滚保证。需要解释为何使用事务时，应指出部分成功会破坏哪个具体业务不变量。[ACID][COMMIT]\n\n## 5. Official references\n\n- [ACID] MySQL 8.0，§17.2 InnoDB and the ACID Model，四项性质及持久性条件\n- [COMMIT] MySQL 8.0，§15.3.1 START TRANSACTION/COMMIT/ROLLBACK，事务边界\n- [ISO] MySQL 8.0，§17.7.2.1 Transaction Isolation Levels\n\n[ACID]: https://dev.mysql.com/doc/refman/8.0/en/mysql-acid.html\n[COMMIT]: https://dev.mysql.com/doc/refman/8.0/en/commit.html\n[ISO]: https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-isolation-levels.html"
+        },
+        {
+          "vectorRank": 5,
+          "similarityScore": 0.5357445478439331,
+          "chunkId": 531,
+          "documentId": 584,
+          "documentVersion": 1,
+          "chunkIndex": 1,
+          "vectorId": "fd3e23c5-b267-4443-910d-2836acb3cf61",
+          "title": "MySQL 8.0 InnoDB 事务与 ACID",
+          "category": "MYSQL",
+          "source": "https://dev.mysql.com/doc/refman/8.0/en/mysql-acid.html",
+          "content": "# MySQL 8.0 InnoDB 事务与 ACID\n\n> Title: MySQL 8.0 InnoDB 事务与 ACID\n> Bank ID: E04\n> Knowledge category: MYSQL\n> Knowledge point: transaction_acid\n> Difficulty: EASY\n> Target question: MySQL 事务的 ACID 分别指什么？为什么数据库需要事务？\n> Version scope: MySQL 8.0 InnoDB 事务；业务不变量需应用配合，持久性有配置与硬件边界。\n> Primary official source: [ACID]\n> Secondary official sources: COMMIT, ISO（见 S5）\n> Authoring status: PHASE_4D2_AUTHORED_NOT_INGESTED\n\n## 1. Core model\n\n事务把多个相关数据库操作组成一个逻辑工作单元，避免业务步骤只完成一部分。ACID 分别是 Atomicity 原子性、Consistency 一致性、Isolation 隔离性、Durability 持久性；这四项从失败恢复、数据规则、并发相互影响、提交后保存等角度描述事务要求，不能相互替代。[ACID][COMMIT]\n\n## 2. Main mechanism\n\n原子性要求事务内受事务保护的操作整体成功或整体回滚。例如两账户转账时，扣款和入账应放在同一个 InnoDB 事务中，应用发现任一步失败就回滚完整业务单元，而不是提交已经完成的前半部分。COMMIT 确认事务，ROLLBACK 撤销事务内尚未提交的变更。[ACID][COMMIT]\n\n一致性要求执行前后仍满足数据库约束和业务不变量。数据库能执行已定义的约束，但不会从业务描述中自动识别“转账总额不变”等规则；应用必须写对事务内操作、检查结果并选择提交或回滚。这是基于事务机制的工程责任划分，不能把 ACID 当成任意业务代码都正确的保证。[ACID][COMMIT]\n\n隔离性控制并发事务之间的相互影响。InnoDB 支持 READ UNCOMMITTED、READ COMMITTED、REPEATABLE READ、SERIALIZABLE，不同级别的读取与锁定保证不同，不能简单说所有事务都像没有并发一样执行。[ACID][ISO]\n\n## 3. Important boundary\n\n持久性要求成功提交的结果被可靠保存。InnoDB 相关保证还依赖日志刷新设置、是否使用二进制日志及相应同步配置，以及操作系统、存储设备是否兑现写入持久化要求。不能从“已调用 COMMIT”推导在任意错误配置或任意硬件损坏下数据都绝不丢失。[ACID]"
+        }
+      ]
+    },
+    "nativeResponse": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "point_2570": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 0.99,
+          "probabilities": {
+            "uncovered": 0.0,
+            "covered": 1.0
+          }
+        },
+        "point_2571": {
+          "type": "choice",
+          "choice": "uncovered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 1.0,
+            "covered": 0.0
+          }
+        },
+        "point_2572": {
+          "type": "choice",
+          "choice": "uncovered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 1.0,
+            "covered": 0.0
+          }
+        },
+        "depthScore": {
+          "type": "score",
+          "score": 2.02,
+          "confidence": 0.85,
+          "legend": {
+            "0": "无机制说明",
+            "1": "仅复述术语或结论",
+            "2": "能解释基本机制",
+            "3": "解释关键原理与边界",
+            "4": "深入解释原理、边界与设计权衡"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.06,
+            "2": 0.84,
+            "3": 0.09,
+            "4": 0.0
+          }
+        },
+        "completenessScore": {
+          "type": "score",
+          "score": 1.71,
+          "confidence": 0.71,
+          "legend": {
+            "0": "未回答题目要求",
+            "1": "仅覆盖少量评分点",
+            "2": "覆盖主要内容但遗漏重要评分点",
+            "3": "覆盖大部分评分点，少量遗漏",
+            "4": "完整覆盖题目要求与评分点"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.32,
+            "2": 0.65,
+            "3": 0.03,
+            "4": 0.0
+          }
+        },
+        "correctnessScore": {
+          "type": "score",
+          "score": 1.87,
+          "confidence": 0.49,
+          "legend": {
+            "0": "无正确技术内容或关键结论错误",
+            "1": "少量正确内容但有重大错误",
+            "2": "基本结论正确但有明显不准确处",
+            "3": "关键结论与机制正确，仅少量瑕疵",
+            "4": "技术事实与机制准确，无实质错误"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.35,
+            "2": 0.42,
+            "3": 0.21,
+            "4": 0.01
+          }
+        },
+        "clarityScore": {
+          "type": "score",
+          "score": 2.73,
+          "confidence": 0.68,
+          "legend": {
+            "0": "表达无法理解",
+            "1": "结构混乱、含糊",
+            "2": "基本可理解但结构或术语不清晰",
+            "3": "表达清楚、结构合理",
+            "4": "表达精准连贯、层次清晰"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.02,
+            "2": 0.29,
+            "3": 0.63,
+            "4": 0.06
+          }
+        },
+        "point_2569": {
+          "type": "choice",
+          "choice": "covered",
+          "confidence": 1.0,
+          "probabilities": {
+            "uncovered": 0.0,
+            "covered": 1.0
+          }
+        },
+        "practiceScore": {
+          "type": "score",
+          "score": 2.24,
+          "confidence": 0.61,
+          "legend": {
+            "0": "无有效实践内容",
+            "1": "仅有泛泛场景描述",
+            "2": "有合理使用场景或基本示例",
+            "3": "能结合实践解释问题与方案",
+            "4": "实践示例具体，能说明限制、风险与适用条件"
+          },
+          "probabilities": {
+            "0": 0.03,
+            "1": 0.05,
+            "2": 0.58,
+            "3": 0.33,
+            "4": 0.01
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 7590,
+        "output_tokens": 237
+      }
+    },
+    "feedbackContent": "{\n  \"strengths\": [\n    \"MAIN 回答正确给出了防超卖的条件更新做法：UPDATE product SET stock=stock-1 WHERE id=? AND stock>0，并检查影响行数，返回1才视为抢到。\",\n    \"MAIN 回答能够为一次业务操作使用稳定 requestId，并说明数据库处理记录对该键做唯一约束，重复请求读取已有结果、不再扣库存。\",\n    \"MAIN 回答能明确区分订单、处理记录和扣库存需要组合事务，并承认超时后确认结果尚未完整想清楚，避免了错误归因。\"\n  ],\n  \"missingPoints\": [\n    \"未完整说明库存、幂等处理记录与必须共同提交的业务记录如何处于同一事务边界，以及失败时整体回滚或进入明确可恢复状态。\",\n    \"未展开客户端或网络超时后如何确认上次扣减结果、如何查询或恢复已有幂等状态。\",\n    \"未说明对死锁、锁等待超时等可重试失败采用有限重试与退避，并继续复用同一业务幂等键。\"\n  ],\n  \"correction\": null,\n  \"pointEvidence\": [\n    {\n      \"scoringPointId\": 2569,\n      \"evidence\": null\n    },\n    {\n      \"scoringPointId\": 2570,\n      \"evidence\": null\n    },\n    {\n      \"scoringPointId\": 2571,\n      \"evidence\": null\n    },\n    {\n      \"scoringPointId\": 2572,\n      \"evidence\": null\n    }\n  ],\n  \"suggestedFollowUp\": null\n}",
+    "nativeRawSha256": "0f52a9facd46ca190d6cbbb8e72224c1f2b8d2ba9b52e9a2cf14c23e6a328b00",
+    "feedbackRawSha256": "656e8abb4f7e4f2a62ef0c8109e3db4371fa90d0b09ede52177f947628f1c996"
+  }
+]

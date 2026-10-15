@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "rag-p3-holdout-v1",
+  "createdUtc": "2026-10-13T02:42:25.134155+00:00",
+  "queryCount": 12,
+  "coveredCount": 6,
+  "hardNegativeCount": 6,
+  "authoringProvenance": "Assistant-authored from all 21 frozen source documents and mechanism boundaries; no new retrieval/model preview; not generated from P2 low-score hits",
+  "coverageLabelsProvenance": "AI_DOCUMENT_AUDIT_PRE_RETRIEVAL; requires human coverage confirmation for formal quality verdict",
+  "corpusDocumentSha256": {
+    "docs/rag/source-documents/e01_java21_interface_vs_abstract_class.md": "4b82a2724e53946fffa082560fde1c348201114ac4f490e409c2ddbba5071de0",
+    "docs/rag/source-documents/e02_java21_arraylist_vs_linkedlist.md": "8863861e7379cbb3120926a649eb0243945861732aec9975ce97cdcb7c640dec",
+    "docs/rag/source-documents/e03_spring_6_2_ioc_di.md": "d71d9af393307ba3455dab8ffa945e5700f5bec0d3849bae7d37676bbbd352c6",
+    "docs/rag/source-documents/e04_mysql_8_0_transaction_acid.md": "fe159ec2e2c0de9c41b78b496e86cfcea89f846efc69940421306d8ba3613ef2",
+    "docs/rag/source-documents/e05_rfc9293_rfc768_tcp_vs_udp.md": "caa8af92609855354e83f0037af99e42bb9b3fc65125196103730bb2bf258d26",
+    "docs/rag/source-documents/h01_java21_generic_type_erasure.md": "c11ca06913e220726cb279a36ee65124e5e52c4557cb272c1c37b78975fb565b",
+    "docs/rag/source-documents/h02_openjdk8u_concurrent_hashmap.md": "7058c59a4c4c11cda492cb6cc565b85c79a09cbec5b7e3cbf1d9587f30114617",
+    "docs/rag/source-documents/h03_hotspot21_g1_gc.md": "3879a27607bfd98ae4e28c329a63c47474fbe75e25607cc660b7a85c89851603",
+    "docs/rag/source-documents/h04_java21_thread_pool_design.md": "d3c05bc195af157dade05d3e99d312668cb7150206601f3542be0e5b2116c8dc",
+    "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66",
+    "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea",
+    "docs/rag/source-documents/h07_redis_distributed_lock_baseline.md": "e79aff2f6d42ce77989566e6d7d611de77ac5720f962f325ffbae307a1ae88c7",
+    "docs/rag/source-documents/h08_rfc9293_tcp_connection_lifecycle.md": "82dec99995bddc1c7cd17705743598b1d57ae265da80ececb5220b46e8b5df44",
+    "docs/rag/source-documents/h09_mysql_8_0_inventory_idempotency_scenario.md": "2ace6486655a2242f4a616b85c57d0cc9dae3f7130381d49326615d6cd72f65b",
+    "docs/rag/source-documents/m01_java21_equals_hashcode_contract.md": "27a74088733409277eeb02d7e67b02722af8a2a1ec1d40ff1efac5c5596d0387",
+    "docs/rag/source-documents/m02_hashmap_jdk8u_put_resize_treeify.md": "c5e93fa3c3d3af8fb6e78b60db2d309ccb4e37a286e6ac47d4bb6f76fb053b22",
+    "docs/rag/source-documents/m03_jvm21_runtime_data_areas.md": "3daf071761e4dad10738c672acc6781b57a3092edb3e9ee43c943d0899a54d7e",
+    "docs/rag/source-documents/m04_volatile_jmm_java21.md": "fd1f73f1e1ce307567bcf6b4cf737315b9c36591f1de3620689a979dea2b760c",
+    "docs/rag/source-documents/m05_spring_6_2_aop_proxy_self_invocation.md": "b622cf633bb2ccf7320c33feede070f3875f7670e7f92c89488e2a5ee5457788",
+    "docs/rag/source-documents/m06_mysql_8_0_innodb_index_structure.md": "0a11be7250f287eacff2ab77234cb04b1d245ac453127fb1c61a868e305b814c",
+    "docs/rag/source-documents/m07_redis_classic_data_structures.md": "893c0e95adc06f18fb2877feb54c7d14f9a69b2329926046f72f129427354caa"
+  },
+  "queries": [
+    {
+      "queryId": "P3-C01",
+      "questionText": "一段代码对LinkedList执行for循环，并在每次循环中调用get(i)处理第i个元素；处理过程中还会在当前位置插入少量元素。为什么总遍历成本可能不是线性的？改用持续前进的ListIterator后，定位成本和当前位置插入成本分别发生什么变化？",
+      "questionSha256": "7830600827ca68ab748cc57347c53cc4e7cabae8e6831f98b6f6b1764c609457",
+      "expectedCoverage": "COVERED",
+      "targetMechanism": "链表下标定位、反复get与已有游标的区别。",
+      "embeddingQueryText": "一段代码对LinkedList执行for循环，并在每次循环中调用get(i)处理第i个元素；处理过程中还会在当前位置插入少量元素。为什么总遍历成本可能不是线性的？改用持续前进的ListIterator后，定位成本和当前位置插入成本分别发生什么变化？",
+      "rerankQueryText": "一段代码对LinkedList执行for循环，并在每次循环中调用get(i)处理第i个元素；处理过程中还会在当前位置插入少量元素。为什么总遍历成本可能不是线性的？改用持续前进的ListIterator后，定位成本和当前位置插入成本分别发生什么变化？"
+    },
+    {
+      "queryId": "P3-C02",
+      "questionText": "在JDK 8u ConcurrentHashMap中，两个线程同时向同一个空桶put不同键，其中一个CAS失败后应如何继续？如果桶已经非空，为什么锁住桶头后还要复核数组中的桶头没有变化？请说明这两条写入路径的协调边界。",
+      "questionSha256": "aa3705a48e58f98df28151c5af4aae870f8bf29d25618459e9fef74f17858fbf",
+      "expectedCoverage": "COVERED",
+      "targetMechanism": "空桶CAS失败复核、非空桶头同步及位置复核。",
+      "embeddingQueryText": "在JDK 8u ConcurrentHashMap中，两个线程同时向同一个空桶put不同键，其中一个CAS失败后应如何继续？如果桶已经非空，为什么锁住桶头后还要复核数组中的桶头没有变化？请说明这两条写入路径的协调边界。",
+      "rerankQueryText": "在JDK 8u ConcurrentHashMap中，两个线程同时向同一个空桶put不同键，其中一个CAS失败后应如何继续？如果桶已经非空，为什么锁住桶头后还要复核数组中的桶头没有变化？请说明这两条写入路径的协调边界。"
+    },
+    {
+      "queryId": "P3-C03",
+      "questionText": "一个生产线程先给普通字段config赋值，再将volatile字段ready写为true；消费线程读到这次ready=true后才读取config。为什么前面的普通字段写入可以对消费者可见？如果生产者在写ready之后又修改config，能否仅凭这次ready读取保证看到后面的修改？",
+      "questionSha256": "6d326c1336723cd62339958b2db932f5b0e63044fb9fdf63bcb663ab9dbfc582",
+      "expectedCoverage": "COVERED",
+      "targetMechanism": "volatile发布与传递happens-before只覆盖相应写入前的动作；不把可见性当互斥。",
+      "embeddingQueryText": "一个生产线程先给普通字段config赋值，再将volatile字段ready写为true；消费线程读到这次ready=true后才读取config。为什么前面的普通字段写入可以对消费者可见？如果生产者在写ready之后又修改config，能否仅凭这次ready读取保证看到后面的修改？",
+      "rerankQueryText": "一个生产线程先给普通字段config赋值，再将volatile字段ready写为true；消费线程读到这次ready=true后才读取config。为什么前面的普通字段写入可以对消费者可见？如果生产者在写ready之后又修改config，能否仅凭这次ready读取保证看到后面的修改？"
+    },
+    {
+      "queryId": "P3-C04",
+      "questionText": "Spring 6.2默认proxy事务模式下，外部调用一个事务方法；方法更新两条数据库记录后抛出IOException，但没有配置rollbackFor，也没有改变全局默认。它是否必然回滚？如果方法内部catch后正常返回，又为什么不能简单断言必然提交？",
+      "questionSha256": "6462dc5daf15b85a214b13c20b026a9c0e47cf1d99711d419566b8d37f9287cc",
+      "expectedCoverage": "COVERED",
+      "targetMechanism": "checked exception默认及全局/方法规则、吞异常与rollback-only边界。",
+      "embeddingQueryText": "Spring 6.2默认proxy事务模式下，外部调用一个事务方法；方法更新两条数据库记录后抛出IOException，但没有配置rollbackFor，也没有改变全局默认。它是否必然回滚？如果方法内部catch后正常返回，又为什么不能简单断言必然提交？",
+      "rerankQueryText": "Spring 6.2默认proxy事务模式下，外部调用一个事务方法；方法更新两条数据库记录后抛出IOException，但没有配置rollbackFor，也没有改变全局默认。它是否必然回滚？如果方法内部catch后正常返回，又为什么不能简单断言必然提交？"
+    },
+    {
+      "queryId": "P3-C05",
+      "questionText": "MySQL 8.0 InnoDB的REPEATABLE READ事务A已经BEGIN但尚未读取。事务B先提交一次更新，A才执行第一次普通SELECT；B随后再次提交更新，A再做普通SELECT和SELECT FOR UPDATE。这三次读取应按怎样的快照时点或锁定读语义理解，为什么不能把BEGIN时间当成所有读取的固定快照？",
+      "questionSha256": "78c85993b6669fb283bb317b6d3fad94caea2c451b2ab00d59453bc7a41c8ee0",
+      "expectedCoverage": "COVERED",
+      "targetMechanism": "RR第一次一致性读快照与FOR UPDATE最新可用数据的区别；未引入自身更新边界。",
+      "embeddingQueryText": "MySQL 8.0 InnoDB的REPEATABLE READ事务A已经BEGIN但尚未读取。事务B先提交一次更新，A才执行第一次普通SELECT；B随后再次提交更新，A再做普通SELECT和SELECT FOR UPDATE。这三次读取应按怎样的快照时点或锁定读语义理解，为什么不能把BEGIN时间当成所有读取的固定快照？",
+      "rerankQueryText": "MySQL 8.0 InnoDB的REPEATABLE READ事务A已经BEGIN但尚未读取。事务B先提交一次更新，A才执行第一次普通SELECT；B随后再次提交更新，A再做普通SELECT和SELECT FOR UPDATE。这三次读取应按怎样的快照时点或锁定读语义理解，为什么不能把BEGIN时间当成所有读取的固定快照？"
+    },
+    {
+      "queryId": "P3-C06",
+      "questionText": "Redis排行榜用Sorted Set存放用户和积分，两个不同用户积分相同，随后又用新的积分写入其中一个已有用户。成员唯一性与score排序分别约束什么？相同score会不会挤掉另一个用户，已有成员再次写入会不会产生第二份成员？",
+      "questionSha256": "91741834cf4978cbc1a3c7b0adb4de33e48be1a921151f7b84b7a80d1c8ec0c4",
+      "expectedCoverage": "COVERED",
+      "targetMechanism": "成员唯一、不同成员可同score及排序，重复成员仍唯一。",
+      "embeddingQueryText": "Redis排行榜用Sorted Set存放用户和积分，两个不同用户积分相同，随后又用新的积分写入其中一个已有用户。成员唯一性与score排序分别约束什么？相同score会不会挤掉另一个用户，已有成员再次写入会不会产生第二份成员？",
+      "rerankQueryText": "Redis排行榜用Sorted Set存放用户和积分，两个不同用户积分相同，随后又用新的积分写入其中一个已有用户。成员唯一性与score排序分别约束什么？相同score会不会挤掉另一个用户，已有成员再次写入会不会产生第二份成员？"
+    },
+    {
+      "queryId": "P3-N01",
+      "questionText": "Redis Cluster中，一个Lua脚本想同时比较两个锁key的token并删除它们，却收到CROSSSLOT。两个key应满足什么哈希槽条件？怎样使用hash tag安排key才能让多key脚本在同一槽执行，为什么脚本原子性不能自动消除这个限制？",
+      "questionSha256": "51c3dc50a0bda78ccb987ddcc21b99f37f41633300954d4631eb401280b1ff5c",
+      "expectedCoverage": "NOT_COVERED",
+      "targetMechanism": "文档只说明单key compare-and-delete Lua及单实例边界；未解释Cluster槽、hash tag或多key路由。",
+      "embeddingQueryText": "Redis Cluster中，一个Lua脚本想同时比较两个锁key的token并删除它们，却收到CROSSSLOT。两个key应满足什么哈希槽条件？怎样使用hash tag安排key才能让多key脚本在同一槽执行，为什么脚本原子性不能自动消除这个限制？",
+      "rerankQueryText": "Redis Cluster中，一个Lua脚本想同时比较两个锁key的token并删除它们，却收到CROSSSLOT。两个key应满足什么哈希槽条件？怎样使用hash tag安排key才能让多key脚本在同一槽执行，为什么脚本原子性不能自动消除这个限制？"
+    },
+    {
+      "queryId": "P3-N02",
+      "questionText": "MySQL 8.0 InnoDB在REPEATABLE READ下通过非唯一索引做范围SELECT FOR UPDATE时，另一个事务插入范围内一个原本不存在的索引值也会等待。不存在的行为什么还能阻止插入？record lock、gap lock和next-key lock各自覆盖什么，为什么不能只用MVCC快照解释这次等待？",
+      "questionSha256": "29167ef2a120b73bbc06192228cc57dfb459d6af7aa8576a4c2932ded27541c6",
+      "expectedCoverage": "NOT_COVERED",
+      "targetMechanism": "文档区分快照与锁定读，但未定义间隙/next-key及非唯一索引范围锁区间。",
+      "embeddingQueryText": "MySQL 8.0 InnoDB在REPEATABLE READ下通过非唯一索引做范围SELECT FOR UPDATE时，另一个事务插入范围内一个原本不存在的索引值也会等待。不存在的行为什么还能阻止插入？record lock、gap lock和next-key lock各自覆盖什么，为什么不能只用MVCC快照解释这次等待？",
+      "rerankQueryText": "MySQL 8.0 InnoDB在REPEATABLE READ下通过非唯一索引做范围SELECT FOR UPDATE时，另一个事务插入范围内一个原本不存在的索引值也会等待。不存在的行为什么还能阻止插入？record lock、gap lock和next-key lock各自覆盖什么，为什么不能只用MVCC快照解释这次等待？"
+    },
+    {
+      "queryId": "P3-N03",
+      "questionText": "Java 21的ZGC在并发重定位堆对象时，应用线程可能仍读到指向旧地址的引用。colored pointer中记录的状态与load barrier怎样协作，让应用最终使用正确的对象地址？这一读取路径为何不需要应用先等待整个堆完成搬迁？",
+      "questionSha256": "54a8ba1b942682ed816ea806e2dc5be332a77b4b94c6a9d72968ec47c9d46dec",
+      "expectedCoverage": "NOT_COVERED",
+      "targetMechanism": "冻结文档限定G1 Region、Collection Set及暂停复制；没有ZGC彩色指针和load barrier重定位机制。",
+      "embeddingQueryText": "Java 21的ZGC在并发重定位堆对象时，应用线程可能仍读到指向旧地址的引用。colored pointer中记录的状态与load barrier怎样协作，让应用最终使用正确的对象地址？这一读取路径为何不需要应用先等待整个堆完成搬迁？",
+      "rerankQueryText": "Java 21的ZGC在并发重定位堆对象时，应用线程可能仍读到指向旧地址的引用。colored pointer中记录的状态与load barrier怎样协作，让应用最终使用正确的对象地址？这一读取路径为何不需要应用先等待整个堆完成搬迁？"
+    },
+    {
+      "queryId": "P3-N04",
+      "questionText": "两个插件分别由不同的自定义ClassLoader定义同名的com.example.Message类。对象打印出的类名完全相同，交给另一个插件后强制转换却抛ClassCastException。JVM中的类身份由哪些因素共同确定，为什么共享同一份类字节也不能只按类名判断类型相同？",
+      "questionSha256": "c63c3ee9fc16139e4aa53917da356dc4181228ffff4e7b3696f32288efd075f6",
+      "expectedCoverage": "NOT_COVERED",
+      "targetMechanism": "文档解释Method Area/Metaspace类元数据位置；H01解释泛型擦除的Class，不定义二进制名+defining loader类型身份。",
+      "embeddingQueryText": "两个插件分别由不同的自定义ClassLoader定义同名的com.example.Message类。对象打印出的类名完全相同，交给另一个插件后强制转换却抛ClassCastException。JVM中的类身份由哪些因素共同确定，为什么共享同一份类字节也不能只按类名判断类型相同？",
+      "rerankQueryText": "两个插件分别由不同的自定义ClassLoader定义同名的com.example.Message类。对象打印出的类名完全相同，交给另一个插件后强制转换却抛ClassCastException。JVM中的类身份由哪些因素共同确定，为什么共享同一份类字节也不能只按类名判断类型相同？"
+    },
+    {
+      "queryId": "P3-N05",
+      "questionText": "Spring响应式事务使用ReactiveTransactionManager，返回的Mono链中发生publishOn线程切换。事务状态应通过Reactor Context还是普通线程绑定方式传播？TransactionalOperator把哪些订阅执行放进事务，为什么不能直接套用本地JDBC事务的线程绑定解释？",
+      "questionSha256": "44926ed94883fd0b6f09f9300ae1f7383d5edffaa0991036c7e010c04e1a6bc2",
+      "expectedCoverage": "NOT_COVERED",
+      "targetMechanism": "冻结文档只讨论默认proxy和本地JDBC资源边界，没有Reactor Context、响应式订阅及TransactionalOperator。",
+      "embeddingQueryText": "Spring响应式事务使用ReactiveTransactionManager，返回的Mono链中发生publishOn线程切换。事务状态应通过Reactor Context还是普通线程绑定方式传播？TransactionalOperator把哪些订阅执行放进事务，为什么不能直接套用本地JDBC事务的线程绑定解释？",
+      "rerankQueryText": "Spring响应式事务使用ReactiveTransactionManager，返回的Mono链中发生publishOn线程切换。事务状态应通过Reactor Context还是普通线程绑定方式传播？TransactionalOperator把哪些订阅执行放进事务，为什么不能直接套用本地JDBC事务的线程绑定解释？"
+    },
+    {
+      "queryId": "P3-N06",
+      "questionText": "Linux中的TCP连接没有收到对端FIN，发送的数据却长期得不到ACK。SO_KEEPALIVE的探测间隔与TCP_USER_TIMEOUT分别控制什么？把TCP_USER_TIMEOUT设短，会不会同时改变重传或keepalive探测发送的时间，为什么不能用TIME_WAIT的2MSL解释这次断开？",
+      "questionSha256": "248d634f35eace170eba4fe564c67ccac5fbd5ae3e644567033bca0379c9b126",
+      "expectedCoverage": "NOT_COVERED",
+      "targetMechanism": "冻结文档解释FIN关闭、TIME_WAIT/CLOSE_WAIT，不包含Linux keepalive与USER_TIMEOUT的计时和关闭语义。",
+      "embeddingQueryText": "Linux中的TCP连接没有收到对端FIN，发送的数据却长期得不到ACK。SO_KEEPALIVE的探测间隔与TCP_USER_TIMEOUT分别控制什么？把TCP_USER_TIMEOUT设短，会不会同时改变重传或keepalive探测发送的时间，为什么不能用TIME_WAIT的2MSL解释这次断开？",
+      "rerankQueryText": "Linux中的TCP连接没有收到对端FIN，发送的数据却长期得不到ACK。SO_KEEPALIVE的探测间隔与TCP_USER_TIMEOUT分别控制什么？把TCP_USER_TIMEOUT设短，会不会同时改变重传或keepalive探测发送的时间，为什么不能用TIME_WAIT的2MSL解释这次断开？"
+    }
+  ]
+}

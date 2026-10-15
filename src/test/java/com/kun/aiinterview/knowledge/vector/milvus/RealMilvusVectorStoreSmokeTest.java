@@ -28,7 +28,7 @@ import static org.awaitility.Awaitility.await;
         "milvus.enabled=true",
         "spring.main.web-application-type=none"
 })
-@ActiveProfiles("local")
+@ActiveProfiles({"local", "test-real"})
 @Tag("real-external")
 @EnabledIfEnvironmentVariable(
         named = "RUN_REAL_MILVUS_TEST",

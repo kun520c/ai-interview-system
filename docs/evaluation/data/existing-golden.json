@@ -1,0 +1,817 @@
+[
+  {
+    "questionId": 6778,
+    "category": "JAVA_BASIC",
+    "knowledgePoint": "P9C_E2E_java_equals_hashcode",
+    "question": "请说明 Java 中 equals 与 hashCode 的约定，以及在 HashMap 中同时重写两者的原因。",
+    "referenceAnswer": "equals 需要满足自反、对称、传递和一致。若两个对象 equals 为 true，则 hashCode 必须相同。HashMap 先按 hashCode 定位桶，再在桶内用 equals 比较；只重写 equals 不重写 hashCode 会导致相等对象落入不同桶而查找失败。",
+    "scoringPoints": [
+      {
+        "id": 2203,
+        "pointType": "CORE",
+        "content": "说明 equals 与 hashCode 的一致性约定",
+        "weight": 60
+      },
+      {
+        "id": 2204,
+        "pointType": "KEY",
+        "content": "结合 HashMap 桶定位说明同时重写的原因",
+        "weight": 40
+      }
+    ],
+    "id": "Q6778-1",
+    "variant": "原词",
+    "expectedTopic": "equals",
+    "expectedRelevantChunkIds": [
+      443
+    ],
+    "corpusCoverage": "available",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6778,
+    "category": "JAVA_BASIC",
+    "knowledgePoint": "P9C_E2E_java_equals_hashcode",
+    "question": "对象相等判定与散列值之间必须遵守什么规则？为什么作为哈希表键时要配套实现？",
+    "referenceAnswer": "equals 需要满足自反、对称、传递和一致。若两个对象 equals 为 true，则 hashCode 必须相同。HashMap 先按 hashCode 定位桶，再在桶内用 equals 比较；只重写 equals 不重写 hashCode 会导致相等对象落入不同桶而查找失败。",
+    "scoringPoints": [
+      {
+        "id": 2203,
+        "pointType": "CORE",
+        "content": "相等实例必须返回相同散列值",
+        "weight": 60
+      },
+      {
+        "id": 2204,
+        "pointType": "KEY",
+        "content": "解释散列选桶和桶内键比较",
+        "weight": 40
+      }
+    ],
+    "id": "Q6778-2",
+    "variant": "同义",
+    "expectedTopic": "equals",
+    "expectedRelevantChunkIds": [
+      443
+    ],
+    "corpusCoverage": "available",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6778,
+    "category": "JAVA_BASIC",
+    "knowledgePoint": "P9C_E2E_java_equals_hashcode",
+    "question": "我自己写了个对象当 Map 的 key，明明两个对象相等却取不到值，可能漏了什么？",
+    "referenceAnswer": "equals 需要满足自反、对称、传递和一致。若两个对象 equals 为 true，则 hashCode 必须相同。HashMap 先按 hashCode 定位桶，再在桶内用 equals 比较；只重写 equals 不重写 hashCode 会导致相等对象落入不同桶而查找失败。",
+    "scoringPoints": [
+      {
+        "id": 2203,
+        "pointType": "CORE",
+        "content": "说清相等和哈希值的配套要求",
+        "weight": 60
+      },
+      {
+        "id": 2204,
+        "pointType": "KEY",
+        "content": "说清 HashMap 怎么先找桶再比 key",
+        "weight": 40
+      }
+    ],
+    "id": "Q6778-3",
+    "variant": "口语",
+    "expectedTopic": "equals",
+    "expectedRelevantChunkIds": [
+      443
+    ],
+    "corpusCoverage": "available",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6778,
+    "category": "JAVA_BASIC",
+    "knowledgePoint": "P9C_E2E_java_equals_hashcode",
+    "question": "equals、hashCode 和 HashMap 键查找是什么关系？",
+    "referenceAnswer": "equals 需要满足自反、对称、传递和一致。若两个对象 equals 为 true，则 hashCode 必须相同。HashMap 先按 hashCode 定位桶，再在桶内用 equals 比较；只重写 equals 不重写 hashCode 会导致相等对象落入不同桶而查找失败。",
+    "scoringPoints": [
+      {
+        "id": 2203,
+        "pointType": "CORE",
+        "content": "相等与哈希约定",
+        "weight": 60
+      },
+      {
+        "id": 2204,
+        "pointType": "KEY",
+        "content": "哈希桶定位和对象比较",
+        "weight": 40
+      }
+    ],
+    "id": "Q6778-4",
+    "variant": "不完整",
+    "expectedTopic": "equals",
+    "expectedRelevantChunkIds": [
+      443
+    ],
+    "corpusCoverage": "available",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6778,
+    "category": "JAVA_BASIC",
+    "knowledgePoint": "P9C_E2E_java_equals_hashcode",
+    "question": "hashCode 相同是否意味着 equals 为 true？equals 为 true 时 hashCode 能不同吗？",
+    "referenceAnswer": "equals 需要满足自反、对称、传递和一致。若两个对象 equals 为 true，则 hashCode 必须相同。HashMap 先按 hashCode 定位桶，再在桶内用 equals 比较；只重写 equals 不重写 hashCode 会导致相等对象落入不同桶而查找失败。",
+    "scoringPoints": [
+      {
+        "id": 2203,
+        "pointType": "CORE",
+        "content": "区分哈希碰撞与对象相等",
+        "weight": 60
+      },
+      {
+        "id": 2204,
+        "pointType": "KEY",
+        "content": "解释不一致会导致 HashMap 查找失败",
+        "weight": 40
+      }
+    ],
+    "id": "Q6778-5",
+    "variant": "混淆",
+    "expectedTopic": "equals",
+    "expectedRelevantChunkIds": [
+      443
+    ],
+    "corpusCoverage": "available",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6779,
+    "category": "JAVA_COLLECTION",
+    "knowledgePoint": "P9C_E2E_arraylist_vs_linkedlist",
+    "question": "对比 ArrayList 与 LinkedList 的底层结构、随机访问和头尾插入的复杂度差异。",
+    "referenceAnswer": "ArrayList 基于动态数组，随机访问 O(1)，中间插入需要搬移元素。LinkedList 基于双向链表，随机访问 O(n)，头尾插入 O(1)。日常随机读写更常用 ArrayList。",
+    "scoringPoints": [
+      {
+        "id": 2205,
+        "pointType": "CORE",
+        "content": "说明两者底层分别是动态数组和双向链表",
+        "weight": 60
+      },
+      {
+        "id": 2206,
+        "pointType": "KEY",
+        "content": "给出随机访问与头尾插入的复杂度对比",
+        "weight": 40
+      }
+    ],
+    "id": "Q6779-1",
+    "variant": "原词",
+    "expectedTopic": "arraylist",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6779,
+    "category": "JAVA_COLLECTION",
+    "knowledgePoint": "P9C_E2E_arraylist_vs_linkedlist",
+    "question": "顺序表与双向链表在 Java List 实现中，各自的存储方式和读写性能有什么差异？",
+    "referenceAnswer": "ArrayList 基于动态数组，随机访问 O(1)，中间插入需要搬移元素。LinkedList 基于双向链表，随机访问 O(n)，头尾插入 O(1)。日常随机读写更常用 ArrayList。",
+    "scoringPoints": [
+      {
+        "id": 2205,
+        "pointType": "CORE",
+        "content": "动态数组与双向链式节点",
+        "weight": 60
+      },
+      {
+        "id": 2206,
+        "pointType": "KEY",
+        "content": "按下标访问与首尾增删的时间成本",
+        "weight": 40
+      }
+    ],
+    "id": "Q6779-2",
+    "variant": "同义",
+    "expectedTopic": "arraylist",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6779,
+    "category": "JAVA_COLLECTION",
+    "knowledgePoint": "P9C_E2E_arraylist_vs_linkedlist",
+    "question": "经常拿下标取元素，偶尔在开头塞一个元素，用 ArrayList 还是 LinkedList？",
+    "referenceAnswer": "ArrayList 基于动态数组，随机访问 O(1)，中间插入需要搬移元素。LinkedList 基于双向链表，随机访问 O(n)，头尾插入 O(1)。日常随机读写更常用 ArrayList。",
+    "scoringPoints": [
+      {
+        "id": 2205,
+        "pointType": "CORE",
+        "content": "两种 List 的存储原理",
+        "weight": 60
+      },
+      {
+        "id": 2206,
+        "pointType": "KEY",
+        "content": "索引访问和头尾修改的复杂度",
+        "weight": 40
+      }
+    ],
+    "id": "Q6779-3",
+    "variant": "口语",
+    "expectedTopic": "arraylist",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6779,
+    "category": "JAVA_COLLECTION",
+    "knowledgePoint": "P9C_E2E_arraylist_vs_linkedlist",
+    "question": "ArrayList 与 LinkedList 的结构和访问代价？",
+    "referenceAnswer": "ArrayList 基于动态数组，随机访问 O(1)，中间插入需要搬移元素。LinkedList 基于双向链表，随机访问 O(n)，头尾插入 O(1)。日常随机读写更常用 ArrayList。",
+    "scoringPoints": [
+      {
+        "id": 2205,
+        "pointType": "CORE",
+        "content": "数组和链表",
+        "weight": 60
+      },
+      {
+        "id": 2206,
+        "pointType": "KEY",
+        "content": "随机访问与头尾插入",
+        "weight": 40
+      }
+    ],
+    "id": "Q6779-4",
+    "variant": "不完整",
+    "expectedTopic": "arraylist",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6779,
+    "category": "JAVA_COLLECTION",
+    "knowledgePoint": "P9C_E2E_arraylist_vs_linkedlist",
+    "question": "LinkedList 的插入真的永远 O(1) 吗？ArrayList 在末尾和开头添加元素的成本相同吗？",
+    "referenceAnswer": "ArrayList 基于动态数组，随机访问 O(1)，中间插入需要搬移元素。LinkedList 基于双向链表，随机访问 O(n)，头尾插入 O(1)。日常随机读写更常用 ArrayList。",
+    "scoringPoints": [
+      {
+        "id": 2205,
+        "pointType": "CORE",
+        "content": "动态数组与双向链表",
+        "weight": 60
+      },
+      {
+        "id": 2206,
+        "pointType": "KEY",
+        "content": "区分定位节点、末尾追加和头部搬移",
+        "weight": 40
+      }
+    ],
+    "id": "Q6779-5",
+    "variant": "混淆",
+    "expectedTopic": "arraylist",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6780,
+    "category": "SPRING",
+    "knowledgePoint": "P9C_E2E_ioc_di",
+    "question": "解释 Spring IoC 容器与依赖注入，并说明构造器注入相对字段注入的优点。",
+    "referenceAnswer": "IoC 把对象创建和依赖装配交给容器。依赖注入是 IoC 的实现方式。构造器注入使依赖成为必填、便于不可变对象，也更容易做单元测试；字段注入隐藏依赖且不利于测试。",
+    "scoringPoints": [
+      {
+        "id": 2207,
+        "pointType": "CORE",
+        "content": "说明 IoC 由容器负责创建对象并装配依赖",
+        "weight": 60
+      },
+      {
+        "id": 2208,
+        "pointType": "KEY",
+        "content": "说明构造器注入利于必填依赖与测试",
+        "weight": 40
+      }
+    ],
+    "id": "Q6780-1",
+    "variant": "原词",
+    "expectedTopic": "ioc",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6780,
+    "category": "SPRING",
+    "knowledgePoint": "P9C_E2E_ioc_di",
+    "question": "控制反转、对象依赖装配和构造函数注入之间是什么关系？",
+    "referenceAnswer": "IoC 把对象创建和依赖装配交给容器。依赖注入是 IoC 的实现方式。构造器注入使依赖成为必填、便于不可变对象，也更容易做单元测试；字段注入隐藏依赖且不利于测试。",
+    "scoringPoints": [
+      {
+        "id": 2207,
+        "pointType": "CORE",
+        "content": "容器管理创建和依赖装配",
+        "weight": 60
+      },
+      {
+        "id": 2208,
+        "pointType": "KEY",
+        "content": "构造注入显式依赖并便于测试",
+        "weight": 40
+      }
+    ],
+    "id": "Q6780-2",
+    "variant": "同义",
+    "expectedTopic": "ioc",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6780,
+    "category": "SPRING",
+    "knowledgePoint": "P9C_E2E_ioc_di",
+    "question": "为什么不用自己 new Service，让 Spring 帮忙建？依赖放构造方法里有什么好处？",
+    "referenceAnswer": "IoC 把对象创建和依赖装配交给容器。依赖注入是 IoC 的实现方式。构造器注入使依赖成为必填、便于不可变对象，也更容易做单元测试；字段注入隐藏依赖且不利于测试。",
+    "scoringPoints": [
+      {
+        "id": 2207,
+        "pointType": "CORE",
+        "content": "容器创建对象并传入依赖",
+        "weight": 60
+      },
+      {
+        "id": 2208,
+        "pointType": "KEY",
+        "content": "依赖必填、可测试、不可变",
+        "weight": 40
+      }
+    ],
+    "id": "Q6780-3",
+    "variant": "口语",
+    "expectedTopic": "ioc",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6780,
+    "category": "SPRING",
+    "knowledgePoint": "P9C_E2E_ioc_di",
+    "question": "Spring IoC 与构造器 DI？",
+    "referenceAnswer": "IoC 把对象创建和依赖装配交给容器。依赖注入是 IoC 的实现方式。构造器注入使依赖成为必填、便于不可变对象，也更容易做单元测试；字段注入隐藏依赖且不利于测试。",
+    "scoringPoints": [
+      {
+        "id": 2207,
+        "pointType": "CORE",
+        "content": "对象和依赖由容器管理",
+        "weight": 60
+      },
+      {
+        "id": 2208,
+        "pointType": "KEY",
+        "content": "显式的必需依赖与单元测试",
+        "weight": 40
+      }
+    ],
+    "id": "Q6780-4",
+    "variant": "不完整",
+    "expectedTopic": "ioc",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6780,
+    "category": "SPRING",
+    "knowledgePoint": "P9C_E2E_ioc_di",
+    "question": "IoC 等于 AOP 吗？把依赖用 @Autowired 放字段里与构造器里有什么区别？",
+    "referenceAnswer": "IoC 把对象创建和依赖装配交给容器。依赖注入是 IoC 的实现方式。构造器注入使依赖成为必填、便于不可变对象，也更容易做单元测试；字段注入隐藏依赖且不利于测试。",
+    "scoringPoints": [
+      {
+        "id": 2207,
+        "pointType": "CORE",
+        "content": "IoC 管理对象和装配，不是横切增强",
+        "weight": 60
+      },
+      {
+        "id": 2208,
+        "pointType": "KEY",
+        "content": "构造器注入与字段注入的区别",
+        "weight": 40
+      }
+    ],
+    "id": "Q6780-5",
+    "variant": "混淆",
+    "expectedTopic": "ioc",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6781,
+    "category": "MYSQL",
+    "knowledgePoint": "P9C_E2E_innodb_index",
+    "question": "说明 InnoDB 主键索引与二级索引的结构差异，以及回表是什么。",
+    "referenceAnswer": "InnoDB 主键是聚簇索引，叶子节点保存完整行。二级索引叶子保存主键值，通过二级索引找到主键后再回主键索引取整行，这个过程叫回表。覆盖索引可避免回表。",
+    "scoringPoints": [
+      {
+        "id": 2209,
+        "pointType": "CORE",
+        "content": "说明主键聚簇索引叶子保存完整行",
+        "weight": 60
+      },
+      {
+        "id": 2210,
+        "pointType": "KEY",
+        "content": "说明二级索引通过主键回表",
+        "weight": 40
+      }
+    ],
+    "id": "Q6781-1",
+    "variant": "原词",
+    "expectedTopic": "index",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6781,
+    "category": "MYSQL",
+    "knowledgePoint": "P9C_E2E_innodb_index",
+    "question": "InnoDB 聚集存储与非聚集辅助索引如何保存记录？二次查找怎样发生？",
+    "referenceAnswer": "InnoDB 主键是聚簇索引，叶子节点保存完整行。二级索引叶子保存主键值，通过二级索引找到主键后再回主键索引取整行，这个过程叫回表。覆盖索引可避免回表。",
+    "scoringPoints": [
+      {
+        "id": 2209,
+        "pointType": "CORE",
+        "content": "聚簇索引叶子保存行数据",
+        "weight": 60
+      },
+      {
+        "id": 2210,
+        "pointType": "KEY",
+        "content": "辅助索引携带主键，再查主树",
+        "weight": 40
+      }
+    ],
+    "id": "Q6781-2",
+    "variant": "同义",
+    "expectedTopic": "index",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6781,
+    "category": "MYSQL",
+    "knowledgePoint": "P9C_E2E_innodb_index",
+    "question": "走了 MySQL 的普通索引为什么还要再找一遍表？主键索引的叶子里有什么？",
+    "referenceAnswer": "InnoDB 主键是聚簇索引，叶子节点保存完整行。二级索引叶子保存主键值，通过二级索引找到主键后再回主键索引取整行，这个过程叫回表。覆盖索引可避免回表。",
+    "scoringPoints": [
+      {
+        "id": 2209,
+        "pointType": "CORE",
+        "content": "主键树叶子就是整行",
+        "weight": 60
+      },
+      {
+        "id": 2210,
+        "pointType": "KEY",
+        "content": "普通索引拿到主键再查行",
+        "weight": 40
+      }
+    ],
+    "id": "Q6781-3",
+    "variant": "口语",
+    "expectedTopic": "index",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6781,
+    "category": "MYSQL",
+    "knowledgePoint": "P9C_E2E_innodb_index",
+    "question": "InnoDB 主键、二级索引与回表？",
+    "referenceAnswer": "InnoDB 主键是聚簇索引，叶子节点保存完整行。二级索引叶子保存主键值，通过二级索引找到主键后再回主键索引取整行，这个过程叫回表。覆盖索引可避免回表。",
+    "scoringPoints": [
+      {
+        "id": 2209,
+        "pointType": "CORE",
+        "content": "聚簇叶子数据",
+        "weight": 60
+      },
+      {
+        "id": 2210,
+        "pointType": "KEY",
+        "content": "二级叶子主键与回表",
+        "weight": 40
+      }
+    ],
+    "id": "Q6781-4",
+    "variant": "不完整",
+    "expectedTopic": "index",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6781,
+    "category": "MYSQL",
+    "knowledgePoint": "P9C_E2E_innodb_index",
+    "question": "InnoDB 二级索引叶子存整行还是主键？覆盖索引与回表有什么关系？",
+    "referenceAnswer": "InnoDB 主键是聚簇索引，叶子节点保存完整行。二级索引叶子保存主键值，通过二级索引找到主键后再回主键索引取整行，这个过程叫回表。覆盖索引可避免回表。",
+    "scoringPoints": [
+      {
+        "id": 2209,
+        "pointType": "CORE",
+        "content": "区分主键与二级索引叶子结构",
+        "weight": 60
+      },
+      {
+        "id": 2210,
+        "pointType": "KEY",
+        "content": "区分覆盖读取与主键回查",
+        "weight": 40
+      }
+    ],
+    "id": "Q6781-5",
+    "variant": "混淆",
+    "expectedTopic": "index",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6782,
+    "category": "NETWORK",
+    "knowledgePoint": "P9C_E2E_tcp_handshake",
+    "question": "请描述 TCP 三次握手的过程，以及为什么不能只用两次握手。",
+    "referenceAnswer": "客户端发 SYN，服务端回 SYN+ACK，客户端再发 ACK。两次握手无法让客户端确认自己的 ACK 是否被收到，也无法排除过期 SYN 造成的半开连接。三次握手同时完成双方序列号同步。",
+    "scoringPoints": [
+      {
+        "id": 2211,
+        "pointType": "CORE",
+        "content": "正确描述 SYN / SYN+ACK / ACK 三次过程",
+        "weight": 60
+      },
+      {
+        "id": 2212,
+        "pointType": "KEY",
+        "content": "说明两次握手无法可靠同步并排除过期 SYN",
+        "weight": 40
+      }
+    ],
+    "id": "Q6782-1",
+    "variant": "原词",
+    "expectedTopic": "tcp",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6782,
+    "category": "NETWORK",
+    "knowledgePoint": "P9C_E2E_tcp_handshake",
+    "question": "TCP 连接建立时双方如何交换初始序列号，最后一次确认为什么必要？",
+    "referenceAnswer": "客户端发 SYN，服务端回 SYN+ACK，客户端再发 ACK。两次握手无法让客户端确认自己的 ACK 是否被收到，也无法排除过期 SYN 造成的半开连接。三次握手同时完成双方序列号同步。",
+    "scoringPoints": [
+      {
+        "id": 2211,
+        "pointType": "CORE",
+        "content": "SYN、SYN+ACK、ACK 顺序",
+        "weight": 60
+      },
+      {
+        "id": 2212,
+        "pointType": "KEY",
+        "content": "确认对端序列号并处理旧连接请求",
+        "weight": 40
+      }
+    ],
+    "id": "Q6782-2",
+    "variant": "同义",
+    "expectedTopic": "tcp",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6782,
+    "category": "NETWORK",
+    "knowledgePoint": "P9C_E2E_tcp_handshake",
+    "question": "客户端打个招呼、服务器回一句，为什么还要客户端再回一次才连上？",
+    "referenceAnswer": "客户端发 SYN，服务端回 SYN+ACK，客户端再发 ACK。两次握手无法让客户端确认自己的 ACK 是否被收到，也无法排除过期 SYN 造成的半开连接。三次握手同时完成双方序列号同步。",
+    "scoringPoints": [
+      {
+        "id": 2211,
+        "pointType": "CORE",
+        "content": "TCP 三次连接建立消息",
+        "weight": 60
+      },
+      {
+        "id": 2212,
+        "pointType": "KEY",
+        "content": "服务端收到最终 ACK 才确认客户端收到 SYN",
+        "weight": 40
+      }
+    ],
+    "id": "Q6782-3",
+    "variant": "口语",
+    "expectedTopic": "tcp",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6782,
+    "category": "NETWORK",
+    "knowledgePoint": "P9C_E2E_tcp_handshake",
+    "question": "TCP 三次握手，能两次吗？",
+    "referenceAnswer": "客户端发 SYN，服务端回 SYN+ACK，客户端再发 ACK。两次握手无法让客户端确认自己的 ACK 是否被收到，也无法排除过期 SYN 造成的半开连接。三次握手同时完成双方序列号同步。",
+    "scoringPoints": [
+      {
+        "id": 2211,
+        "pointType": "CORE",
+        "content": "SYN/SYN+ACK/ACK",
+        "weight": 60
+      },
+      {
+        "id": 2212,
+        "pointType": "KEY",
+        "content": "序列号同步与旧 SYN",
+        "weight": 40
+      }
+    ],
+    "id": "Q6782-4",
+    "variant": "不完整",
+    "expectedTopic": "tcp",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "questionId": 6782,
+    "category": "NETWORK",
+    "knowledgePoint": "P9C_E2E_tcp_handshake",
+    "question": "TCP 三次握手和四次挥手是一回事吗？最终 ACK 确认的是 SYN 还是另一个 ACK？",
+    "referenceAnswer": "客户端发 SYN，服务端回 SYN+ACK，客户端再发 ACK。两次握手无法让客户端确认自己的 ACK 是否被收到，也无法排除过期 SYN 造成的半开连接。三次握手同时完成双方序列号同步。",
+    "scoringPoints": [
+      {
+        "id": 2211,
+        "pointType": "CORE",
+        "content": "连接建立的三个报文",
+        "weight": 60
+      },
+      {
+        "id": 2212,
+        "pointType": "KEY",
+        "content": "确认 SYN 序列号，区分连接终止",
+        "weight": 40
+      }
+    ],
+    "id": "Q6782-5",
+    "variant": "混淆",
+    "expectedTopic": "tcp",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "missing",
+    "negative": false,
+    "expectedBehavior": "检索可支撑该题评分点的知识；资料缺失时不应强塞无关证据"
+  },
+  {
+    "id": "N1",
+    "variant": "无对应知识",
+    "question": "如何做番茄炒鸡蛋？",
+    "category": "PROJECT_SCENARIO",
+    "knowledgePoint": "negative-control",
+    "referenceAnswer": "本轮知识库没有对应主题。",
+    "scoringPoints": [
+      {
+        "id": 90001,
+        "pointType": "CORE",
+        "content": "解释题目自身要求的概念，不使用无关知识",
+        "weight": 100
+      }
+    ],
+    "expectedTopic": "none",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "negative",
+    "negative": true,
+    "expectedBehavior": "没有相关知识时应返回空证据；不能把语义邻近当成事实依据"
+  },
+  {
+    "id": "N2",
+    "variant": "无对应知识",
+    "question": "周末在海边拍照应该穿什么？",
+    "category": "PROJECT_SCENARIO",
+    "knowledgePoint": "negative-control",
+    "referenceAnswer": "本轮知识库没有对应主题。",
+    "scoringPoints": [
+      {
+        "id": 90002,
+        "pointType": "CORE",
+        "content": "解释题目自身要求的概念，不使用无关知识",
+        "weight": 100
+      }
+    ],
+    "expectedTopic": "none",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "negative",
+    "negative": true,
+    "expectedBehavior": "没有相关知识时应返回空证据；不能把语义邻近当成事实依据"
+  },
+  {
+    "id": "N3",
+    "variant": "无对应知识",
+    "question": "HTTP/3 的 QUIC 是否使用 TCP 三次握手？",
+    "category": "PROJECT_SCENARIO",
+    "knowledgePoint": "negative-control",
+    "referenceAnswer": "本轮知识库没有对应主题。",
+    "scoringPoints": [
+      {
+        "id": 90003,
+        "pointType": "CORE",
+        "content": "解释题目自身要求的概念，不使用无关知识",
+        "weight": 100
+      }
+    ],
+    "expectedTopic": "none",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "negative",
+    "negative": true,
+    "expectedBehavior": "没有相关知识时应返回空证据；不能把语义邻近当成事实依据"
+  },
+  {
+    "id": "N4",
+    "variant": "无对应知识",
+    "question": "如何计算 JVM G1 的混合回收触发条件？",
+    "category": "PROJECT_SCENARIO",
+    "knowledgePoint": "negative-control",
+    "referenceAnswer": "本轮知识库没有对应主题。",
+    "scoringPoints": [
+      {
+        "id": 90004,
+        "pointType": "CORE",
+        "content": "解释题目自身要求的概念，不使用无关知识",
+        "weight": 100
+      }
+    ],
+    "expectedTopic": "none",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "negative",
+    "negative": true,
+    "expectedBehavior": "没有相关知识时应返回空证据；不能把语义邻近当成事实依据"
+  },
+  {
+    "id": "N5",
+    "variant": "无对应知识",
+    "question": "Kubernetes 多租户隔离网络策略如何设计？",
+    "category": "PROJECT_SCENARIO",
+    "knowledgePoint": "negative-control",
+    "referenceAnswer": "本轮知识库没有对应主题。",
+    "scoringPoints": [
+      {
+        "id": 90005,
+        "pointType": "CORE",
+        "content": "解释题目自身要求的概念，不使用无关知识",
+        "weight": 100
+      }
+    ],
+    "expectedTopic": "none",
+    "expectedRelevantChunkIds": [],
+    "corpusCoverage": "negative",
+    "negative": true,
+    "expectedBehavior": "没有相关知识时应返回空证据；不能把语义邻近当成事实依据"
+  }
+]

@@ -75,7 +75,7 @@ class JevClientTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {401, 422, 429, 500, 529})
+    @ValueSource(ints = {401, 422, 429, 451, 500, 529})
     void sanitizesHttpErrorsWithoutExposingProviderBody(int status) {
         server.expect(requestTo("http://localhost/v1/systemone"))
                 .andRespond(withStatus(HttpStatusCode.valueOf(status)).body("private-answer-and-key"));

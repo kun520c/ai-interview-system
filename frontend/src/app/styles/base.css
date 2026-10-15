@@ -1,0 +1,40 @@
+body {
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+}
+
+:focus-visible {
+  outline: var(--focus);
+  outline-offset: 2px;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 8px;
+}
+
+.skip-link:focus {
+  left: 8px;
+  z-index: 80;
+  background: var(--surface);
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

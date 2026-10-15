@@ -1,2 +1,13 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+
+# Preserve exact bytes for SHA-bound fixtures, frozen inputs and experiment archives.
+# -text disables newline conversion without disabling text diffs.
+/src/test/resources/evaluation/*.json -text
+/src/test/resources/rag-p1*/** -text
+/tools/** -text
+/docs/question-bank/PHASE_1_QUESTION_BANK_FINAL.* -text
+/docs/rag/source-documents/** -text
+/docs/rag/evaluation/*.json -text
+/docs/evaluation/data/*.json -text
+/docs/evaluation/judge/PHASE_5A_JUDGE_BENCHMARK.json -text

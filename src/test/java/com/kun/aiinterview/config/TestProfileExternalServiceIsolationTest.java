@@ -12,6 +12,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Map;
@@ -27,6 +28,15 @@ class TestProfileExternalServiceIsolationTest {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Test
+    void actualDatasourceAndMilvusTargetShouldUseDedicatedTestEnvironment() {
+        assertThat(applicationContext.getBean(JdbcTemplate.class)
+                .queryForObject("SELECT DATABASE()", String.class))
+                .isEqualTo("ai_interview_test");
+        assertThat(environment.getProperty("milvus.collection-name"))
+                .isEqualTo("knowledge_chunk_vectors_test");
+    }
 
     @Test
     void localThenTestProfilesShouldKeepDeepSeekAndMilvusDisabled() {
