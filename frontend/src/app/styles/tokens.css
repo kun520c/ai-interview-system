@@ -1,0 +1,57 @@
+:root {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --surface-subtle: #f2f4f7;
+
+  --text: #101828;
+  --text-2: #667085;
+  --text-3: #98a2b3;
+
+  --border: #e4e7ec;
+
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-soft: #eff6ff;
+  --primary-border: #bfdbfe;
+
+  --success: #16803c;
+  --success-soft: #ecfdf3;
+  --warning: #b54708;
+  --warning-soft: #fffaeb;
+  --danger: #b42318;
+  --danger-soft: #fef3f2;
+
+  --placeholder: #667085;
+
+  --font: system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  --radius: 8px;
+  --radius-lg: 10px;
+
+  --sidebar: 224px;
+  --sidebar-compact: 200px;
+  --session-max: 1240px;
+  --workspace-max: 1200px;
+  --focus: 2px solid var(--primary);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --icon: 16px;
+  --icon-lg: 18px;
+  --mark: 22px;
+
+  --move: 140ms ease;
+  --move-panel: 180ms ease;
+
+  --question-pane: 40%;
+  --answer-pane: 60%;
+}

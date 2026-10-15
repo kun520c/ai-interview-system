@@ -1,0 +1,15 @@
+export const DETAIL_COPY = {
+  title: '面试复盘',
+  missingRecord: '面试记录不存在或无权查看',
+  backToHistory: '返回历史',
+  openReport: '查看报告',
+  loading: '正在加载面试记录',
+  loadError: '面试记录暂时无法加载。',
+  emptyTimeline: '这场已完成面试缺少题目记录，无法展示复盘。',
+  retry: '重试',
+  missingAnswer: '本题没有记录作答。',
+  missingEvaluation: '本题没有评价。',
+  incompleteNotice: '这场已完成面试中有题目缺少作答或评价，记录可能不完整。',
+  answerHeading: '作答',
+  evaluationHeading: '本题评价',
+} as const
