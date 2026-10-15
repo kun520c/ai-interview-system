@@ -1,5 +1,6 @@
 package com.kun.aiinterview.interview.orchestration;
 
+import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.enums.DecisionAction;
 import com.kun.aiinterview.interview.enums.EvaluationPhase;
 import com.kun.aiinterview.interview.evaluation.standard.EvaluationLevel;
@@ -28,8 +29,19 @@ public record EvaluationOrchestrationResult(
 
         List<Long> followUpTargetPointIds,
 
-        String retrievalBatchId
+        String retrievalBatchId,
+
+        AnswerEvaluation evaluation
 ) {
+    public EvaluationOrchestrationResult withPersistedId() {
+        if (evaluation == null) {
+            return this;
+        }
+        return new EvaluationOrchestrationResult(evaluation.getId(), answerId, mainInterviewQuestionId,
+                evaluationPhase, decisionAction, totalScore, level, followUpRecommended,
+                suggestedFollowUp, followUpTargetPointIds, retrievalBatchId, evaluation);
+    }
+
     public EvaluationOrchestrationResult{
         if (followUpTargetPointIds == null) {
             throw new IllegalArgumentException(

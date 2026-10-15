@@ -12,6 +12,7 @@
             answer_content,
             status,
             request_id,
+            attempt_id,
             error_code,
             submitted_at,
             created_at,
@@ -28,6 +29,7 @@
             answer_content,
             status,
             request_id,
+            attempt_id,
             error_code,
             submitted_at,
             created_at,
@@ -44,6 +46,7 @@
             answer_content,
             status,
             request_id,
+            attempt_id,
             error_code,
             submitted_at,
             created_at,
@@ -60,6 +63,7 @@
             answer_content,
             status,
             request_id,
+            attempt_id,
             error_code,
             submitted_at,
             created_at,
@@ -97,9 +101,14 @@
         )
     </insert>
 
+    <select id="lockById" resultType="com.kun.aiinterview.interview.entity.InterviewAnswer">
+        SELECT * FROM interview_answer WHERE id = #{id} FOR UPDATE
+    </select>
+
     <update id="claimEvaluation">
         UPDATE interview_answer
         SET
+            attempt_id = #{attemptId},
             status = 'EVALUATING',
             error_code = NULL
         WHERE id = #{id}
@@ -109,6 +118,7 @@
     <update id="retryEvaluation">
         UPDATE interview_answer
         SET
+            attempt_id = #{attemptId},
             status = 'EVALUATING',
             error_code = NULL
         WHERE id = #{id}
@@ -118,6 +128,7 @@
     <update id="reclaimStaleEvaluating">
         UPDATE interview_answer
         SET
+            attempt_id = #{attemptId},
             updated_at = CURRENT_TIMESTAMP,
             error_code = NULL
         WHERE id = #{id}
@@ -132,6 +143,7 @@
             error_code = NULL
         WHERE id = #{id}
             AND status = 'EVALUATING'
+            AND attempt_id = #{attemptId}
     </update>
 
     <update id="markFailed">
@@ -141,5 +153,6 @@
             error_code = #{errorCode}
         WHERE id = #{id}
             AND status = 'EVALUATING'
+            AND attempt_id = #{attemptId}
     </update>
 </mapper>

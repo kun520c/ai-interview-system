@@ -4,6 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.common.exception.ConflictException;
 import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
 import com.kun.aiinterview.interview.entity.InterviewAnswer;
+import com.kun.aiinterview.interview.entity.AnswerEvaluation;
+import com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import com.kun.aiinterview.interview.enums.DecisionAction;
 import com.kun.aiinterview.interview.enums.EvaluationPhase;
 import com.kun.aiinterview.interview.enums.InterviewAnswerStatus;
@@ -49,6 +53,9 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles({"local", "test"})
 @Import(InterviewEvaluationClaimConcurrencyIntegrationTest.PausingMapperConfiguration.class)
 class InterviewEvaluationClaimConcurrencyIntegrationTest {
+
+    @Autowired
+    private AnswerEvaluationMapper evaluationMapper;
 
     @Autowired
     private InterviewAnswerMapper interviewAnswerMapper;
@@ -98,6 +105,7 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
     void cleanUp() {
         claimBarrier.disarm();
         if (answerId != null) {
+            jdbcTemplate.update("DELETE FROM answer_evaluation WHERE answer_id = ?", answerId);
             jdbcTemplate.update(
                     "DELETE FROM interview_answer WHERE id = ?",
                     answerId
@@ -208,7 +216,7 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
             assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId)
                     .getStatus())
                     .isEqualTo(InterviewAnswerStatus.EVALUATED);
-            assertThat(countAnswerEvaluations()).isZero();
+            assertThat(countAnswerEvaluations()).isEqualTo(1);
         } finally {
             releaseEvaluate.countDown();
             executor.shutdownNow();
@@ -228,7 +236,7 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
 
     private EvaluationOrchestrationResult finishResult() {
         return new EvaluationOrchestrationResult(
-                401L,
+                null,
                 answerId,
                 interviewQuestionId,
                 EvaluationPhase.FINAL,
@@ -238,8 +246,87 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
                 false,
                 null,
                 List.of(),
-                "retrieval-batch-claim"
+                "retrieval-batch-claim",
+                evaluationDraft()
         );
+    }
+
+    private AnswerEvaluation evaluationDraft() {
+        return AnswerEvaluation.builder().answerId(answerId).mainInterviewQuestionId(interviewQuestionId)
+                .evaluationPhase(EvaluationPhase.FINAL).decisionAction(DecisionAction.FINISH)
+                .correctnessScore(16).completenessScore(16).depthScore(16).clarityScore(16).practiceScore(16)
+                .totalScore(80).level("GOOD").strengths("[]").missingPoints("[]").correction("")
+                .scoringPointResults("[]").followUpRecommended(false).retrievalBatchId("retrieval-batch-claim")
+                .llmModel("fake").promptVersion("fake").evaluationStandardVersion("fake").rawResult("{}")
+                .build();
+    }
+
+    @ParameterizedTest
+    @CsvSource({"false,false", "true,false", "false,true", "true,true"})
+    void staleWorkerCannotSaveEvaluationOrFailReplacement(boolean oldThrows, boolean replacementFinishesFirst)
+            throws Exception {
+        seedAnswer(InterviewAnswerStatus.SUBMITTED);
+        CountDownLatch oldEntered = new CountDownLatch(1);
+        CountDownLatch newEntered = new CountDownLatch(1);
+        CountDownLatch releaseOld = new CountDownLatch(1);
+        CountDownLatch releaseNew = new CountDownLatch(1);
+        AtomicInteger calls = new AtomicInteger();
+        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean())).thenAnswer(invocation -> {
+            boolean old = calls.incrementAndGet() == 1;
+            (old ? oldEntered : newEntered).countDown();
+            if (!(old ? releaseOld : releaseNew).await(15, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("evaluation latch timed out");
+            }
+            if (old && oldThrows) { throw new IllegalArgumentException("old provider failed"); }
+            var result = finishResult();
+            result.evaluation().setLlmModel(old ? "worker-A" : "worker-B");
+            return result;
+        });
+        try (var executor = Executors.newFixedThreadPool(2)) {
+            Future<ClaimOutcome> old = executor.submit(this::runEvaluateAnswer);
+            assertThat(oldEntered.await(10, TimeUnit.SECONDS)).isTrue();
+            String oldAttempt = interviewAnswerMapper.getInterviewAnswerById(answerId).getAttemptId();
+            jdbcTemplate.update("UPDATE interview_answer SET updated_at = ? WHERE id = ?",
+                    LocalDateTime.now().minusMinutes(20), answerId);
+            Future<ClaimOutcome> replacement = executor.submit(this::runEvaluateAnswer);
+            assertThat(newEntered.await(10, TimeUnit.SECONDS)).isTrue();
+            String newAttempt = interviewAnswerMapper.getInterviewAnswerById(answerId).getAttemptId();
+            assertThat(newAttempt).isNotEqualTo(oldAttempt).hasSize(32);
+            if (replacementFinishesFirst) {
+                releaseNew.countDown();
+                assertThat(replacement.get(10, TimeUnit.SECONDS).error()).isNull();
+            }
+            releaseOld.countDown();
+            var oldOutcome = old.get(10, TimeUnit.SECONDS);
+            assertThat(oldOutcome.error()).isInstanceOf(oldThrows ? IllegalArgumentException.class : ConflictException.class);
+            if (!replacementFinishesFirst) {
+                assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId).getStatus())
+                        .isEqualTo(InterviewAnswerStatus.EVALUATING);
+                assertThat(countAnswerEvaluations()).isZero();
+                releaseNew.countDown();
+                assertThat(replacement.get(10, TimeUnit.SECONDS).error()).isNull();
+            }
+            assertThat(countAnswerEvaluations()).isEqualTo(1);
+            assertThat(evaluationMapper.getByAnswerId(answerId).getLlmModel()).isEqualTo("worker-B");
+            assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId).getAttemptId()).isEqualTo(newAttempt);
+            assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId).getStatus()).isEqualTo(InterviewAnswerStatus.EVALUATED);
+            assertThat(interviewSessionMapper.getInterviewSessionById(sessionId).getVersion()).isEqualTo(1);
+        } finally {
+            releaseOld.countDown();
+            releaseNew.countDown();
+        }
+    }
+
+    @Test
+    void retryReusesLegacyPersistedEvaluationWithoutDuplicateInsert() {
+        seedAnswer(InterviewAnswerStatus.FAILED);
+        var result = finishResult();
+        assertThat(evaluationMapper.insertEvaluation(result.evaluation())).isEqualTo(1);
+        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean())).thenReturn(result);
+        var replay = workflowService.evaluateAnswer(answerId);
+        assertThat(replay.evaluationId()).isEqualTo(result.evaluation().getId());
+        assertThat(countAnswerEvaluations()).isEqualTo(1);
+        assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId).getStatus()).isEqualTo(InterviewAnswerStatus.EVALUATED);
     }
 
     private long countAnswerEvaluations() {
@@ -377,6 +464,9 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
         ) {
             return new InterviewAnswerMapper() {
                 @Override
+                public InterviewAnswer lockById(Long id) { return delegate.lockById(id); }
+
+                @Override
                 public InterviewAnswer getInterviewAnswerById(Long id) {
                     return delegate.getInterviewAnswerById(id);
                 }
@@ -412,39 +502,40 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
                 }
 
                 @Override
-                public int claimEvaluation(Long id) {
+                public int claimEvaluation(Long id, String attemptId) {
                     return barrier.awaitThenRun(
                             id,
                             EvaluationClaimBarrier.Mode.CLAIM,
-                            () -> delegate.claimEvaluation(id)
+                            () -> delegate.claimEvaluation(id, attemptId)
                     );
                 }
 
                 @Override
-                public int retryEvaluation(Long id) {
+                public int retryEvaluation(Long id, String attemptId) {
                     return barrier.awaitThenRun(
                             id,
                             EvaluationClaimBarrier.Mode.RETRY,
-                            () -> delegate.retryEvaluation(id)
+                            () -> delegate.retryEvaluation(id, attemptId)
                     );
                 }
 
                 @Override
                 public int reclaimStaleEvaluating(
                         Long id,
-                        LocalDateTime cutoff
+                        LocalDateTime cutoff,
+                        String attemptId
                 ) {
-                    return delegate.reclaimStaleEvaluating(id, cutoff);
+                    return delegate.reclaimStaleEvaluating(id, cutoff, attemptId);
                 }
 
                 @Override
-                public int markEvaluated(Long id) {
-                    return delegate.markEvaluated(id);
+                public int markEvaluated(Long id, String attemptId) {
+                    return delegate.markEvaluated(id, attemptId);
                 }
 
                 @Override
-                public int markFailed(Long id, String errorCode) {
-                    return delegate.markFailed(id, errorCode);
+                public int markFailed(Long id, String errorCode, String attemptId) {
+                    return delegate.markFailed(id, errorCode, attemptId);
                 }
             };
         }

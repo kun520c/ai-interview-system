@@ -221,7 +221,7 @@ class InterviewReportServiceTest {
         verify(interviewSessionMapper, never())
                 .claimReportGeneration(any(), any(), any());
         verify(interviewSessionMapper, never())
-                .reclaimStaleGenerating(any(), any());
+                .reclaimStaleGenerating(any(), any(), any());
     }
 
     @Test
@@ -233,7 +233,11 @@ class InterviewReportServiceTest {
         List<AnswerEvaluation> evaluations = evaluations(70, 80, 90);
         when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
                 .thenReturn(stale, reclaimed, reclaimed);
-        when(interviewSessionMapper.reclaimStaleGenerating(eq(SESSION_ID), any()))
+        when(interviewSessionMapper.reclaimStaleGenerating(
+                eq(SESSION_ID),
+                any(),
+                any()
+        ))
                 .thenReturn(1);
         when(interviewReportMapper.getBySessionId(SESSION_ID)).thenReturn(null);
         when(generatorProvider.getIfAvailable()).thenReturn(generator);
@@ -250,6 +254,7 @@ class InterviewReportServiceTest {
         assertThat(result.getOverallScore()).isEqualByComparingTo("80.00");
         verify(interviewSessionMapper).reclaimStaleGenerating(
                 eq(SESSION_ID),
+                any(),
                 any()
         );
         verify(interviewSessionMapper, never())
@@ -266,12 +271,16 @@ class InterviewReportServiceTest {
         InterviewReport existing = report();
         when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
                 .thenReturn(stale, reclaimed);
-        when(interviewSessionMapper.reclaimStaleGenerating(eq(SESSION_ID), any()))
+        when(interviewSessionMapper.reclaimStaleGenerating(
+                eq(SESSION_ID),
+                any(),
+                any()
+        ))
                 .thenReturn(1);
         when(interviewReportMapper.getBySessionId(SESSION_ID)).thenReturn(existing);
         when(interviewSessionMapper.markReportReady(
                 SESSION_ID,
-                GENERATING_VERSION,
+                GENERATING_VERSION + 1,
                 existing.getOverallScore()
         )).thenReturn(1);
 
@@ -280,7 +289,7 @@ class InterviewReportServiceTest {
         assertThat(result).isSameAs(existing);
         verify(interviewSessionMapper).markReportReady(
                 SESSION_ID,
-                GENERATING_VERSION,
+                GENERATING_VERSION + 1,
                 existing.getOverallScore()
         );
         verifyNoInteractions(generatorProvider, generator, transactionService);
@@ -341,8 +350,6 @@ class InterviewReportServiceTest {
                         INITIAL_VERSION,
                         InterviewReportStatus.NOT_STARTED
                 );
-        order.verify(interviewSessionMapper)
-                .getInterviewSessionById(SESSION_ID);
         order.verify(answerEvaluationMapper)
                 .listFinalEffectiveEvaluationsBySessionId(SESSION_ID);
         order.verify(generator).generate(
@@ -597,8 +604,8 @@ class InterviewReportServiceTest {
                 () -> service.generateReport(USER_ID, SESSION_ID)
         ).isSameAs(commitSignal);
 
-        verify(interviewSessionMapper, never())
-                .markReportFailed(any(), any());
+        verify(interviewSessionMapper).markReportFailed(SESSION_ID, GENERATING_VERSION);
+        verify(interviewSessionMapper, org.mockito.Mockito.times(1)).getInterviewSessionById(SESSION_ID);
     }
 
     @Test

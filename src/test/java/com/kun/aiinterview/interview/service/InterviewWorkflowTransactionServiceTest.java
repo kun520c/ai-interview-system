@@ -1,5 +1,8 @@
 package com.kun.aiinterview.interview.service;
 
+import org.mockito.Mockito;
+import com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper;
+import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.entity.InterviewAnswer;
 import com.kun.aiinterview.interview.entity.InterviewQuestion;
 import com.kun.aiinterview.interview.entity.InterviewSession;
@@ -50,6 +53,9 @@ class InterviewWorkflowTransactionServiceTest {
     private static final int SESSION_VERSION = 7;
 
     @Mock
+    private AnswerEvaluationMapper answerEvaluationMapper;
+
+    @Mock
     private InterviewAnswerMapper interviewAnswerMapper;
 
     @Mock
@@ -58,15 +64,59 @@ class InterviewWorkflowTransactionServiceTest {
     @Mock
     private InterviewSessionMapper interviewSessionMapper;
 
+    private AnswerEvaluation evaluation() {
+        return AnswerEvaluation.builder().id(901L).answerId(ANSWER_ID).build();
+    }
+
     private InterviewWorkflowTransactionService service;
 
     @BeforeEach
     void setUp() {
+        Mockito.lenient().when(interviewAnswerMapper.lockById(ANSWER_ID))
+                .thenReturn(InterviewAnswer.builder().id(ANSWER_ID).attemptId("attempt-test")
+                        .status(InterviewAnswerStatus.EVALUATING).build());
+        Mockito.lenient().when(answerEvaluationMapper.getByAnswerId(ANSWER_ID)).thenAnswer(i -> evaluation());
         service = new InterviewWorkflowTransactionService(
+                answerEvaluationMapper,
                 interviewAnswerMapper,
                 interviewQuestionMapper,
                 interviewSessionMapper
         );
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 2})
+    void shouldRejectUnexpectedEvaluationInsertCount(int rows) {
+        var draft = evaluation();
+        draft.setId(null);
+        when(answerEvaluationMapper.getByAnswerId(ANSWER_ID)).thenReturn(null);
+        when(answerEvaluationMapper.insertEvaluation(draft)).thenReturn(rows);
+        assertThatThrownBy(() -> service.finishSession(
+                        ANSWER_ID,
+                        mainQuestion(),
+                        session(MAIN_QUESTION_ID),
+                        "attempt-test",
+                        draft
+                ))
+                .isInstanceOf(IllegalStateException.class).hasMessage("AnswerEvaluation写入失败");
+        verify(interviewAnswerMapper, never()).markEvaluated(any(), any());
+    }
+
+    @Test
+    void shouldRejectEvaluationInsertWithoutGeneratedKey() {
+        var draft = evaluation();
+        draft.setId(null);
+        when(answerEvaluationMapper.getByAnswerId(ANSWER_ID)).thenReturn(null);
+        when(answerEvaluationMapper.insertEvaluation(draft)).thenReturn(1);
+        assertThatThrownBy(() -> service.finishSession(
+                        ANSWER_ID,
+                        mainQuestion(),
+                        session(MAIN_QUESTION_ID),
+                        "attempt-test",
+                        draft
+                ))
+                .isInstanceOf(IllegalStateException.class).hasMessage("AnswerEvaluation主键未回填");
+        verify(interviewAnswerMapper, never()).markEvaluated(any(), any());
     }
 
     @Test
@@ -162,16 +212,16 @@ class InterviewWorkflowTransactionServiceTest {
 
     @Test
     void shouldClaimAndRetryEvaluationThroughSeparateCasMethods() {
-        when(interviewAnswerMapper.claimEvaluation(ANSWER_ID))
+        when(interviewAnswerMapper.claimEvaluation(ANSWER_ID, "attempt-test"))
                 .thenReturn(1);
-        when(interviewAnswerMapper.retryEvaluation(ANSWER_ID))
+        when(interviewAnswerMapper.retryEvaluation(ANSWER_ID, "attempt-test"))
                 .thenReturn(1);
 
-        assertThat(service.tryClaimEvaluation(ANSWER_ID)).isTrue();
-        assertThat(service.tryRetryEvaluation(ANSWER_ID)).isTrue();
+        assertThat(service.tryClaimEvaluation(ANSWER_ID, "attempt-test")).isTrue();
+        assertThat(service.tryRetryEvaluation(ANSWER_ID, "attempt-test")).isTrue();
 
-        verify(interviewAnswerMapper).claimEvaluation(ANSWER_ID);
-        verify(interviewAnswerMapper).retryEvaluation(ANSWER_ID);
+        verify(interviewAnswerMapper).claimEvaluation(ANSWER_ID, "attempt-test");
+        verify(interviewAnswerMapper).retryEvaluation(ANSWER_ID, "attempt-test");
         verifyNoInteractions(
                 interviewQuestionMapper,
                 interviewSessionMapper
@@ -180,16 +230,16 @@ class InterviewWorkflowTransactionServiceTest {
 
     @Test
     void shouldReturnFalseWhenEvaluationClaimOrRetryCasMisses() {
-        when(interviewAnswerMapper.claimEvaluation(ANSWER_ID))
+        when(interviewAnswerMapper.claimEvaluation(ANSWER_ID, "attempt-test"))
                 .thenReturn(0);
-        when(interviewAnswerMapper.retryEvaluation(ANSWER_ID))
+        when(interviewAnswerMapper.retryEvaluation(ANSWER_ID, "attempt-test"))
                 .thenReturn(0);
 
-        assertThat(service.tryClaimEvaluation(ANSWER_ID)).isFalse();
-        assertThat(service.tryRetryEvaluation(ANSWER_ID)).isFalse();
+        assertThat(service.tryClaimEvaluation(ANSWER_ID, "attempt-test")).isFalse();
+        assertThat(service.tryRetryEvaluation(ANSWER_ID, "attempt-test")).isFalse();
 
-        verify(interviewAnswerMapper).claimEvaluation(ANSWER_ID);
-        verify(interviewAnswerMapper).retryEvaluation(ANSWER_ID);
+        verify(interviewAnswerMapper).claimEvaluation(ANSWER_ID, "attempt-test");
+        verify(interviewAnswerMapper).retryEvaluation(ANSWER_ID, "attempt-test");
         verifyNoInteractions(
                 interviewQuestionMapper,
                 interviewSessionMapper
@@ -199,14 +249,14 @@ class InterviewWorkflowTransactionServiceTest {
     @Test
     void shouldReturnWhetherStaleEvaluatingReclaimWon() {
         LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
-        when(interviewAnswerMapper.reclaimStaleEvaluating(ANSWER_ID, cutoff))
+        when(interviewAnswerMapper.reclaimStaleEvaluating(ANSWER_ID, cutoff, "attempt-test"))
                 .thenReturn(1, 0);
 
-        assertThat(service.tryReclaimStaleEvaluating(ANSWER_ID, cutoff)).isTrue();
-        assertThat(service.tryReclaimStaleEvaluating(ANSWER_ID, cutoff)).isFalse();
+        assertThat(service.tryReclaimStaleEvaluating(ANSWER_ID, cutoff, "attempt-test")).isTrue();
+        assertThat(service.tryReclaimStaleEvaluating(ANSWER_ID, cutoff, "attempt-test")).isFalse();
 
         verify(interviewAnswerMapper, times(2))
-                .reclaimStaleEvaluating(ANSWER_ID, cutoff);
+                .reclaimStaleEvaluating(ANSWER_ID, cutoff, "attempt-test");
         verifyNoInteractions(
                 interviewQuestionMapper,
                 interviewSessionMapper
@@ -216,12 +266,12 @@ class InterviewWorkflowTransactionServiceTest {
     @Test
     void shouldRejectBlankIdentifiersForStaleEvaluatingReclaim() {
         assertThatThrownBy(
-                () -> service.tryReclaimStaleEvaluating(null, LocalDateTime.now())
+                () -> service.tryReclaimStaleEvaluating(null, LocalDateTime.now(), "attempt-test")
         )
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("answerId和cutoff不能为空");
         assertThatThrownBy(
-                () -> service.tryReclaimStaleEvaluating(ANSWER_ID, null)
+                () -> service.tryReclaimStaleEvaluating(ANSWER_ID, null, "attempt-test")
         )
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("answerId和cutoff不能为空");
@@ -246,24 +296,21 @@ class InterviewWorkflowTransactionServiceTest {
                     draft.setId(FOLLOW_UP_QUESTION_ID);
                     return 1;
                 });
-        when(interviewAnswerMapper.markEvaluated(ANSWER_ID))
+        when(interviewAnswerMapper.markEvaluated(ANSWER_ID, "attempt-test"))
                 .thenReturn(1);
         when(interviewQuestionMapper.markWaitingAnswer(
                 FOLLOW_UP_QUESTION_ID,
                 SESSION_ID
         )).thenReturn(1);
-        when(interviewSessionMapper.moveToFollowUp(
-                SESSION_ID,
-                SESSION_VERSION,
-                MAIN_QUESTION_ID,
-                FOLLOW_UP_QUESTION_ID
-        )).thenReturn(1);
+        when(interviewSessionMapper.moveToFollowUp(SESSION_ID, SESSION_VERSION, MAIN_QUESTION_ID, FOLLOW_UP_QUESTION_ID)).thenReturn(1);
 
         InterviewQuestion result = service.moveToFollowUp(
                 ANSWER_ID,
                 parentMain,
                 session,
-                draft
+                draft,
+                "attempt-test",
+                evaluation()
         );
 
         assertThat(result).isSameAs(draft);
@@ -296,19 +343,14 @@ class InterviewWorkflowTransactionServiceTest {
         order.verify(interviewQuestionMapper)
                 .insertFollowUp(draft);
         order.verify(interviewAnswerMapper)
-                .markEvaluated(ANSWER_ID);
+                .markEvaluated(ANSWER_ID, "attempt-test");
         order.verify(interviewQuestionMapper)
                 .markWaitingAnswer(
                         FOLLOW_UP_QUESTION_ID,
                         SESSION_ID
                 );
         order.verify(interviewSessionMapper)
-                .moveToFollowUp(
-                        SESSION_ID,
-                        SESSION_VERSION,
-                        MAIN_QUESTION_ID,
-                        FOLLOW_UP_QUESTION_ID
-                );
+                .moveToFollowUp(SESSION_ID, SESSION_VERSION, MAIN_QUESTION_ID, FOLLOW_UP_QUESTION_ID);
     }
 
     @Test
@@ -317,43 +359,35 @@ class InterviewWorkflowTransactionServiceTest {
         when(interviewQuestionMapper.getFollowUpByParentQuestionId(
                 MAIN_QUESTION_ID
         )).thenReturn(existingFollowUp);
-        when(interviewAnswerMapper.markEvaluated(ANSWER_ID))
+        when(interviewAnswerMapper.markEvaluated(ANSWER_ID, "attempt-test"))
                 .thenReturn(1);
         when(interviewQuestionMapper.markWaitingAnswer(
                 FOLLOW_UP_QUESTION_ID,
                 SESSION_ID
         )).thenReturn(1);
-        when(interviewSessionMapper.moveToFollowUp(
-                SESSION_ID,
-                SESSION_VERSION,
-                MAIN_QUESTION_ID,
-                FOLLOW_UP_QUESTION_ID
-        )).thenReturn(1);
+        when(interviewSessionMapper.moveToFollowUp(SESSION_ID, SESSION_VERSION, MAIN_QUESTION_ID, FOLLOW_UP_QUESTION_ID)).thenReturn(1);
 
         InterviewQuestion result = service.moveToFollowUp(
                 ANSWER_ID,
                 mainQuestion(),
                 session(MAIN_QUESTION_ID),
-                followUpDraft()
+                followUpDraft(),
+                "attempt-test",
+                evaluation()
         );
 
         assertThat(result).isSameAs(existingFollowUp);
         verify(interviewQuestionMapper, never())
                 .insertFollowUp(any());
         verify(interviewAnswerMapper)
-                .markEvaluated(ANSWER_ID);
+                .markEvaluated(ANSWER_ID, "attempt-test");
         verify(interviewQuestionMapper)
                 .markWaitingAnswer(
                         FOLLOW_UP_QUESTION_ID,
                         SESSION_ID
                 );
         verify(interviewSessionMapper)
-                .moveToFollowUp(
-                        SESSION_ID,
-                        SESSION_VERSION,
-                        MAIN_QUESTION_ID,
-                        FOLLOW_UP_QUESTION_ID
-                );
+                .moveToFollowUp(SESSION_ID, SESSION_VERSION, MAIN_QUESTION_ID, FOLLOW_UP_QUESTION_ID);
     }
 
     @Test
@@ -370,14 +404,16 @@ class InterviewWorkflowTransactionServiceTest {
                 ANSWER_ID,
                 mainQuestion(),
                 session(FOLLOW_UP_QUESTION_ID),
-                followUpDraft()
+                followUpDraft(),
+                "attempt-test",
+                evaluation()
         );
 
         assertThat(result).isSameAs(existingFollowUp);
         verify(interviewQuestionMapper, never())
                 .insertFollowUp(any());
         verify(interviewAnswerMapper, never())
-                .markEvaluated(any());
+                .markEvaluated(any(), any());
         verify(interviewQuestionMapper, never())
                 .markWaitingAnswer(any(), any());
         verifyNoInteractions(interviewSessionMapper);
@@ -400,16 +436,16 @@ class InterviewWorkflowTransactionServiceTest {
                         ANSWER_ID,
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
-                        draft
+                        draft,
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("FOLLOW_UP问题写入失败");
 
-        verifyNoInteractions(
-                interviewAnswerMapper,
-                interviewSessionMapper
-        );
+        verify(interviewAnswerMapper, never()).markEvaluated(any(), any());
+        verifyNoInteractions(interviewSessionMapper);
     }
 
     @Test
@@ -426,22 +462,22 @@ class InterviewWorkflowTransactionServiceTest {
                         ANSWER_ID,
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
-                        draft
+                        draft,
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("FOLLOW_UP问题主键未回填");
 
-        verifyNoInteractions(
-                interviewAnswerMapper,
-                interviewSessionMapper
-        );
+        verify(interviewAnswerMapper, never()).markEvaluated(any(), any());
+        verifyNoInteractions(interviewSessionMapper);
     }
 
     @Test
     void shouldStopFollowUpWhenAnswerCasMisses() {
         InterviewQuestion draft = stubInsertedFollowUp();
-        when(interviewAnswerMapper.markEvaluated(ANSWER_ID))
+        when(interviewAnswerMapper.markEvaluated(ANSWER_ID, "attempt-test"))
                 .thenReturn(0);
 
         assertThatThrownBy(
@@ -449,7 +485,9 @@ class InterviewWorkflowTransactionServiceTest {
                         ANSWER_ID,
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
-                        draft
+                        draft,
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -463,7 +501,7 @@ class InterviewWorkflowTransactionServiceTest {
     @Test
     void shouldStopFollowUpWhenQuestionActivationCasMisses() {
         InterviewQuestion draft = stubInsertedFollowUp();
-        when(interviewAnswerMapper.markEvaluated(ANSWER_ID))
+        when(interviewAnswerMapper.markEvaluated(ANSWER_ID, "attempt-test"))
                 .thenReturn(1);
         when(interviewQuestionMapper.markWaitingAnswer(
                 FOLLOW_UP_QUESTION_ID,
@@ -475,7 +513,9 @@ class InterviewWorkflowTransactionServiceTest {
                         ANSWER_ID,
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
-                        draft
+                        draft,
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -487,25 +527,22 @@ class InterviewWorkflowTransactionServiceTest {
     @Test
     void shouldRejectFollowUpWhenSessionCasMisses() {
         InterviewQuestion draft = stubInsertedFollowUp();
-        when(interviewAnswerMapper.markEvaluated(ANSWER_ID))
+        when(interviewAnswerMapper.markEvaluated(ANSWER_ID, "attempt-test"))
                 .thenReturn(1);
         when(interviewQuestionMapper.markWaitingAnswer(
                 FOLLOW_UP_QUESTION_ID,
                 SESSION_ID
         )).thenReturn(1);
-        when(interviewSessionMapper.moveToFollowUp(
-                SESSION_ID,
-                SESSION_VERSION,
-                MAIN_QUESTION_ID,
-                FOLLOW_UP_QUESTION_ID
-        )).thenReturn(0);
+        when(interviewSessionMapper.moveToFollowUp(SESSION_ID, SESSION_VERSION, MAIN_QUESTION_ID, FOLLOW_UP_QUESTION_ID)).thenReturn(0);
 
         assertThatThrownBy(
                 () -> service.moveToFollowUp(
                         ANSWER_ID,
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
-                        draft
+                        draft,
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -517,24 +554,21 @@ class InterviewWorkflowTransactionServiceTest {
         InterviewQuestion currentQuestion = mainQuestion();
         InterviewSession session = session(MAIN_QUESTION_ID);
         InterviewQuestion nextMain = nextMainQuestion();
-        when(interviewAnswerMapper.markEvaluated(ANSWER_ID))
+        when(interviewAnswerMapper.markEvaluated(ANSWER_ID, "attempt-test"))
                 .thenReturn(1);
         when(interviewQuestionMapper.markWaitingAnswer(
                 NEXT_MAIN_QUESTION_ID,
                 SESSION_ID
         )).thenReturn(1);
-        when(interviewSessionMapper.advanceToNextMain(
-                SESSION_ID,
-                SESSION_VERSION,
-                MAIN_QUESTION_ID,
-                NEXT_MAIN_QUESTION_ID
-        )).thenReturn(1);
+        when(interviewSessionMapper.advanceToNextMain(SESSION_ID, SESSION_VERSION, MAIN_QUESTION_ID, NEXT_MAIN_QUESTION_ID)).thenReturn(1);
 
         service.advanceToNextMain(
                 ANSWER_ID,
                 currentQuestion,
                 session,
-                nextMain
+                nextMain,
+                "attempt-test",
+                evaluation()
         );
 
         InOrder order = inOrder(
@@ -543,24 +577,19 @@ class InterviewWorkflowTransactionServiceTest {
                 interviewSessionMapper
         );
         order.verify(interviewAnswerMapper)
-                .markEvaluated(ANSWER_ID);
+                .markEvaluated(ANSWER_ID, "attempt-test");
         order.verify(interviewQuestionMapper)
                 .markWaitingAnswer(
                         NEXT_MAIN_QUESTION_ID,
                         SESSION_ID
                 );
         order.verify(interviewSessionMapper)
-                .advanceToNextMain(
-                        SESSION_ID,
-                        SESSION_VERSION,
-                        MAIN_QUESTION_ID,
-                        NEXT_MAIN_QUESTION_ID
-                );
+                .advanceToNextMain(SESSION_ID, SESSION_VERSION, MAIN_QUESTION_ID, NEXT_MAIN_QUESTION_ID);
     }
 
     @Test
     void shouldStopNextMainWhenAnswerCasMisses() {
-        when(interviewAnswerMapper.markEvaluated(ANSWER_ID))
+        when(interviewAnswerMapper.markEvaluated(ANSWER_ID, "attempt-test"))
                 .thenReturn(0);
 
         assertThatThrownBy(
@@ -568,7 +597,9 @@ class InterviewWorkflowTransactionServiceTest {
                         ANSWER_ID,
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
-                        nextMainQuestion()
+                        nextMainQuestion(),
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -582,7 +613,7 @@ class InterviewWorkflowTransactionServiceTest {
 
     @Test
     void shouldStopNextMainWhenQuestionActivationCasMisses() {
-        when(interviewAnswerMapper.markEvaluated(ANSWER_ID))
+        when(interviewAnswerMapper.markEvaluated(ANSWER_ID, "attempt-test"))
                 .thenReturn(1);
         when(interviewQuestionMapper.markWaitingAnswer(
                 NEXT_MAIN_QUESTION_ID,
@@ -594,7 +625,9 @@ class InterviewWorkflowTransactionServiceTest {
                         ANSWER_ID,
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
-                        nextMainQuestion()
+                        nextMainQuestion(),
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -605,25 +638,22 @@ class InterviewWorkflowTransactionServiceTest {
 
     @Test
     void shouldRejectNextMainWhenSessionCasMisses() {
-        when(interviewAnswerMapper.markEvaluated(ANSWER_ID))
+        when(interviewAnswerMapper.markEvaluated(ANSWER_ID, "attempt-test"))
                 .thenReturn(1);
         when(interviewQuestionMapper.markWaitingAnswer(
                 NEXT_MAIN_QUESTION_ID,
                 SESSION_ID
         )).thenReturn(1);
-        when(interviewSessionMapper.advanceToNextMain(
-                SESSION_ID,
-                SESSION_VERSION,
-                MAIN_QUESTION_ID,
-                NEXT_MAIN_QUESTION_ID
-        )).thenReturn(0);
+        when(interviewSessionMapper.advanceToNextMain(SESSION_ID, SESSION_VERSION, MAIN_QUESTION_ID, NEXT_MAIN_QUESTION_ID)).thenReturn(0);
 
         assertThatThrownBy(
                 () -> service.advanceToNextMain(
                         ANSWER_ID,
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
-                        nextMainQuestion()
+                        nextMainQuestion(),
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -632,7 +662,7 @@ class InterviewWorkflowTransactionServiceTest {
 
     @Test
     void shouldFinishSessionAfterAnswerBecomesEvaluated() {
-        when(interviewAnswerMapper.markEvaluated(ANSWER_ID))
+        when(interviewAnswerMapper.markEvaluated(ANSWER_ID, "attempt-test"))
                 .thenReturn(1);
         when(interviewSessionMapper.completeSession(
                 SESSION_ID,
@@ -641,17 +671,19 @@ class InterviewWorkflowTransactionServiceTest {
         )).thenReturn(1);
 
         service.finishSession(
-                ANSWER_ID,
-                mainQuestion(),
-                session(MAIN_QUESTION_ID)
-        );
+                        ANSWER_ID,
+                        mainQuestion(),
+                        session(MAIN_QUESTION_ID),
+                        "attempt-test",
+                        evaluation()
+                );
 
         InOrder order = inOrder(
                 interviewAnswerMapper,
                 interviewSessionMapper
         );
         order.verify(interviewAnswerMapper)
-                .markEvaluated(ANSWER_ID);
+                .markEvaluated(ANSWER_ID, "attempt-test");
         order.verify(interviewSessionMapper)
                 .completeSession(
                         SESSION_ID,
@@ -662,14 +694,16 @@ class InterviewWorkflowTransactionServiceTest {
 
     @Test
     void shouldStopFinishWhenAnswerCasMisses() {
-        when(interviewAnswerMapper.markEvaluated(ANSWER_ID))
+        when(interviewAnswerMapper.markEvaluated(ANSWER_ID, "attempt-test"))
                 .thenReturn(0);
 
         assertThatThrownBy(
                 () -> service.finishSession(
                         ANSWER_ID,
                         mainQuestion(),
-                        session(MAIN_QUESTION_ID)
+                        session(MAIN_QUESTION_ID),
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -680,7 +714,7 @@ class InterviewWorkflowTransactionServiceTest {
 
     @Test
     void shouldRejectFinishWhenSessionCasMisses() {
-        when(interviewAnswerMapper.markEvaluated(ANSWER_ID))
+        when(interviewAnswerMapper.markEvaluated(ANSWER_ID, "attempt-test"))
                 .thenReturn(1);
         when(interviewSessionMapper.completeSession(
                 SESSION_ID,
@@ -692,7 +726,9 @@ class InterviewWorkflowTransactionServiceTest {
                 () -> service.finishSession(
                         ANSWER_ID,
                         mainQuestion(),
-                        session(MAIN_QUESTION_ID)
+                        session(MAIN_QUESTION_ID),
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -708,7 +744,9 @@ class InterviewWorkflowTransactionServiceTest {
                         ANSWER_ID,
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
-                        invalidNext
+                        invalidNext,
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalArgumentException.class)
@@ -731,7 +769,9 @@ class InterviewWorkflowTransactionServiceTest {
                         ANSWER_ID,
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
-                        invalidNext
+                        invalidNext,
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalArgumentException.class)
@@ -750,7 +790,9 @@ class InterviewWorkflowTransactionServiceTest {
                 () -> service.finishSession(
                         ANSWER_ID,
                         mainQuestion(),
-                        session(NEXT_MAIN_QUESTION_ID)
+                        session(NEXT_MAIN_QUESTION_ID),
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -774,7 +816,9 @@ class InterviewWorkflowTransactionServiceTest {
                         ANSWER_ID,
                         mainQuestion(),
                         session(NEXT_MAIN_QUESTION_ID),
-                        followUpDraft()
+                        followUpDraft(),
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -782,10 +826,8 @@ class InterviewWorkflowTransactionServiceTest {
 
         verify(interviewQuestionMapper, never())
                 .insertFollowUp(any());
-        verifyNoInteractions(
-                interviewAnswerMapper,
-                interviewSessionMapper
-        );
+        verify(interviewAnswerMapper, never()).markEvaluated(any(), any());
+        verifyNoInteractions(interviewSessionMapper);
     }
 
     @Test
@@ -817,6 +859,7 @@ class InterviewWorkflowTransactionServiceTest {
                     PlatformTransactionManager.class,
                     () -> transactionManager
             );
+            context.registerBean(AnswerEvaluationMapper.class, () -> answerEvaluationMapper);
             context.registerBean(
                     InterviewAnswerMapper.class,
                     () -> interviewAnswerMapper

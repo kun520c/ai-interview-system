@@ -100,12 +100,12 @@ class KnowledgeDocumentMapperTest {
         assertEquals(1, knowledgeDocumentMapper.insertDocument(failed));
         assertEquals(1, knowledgeDocumentMapper.insertDocument(stale));
         assertEquals(1, knowledgeDocumentMapper.insertDocument(fresh));
-        assertEquals(1, knowledgeDocumentMapper.claimProcessing(failed.getId()));
-        assertEquals(1, knowledgeDocumentMapper.claimProcessing(stale.getId()));
-        assertEquals(1, knowledgeDocumentMapper.claimProcessing(fresh.getId()));
+        assertEquals(1, knowledgeDocumentMapper.claimProcessing(failed.getId(), "attempt-test"));
+        assertEquals(1, knowledgeDocumentMapper.claimProcessing(stale.getId(), "attempt-test"));
+        assertEquals(1, knowledgeDocumentMapper.claimProcessing(fresh.getId(), "attempt-test"));
         assertEquals(
                 1,
-                knowledgeDocumentMapper.markFailed(failed.getId(), "previous")
+                knowledgeDocumentMapper.markFailed(failed.getId(), "previous", "attempt-test")
         );
         LocalDateTime staleAt = LocalDateTime.now().minusMinutes(20);
         setDocumentUpdatedAt(stale.getId(), staleAt);
@@ -114,7 +114,7 @@ class KnowledgeDocumentMapperTest {
 
         assertEquals(
                 1,
-                knowledgeDocumentMapper.claimFailedProcessing(failed.getId())
+                knowledgeDocumentMapper.claimFailedProcessing(failed.getId(), "attempt-test")
         );
         assertEquals(
                 KnowledgeProcessingStatus.PROCESSING,
@@ -123,13 +123,14 @@ class KnowledgeDocumentMapperTest {
         );
         assertEquals(
                 0,
-                knowledgeDocumentMapper.claimFailedProcessing(failed.getId())
+                knowledgeDocumentMapper.claimFailedProcessing(failed.getId(), "attempt-test")
         );
         assertEquals(
                 1,
                 knowledgeDocumentMapper.reclaimStaleProcessing(
                         stale.getId(),
-                        cutoff
+                        cutoff,
+                        "attempt-test"
                 )
         );
         assertEquals(
@@ -141,14 +142,16 @@ class KnowledgeDocumentMapperTest {
                 0,
                 knowledgeDocumentMapper.reclaimStaleProcessing(
                         stale.getId(),
-                        cutoff
+                        cutoff,
+                        "attempt-test"
                 )
         );
         assertEquals(
                 0,
                 knowledgeDocumentMapper.reclaimStaleProcessing(
                         fresh.getId(),
-                        cutoff
+                        cutoff,
+                        "attempt-test"
                 )
         );
     }

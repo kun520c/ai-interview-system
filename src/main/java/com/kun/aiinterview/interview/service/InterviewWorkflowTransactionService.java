@@ -1,5 +1,8 @@
 package com.kun.aiinterview.interview.service;
 
+import com.kun.aiinterview.common.exception.ConflictException;
+import com.kun.aiinterview.interview.entity.AnswerEvaluation;
+import com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper;
 import com.kun.aiinterview.interview.entity.InterviewAnswer;
 import com.kun.aiinterview.interview.entity.InterviewQuestion;
 import com.kun.aiinterview.interview.entity.InterviewSession;
@@ -20,6 +23,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class InterviewWorkflowTransactionService {
 
+    private final AnswerEvaluationMapper answerEvaluationMapper;
     private final InterviewAnswerMapper interviewAnswerMapper;
     private final InterviewQuestionMapper interviewQuestionMapper;
     private final InterviewSessionMapper interviewSessionMapper;
@@ -84,23 +88,24 @@ public class InterviewWorkflowTransactionService {
     }
 
     @Transactional
-    public boolean tryClaimEvaluation(Long answerId) {
+    public boolean tryClaimEvaluation(Long answerId, String attemptId) {
         int affectedRows =
-                interviewAnswerMapper.claimEvaluation(answerId);
+                interviewAnswerMapper.claimEvaluation(answerId, attemptId);
         return affectedRows == 1;
     }
 
     @Transactional
-    public boolean tryRetryEvaluation(Long answerId) {
+    public boolean tryRetryEvaluation(Long answerId, String attemptId) {
         int affectedRows =
-                interviewAnswerMapper.retryEvaluation(answerId);
+                interviewAnswerMapper.retryEvaluation(answerId, attemptId);
         return affectedRows == 1;
     }
 
     @Transactional
     public boolean tryReclaimStaleEvaluating(
             Long answerId,
-            LocalDateTime cutoff
+            LocalDateTime cutoff,
+            String attemptId
     ) {
         if (answerId == null || cutoff == null) {
             throw new IllegalArgumentException(
@@ -111,7 +116,8 @@ public class InterviewWorkflowTransactionService {
         int affectedRows =
                 interviewAnswerMapper.reclaimStaleEvaluating(
                         answerId,
-                        cutoff
+                        cutoff,
+                        attemptId
                 );
         return affectedRows == 1;
     }
@@ -119,12 +125,14 @@ public class InterviewWorkflowTransactionService {
     @Transactional
     public void markEvaluationFailed(
             Long answerId,
-            String errorCode
+            String errorCode,
+            String attemptId
     ) {
         int affectedRows =
                 interviewAnswerMapper.markFailed(
                         answerId,
-                        errorCode
+                        errorCode,
+                        attemptId
                 );
 
         if (affectedRows != 1) {
@@ -139,7 +147,9 @@ public class InterviewWorkflowTransactionService {
             Long answerId,
             InterviewQuestion parentMain,
             InterviewSession session,
-            InterviewQuestion followUpDraft
+            InterviewQuestion followUpDraft,
+            String attemptId,
+            AnswerEvaluation evaluation
     ) {
         requireQuestionIdentity(parentMain);
         requireSessionIdentity(session);
@@ -185,6 +195,7 @@ public class InterviewWorkflowTransactionService {
                             session.getCurrentInterviewQuestionId(),
                             followUp.getId()
                     )) {
+                persistOwnedEvaluation(answerId, attemptId, evaluation);
                 return followUp;
             }
         }
@@ -197,6 +208,8 @@ public class InterviewWorkflowTransactionService {
                     "Session当前问题不是目标MAIN"
             );
         }
+
+        persistOwnedEvaluation(answerId, attemptId, evaluation);
 
         if (followUp == null) {
             followUp = prepareFollowUp(
@@ -223,7 +236,7 @@ public class InterviewWorkflowTransactionService {
         }
 
         int answerRows =
-                interviewAnswerMapper.markEvaluated(answerId);
+                interviewAnswerMapper.markEvaluated(answerId, attemptId);
 
         if (answerRows != 1) {
             throw new IllegalStateException(
@@ -265,7 +278,9 @@ public class InterviewWorkflowTransactionService {
             Long answerId,
             InterviewQuestion currentQuestion,
             InterviewSession session,
-            InterviewQuestion nextMain
+            InterviewQuestion nextMain,
+            String attemptId,
+            AnswerEvaluation evaluation
     ) {
         validateCurrentQuestionAndSession(
                 currentQuestion,
@@ -290,8 +305,10 @@ public class InterviewWorkflowTransactionService {
             );
         }
 
+        persistOwnedEvaluation(answerId, attemptId, evaluation);
+
         int answerRows =
-                interviewAnswerMapper.markEvaluated(answerId);
+                interviewAnswerMapper.markEvaluated(answerId, attemptId);
 
         if (answerRows != 1) {
             throw new IllegalStateException(
@@ -330,15 +347,19 @@ public class InterviewWorkflowTransactionService {
     public void finishSession(
             Long answerId,
             InterviewQuestion currentQuestion,
-            InterviewSession session
+            InterviewSession session,
+            String attemptId,
+            AnswerEvaluation evaluation
     ) {
         validateCurrentQuestionAndSession(
                 currentQuestion,
                 session
         );
 
+        persistOwnedEvaluation(answerId, attemptId, evaluation);
+
         int answerRows =
-                interviewAnswerMapper.markEvaluated(answerId);
+                interviewAnswerMapper.markEvaluated(answerId, attemptId);
 
         if (answerRows != 1) {
             throw new IllegalStateException(
@@ -357,6 +378,32 @@ public class InterviewWorkflowTransactionService {
             throw new IllegalStateException(
                     "Session完成失败"
             );
+        }
+    }
+
+    private void persistOwnedEvaluation(Long answerId, String attemptId, AnswerEvaluation evaluation) {
+        InterviewAnswer current = interviewAnswerMapper.lockById(answerId);
+        if (attemptId == null || current == null
+                || current.getStatus() != InterviewAnswerStatus.EVALUATING
+                || !attemptId.equals(current.getAttemptId())) {
+            throw new ConflictException("评价任务已失效，请重试");
+        }
+        if (evaluation == null || !Objects.equals(answerId, evaluation.getAnswerId())) {
+            throw new IllegalArgumentException("评价结果不属于当前Answer");
+        }
+        AnswerEvaluation existing = answerEvaluationMapper.getByAnswerId(answerId);
+        if (existing != null) {
+            if (!Objects.equals(existing.getId(), evaluation.getId())) {
+                throw new ConflictException("评价结果已发生变化，请重试");
+            }
+            return; // Legacy persisted evaluations are replayed under the current attempt.
+        }
+        if (evaluation.getId() != null
+                || answerEvaluationMapper.insertEvaluation(evaluation) != 1) {
+            throw new IllegalStateException("AnswerEvaluation写入失败");
+        }
+        if (evaluation.getId() == null) {
+            throw new IllegalStateException("AnswerEvaluation主键未回填");
         }
     }
 

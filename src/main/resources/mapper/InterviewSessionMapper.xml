@@ -154,6 +154,7 @@
             AND status = 'COMPLETED'
             AND report_status = 'GENERATING'
             AND updated_at &lt;= #{cutoff}
+            AND version = #{expectedVersion}
     </update>
 
     <update id="markReportReady">

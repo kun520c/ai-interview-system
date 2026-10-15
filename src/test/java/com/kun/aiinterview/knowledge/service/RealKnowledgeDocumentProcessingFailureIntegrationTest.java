@@ -122,6 +122,9 @@ class RealKnowledgeDocumentProcessingFailureIntegrationTest {
     private FaultInjectingVectorStoreClient faultInjectingVectorStoreClient;
 
     @Autowired
+    private KnowledgeDocumentProcessingTransactionService transactionService;
+
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @BeforeAll
@@ -225,9 +228,23 @@ class RealKnowledgeDocumentProcessingFailureIntegrationTest {
             sentinel = insertRealSentinel(testId);
             awaitVectorPresent(sentinel);
 
+            // Old chunks are now replaced under the document lock. Force a duplicate in the
+            // incoming batch so the real MySQL unique constraint fails after that deletion.
+            var failingTransaction = org.mockito.Mockito.mock(KnowledgeDocumentProcessingTransactionService.class);
+            org.mockito.Mockito.when(failingTransaction.persistChunksAndMarkReady(
+                    org.mockito.ArgumentMatchers.eq(document.getId()), org.mockito.ArgumentMatchers.anyList(),
+                    org.mockito.ArgumentMatchers.anyString())).thenAnswer(invocation -> {
+                List<KnowledgeChunk> duplicate = new ArrayList<>(invocation.getArgument(1));
+                duplicate.add(duplicate.getFirst());
+                return transactionService.persistChunksAndMarkReady(document.getId(), duplicate, invocation.getArgument(2));
+            });
+            var failingService = new KnowledgeDocumentProcessingService(knowledgeDocumentMapper,
+                    knowledgeTextChunker, embeddingClient, faultInjectingVectorStoreClient, failingTransaction,
+                    new com.kun.aiinterview.common.recovery.StaleRecoveryProperties());
+
             RuntimeException actual = org.junit.jupiter.api.Assertions.assertThrows(
                     RuntimeException.class,
-                    () -> processingService.processDocument(document.getId())
+                    () -> failingService.processDocument(document.getId())
             );
 
             assertThat(actual)

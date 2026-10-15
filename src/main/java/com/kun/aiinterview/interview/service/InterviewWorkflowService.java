@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -128,8 +129,9 @@ public class InterviewWorkflowService {
                         session
                 );
 
+        String attemptId = UUID.randomUUID().toString().replace("-", "");
         EvaluationClaim claim =
-                claimOrRecoverEvaluation(answer);
+                claimOrRecoverEvaluation(answer, attemptId);
         if (claim == EvaluationClaim.REPLAY) {
             return null;
         }
@@ -153,6 +155,7 @@ public class InterviewWorkflowService {
 
             applyDecision(
                     answerId,
+                    attemptId,
                     currentQuestion,
                     mainQuestion,
                     session,
@@ -160,10 +163,11 @@ public class InterviewWorkflowService {
                     result
             );
 
-            return result;
+            return result.withPersistedId();
         } catch (RuntimeException exception) {
             markEvaluationFailed(
                     answerId,
+                    attemptId,
                     exception
             );
             throw exception;
@@ -171,26 +175,26 @@ public class InterviewWorkflowService {
     }
 
     private EvaluationClaim claimOrRecoverEvaluation(
-            InterviewAnswer answer
+            InterviewAnswer answer, String attemptId
     ) {
         if (answer.getStatus()
                 == InterviewAnswerStatus.SUBMITTED) {
             if (transactionService.tryClaimEvaluation(
-                    answer.getId()
+                    answer.getId(), attemptId
             )) {
                 return EvaluationClaim.OWNED;
             }
-            return resolveLostEvaluationClaim(answer.getId());
+            return resolveLostEvaluationClaim(answer.getId(), attemptId);
         }
 
         if (answer.getStatus()
                 == InterviewAnswerStatus.FAILED) {
             if (transactionService.tryRetryEvaluation(
-                    answer.getId()
+                    answer.getId(), attemptId
             )) {
                 return EvaluationClaim.OWNED;
             }
-            return resolveLostEvaluationClaim(answer.getId());
+            return resolveLostEvaluationClaim(answer.getId(), attemptId);
         }
 
         if (answer.getStatus()
@@ -200,10 +204,10 @@ public class InterviewWorkflowService {
             );
         }
 
-        return recoverStaleEvaluating(answer);
+        return recoverStaleEvaluating(answer, attemptId);
     }
 
-    private EvaluationClaim resolveLostEvaluationClaim(Long answerId) {
+    private EvaluationClaim resolveLostEvaluationClaim(Long answerId, String attemptId) {
         InterviewAnswer latest = requireReloadedAnswer(
                 answerId,
                 "评价资格冲突后Answer不存在"
@@ -211,22 +215,22 @@ public class InterviewWorkflowService {
 
         return switch (latest.getStatus()) {
             case EVALUATED -> EvaluationClaim.REPLAY;
-            case EVALUATING -> recoverStaleEvaluating(latest);
-            case FAILED -> retryAfterLostClaim(latest);
+            case EVALUATING -> recoverStaleEvaluating(latest, attemptId);
+            case FAILED -> retryAfterLostClaim(latest, attemptId);
             case SUBMITTED -> throw new IllegalStateException(
                     "评价资格抢占失败后Answer仍为SUBMITTED"
             );
         };
     }
 
-    private EvaluationClaim retryAfterLostClaim(InterviewAnswer latest) {
-        if (transactionService.tryRetryEvaluation(latest.getId())) {
+    private EvaluationClaim retryAfterLostClaim(InterviewAnswer latest, String attemptId) {
+        if (transactionService.tryRetryEvaluation(latest.getId(), attemptId)) {
             return EvaluationClaim.OWNED;
         }
-        return resolveLostRetry(latest.getId());
+        return resolveLostRetry(latest.getId(), attemptId);
     }
 
-    private EvaluationClaim resolveLostRetry(Long answerId) {
+    private EvaluationClaim resolveLostRetry(Long answerId, String attemptId) {
         InterviewAnswer latest = requireReloadedAnswer(
                 answerId,
                 "评价重试资格冲突后Answer不存在"
@@ -234,14 +238,14 @@ public class InterviewWorkflowService {
 
         return switch (latest.getStatus()) {
             case EVALUATED -> EvaluationClaim.REPLAY;
-            case EVALUATING -> recoverStaleEvaluating(latest);
+            case EVALUATING -> recoverStaleEvaluating(latest, attemptId);
             default -> throw new IllegalStateException(
                     "评价重试资格抢占失败后Answer状态非法"
             );
         };
     }
 
-    private EvaluationClaim recoverStaleEvaluating(InterviewAnswer answer) {
+    private EvaluationClaim recoverStaleEvaluating(InterviewAnswer answer, String attemptId) {
         if (!staleRecoveryProperties
                 .isEvaluatingStale(answer.getUpdatedAt())) {
             throw new ConflictException(
@@ -252,7 +256,8 @@ public class InterviewWorkflowService {
         boolean reclaimed =
                 transactionService.tryReclaimStaleEvaluating(
                         answer.getId(),
-                        staleRecoveryProperties.evaluatingCutoff()
+                        staleRecoveryProperties.evaluatingCutoff(),
+                        attemptId
                 );
         if (reclaimed) {
             return EvaluationClaim.OWNED;
@@ -266,7 +271,7 @@ public class InterviewWorkflowService {
 
         if (latest.getStatus()
                 == InterviewAnswerStatus.FAILED) {
-            return retryAfterLostClaim(latest);
+            return retryAfterLostClaim(latest, attemptId);
         }
 
         if (latest.getStatus()
@@ -300,12 +305,14 @@ public class InterviewWorkflowService {
 
     private void markEvaluationFailed(
             Long answerId,
+            String attemptId,
             RuntimeException primaryException
     ) {
         try {
             transactionService.markEvaluationFailed(
                     answerId,
-                    EVALUATION_ERROR_CODE
+                    EVALUATION_ERROR_CODE,
+                    attemptId
             );
         } catch (RuntimeException markFailedException) {
             primaryException.addSuppressed(
@@ -390,6 +397,7 @@ public class InterviewWorkflowService {
 
     private void applyDecision(
             Long answerId,
+            String attemptId,
             InterviewQuestion currentQuestion,
             InterviewQuestion mainQuestion,
             InterviewSession session,
@@ -405,6 +413,7 @@ public class InterviewWorkflowService {
         switch (result.decisionAction()) {
             case FOLLOW_UP -> handleFollowUp(
                     answerId,
+                    attemptId,
                     currentQuestion,
                     mainQuestion,
                     session,
@@ -421,7 +430,9 @@ public class InterviewWorkflowService {
                         answerId,
                         currentQuestion,
                         session,
-                        nextMain
+                        nextMain,
+                        attemptId,
+                        result.evaluation()
                 );
             }
             case FINISH -> {
@@ -434,7 +445,9 @@ public class InterviewWorkflowService {
                 transactionService.finishSession(
                         answerId,
                         currentQuestion,
-                        session
+                        session,
+                        attemptId,
+                        result.evaluation()
                 );
             }
         }
@@ -485,6 +498,7 @@ public class InterviewWorkflowService {
 
     private void handleFollowUp(
             Long answerId,
+            String attemptId,
             InterviewQuestion currentQuestion,
             InterviewQuestion mainQuestion,
             InterviewSession session,
@@ -526,7 +540,9 @@ public class InterviewWorkflowService {
                 answerId,
                 mainQuestion,
                 session,
-                followUpDraft
+                followUpDraft,
+                attemptId,
+                result.evaluation()
         );
     }
 

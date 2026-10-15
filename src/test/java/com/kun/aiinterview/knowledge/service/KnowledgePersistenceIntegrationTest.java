@@ -128,7 +128,7 @@ class KnowledgePersistenceIntegrationTest {
 
         assertEquals(
                 1,
-                knowledgeDocumentMapper.claimProcessing(inserted.getId())
+                knowledgeDocumentMapper.claimProcessing(inserted.getId(), "attempt-test")
         );
         KnowledgeDocument claimed = knowledgeDocumentMapper.selectById(
                 inserted.getId()
@@ -143,7 +143,7 @@ class KnowledgePersistenceIntegrationTest {
 
         assertEquals(
                 0,
-                knowledgeDocumentMapper.claimProcessing(inserted.getId())
+                knowledgeDocumentMapper.claimProcessing(inserted.getId(), "attempt-test")
         );
         assertEquals(
                 KnowledgeProcessingStatus.PROCESSING,
@@ -159,13 +159,14 @@ class KnowledgePersistenceIntegrationTest {
         assertEquals(
                 1,
                 knowledgeDocumentMapper.claimProcessing(
-                        processingDocument.getId()
+                        processingDocument.getId(),
+                        "attempt-test"
                 )
         );
 
         assertEquals(
                 1,
-                knowledgeDocumentMapper.markReady(processingDocument.getId())
+                knowledgeDocumentMapper.markReady(processingDocument.getId(), "attempt-test")
         );
         assertEquals(
                 KnowledgeProcessingStatus.READY,
@@ -174,12 +175,12 @@ class KnowledgePersistenceIntegrationTest {
         );
         assertEquals(
                 0,
-                knowledgeDocumentMapper.markReady(processingDocument.getId())
+                knowledgeDocumentMapper.markReady(processingDocument.getId(), "attempt-test")
         );
 
         assertEquals(
                 0,
-                knowledgeDocumentMapper.markReady(uploadedDocument.getId())
+                knowledgeDocumentMapper.markReady(uploadedDocument.getId(), "attempt-test")
         );
         assertEquals(
                 KnowledgeProcessingStatus.UPLOADED,
@@ -196,23 +197,25 @@ class KnowledgePersistenceIntegrationTest {
         assertEquals(
                 1,
                 knowledgeDocumentMapper.claimProcessing(
-                        processingDocument.getId()
+                        processingDocument.getId(),
+                        "attempt-test"
                 )
         );
         assertEquals(
                 1,
-                knowledgeDocumentMapper.claimProcessing(readyDocument.getId())
+                knowledgeDocumentMapper.claimProcessing(readyDocument.getId(), "attempt-test")
         );
         assertEquals(
                 1,
-                knowledgeDocumentMapper.markReady(readyDocument.getId())
+                knowledgeDocumentMapper.markReady(readyDocument.getId(), "attempt-test")
         );
 
         assertEquals(
                 1,
                 knowledgeDocumentMapper.markFailed(
                         processingDocument.getId(),
-                        "c1 integration test failure"
+                        "c1 integration test failure",
+                        "attempt-test"
                 )
         );
         KnowledgeDocument failed = knowledgeDocumentMapper.selectById(
@@ -233,14 +236,16 @@ class KnowledgePersistenceIntegrationTest {
                 0,
                 knowledgeDocumentMapper.markFailed(
                         uploadedDocument.getId(),
-                        "must not be stored"
+                        "must not be stored",
+                        "attempt-test"
                 )
         );
         assertEquals(
                 0,
                 knowledgeDocumentMapper.markFailed(
                         readyDocument.getId(),
-                        "must not be stored"
+                        "must not be stored",
+                        "attempt-test"
                 )
         );
         assertNull(
@@ -324,7 +329,7 @@ class KnowledgePersistenceIntegrationTest {
         KnowledgeDocument document = insertUploadedDocument();
         assertEquals(
                 1,
-                knowledgeDocumentMapper.claimProcessing(document.getId())
+                knowledgeDocumentMapper.claimProcessing(document.getId(), "attempt-test")
         );
         List<KnowledgeChunk> chunks = List.of(
                 chunk(document.getId(), 1, 1),
@@ -332,7 +337,9 @@ class KnowledgePersistenceIntegrationTest {
                 chunk(document.getId(), 1, 3)
         );
 
-        transactionService.persistChunksAndMarkReady(document.getId(), chunks);
+        chunks.forEach(chunk -> chunk.setVectorId("attempt-test-" + chunk.getChunkIndex()));
+
+        transactionService.persistChunksAndMarkReady(document.getId(), chunks, "attempt-test");
 
         assertAll(
                 () -> assertEquals(3, countChunks(document.getId())),
@@ -353,10 +360,11 @@ class KnowledgePersistenceIntegrationTest {
         );
 
         assertThrows(
-                BusinessException.class,
+                com.kun.aiinterview.common.exception.ConflictException.class,
                 () -> transactionService.persistChunksAndMarkReady(
                         uploadedDocument.getId(),
-                        chunks
+                        chunks,
+                        "attempt-test"
                 )
         );
 

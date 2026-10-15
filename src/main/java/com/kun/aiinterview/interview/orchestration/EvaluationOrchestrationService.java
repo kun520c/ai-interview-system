@@ -190,22 +190,7 @@ public class EvaluationOrchestrationService {
                         llmResult
                 );
 
-        int affectedRows =
-                answerEvaluationMapper
-                        .insertEvaluation(evaluation);
-
-        if (affectedRows != 1) {
-            throw new IllegalStateException(
-                    "AnswerEvaluation写入失败"
-            );
-        }
-
-        if (evaluation.getId() == null) {
-            throw new IllegalStateException(
-                    "AnswerEvaluation主键未回填"
-            );
-        }
-
+        // Persistence belongs to the fenced workflow transaction, after the model returns.
         return toResult(
                 evaluation,
                 decision.followUpTargetPointIds()
@@ -464,7 +449,9 @@ public class EvaluationOrchestrationService {
 
                 followUpTargetPointIds,
 
-                evaluation.getRetrievalBatchId()
+                evaluation.getRetrievalBatchId(),
+
+                evaluation
         );
     }
 }

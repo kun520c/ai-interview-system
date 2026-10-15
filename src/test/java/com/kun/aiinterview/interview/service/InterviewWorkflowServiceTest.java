@@ -37,6 +37,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -121,7 +122,7 @@ class InterviewWorkflowServiceTest {
                 evaluationOrchestrationService
         );
         order.verify(transactionService)
-                .tryClaimEvaluation(ANSWER_ID);
+                .tryClaimEvaluation(eq(ANSWER_ID), anyString());
         order.verify(evaluationOrchestrationService)
                 .evaluate(ANSWER_ID, true);
         order.verify(transactionService)
@@ -129,7 +130,9 @@ class InterviewWorkflowServiceTest {
                         eq(ANSWER_ID),
                         same(main),
                         same(session),
-                        draftCaptor.capture()
+                        draftCaptor.capture(),
+                        anyString(),
+                        any()
                 );
 
         InterviewQuestion draft = draftCaptor.getValue();
@@ -142,9 +145,9 @@ class InterviewWorkflowServiceTest {
         );
         assertThat(targetIds).containsExactly(101L, 103L);
         verify(transactionService, never())
-                .advanceToNextMain(any(), any(), any(), any());
+                .advanceToNextMain(any(), any(), any(), any(), anyString(), any());
         verify(transactionService, never())
-                .finishSession(any(), any(), any());
+                .finishSession(any(), any(), any(), anyString(), any());
     }
 
     @Test
@@ -178,20 +181,22 @@ class InterviewWorkflowServiceTest {
                 evaluationOrchestrationService
         );
         order.verify(transactionService)
-                .tryClaimEvaluation(ANSWER_ID);
+                .tryClaimEvaluation(eq(ANSWER_ID), anyString());
         order.verify(evaluationOrchestrationService)
                 .evaluate(ANSWER_ID, true);
         order.verify(transactionService)
                 .advanceToNextMain(
-                        ANSWER_ID,
-                        main,
-                        session,
-                        nextMain
-                );
+                eq(ANSWER_ID),
+                eq(main),
+                eq(session),
+                eq(nextMain),
+                anyString(),
+                any()
+        );
         verify(transactionService, never())
-                .moveToFollowUp(any(), any(), any(), any());
+                .moveToFollowUp(any(), any(), any(), any(), anyString(), any());
         verify(transactionService, never())
-                .finishSession(any(), any(), any());
+                .finishSession(any(), any(), any(), anyString(), any());
     }
 
     @Test
@@ -212,14 +217,16 @@ class InterviewWorkflowServiceTest {
         service.evaluateAnswer(ANSWER_ID);
 
         verify(transactionService).finishSession(
-                ANSWER_ID,
-                main,
-                session
+                eq(ANSWER_ID),
+                eq(main),
+                eq(session),
+                anyString(),
+                any()
         );
         verify(transactionService, never())
-                .moveToFollowUp(any(), any(), any(), any());
+                .moveToFollowUp(any(), any(), any(), any(), anyString(), any());
         verify(transactionService, never())
-                .advanceToNextMain(any(), any(), any(), any());
+                .advanceToNextMain(any(), any(), any(), any(), anyString(), any());
     }
 
     @Test
@@ -250,13 +257,15 @@ class InterviewWorkflowServiceTest {
                         MAIN_PLAN_ORDER
                 );
         verify(transactionService).advanceToNextMain(
-                ANSWER_ID,
-                followUp,
-                session,
-                nextMain
+                eq(ANSWER_ID),
+                eq(followUp),
+                eq(session),
+                eq(nextMain),
+                anyString(),
+                any()
         );
         verify(transactionService, never())
-                .moveToFollowUp(any(), any(), any(), any());
+                .moveToFollowUp(any(), any(), any(), any(), anyString(), any());
     }
 
     @Test
@@ -279,14 +288,16 @@ class InterviewWorkflowServiceTest {
         service.evaluateAnswer(ANSWER_ID);
 
         verify(transactionService).finishSession(
-                ANSWER_ID,
-                followUp,
-                session
+                eq(ANSWER_ID),
+                eq(followUp),
+                eq(session),
+                anyString(),
+                any()
         );
         verify(transactionService, never())
-                .moveToFollowUp(any(), any(), any(), any());
+                .moveToFollowUp(any(), any(), any(), any(), anyString(), any());
         verify(transactionService, never())
-                .advanceToNextMain(any(), any(), any(), any());
+                .advanceToNextMain(any(), any(), any(), any(), anyString(), any());
     }
 
     @Test
@@ -313,13 +324,14 @@ class InterviewWorkflowServiceTest {
                 evaluationOrchestrationService
         );
         order.verify(transactionService)
-                .tryClaimEvaluation(ANSWER_ID);
+                .tryClaimEvaluation(eq(ANSWER_ID), anyString());
         order.verify(evaluationOrchestrationService)
                 .evaluate(ANSWER_ID, false);
         order.verify(transactionService)
                 .markEvaluationFailed(
-                        ANSWER_ID,
-                        "EVALUATION_ERROR"
+                        eq(ANSWER_ID),
+                        eq("EVALUATION_ERROR"),
+                        anyString()
                 );
         verifyNoDecisionTransitions();
     }
@@ -342,14 +354,16 @@ class InterviewWorkflowServiceTest {
 
         service.evaluateAnswer(ANSWER_ID);
 
-        verify(transactionService).tryRetryEvaluation(ANSWER_ID);
+        verify(transactionService).tryRetryEvaluation(eq(ANSWER_ID), anyString());
         verify(transactionService, never())
-                .tryClaimEvaluation(ANSWER_ID);
+                .tryClaimEvaluation(eq(ANSWER_ID), anyString());
         verify(transactionService).advanceToNextMain(
-                ANSWER_ID,
-                main,
-                session,
-                nextMain
+                eq(ANSWER_ID),
+                eq(main),
+                eq(session),
+                eq(nextMain),
+                anyString(),
+                any()
         );
     }
 
@@ -371,17 +385,17 @@ class InterviewWorkflowServiceTest {
                 .thenReturn(main);
         when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
                 .thenReturn(session(MAIN_QUESTION_ID));
-        when(transactionService.tryClaimEvaluation(ANSWER_ID))
+        when(transactionService.tryClaimEvaluation(eq(ANSWER_ID), anyString()))
                 .thenReturn(false);
 
         assertThatThrownBy(() -> service.evaluateAnswer(ANSWER_ID))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("答案正在评估中，请稍后重试");
 
-        verify(transactionService).tryClaimEvaluation(ANSWER_ID);
+        verify(transactionService).tryClaimEvaluation(eq(ANSWER_ID), anyString());
         verifyNoInteractions(evaluationOrchestrationService);
         verify(transactionService, never())
-                .tryReclaimStaleEvaluating(any(), any());
+                .tryReclaimStaleEvaluating(any(), any(), anyString());
         verify(interviewQuestionMapper, never())
                 .findNextPendingMainQuestion(any(), any());
         verifyNoDecisionTransitions();
@@ -405,15 +419,15 @@ class InterviewWorkflowServiceTest {
                 .thenReturn(main);
         when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
                 .thenReturn(session(MAIN_QUESTION_ID));
-        when(transactionService.tryRetryEvaluation(ANSWER_ID))
+        when(transactionService.tryRetryEvaluation(eq(ANSWER_ID), anyString()))
                 .thenReturn(false);
 
         assertThatThrownBy(() -> service.evaluateAnswer(ANSWER_ID))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("答案正在评估中，请稍后重试");
 
-        verify(transactionService).tryRetryEvaluation(ANSWER_ID);
-        verify(transactionService, never()).tryClaimEvaluation(ANSWER_ID);
+        verify(transactionService).tryRetryEvaluation(eq(ANSWER_ID), anyString());
+        verify(transactionService, never()).tryClaimEvaluation(eq(ANSWER_ID), anyString());
         verifyNoInteractions(evaluationOrchestrationService);
         verify(interviewQuestionMapper, never())
                 .findNextPendingMainQuestion(any(), any());
@@ -437,14 +451,14 @@ class InterviewWorkflowServiceTest {
                 .thenReturn(main);
         when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
                 .thenReturn(session(MAIN_QUESTION_ID));
-        when(transactionService.tryClaimEvaluation(ANSWER_ID))
+        when(transactionService.tryClaimEvaluation(eq(ANSWER_ID), anyString()))
                 .thenReturn(false);
 
         EvaluationOrchestrationResult actual =
                 service.evaluateAnswer(ANSWER_ID);
 
         assertThat(actual).isNull();
-        verify(transactionService).tryClaimEvaluation(ANSWER_ID);
+        verify(transactionService).tryClaimEvaluation(eq(ANSWER_ID), anyString());
         verifyNoInteractions(evaluationOrchestrationService);
         verify(interviewQuestionMapper, never())
                 .findNextPendingMainQuestion(any(), any());
@@ -468,14 +482,14 @@ class InterviewWorkflowServiceTest {
                 .thenReturn(main);
         when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
                 .thenReturn(session(MAIN_QUESTION_ID));
-        when(transactionService.tryRetryEvaluation(ANSWER_ID))
+        when(transactionService.tryRetryEvaluation(eq(ANSWER_ID), anyString()))
                 .thenReturn(false);
 
         EvaluationOrchestrationResult actual =
                 service.evaluateAnswer(ANSWER_ID);
 
         assertThat(actual).isNull();
-        verify(transactionService).tryRetryEvaluation(ANSWER_ID);
+        verify(transactionService).tryRetryEvaluation(eq(ANSWER_ID), anyString());
         verifyNoInteractions(evaluationOrchestrationService);
         verifyNoDecisionTransitions();
     }
@@ -537,10 +551,10 @@ class InterviewWorkflowServiceTest {
                 .hasMessage("答案正在评估中，请稍后重试");
 
         verifyNoInteractions(evaluationOrchestrationService);
-        verify(transactionService, never()).tryClaimEvaluation(ANSWER_ID);
-        verify(transactionService, never()).tryRetryEvaluation(ANSWER_ID);
+        verify(transactionService, never()).tryClaimEvaluation(eq(ANSWER_ID), anyString());
+        verify(transactionService, never()).tryRetryEvaluation(eq(ANSWER_ID), anyString());
         verify(transactionService, never())
-                .tryReclaimStaleEvaluating(any(), any());
+                .tryReclaimStaleEvaluating(any(), any(), anyString());
         verify(interviewQuestionMapper, never())
                 .findNextPendingMainQuestion(any(), any());
     }
@@ -565,7 +579,8 @@ class InterviewWorkflowServiceTest {
                 .thenReturn(answer);
         when(transactionService.tryReclaimStaleEvaluating(
                 eq(ANSWER_ID),
-                any()
+                any(),
+                anyString()
         )).thenReturn(true);
         when(evaluationOrchestrationService.evaluate(
                 ANSWER_ID,
@@ -576,16 +591,19 @@ class InterviewWorkflowServiceTest {
 
         verify(transactionService).tryReclaimStaleEvaluating(
                 eq(ANSWER_ID),
-                any()
+                any(),
+                anyString()
         );
-        verify(transactionService, never()).tryClaimEvaluation(ANSWER_ID);
-        verify(transactionService, never()).tryRetryEvaluation(ANSWER_ID);
+        verify(transactionService, never()).tryClaimEvaluation(eq(ANSWER_ID), anyString());
+        verify(transactionService, never()).tryRetryEvaluation(eq(ANSWER_ID), anyString());
         verify(evaluationOrchestrationService).evaluate(ANSWER_ID, true);
         verify(transactionService).advanceToNextMain(
-                ANSWER_ID,
-                main,
-                session,
-                nextMain
+                eq(ANSWER_ID),
+                eq(main),
+                eq(session),
+                eq(nextMain),
+                anyString(),
+                any()
         );
     }
 
@@ -613,23 +631,26 @@ class InterviewWorkflowServiceTest {
                 .thenReturn(stale, failed);
         when(transactionService.tryReclaimStaleEvaluating(
                 eq(ANSWER_ID),
-                any()
+                any(),
+                anyString()
         )).thenReturn(false);
         when(evaluationOrchestrationService.evaluate(ANSWER_ID, true))
                 .thenReturn(finalResult(DecisionAction.NEXT_MAIN));
-        when(transactionService.tryRetryEvaluation(ANSWER_ID))
+        when(transactionService.tryRetryEvaluation(eq(ANSWER_ID), anyString()))
                 .thenReturn(true);
 
         service.evaluateAnswer(ANSWER_ID);
 
-        verify(transactionService, never()).tryClaimEvaluation(ANSWER_ID);
-        verify(transactionService).tryRetryEvaluation(ANSWER_ID);
+        verify(transactionService, never()).tryClaimEvaluation(eq(ANSWER_ID), anyString());
+        verify(transactionService).tryRetryEvaluation(eq(ANSWER_ID), anyString());
         verify(evaluationOrchestrationService).evaluate(ANSWER_ID, true);
         verify(transactionService).advanceToNextMain(
-                ANSWER_ID,
-                main,
-                session,
-                nextMain
+                eq(ANSWER_ID),
+                eq(main),
+                eq(session),
+                eq(nextMain),
+                anyString(),
+                any()
         );
     }
 
@@ -649,7 +670,8 @@ class InterviewWorkflowServiceTest {
                 .thenReturn(session(MAIN_QUESTION_ID));
         when(transactionService.tryReclaimStaleEvaluating(
                 eq(ANSWER_ID),
-                any()
+                any(),
+                anyString()
         )).thenReturn(false);
 
         assertThatThrownBy(() -> service.evaluateAnswer(ANSWER_ID))
@@ -657,7 +679,7 @@ class InterviewWorkflowServiceTest {
                 .hasMessage("答案正在评估中，请稍后重试");
 
         verifyNoInteractions(evaluationOrchestrationService);
-        verify(transactionService, never()).tryRetryEvaluation(ANSWER_ID);
+        verify(transactionService, never()).tryRetryEvaluation(eq(ANSWER_ID), anyString());
         verify(interviewQuestionMapper, never())
                 .findNextPendingMainQuestion(any(), any());
     }
@@ -793,13 +815,14 @@ class InterviewWorkflowServiceTest {
                 );
 
         verify(transactionService, never())
-                .finishSession(any(), any(), any());
+                .finishSession(any(), any(), any(), anyString(), any());
         verify(transactionService, never())
-                .advanceToNextMain(any(), any(), any(), any());
+                .advanceToNextMain(any(), any(), any(), any(), anyString(), any());
         verify(transactionService)
                 .markEvaluationFailed(
-                        ANSWER_ID,
-                        "EVALUATION_ERROR"
+                        eq(ANSWER_ID),
+                        eq("EVALUATION_ERROR"),
+                        anyString()
                 );
     }
 
@@ -832,7 +855,7 @@ class InterviewWorkflowServiceTest {
                 .hasMessage("FOLLOW_UP缺少追问内容");
 
         verify(transactionService, never())
-                .moveToFollowUp(any(), any(), any(), any());
+                .moveToFollowUp(any(), any(), any(), any(), anyString(), any());
     }
 
     @Test
@@ -860,7 +883,7 @@ class InterviewWorkflowServiceTest {
                 .hasMessage("评价结果决策非法");
 
         verify(transactionService, never())
-                .moveToFollowUp(any(), any(), any(), any());
+                .moveToFollowUp(any(), any(), any(), any(), anyString(), any());
     }
 
     @Test
@@ -890,7 +913,7 @@ class InterviewWorkflowServiceTest {
                 .hasMessage("只有MAIN评价可以进入FOLLOW_UP");
 
         verify(transactionService, never())
-                .moveToFollowUp(any(), any(), any(), any());
+                .moveToFollowUp(any(), any(), any(), any(), anyString(), any());
     }
 
     @Test
@@ -936,8 +959,9 @@ class InterviewWorkflowServiceTest {
         doThrow(markFailed)
                 .when(transactionService)
                 .markEvaluationFailed(
-                        ANSWER_ID,
-                        "EVALUATION_ERROR"
+                        eq(ANSWER_ID),
+                        eq("EVALUATION_ERROR"),
+                        anyString()
                 );
 
         assertThatThrownBy(
@@ -1000,11 +1024,11 @@ class InterviewWorkflowServiceTest {
             InterviewAnswerStatus answerStatus
     ) {
         if (answerStatus == InterviewAnswerStatus.SUBMITTED) {
-            when(transactionService.tryClaimEvaluation(ANSWER_ID))
+            when(transactionService.tryClaimEvaluation(eq(ANSWER_ID), anyString()))
                     .thenReturn(true);
         }
         if (answerStatus == InterviewAnswerStatus.FAILED) {
-            when(transactionService.tryRetryEvaluation(ANSWER_ID))
+            when(transactionService.tryRetryEvaluation(eq(ANSWER_ID), anyString()))
                     .thenReturn(true);
         }
     }
@@ -1120,16 +1144,17 @@ class InterviewWorkflowServiceTest {
                 action == DecisionAction.FOLLOW_UP,
                 suggestedFollowUp,
                 targetPointIds,
-                "retrieval-batch-1"
+                "retrieval-batch-1",
+                null
         );
     }
 
     private void verifyNoDecisionTransitions() {
         verify(transactionService, never())
-                .moveToFollowUp(any(), any(), any(), any());
+                .moveToFollowUp(any(), any(), any(), any(), anyString(), any());
         verify(transactionService, never())
-                .advanceToNextMain(any(), any(), any(), any());
+                .advanceToNextMain(any(), any(), any(), any(), anyString(), any());
         verify(transactionService, never())
-                .finishSession(any(), any(), any());
+                .finishSession(any(), any(), any(), anyString(), any());
     }
 }

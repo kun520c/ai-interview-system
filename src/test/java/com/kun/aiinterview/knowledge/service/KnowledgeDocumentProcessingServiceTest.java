@@ -99,7 +99,6 @@ class KnowledgeDocumentProcessingServiceTest {
     void setUp() {
         processingService = new KnowledgeDocumentProcessingService(
                 knowledgeDocumentMapper,
-                knowledgeChunkMapper,
                 knowledgeTextChunker,
                 embeddingClient,
                 vectorStoreClient,
@@ -121,7 +120,6 @@ class KnowledgeDocumentProcessingServiceTest {
 
         verifyNoInteractions(
                 knowledgeDocumentMapper,
-                knowledgeChunkMapper,
                 knowledgeTextChunker,
                 embeddingClient,
                 vectorStoreClient,
@@ -139,11 +137,10 @@ class KnowledgeDocumentProcessingServiceTest {
         );
 
         verify(knowledgeDocumentMapper).selectById(DOCUMENT_ID);
-        verify(knowledgeDocumentMapper, never()).claimProcessing(DOCUMENT_ID);
+        verify(knowledgeDocumentMapper, never()).claimProcessing(eq(DOCUMENT_ID), anyString());
         verify(knowledgeDocumentMapper, never())
-                .markFailed(eq(DOCUMENT_ID), anyString());
+                .markFailed(eq(DOCUMENT_ID), anyString(), anyString());
         verifyNoInteractions(
-                knowledgeChunkMapper,
                 knowledgeTextChunker,
                 embeddingClient,
                 vectorStoreClient,
@@ -155,19 +152,18 @@ class KnowledgeDocumentProcessingServiceTest {
     void givenClaimRejected_whenProcessing_thenStopsWithoutMarkingFailed() {
         when(knowledgeDocumentMapper.selectById(DOCUMENT_ID))
                 .thenReturn(uploadedDocument(), uploadedDocument());
-        when(knowledgeDocumentMapper.claimProcessing(DOCUMENT_ID)).thenReturn(0);
+        when(knowledgeDocumentMapper.claimProcessing(eq(DOCUMENT_ID), anyString())).thenReturn(0);
 
         assertThrows(
                 ConflictException.class,
                 () -> processingService.processDocument(DOCUMENT_ID)
         );
 
-        verify(knowledgeDocumentMapper).claimProcessing(DOCUMENT_ID);
+        verify(knowledgeDocumentMapper).claimProcessing(eq(DOCUMENT_ID), anyString());
         verify(knowledgeDocumentMapper, never())
-                .markFailed(eq(DOCUMENT_ID), anyString());
+                .markFailed(eq(DOCUMENT_ID), anyString(), anyString());
         verify(vectorStoreClient, never()).deleteByDocumentId(DOCUMENT_ID);
         verifyNoInteractions(
-                knowledgeChunkMapper,
                 knowledgeTextChunker,
                 embeddingClient,
                 transactionService
@@ -186,19 +182,12 @@ class KnowledgeDocumentProcessingServiceTest {
         InOrder calls = inOrder(
                 knowledgeDocumentMapper,
                 vectorStoreClient,
-                knowledgeChunkMapper,
                 knowledgeTextChunker,
                 embeddingClient,
                 transactionService
         );
         calls.verify(knowledgeDocumentMapper).selectById(DOCUMENT_ID);
-        calls.verify(knowledgeDocumentMapper).claimProcessing(DOCUMENT_ID);
-        calls.verify(knowledgeDocumentMapper).selectById(DOCUMENT_ID);
-        calls.verify(vectorStoreClient).deleteByDocumentId(DOCUMENT_ID);
-        calls.verify(knowledgeChunkMapper).deleteByDocumentIdAndVersion(
-                DOCUMENT_ID,
-                DOCUMENT_VERSION
-        );
+        calls.verify(knowledgeDocumentMapper).claimProcessing(eq(DOCUMENT_ID), anyString());
         calls.verify(knowledgeTextChunker).split(DOCUMENT_CONTENT);
         calls.verify(embeddingClient).embed(List.of(
                 "chunk one",
@@ -209,7 +198,8 @@ class KnowledgeDocumentProcessingServiceTest {
         calls.verify(transactionService)
                 .persistChunksAndMarkReady(
                         eq(DOCUMENT_ID),
-                        chunksCaptor.capture()
+                        chunksCaptor.capture(),
+                        anyString()
                 );
 
         List<KnowledgeChunk> chunks = chunksCaptor.getValue();
@@ -237,7 +227,7 @@ class KnowledgeDocumentProcessingServiceTest {
             assertThat(chunk.getEmbeddingVersion()).isEqualTo(EMBEDDING_VERSION);
             assertThat(chunk.getStatus()).isEqualTo(KnowledgeChunkStatus.ACTIVE);
             assertThat(chunk.getVectorId()).isNotBlank();
-            assertDoesNotThrow(() -> UUID.fromString(chunk.getVectorId()));
+            assertThat(chunk.getVectorId()).matches("[0-9a-f]{32}-" + draft.chunkIndex());
             assertThat(uniqueVectorIds.add(chunk.getVectorId())).isTrue();
 
             assertThat(vectorItem.vectorId()).isEqualTo(chunk.getVectorId());
@@ -251,7 +241,7 @@ class KnowledgeDocumentProcessingServiceTest {
 
         verify(vectorStoreClient, never()).deleteByVectorIds(anyList());
         verify(knowledgeDocumentMapper, never())
-                .markFailed(eq(DOCUMENT_ID), anyString());
+                .markFailed(eq(DOCUMENT_ID), anyString(), anyString());
     }
 
     @Test
@@ -268,12 +258,12 @@ class KnowledgeDocumentProcessingServiceTest {
         );
 
         assertSame(originalException, actual);
-        verify(vectorStoreClient).deleteByDocumentId(DOCUMENT_ID);
+        verify(vectorStoreClient, never()).deleteByDocumentId(DOCUMENT_ID);
         verify(vectorStoreClient, never()).insert(anyList());
         verify(vectorStoreClient, never()).deleteByVectorIds(anyList());
         verifyNoInteractions(embeddingClient, transactionService);
         verify(knowledgeDocumentMapper)
-                .markFailed(DOCUMENT_ID, "知识文档切片失败");
+                .markFailed(eq(DOCUMENT_ID), eq("知识文档切片失败"), anyString());
     }
 
     @Test
@@ -291,7 +281,7 @@ class KnowledgeDocumentProcessingServiceTest {
         assertSame(originalException, actual);
         verifyNoInsertOrCompensation();
         verify(knowledgeDocumentMapper)
-                .markFailed(DOCUMENT_ID, "知识文档Embedding生成失败");
+                .markFailed(eq(DOCUMENT_ID), eq("知识文档Embedding生成失败"), anyString());
     }
 
     @Test
@@ -310,7 +300,7 @@ class KnowledgeDocumentProcessingServiceTest {
 
         verifyNoInsertOrCompensation();
         verify(knowledgeDocumentMapper)
-                .markFailed(DOCUMENT_ID, "知识文档Embedding生成失败");
+                .markFailed(eq(DOCUMENT_ID), eq("知识文档Embedding生成失败"), anyString());
     }
 
     @ParameterizedTest(name = "{0}")
@@ -330,7 +320,7 @@ class KnowledgeDocumentProcessingServiceTest {
 
         verifyNoInsertOrCompensation();
         verify(knowledgeDocumentMapper)
-                .markFailed(DOCUMENT_ID, "知识文档Embedding生成失败");
+                .markFailed(eq(DOCUMENT_ID), eq("知识文档Embedding生成失败"), anyString());
     }
 
     @Test
@@ -355,7 +345,7 @@ class KnowledgeDocumentProcessingServiceTest {
 
         verifyNoInsertOrCompensation();
         verify(knowledgeDocumentMapper)
-                .markFailed(DOCUMENT_ID, "知识文档Embedding生成失败");
+                .markFailed(eq(DOCUMENT_ID), eq("知识文档Embedding生成失败"), anyString());
     }
 
     @Test
@@ -374,7 +364,7 @@ class KnowledgeDocumentProcessingServiceTest {
         assertCompensatedIdsMatchAttemptedInsert();
         verifyNoInteractions(transactionService);
         verify(knowledgeDocumentMapper)
-                .markFailed(DOCUMENT_ID, "Milvus向量写入失败");
+                .markFailed(eq(DOCUMENT_ID), eq("Milvus向量写入失败"), anyString());
     }
 
     @Test
@@ -383,7 +373,11 @@ class KnowledgeDocumentProcessingServiceTest {
         stubThroughEmbedding(outOfOrderEmbeddingResult());
         doThrow(originalException)
                 .when(transactionService)
-                .persistChunksAndMarkReady(eq(DOCUMENT_ID), anyList());
+                .persistChunksAndMarkReady(
+                eq(DOCUMENT_ID),
+                anyList(),
+                anyString()
+        );
         stubSuccessfulMarkFailed();
 
         RuntimeException actual = assertThrows(
@@ -394,8 +388,9 @@ class KnowledgeDocumentProcessingServiceTest {
         assertSame(originalException, actual);
         assertCompensatedIdsMatchAttemptedInsert();
         verify(knowledgeDocumentMapper).markFailed(
-                DOCUMENT_ID,
-                "知识切片持久化或文档状态更新失败"
+                eq(DOCUMENT_ID),
+                eq("知识切片持久化或文档状态更新失败"),
+                anyString()
         );
     }
 
@@ -407,7 +402,11 @@ class KnowledgeDocumentProcessingServiceTest {
         stubThroughEmbedding(outOfOrderEmbeddingResult());
         doThrow(originalException)
                 .when(transactionService)
-                .persistChunksAndMarkReady(eq(DOCUMENT_ID), anyList());
+                .persistChunksAndMarkReady(
+                eq(DOCUMENT_ID),
+                anyList(),
+                anyString()
+        );
         doThrow(compensationException)
                 .when(vectorStoreClient)
                 .deleteByVectorIds(anyList());
@@ -422,11 +421,12 @@ class KnowledgeDocumentProcessingServiceTest {
         assertThat(actual.getSuppressed()).containsExactly(compensationException);
         verify(vectorStoreClient).deleteByVectorIds(anyList());
         verify(knowledgeDocumentMapper).markFailed(
-                DOCUMENT_ID,
-                "知识切片持久化或文档状态更新失败"
+                eq(DOCUMENT_ID),
+                eq("知识切片持久化或文档状态更新失败"),
+                anyString()
         );
-        verify(knowledgeDocumentMapper).claimProcessing(DOCUMENT_ID);
-        verify(knowledgeDocumentMapper, never()).claimFailedProcessing(DOCUMENT_ID);
+        verify(knowledgeDocumentMapper).claimProcessing(eq(DOCUMENT_ID), anyString());
+        verify(knowledgeDocumentMapper, never()).claimFailedProcessing(eq(DOCUMENT_ID), anyString());
     }
 
     @Test
@@ -440,14 +440,17 @@ class KnowledgeDocumentProcessingServiceTest {
         );
 
         assertThat(exception.getMessage()).isEqualTo("文档已处理完成，不能重复处理");
-        verify(knowledgeDocumentMapper, never()).claimProcessing(DOCUMENT_ID);
-        verify(knowledgeDocumentMapper, never()).claimFailedProcessing(DOCUMENT_ID);
+        verify(knowledgeDocumentMapper, never()).claimProcessing(eq(DOCUMENT_ID), anyString());
+        verify(knowledgeDocumentMapper, never()).claimFailedProcessing(eq(DOCUMENT_ID), anyString());
         verify(knowledgeDocumentMapper, never())
-                .reclaimStaleProcessing(eq(DOCUMENT_ID), any());
+                .reclaimStaleProcessing(
+                eq(DOCUMENT_ID),
+                any(),
+                anyString()
+        );
         verify(vectorStoreClient, never()).deleteByDocumentId(DOCUMENT_ID);
         verify(vectorStoreClient, never()).insert(anyList());
         verifyNoInteractions(
-                knowledgeChunkMapper,
                 knowledgeTextChunker,
                 embeddingClient,
                 transactionService
@@ -466,13 +469,16 @@ class KnowledgeDocumentProcessingServiceTest {
 
         assertThat(exception.getMessage()).isEqualTo("文档正在处理中，请稍后重试");
         verify(knowledgeDocumentMapper, never())
-                .reclaimStaleProcessing(eq(DOCUMENT_ID), any());
-        verify(knowledgeDocumentMapper, never()).claimProcessing(DOCUMENT_ID);
-        verify(knowledgeDocumentMapper, never()).claimFailedProcessing(DOCUMENT_ID);
+                .reclaimStaleProcessing(
+                eq(DOCUMENT_ID),
+                any(),
+                anyString()
+        );
+        verify(knowledgeDocumentMapper, never()).claimProcessing(eq(DOCUMENT_ID), anyString());
+        verify(knowledgeDocumentMapper, never()).claimFailedProcessing(eq(DOCUMENT_ID), anyString());
         verify(vectorStoreClient, never()).deleteByDocumentId(DOCUMENT_ID);
         verify(vectorStoreClient, never()).insert(anyList());
         verifyNoInteractions(
-                knowledgeChunkMapper,
                 knowledgeTextChunker,
                 embeddingClient,
                 transactionService
@@ -480,7 +486,7 @@ class KnowledgeDocumentProcessingServiceTest {
     }
 
     @Test
-    void givenFailedDocument_whenRetrying_thenDeletesByDocumentIdBeforeInsert() {
+    void givenFailedDocument_whenRetrying_thenUsesOnlyAttemptScopedWrites() {
         stubFailedRetry(outOfOrderEmbeddingResult());
 
         processingService.processDocument(DOCUMENT_ID);
@@ -488,32 +494,26 @@ class KnowledgeDocumentProcessingServiceTest {
         InOrder order = inOrder(
                 knowledgeDocumentMapper,
                 vectorStoreClient,
-                knowledgeChunkMapper,
                 knowledgeTextChunker,
                 embeddingClient,
                 transactionService
         );
         order.verify(knowledgeDocumentMapper).selectById(DOCUMENT_ID);
-        order.verify(knowledgeDocumentMapper).claimFailedProcessing(DOCUMENT_ID);
-        order.verify(knowledgeDocumentMapper).selectById(DOCUMENT_ID);
-        order.verify(vectorStoreClient).deleteByDocumentId(DOCUMENT_ID);
-        order.verify(knowledgeChunkMapper).deleteByDocumentIdAndVersion(
-                DOCUMENT_ID,
-                DOCUMENT_VERSION
-        );
+        order.verify(knowledgeDocumentMapper).claimFailedProcessing(eq(DOCUMENT_ID), anyString());
         order.verify(knowledgeTextChunker).split(DOCUMENT_CONTENT);
         order.verify(embeddingClient).embed(chunkTexts());
         order.verify(vectorStoreClient).insert(anyList());
         order.verify(transactionService).persistChunksAndMarkReady(
                 eq(DOCUMENT_ID),
-                anyList()
+                anyList(),
+                anyString()
         );
-        verify(knowledgeDocumentMapper, never()).claimProcessing(DOCUMENT_ID);
+        verify(knowledgeDocumentMapper, never()).claimProcessing(eq(DOCUMENT_ID), anyString());
         verify(vectorStoreClient, never()).deleteByVectorIds(anyList());
     }
 
     @Test
-    void givenStaleProcessingDocument_whenRecovering_thenReclaimsAndDeletesByDocumentIdBeforeInsert() {
+    void givenStaleProcessingDocument_whenRecovering_thenReclaimsWithFreshAttempt() {
         stubStaleProcessingRetry(outOfOrderEmbeddingResult());
 
         processingService.processDocument(DOCUMENT_ID);
@@ -525,25 +525,26 @@ class KnowledgeDocumentProcessingServiceTest {
         order.verify(knowledgeDocumentMapper).selectById(DOCUMENT_ID);
         order.verify(knowledgeDocumentMapper).reclaimStaleProcessing(
                 eq(DOCUMENT_ID),
-                any()
+                any(),
+                anyString()
         );
-        order.verify(knowledgeDocumentMapper).selectById(DOCUMENT_ID);
-        order.verify(vectorStoreClient).deleteByDocumentId(DOCUMENT_ID);
         order.verify(vectorStoreClient).insert(anyList());
-        verify(knowledgeDocumentMapper, never()).claimProcessing(DOCUMENT_ID);
-        verify(knowledgeDocumentMapper, never()).claimFailedProcessing(DOCUMENT_ID);
+        verify(knowledgeDocumentMapper, never()).claimProcessing(eq(DOCUMENT_ID), anyString());
+        verify(knowledgeDocumentMapper, never()).claimFailedProcessing(eq(DOCUMENT_ID), anyString());
     }
 
     @Test
-    void givenCompensationDeleteFailure_whenRetryingFailedDocument_thenCleansByDocumentIdBeforeNewInsert() {
+    void givenCompensationDeleteFailure_whenRetryingFailedDocument_thenKeepsNewAttemptIsolated() {
         RuntimeException originalException = new RuntimeException("mysql failure");
         RuntimeException compensationException =
                 new RuntimeException("compensation failure");
         stubUploadedThenFailedRetry(outOfOrderEmbeddingResult());
-        doThrow(originalException)
-                .doNothing()
-                .when(transactionService)
-                .persistChunksAndMarkReady(eq(DOCUMENT_ID), anyList());
+        when(transactionService.persistChunksAndMarkReady(
+                eq(DOCUMENT_ID),
+                anyList(),
+                anyString()
+        ))
+                .thenThrow(originalException).thenReturn(List.of());
         doThrow(compensationException)
                 .when(vectorStoreClient)
                 .deleteByVectorIds(anyList());
@@ -559,21 +560,21 @@ class KnowledgeDocumentProcessingServiceTest {
         processingService.processDocument(DOCUMENT_ID);
 
         InOrder order = inOrder(vectorStoreClient, transactionService);
-        order.verify(vectorStoreClient).deleteByDocumentId(DOCUMENT_ID);
         order.verify(vectorStoreClient).insert(anyList());
         order.verify(transactionService).persistChunksAndMarkReady(
                 eq(DOCUMENT_ID),
-                anyList()
+                anyList(),
+                anyString()
         );
         order.verify(vectorStoreClient).deleteByVectorIds(anyList());
-        order.verify(vectorStoreClient).deleteByDocumentId(DOCUMENT_ID);
         order.verify(vectorStoreClient).insert(anyList());
         order.verify(transactionService).persistChunksAndMarkReady(
                 eq(DOCUMENT_ID),
-                anyList()
+                anyList(),
+                anyString()
         );
-        verify(knowledgeDocumentMapper).claimFailedProcessing(DOCUMENT_ID);
-        verify(vectorStoreClient, times(2)).deleteByDocumentId(DOCUMENT_ID);
+        verify(knowledgeDocumentMapper).claimFailedProcessing(eq(DOCUMENT_ID), anyString());
+        verify(vectorStoreClient, never()).deleteByDocumentId(DOCUMENT_ID);
         verify(vectorStoreClient, times(2)).insert(anyList());
     }
 
@@ -583,7 +584,8 @@ class KnowledgeDocumentProcessingServiceTest {
                 .thenReturn(staleProcessingDocument());
         when(knowledgeDocumentMapper.reclaimStaleProcessing(
                 eq(DOCUMENT_ID),
-                any()
+                any(),
+                anyString()
         )).thenReturn(0);
 
         ConflictException exception = assertThrows(
@@ -594,12 +596,12 @@ class KnowledgeDocumentProcessingServiceTest {
         assertThat(exception.getMessage()).isEqualTo("文档正在处理中，请稍后重试");
         verify(knowledgeDocumentMapper).reclaimStaleProcessing(
                 eq(DOCUMENT_ID),
-                any()
+                any(),
+                anyString()
         );
         verify(vectorStoreClient, never()).deleteByDocumentId(DOCUMENT_ID);
         verify(vectorStoreClient, never()).insert(anyList());
         verifyNoInteractions(
-                knowledgeChunkMapper,
                 knowledgeTextChunker,
                 embeddingClient,
                 transactionService
@@ -611,7 +613,7 @@ class KnowledgeDocumentProcessingServiceTest {
         RuntimeException originalException = new RuntimeException("embedding failure");
         stubThroughChunking();
         when(embeddingClient.embed(chunkTexts())).thenThrow(originalException);
-        when(knowledgeDocumentMapper.markFailed(eq(DOCUMENT_ID), anyString()))
+        when(knowledgeDocumentMapper.markFailed(eq(DOCUMENT_ID), anyString(), anyString()))
                 .thenReturn(0);
 
         RuntimeException actual = assertThrows(
@@ -636,7 +638,7 @@ class KnowledgeDocumentProcessingServiceTest {
         RuntimeException statusException = new RuntimeException("database unavailable");
         stubThroughChunking();
         when(embeddingClient.embed(chunkTexts())).thenThrow(originalException);
-        when(knowledgeDocumentMapper.markFailed(eq(DOCUMENT_ID), anyString()))
+        when(knowledgeDocumentMapper.markFailed(eq(DOCUMENT_ID), anyString(), anyString()))
                 .thenThrow(statusException);
 
         RuntimeException actual = assertThrows(
@@ -651,13 +653,13 @@ class KnowledgeDocumentProcessingServiceTest {
     private void stubClaimedDocument() {
         when(knowledgeDocumentMapper.selectById(DOCUMENT_ID))
                 .thenReturn(uploadedDocument(), processingDocument(null));
-        when(knowledgeDocumentMapper.claimProcessing(DOCUMENT_ID)).thenReturn(1);
+        when(knowledgeDocumentMapper.claimProcessing(eq(DOCUMENT_ID), anyString())).thenReturn(1);
     }
 
     private void stubFailedRetry(EmbeddingBatchResult embeddingResult) {
         when(knowledgeDocumentMapper.selectById(DOCUMENT_ID))
                 .thenReturn(failedDocument(), processingDocument(null));
-        when(knowledgeDocumentMapper.claimFailedProcessing(DOCUMENT_ID))
+        when(knowledgeDocumentMapper.claimFailedProcessing(eq(DOCUMENT_ID), anyString()))
                 .thenReturn(1);
         when(knowledgeTextChunker.split(DOCUMENT_CONTENT)).thenReturn(DRAFTS);
         when(embeddingClient.embed(chunkTexts())).thenReturn(embeddingResult);
@@ -671,7 +673,8 @@ class KnowledgeDocumentProcessingServiceTest {
                 );
         when(knowledgeDocumentMapper.reclaimStaleProcessing(
                 eq(DOCUMENT_ID),
-                any()
+                any(),
+                anyString()
         )).thenReturn(1);
         when(knowledgeTextChunker.split(DOCUMENT_CONTENT)).thenReturn(DRAFTS);
         when(embeddingClient.embed(chunkTexts())).thenReturn(embeddingResult);
@@ -681,12 +684,11 @@ class KnowledgeDocumentProcessingServiceTest {
         when(knowledgeDocumentMapper.selectById(DOCUMENT_ID))
                 .thenReturn(
                         uploadedDocument(),
-                        processingDocument(null),
                         failedDocument(),
-                        processingDocument(null)
+                        failedDocument()
                 );
-        when(knowledgeDocumentMapper.claimProcessing(DOCUMENT_ID)).thenReturn(1);
-        when(knowledgeDocumentMapper.claimFailedProcessing(DOCUMENT_ID))
+        when(knowledgeDocumentMapper.claimProcessing(eq(DOCUMENT_ID), anyString())).thenReturn(1);
+        when(knowledgeDocumentMapper.claimFailedProcessing(eq(DOCUMENT_ID), anyString()))
                 .thenReturn(1);
         when(knowledgeTextChunker.split(DOCUMENT_CONTENT)).thenReturn(DRAFTS);
         when(embeddingClient.embed(chunkTexts())).thenReturn(embeddingResult);
@@ -703,12 +705,12 @@ class KnowledgeDocumentProcessingServiceTest {
     }
 
     private void stubSuccessfulMarkFailed() {
-        when(knowledgeDocumentMapper.markFailed(eq(DOCUMENT_ID), anyString()))
+        when(knowledgeDocumentMapper.markFailed(eq(DOCUMENT_ID), anyString(), anyString()))
                 .thenReturn(1);
     }
 
     private void verifyNoInsertOrCompensation() {
-        verify(vectorStoreClient).deleteByDocumentId(DOCUMENT_ID);
+        verify(vectorStoreClient, never()).deleteByDocumentId(DOCUMENT_ID);
         verify(vectorStoreClient, never()).insert(anyList());
         verify(vectorStoreClient, never()).deleteByVectorIds(anyList());
         verifyNoInteractions(transactionService);

@@ -1,5 +1,8 @@
 package com.kun.aiinterview.interview.service;
 
+import com.kun.aiinterview.interview.enums.DecisionAction;
+import com.kun.aiinterview.interview.enums.EvaluationPhase;
+import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.entity.InterviewQuestion;
 import com.kun.aiinterview.interview.entity.InterviewSession;
 import com.kun.aiinterview.interview.enums.InterviewAnswerStatus;
@@ -45,6 +48,7 @@ class InterviewWorkflowTransactionServiceIntegrationTest {
     @AfterEach
     void cleanUp() {
         if (answerId != null) {
+            jdbcTemplate.update("DELETE FROM answer_evaluation WHERE answer_id = ?", answerId);
             jdbcTemplate.update(
                     "DELETE FROM interview_answer WHERE id = ?",
                     answerId
@@ -87,9 +91,22 @@ class InterviewWorkflowTransactionServiceIntegrationTest {
         }
     }
 
+    private AnswerEvaluation evaluation() {
+        return AnswerEvaluation.builder()
+                .answerId(answerId).mainInterviewQuestionId(currentQuestionId)
+                .evaluationPhase(EvaluationPhase.FINAL)
+                .decisionAction(DecisionAction.NEXT_MAIN)
+                .correctnessScore(16).completenessScore(16).depthScore(16).clarityScore(16).practiceScore(16)
+                .totalScore(80).level("GOOD").strengths("[]").missingPoints("[]").correction("")
+                .scoringPointResults("[]").followUpRecommended(false).retrievalBatchId("test-batch")
+                .llmModel("fake").promptVersion("fake").evaluationStandardVersion("fake").rawResult("{}")
+                .build();
+    }
+
     @Test
     void shouldRollbackEarlierUpdatesWhenSessionCasFails() {
         prepareWorkflowState();
+        jdbcTemplate.update("UPDATE interview_answer SET attempt_id = ? WHERE id = ?", "attempt-test", answerId);
 
         InterviewQuestion currentQuestion =
                 interviewQuestionMapper.getInterviewQuestionById(
@@ -108,7 +125,9 @@ class InterviewWorkflowTransactionServiceIntegrationTest {
                         answerId,
                         currentQuestion,
                         staleSession,
-                        nextQuestion
+                        nextQuestion,
+                        "attempt-test",
+                        evaluation()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -126,6 +145,14 @@ class InterviewWorkflowTransactionServiceIntegrationTest {
         assertThat(unchangedSession.getCompletedQuestionCount())
                 .isZero();
         assertThat(unchangedSession.getVersion()).isZero();
+        assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM answer_evaluation WHERE answer_id = ?", Long.class, answerId)).isZero();
+        transactionService.markEvaluationFailed(answerId, "TEST", "attempt-test");
+        assertThat(transactionService.tryRetryEvaluation(answerId, "retry-attempt")).isTrue();
+        transactionService.advanceToNextMain(answerId, currentQuestion, unchangedSession, nextQuestion,
+                "retry-attempt", evaluation());
+        assertThat(answerStatus()).isEqualTo("EVALUATED");
+        assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM answer_evaluation WHERE answer_id = ?", Long.class, answerId)).isEqualTo(1);
+
     }
 
     private void prepareWorkflowState() {

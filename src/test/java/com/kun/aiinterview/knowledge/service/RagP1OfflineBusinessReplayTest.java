@@ -147,13 +147,6 @@ class RagP1OfflineBusinessReplayTest {
             traceHits.addAll(inserted);
             return inserted.size();
         });
-        var saved = new ArrayList<AnswerEvaluation>();
-        when(answers.insertEvaluation(any())).thenAnswer(inv -> {
-            AnswerEvaluation evaluation = inv.getArgument(0);
-            evaluation.setId(10L);
-            saved.add(evaluation);
-            return 1;
-        });
         var prompts = new ArrayList<EvaluationPrompt>();
         JudgeProvider offlineJudge = (c, prompt) -> {
             prompts.add(prompt);
@@ -169,8 +162,9 @@ class RagP1OfflineBusinessReplayTest {
         var result = orchestrator.evaluate(1L, false);
         assertThat(result.totalScore()).isEqualTo(70);
         assertThat(result.evaluationPhase()).isEqualTo(EvaluationPhase.FINAL);
-        assertThat(saved).hasSize(1);
-        assertThat(saved.get(0).getRetrievalBatchId()).isEqualTo(traceBatches.get(0).getRetrievalBatchId());
+        assertThat(result.evaluation()).isNotNull();
+        verify(answers, never()).insertEvaluation(any());
+        assertThat(result.evaluation().getRetrievalBatchId()).isEqualTo(traceBatches.get(0).getRetrievalBatchId());
         assertThat(traceBatches.get(0).getRawHitCount()).isEqualTo(5);
         assertThat(traceBatches.get(0).getEvidenceHitCount()).isEqualTo(retained.size());
         var snapshot = JSON.readTree(traceBatches.get(0).getFilterSnapshot());
