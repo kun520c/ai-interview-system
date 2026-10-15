@@ -6,6 +6,7 @@ import com.kun.aiinterview.knowledge.embedding.EmbeddingVector;
 import com.kun.aiinterview.knowledge.mapper.KnowledgeChunkMapper;
 import com.kun.aiinterview.knowledge.retrieval.KnowledgeRetrievalRow;
 import com.kun.aiinterview.knowledge.retrieval.RetrievalResult;
+import com.kun.aiinterview.knowledge.retrieval.RetrievalProperties;
 import com.kun.aiinterview.knowledge.retrieval.RetrievedChunk;
 import com.kun.aiinterview.knowledge.vector.VectorSearchHit;
 import com.kun.aiinterview.knowledge.vector.VectorStoreClient;
@@ -30,15 +31,18 @@ public class KnowledgeRetrievalService {
     private final EmbeddingClient embeddingClient;
     private final VectorStoreClient vectorStoreClient;
     private final KnowledgeChunkMapper knowledgeChunkMapper;
+    private final RetrievalProperties retrievalProperties;
 
     public KnowledgeRetrievalService(
             EmbeddingClient embeddingClient,
             VectorStoreClient vectorStoreClient,
-            KnowledgeChunkMapper knowledgeChunkMapper
+            KnowledgeChunkMapper knowledgeChunkMapper,
+            RetrievalProperties retrievalProperties
     ) {
         this.embeddingClient = embeddingClient;
         this.vectorStoreClient = vectorStoreClient;
         this.knowledgeChunkMapper = knowledgeChunkMapper;
+        this.retrievalProperties = retrievalProperties;
     }
 
     public RetrievalResult retrieve(
@@ -111,9 +115,17 @@ public class KnowledgeRetrievalService {
 
         List<String> vectorIds =
                 hits.stream()
+                        .filter(this::passesCosineThreshold)
                         .map(VectorSearchHit::vectorId)
                         .distinct()
                         .toList();
+
+        if (vectorIds.isEmpty()) {
+            return new RetrievalResult(
+                    normalizedQuery, topK, embeddingResult.model(),
+                    embeddingResult.profileVersion(), hits, List.of()
+            );
+        }
 
         List<KnowledgeRetrievalRow> rows =
                 knowledgeChunkMapper
@@ -138,6 +150,10 @@ public class KnowledgeRetrievalService {
         for (int i = 0;i < hits.size();i++) {
 
             VectorSearchHit hit = hits.get(i);
+
+            if (!passesCosineThreshold(hit)) {
+                continue;
+            }
 
             KnowledgeRetrievalRow row =
                     rowByVectorId.get(
@@ -195,5 +211,11 @@ public class KnowledgeRetrievalService {
                 hits,
                 retrievedChunks
         );
+    }
+
+    private boolean passesCosineThreshold(VectorSearchHit hit) {
+        // VectorSearchHit already rejects non-finite scores. Never rescale the raw COSINE value.
+        return !retrievalProperties.isCosineThresholdEnabled()
+                || hit.similarityScore() >= retrievalProperties.getMinCosineScore();
     }
 }

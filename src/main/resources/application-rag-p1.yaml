@@ -1,0 +1,5 @@
+# Opt-in candidate experiment only. Does not enable Milvus, models, or change data targets.
+rag:
+  retrieval:
+    cosine-threshold-enabled: true
+    min-cosine-score: 0.70

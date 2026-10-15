@@ -9,6 +9,7 @@ import com.kun.aiinterview.knowledge.enums.KnowledgeCategory;
 import com.kun.aiinterview.knowledge.mapper.RagHitLogMapper;
 import com.kun.aiinterview.knowledge.mapper.RagRetrievalBatchMapper;
 import com.kun.aiinterview.knowledge.retrieval.RetrievedChunk;
+import com.kun.aiinterview.knowledge.retrieval.RetrievalProperties;
 import com.kun.aiinterview.knowledge.vector.VectorSearchHit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,21 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RagTracePersistenceServiceTest {
 
+    private static final String CANONICAL_FILTER_SNAPSHOT_V1 = """
+            {
+              "filterVersion": "evaluation-rag-filter-v1",
+              "milvus": {
+                "requireEmbeddingVersionMatch": true
+              },
+              "mysql": {
+                "chunkStatus": "ACTIVE",
+                "documentProcessingStatus": "READY",
+                "requireCurrentDocumentVersion": true,
+                "requireEmbeddingModelMatch": true,
+                "requireEmbeddingVersionMatch": true
+              }
+            }
+            """;
     private static final String QUERY = "HashMap 扩容机制";
     private static final String EMBEDDING_MODEL = "test-embedding-model";
     private static final String EMBEDDING_VERSION = "test-profile-v1";
@@ -62,7 +78,8 @@ class RagTracePersistenceServiceTest {
         objectMapper = new ObjectMapper();
         service = new RagTracePersistenceService(
                 ragRetrievalBatchMapper,
-                ragHitLogMapper
+                ragHitLogMapper,
+                new RetrievalProperties()
         );
     }
 
@@ -220,6 +237,42 @@ class RagTracePersistenceServiceTest {
         verifyNoInteractions(ragRetrievalBatchMapper, ragHitLogMapper);
     }
 
+    @Test
+    void shouldRecordV2SnapshotOnlyWhenThresholdIsEnabled() throws Exception {
+        RetrievalProperties properties = new RetrievalProperties();
+        properties.setCosineThresholdEnabled(true);
+        properties.setMinCosineScore(0.70F);
+        RagTracePersistenceService enabledService = new RagTracePersistenceService(
+                ragRetrievalBatchMapper,
+                ragHitLogMapper,
+                properties
+        );
+        when(ragRetrievalBatchMapper.insertBatch(any())).thenReturn(1);
+        when(ragHitLogMapper.batchInsert(any())).thenReturn(1);
+
+        enabledService.persist(
+                UUID.randomUUID().toString(),
+                ANSWER_ID,
+                retrievalResult(5, List.of(evidence(1, 101L, 0.91D)))
+        );
+
+        verify(ragRetrievalBatchMapper).insertBatch(batchCaptor.capture());
+        verify(ragHitLogMapper).batchInsert(hitsCaptor.capture());
+        JsonNode json = objectMapper.readTree(batchCaptor.getValue().getFilterSnapshot());
+        assertThat(json.path("filterVersion").asText())
+                .isEqualTo("evaluation-rag-filter-v2");
+        assertThat(json.path("cosineCandidate").path("enabled").asBoolean()).isTrue();
+        assertThat(json.path("cosineCandidate").path("metric").asText()).isEqualTo("COSINE");
+        assertThat(json.path("cosineCandidate").path("scorePrecision").asText())
+                .isEqualTo("FLOAT32");
+        assertThat((float) json.path("cosineCandidate").path("minScore").asDouble())
+                .isEqualTo(0.70F);
+        assertThat(json.path("milvus").path("requireEmbeddingVersionMatch").asBoolean()).isTrue();
+        assertThat(json.path("mysql").path("chunkStatus").asText()).isEqualTo("ACTIVE");
+        assertThat(objectMapper.readTree(hitsCaptor.getValue().getFirst().getFilterSnapshot()))
+                .isEqualTo(json);
+    }
+
     private EvaluationRetrievalResult retrievalResult(
             int rawHitCount,
             List<RetrievedChunk> evidence
@@ -266,6 +319,8 @@ class RagTracePersistenceServiceTest {
 
     private void assertFilterSnapshot(String snapshot) throws Exception {
         JsonNode json = objectMapper.readTree(snapshot);
+        assertThat(json).isEqualTo(objectMapper.readTree(CANONICAL_FILTER_SNAPSHOT_V1));
+        assertThat(json.has("cosineCandidate")).isFalse();
         assertThat(json.path("filterVersion").asText())
                 .isEqualTo("evaluation-rag-filter-v1");
         assertThat(json.path("milvus")

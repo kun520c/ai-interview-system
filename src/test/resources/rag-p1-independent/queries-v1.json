@@ -1,0 +1,782 @@
+{
+  "schemaVersion": "rag-p1-independent-query-set-v1",
+  "datasetId": "RAG_P1_INDEPENDENT_16_20261012_V1",
+  "frozenAtUtc": "2026-10-12T03:56:49.545056+00:00",
+  "queryCount": 16,
+  "authoringProvenance": "Assistant-authored technical questions after read-only source-document review; no result preview",
+  "annotationStatus": "NOT_STARTED",
+  "liveRetrievalStatus": "NOT_RUN",
+  "queryBuilder": "com.kun.aiinterview.interview.evaluation.EvaluationRagQueryBuilder",
+  "syntheticContextOnly": true,
+  "expectedScoreLabelsProvided": false,
+  "embeddingContract": {
+    "model": "qwen3.7-text-embedding",
+    "dimension": 1024,
+    "profileVersion": "qwen3.7-text-embedding-1024-dense-v1",
+    "metric": "COSINE",
+    "topK": 5
+  },
+  "isolation": {
+    "appendToExistingGold": false,
+    "applyAiLabelProposals": false,
+    "excludedDatasetSha256": {
+      "docs/evaluation/data/existing-golden.json": "cced7360896674f79741fd39e2239ad0b894b6b57d4b2694d134c87475903e93",
+      "docs/evaluation/data/expanded-golden.json": "6fd8fd5a0e582e7e985420e047747033b14330100f8a69dac4bfe9e032229b0c",
+      "docs/rag/evaluation/PHASE_4C2_HOLDOUT_QUERY_SET.json": "7cc73a8c8eaf438243b1109ae2bd8a4e62d2a7982551b5dbc6c0309cb6e68e95",
+      "src/test/resources/rag-p1/local-replay.json": "2af10ba0f88e40505771d16835645e7929771d89c25148790ef23f52bfb7c4ae"
+    }
+  },
+  "corpusDocumentSha256": {
+    "docs/rag/source-documents/e01_java21_interface_vs_abstract_class.md": "4b82a2724e53946fffa082560fde1c348201114ac4f490e409c2ddbba5071de0",
+    "docs/rag/source-documents/e02_java21_arraylist_vs_linkedlist.md": "8863861e7379cbb3120926a649eb0243945861732aec9975ce97cdcb7c640dec",
+    "docs/rag/source-documents/e03_spring_6_2_ioc_di.md": "d71d9af393307ba3455dab8ffa945e5700f5bec0d3849bae7d37676bbbd352c6",
+    "docs/rag/source-documents/e04_mysql_8_0_transaction_acid.md": "fe159ec2e2c0de9c41b78b496e86cfcea89f846efc69940421306d8ba3613ef2",
+    "docs/rag/source-documents/e05_rfc9293_rfc768_tcp_vs_udp.md": "caa8af92609855354e83f0037af99e42bb9b3fc65125196103730bb2bf258d26",
+    "docs/rag/source-documents/h01_java21_generic_type_erasure.md": "c11ca06913e220726cb279a36ee65124e5e52c4557cb272c1c37b78975fb565b",
+    "docs/rag/source-documents/h02_openjdk8u_concurrent_hashmap.md": "7058c59a4c4c11cda492cb6cc565b85c79a09cbec5b7e3cbf1d9587f30114617",
+    "docs/rag/source-documents/h03_hotspot21_g1_gc.md": "3879a27607bfd98ae4e28c329a63c47474fbe75e25607cc660b7a85c89851603",
+    "docs/rag/source-documents/h04_java21_thread_pool_design.md": "d3c05bc195af157dade05d3e99d312668cb7150206601f3542be0e5b2116c8dc",
+    "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66",
+    "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea",
+    "docs/rag/source-documents/h07_redis_distributed_lock_baseline.md": "e79aff2f6d42ce77989566e6d7d611de77ac5720f962f325ffbae307a1ae88c7",
+    "docs/rag/source-documents/h08_rfc9293_tcp_connection_lifecycle.md": "82dec99995bddc1c7cd17705743598b1d57ae265da80ececb5220b46e8b5df44",
+    "docs/rag/source-documents/h09_mysql_8_0_inventory_idempotency_scenario.md": "2ace6486655a2242f4a616b85c57d0cc9dae3f7130381d49326615d6cd72f65b",
+    "docs/rag/source-documents/m01_java21_equals_hashcode_contract.md": "27a74088733409277eeb02d7e67b02722af8a2a1ec1d40ff1efac5c5596d0387",
+    "docs/rag/source-documents/m02_hashmap_jdk8u_put_resize_treeify.md": "c5e93fa3c3d3af8fb6e78b60db2d309ccb4e37a286e6ac47d4bb6f76fb053b22",
+    "docs/rag/source-documents/m03_jvm21_runtime_data_areas.md": "3daf071761e4dad10738c672acc6781b57a3092edb3e9ee43c943d0899a54d7e",
+    "docs/rag/source-documents/m04_volatile_jmm_java21.md": "fd1f73f1e1ce307567bcf6b4cf737315b9c36591f1de3620689a979dea2b760c",
+    "docs/rag/source-documents/m05_spring_6_2_aop_proxy_self_invocation.md": "b622cf633bb2ccf7320c33feede070f3875f7670e7f92c89488e2a5ee5457788",
+    "docs/rag/source-documents/m06_mysql_8_0_innodb_index_structure.md": "0a11be7250f287eacff2ab77234cb04b1d245ac453127fb1c61a868e305b814c",
+    "docs/rag/source-documents/m07_redis_classic_data_structures.md": "893c0e95adc06f18fb2877feb54c7d14f9a69b2329926046f72f129427354caa"
+  },
+  "queries": [
+    {
+      "queryId": "P1I-Q01",
+      "questionText": "一个文件导出组件已经继承了框架提供的基类，现在还要统一暴露导出能力，并让几种实现复用各自的配置状态。接口和抽象类分别能承担哪部分职责？为什么不能再继承一个保存配置的父类？",
+      "testType": "INDEPENDENT_PARAPHRASE",
+      "requiredKnowledge": [
+        "区分可组合的行为契约与对象实例状态。",
+        "结合单类继承限制说明共享实现和配置初始化的安排。"
+      ],
+      "knowledgePoint": "interface_contract_and_shared_state",
+      "category": "JAVA_BASIC",
+      "coverageStatus": "COVERED_BY_DOCUMENT_CONTENT",
+      "coverageBasis": [
+        {
+          "bankId": "E01",
+          "path": "docs/rag/source-documents/e01_java21_interface_vs_abstract_class.md",
+          "sha256": "4b82a2724e53946fffa082560fde1c348201114ac4f490e409c2ddbba5071de0",
+          "line": 20,
+          "quote": "一个类只能直接继承一个类，但可以实现多个接口"
+        }
+      ],
+      "uncoveredReason": null,
+      "builderInput": {
+        "mode": "MAIN_ANSWER",
+        "mainQuestionContent": "一个文件导出组件已经继承了框架提供的基类，现在还要统一暴露导出能力，并让几种实现复用各自的配置状态。接口和抽象类分别能承担哪部分职责？为什么不能再继承一个保存配置的父类？",
+        "followUpQuestionContent": null,
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012011,
+            "pointType": "CORE",
+            "content": "区分可组合的行为契约与对象实例状态。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012012,
+            "pointType": "KEY",
+            "content": "结合单类继承限制说明共享实现和配置初始化的安排。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": []
+      },
+      "productionStyleQueryText": "主问题：一个文件导出组件已经继承了框架提供的基类，现在还要统一暴露导出能力，并让几种实现复用各自的配置状态。接口和抽象类分别能承担哪部分职责？为什么不能再继承一个保存配置的父类？\n评分点：\n- 区分可组合的行为契约与对象实例状态。\n- 结合单类继承限制说明共享实现和配置初始化的安排。",
+      "productionStyleQuerySha256": "bf1395ee2e90710a2ae87012986e03e374ef36fb9b36ba7c127997410b0af36e"
+    },
+    {
+      "queryId": "P1I-Q02",
+      "questionText": "订单服务的构造器接收一个通知发送器，但方法内部又直接创建邮件发送器。测试传入的假发送器为什么没有生效？怎样调整依赖的获得方式，才能让业务逻辑使用组装方提供的实现？",
+      "testType": "INDEPENDENT_PARAPHRASE",
+      "requiredKnowledge": [
+        "识别业务内部创建具体依赖绕过了外部组装。",
+        "说明构造器接收并使用依赖契约如何支持替换和测试。"
+      ],
+      "knowledgePoint": "dependency_injection_bypassed_by_manual_creation",
+      "category": "SPRING",
+      "coverageStatus": "COVERED_BY_DOCUMENT_CONTENT",
+      "coverageBasis": [
+        {
+          "bankId": "E03",
+          "path": "docs/rag/source-documents/e03_spring_6_2_ioc_di.md",
+          "sha256": "d71d9af393307ba3455dab8ffa945e5700f5bec0d3849bae7d37676bbbd352c6",
+          "line": 41,
+          "quote": "业务类内部又自行构造具体依赖，外部提供的替代实现就可能失去作用"
+        }
+      ],
+      "uncoveredReason": null,
+      "builderInput": {
+        "mode": "MAIN_ANSWER",
+        "mainQuestionContent": "订单服务的构造器接收一个通知发送器，但方法内部又直接创建邮件发送器。测试传入的假发送器为什么没有生效？怎样调整依赖的获得方式，才能让业务逻辑使用组装方提供的实现？",
+        "followUpQuestionContent": null,
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012021,
+            "pointType": "CORE",
+            "content": "识别业务内部创建具体依赖绕过了外部组装。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012022,
+            "pointType": "KEY",
+            "content": "说明构造器接收并使用依赖契约如何支持替换和测试。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": []
+      },
+      "productionStyleQueryText": "主问题：订单服务的构造器接收一个通知发送器，但方法内部又直接创建邮件发送器。测试传入的假发送器为什么没有生效？怎样调整依赖的获得方式，才能让业务逻辑使用组装方提供的实现？\n评分点：\n- 识别业务内部创建具体依赖绕过了外部组装。\n- 说明构造器接收并使用依赖契约如何支持替换和测试。",
+      "productionStyleQuerySha256": "0b647bb089b685040bde2d743a0132d9dea2b1f3de475cd53780fc4869dc5eb6"
+    },
+    {
+      "queryId": "P1I-Q03",
+      "questionText": "把一个用户对象作为HashMap的键保存后，又修改了参与相等判断的用户编号，此时用原对象查找也可能失败。对象还是同一个，为什么会发生这种现象？怎样选择更稳定的键？",
+      "testType": "INDEPENDENT_PARAPHRASE",
+      "requiredKnowledge": [
+        "说明插入时节点记录的hash与修改后查找定位可能不一致。",
+        "给出保持相等信息稳定的键设计，避免把所有可变对象一概禁止。"
+      ],
+      "knowledgePoint": "mutable_hash_key_lookup",
+      "category": "JAVA_BASIC",
+      "coverageStatus": "COVERED_BY_DOCUMENT_CONTENT",
+      "coverageBasis": [
+        {
+          "bankId": "M01",
+          "path": "docs/rag/source-documents/m01_java21_equals_hashcode_contract.md",
+          "sha256": "27a74088733409277eeb02d7e67b02722af8a2a1ec1d40ff1efac5c5596d0387",
+          "line": 41,
+          "quote": "节点保存的是插入时的 hash"
+        }
+      ],
+      "uncoveredReason": null,
+      "builderInput": {
+        "mode": "MAIN_ANSWER",
+        "mainQuestionContent": "把一个用户对象作为HashMap的键保存后，又修改了参与相等判断的用户编号，此时用原对象查找也可能失败。对象还是同一个，为什么会发生这种现象？怎样选择更稳定的键？",
+        "followUpQuestionContent": null,
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012031,
+            "pointType": "CORE",
+            "content": "说明插入时节点记录的hash与修改后查找定位可能不一致。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012032,
+            "pointType": "KEY",
+            "content": "给出保持相等信息稳定的键设计，避免把所有可变对象一概禁止。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": []
+      },
+      "productionStyleQueryText": "主问题：把一个用户对象作为HashMap的键保存后，又修改了参与相等判断的用户编号，此时用原对象查找也可能失败。对象还是同一个，为什么会发生这种现象？怎样选择更稳定的键？\n评分点：\n- 说明插入时节点记录的hash与修改后查找定位可能不一致。\n- 给出保持相等信息稳定的键设计，避免把所有可变对象一概禁止。",
+      "productionStyleQuerySha256": "f0f54c92cbb539abb786c7a5872c9ba7abc5daca9f6576cac23fc79a069f1c0f"
+    },
+    {
+      "queryId": "P1I-Q04",
+      "questionText": "两个线程各自执行同一个方法，方法的局部变量都指向同一个缓存对象。局部变量属于各自线程，是否说明对该对象的修改也互不影响？请区分栈帧中的引用和被引用对象的归属。",
+      "testType": "INDEPENDENT_PARAPHRASE",
+      "requiredKnowledge": [
+        "区分每次调用的局部引用与共享对象。",
+        "说明线程私有调用栈不能自动使所引用的堆对象私有。"
+      ],
+      "knowledgePoint": "thread_local_frame_shared_object",
+      "category": "JVM",
+      "coverageStatus": "COVERED_BY_DOCUMENT_CONTENT",
+      "coverageBasis": [
+        {
+          "bankId": "M03",
+          "path": "docs/rag/source-documents/m03_jvm21_runtime_data_areas.md",
+          "sha256": "3daf071761e4dad10738c672acc6781b57a3092edb3e9ee43c943d0899a54d7e",
+          "line": 38,
+          "quote": "两个局部变量可以指向同一个对象"
+        }
+      ],
+      "uncoveredReason": null,
+      "builderInput": {
+        "mode": "MAIN_ANSWER",
+        "mainQuestionContent": "两个线程各自执行同一个方法，方法的局部变量都指向同一个缓存对象。局部变量属于各自线程，是否说明对该对象的修改也互不影响？请区分栈帧中的引用和被引用对象的归属。",
+        "followUpQuestionContent": null,
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012041,
+            "pointType": "CORE",
+            "content": "区分每次调用的局部引用与共享对象。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012042,
+            "pointType": "KEY",
+            "content": "说明线程私有调用栈不能自动使所引用的堆对象私有。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": []
+      },
+      "productionStyleQueryText": "主问题：两个线程各自执行同一个方法，方法的局部变量都指向同一个缓存对象。局部变量属于各自线程，是否说明对该对象的修改也互不影响？请区分栈帧中的引用和被引用对象的归属。\n评分点：\n- 区分每次调用的局部引用与共享对象。\n- 说明线程私有调用栈不能自动使所引用的堆对象私有。",
+      "productionStyleQuerySha256": "7334d1524b3d991f8e75abf97dca5735bcc85c191a4b7e9c526a29ae24185e62"
+    },
+    {
+      "queryId": "P1I-Q05",
+      "questionText": "批量装入大量数据时，一个JDK 8u HashMap不断扩容。提前规划容量和调低负载因子分别改变什么？为什么不能把负载因子越小就越好当作通用优化结论？",
+      "testType": "INDEPENDENT_PARAPHRASE",
+      "requiredKnowledge": [
+        "说明容量、映射数和数量阈值与扩容的关系。",
+        "分析更早扩容、桶表内存与冲突成本之间的取舍。"
+      ],
+      "knowledgePoint": "hashmap_capacity_load_factor_tradeoff",
+      "category": "JAVA_COLLECTION",
+      "coverageStatus": "COVERED_BY_DOCUMENT_CONTENT",
+      "coverageBasis": [
+        {
+          "bankId": "M02",
+          "path": "docs/rag/source-documents/m02_hashmap_jdk8u_put_resize_treeify.md",
+          "sha256": "c5e93fa3c3d3af8fb6e78b60db2d309ccb4e37a286e6ac47d4bb6f76fb053b22",
+          "line": 18,
+          "quote": "较低负载因子会让扩容更早发生并占用较大的桶表"
+        }
+      ],
+      "uncoveredReason": null,
+      "builderInput": {
+        "mode": "MAIN_ANSWER",
+        "mainQuestionContent": "批量装入大量数据时，一个JDK 8u HashMap不断扩容。提前规划容量和调低负载因子分别改变什么？为什么不能把负载因子越小就越好当作通用优化结论？",
+        "followUpQuestionContent": null,
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012051,
+            "pointType": "CORE",
+            "content": "说明容量、映射数和数量阈值与扩容的关系。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012052,
+            "pointType": "KEY",
+            "content": "分析更早扩容、桶表内存与冲突成本之间的取舍。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": []
+      },
+      "productionStyleQueryText": "主问题：批量装入大量数据时，一个JDK 8u HashMap不断扩容。提前规划容量和调低负载因子分别改变什么？为什么不能把负载因子越小就越好当作通用优化结论？\n评分点：\n- 说明容量、映射数和数量阈值与扩容的关系。\n- 分析更早扩容、桶表内存与冲突成本之间的取舍。",
+      "productionStyleQuerySha256": "cf52435281c41810956bfe669501f6c842c1c10b817b4a5de5c905de70be7a4a"
+    },
+    {
+      "queryId": "P1I-Q06",
+      "questionText": "一张InnoDB表使用很长的字符串作为主键，并建立了多个二级索引。为什么这种主键选择可能使每个二级索引也占用更多空间？二级索引记录需要保存什么，才能找到完整行？",
+      "testType": "INDEPENDENT_PARAPHRASE",
+      "requiredKnowledge": [
+        "说明二级记录携带对应主键值。",
+        "从记录内容解释主键长度对多个二级索引占用的影响。"
+      ],
+      "knowledgePoint": "primary_key_width_secondary_index_cost",
+      "category": "MYSQL",
+      "coverageStatus": "COVERED_BY_DOCUMENT_CONTENT",
+      "coverageBasis": [
+        {
+          "bankId": "M06",
+          "path": "docs/rag/source-documents/m06_mysql_8_0_innodb_index_structure.md",
+          "sha256": "0a11be7250f287eacff2ab77234cb04b1d245ac453127fb1c61a868e305b814c",
+          "line": 22,
+          "quote": "主键既是聚簇定位依据，也影响二级索引记录占用"
+        }
+      ],
+      "uncoveredReason": null,
+      "builderInput": {
+        "mode": "MAIN_ANSWER",
+        "mainQuestionContent": "一张InnoDB表使用很长的字符串作为主键，并建立了多个二级索引。为什么这种主键选择可能使每个二级索引也占用更多空间？二级索引记录需要保存什么，才能找到完整行？",
+        "followUpQuestionContent": null,
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012061,
+            "pointType": "CORE",
+            "content": "说明二级记录携带对应主键值。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012062,
+            "pointType": "KEY",
+            "content": "从记录内容解释主键长度对多个二级索引占用的影响。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": []
+      },
+      "productionStyleQueryText": "主问题：一张InnoDB表使用很长的字符串作为主键，并建立了多个二级索引。为什么这种主键选择可能使每个二级索引也占用更多空间？二级索引记录需要保存什么，才能找到完整行？\n评分点：\n- 说明二级记录携带对应主键值。\n- 从记录内容解释主键长度对多个二级索引占用的影响。",
+      "productionStyleQuerySha256": "200e11cea39684439def6711f0910f484bb9b6660c2acc136ad825e7c4be892e"
+    },
+    {
+      "queryId": "P1I-Q07",
+      "questionText": "把访问过页面的用户ID依次加入Redis集合时，有的业务需要保留每次访问，有的只需要知道有哪些用户来过。List和Set应怎样选择？重复加入同一ID后，两种结构保存的信息有什么区别？",
+      "testType": "INDEPENDENT_PARAPHRASE",
+      "requiredKnowledge": [
+        "区分事件序列和唯一成员集合。",
+        "根据重复成员与顺序需求说明List/Set的选择。"
+      ],
+      "knowledgePoint": "redis_visit_history_vs_unique_members",
+      "category": "REDIS",
+      "coverageStatus": "COVERED_BY_DOCUMENT_CONTENT",
+      "coverageBasis": [
+        {
+          "bankId": "M07",
+          "path": "docs/rag/source-documents/m07_redis_classic_data_structures.md",
+          "sha256": "893c0e95adc06f18fb2877feb54c7d14f9a69b2329926046f72f129427354caa",
+          "line": 22,
+          "quote": "List 可以有重复元素，不能用序列自动替代去重需求"
+        }
+      ],
+      "uncoveredReason": null,
+      "builderInput": {
+        "mode": "MAIN_ANSWER",
+        "mainQuestionContent": "把访问过页面的用户ID依次加入Redis集合时，有的业务需要保留每次访问，有的只需要知道有哪些用户来过。List和Set应怎样选择？重复加入同一ID后，两种结构保存的信息有什么区别？",
+        "followUpQuestionContent": null,
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012071,
+            "pointType": "CORE",
+            "content": "区分事件序列和唯一成员集合。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012072,
+            "pointType": "KEY",
+            "content": "根据重复成员与顺序需求说明List/Set的选择。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": []
+      },
+      "productionStyleQueryText": "主问题：把访问过页面的用户ID依次加入Redis集合时，有的业务需要保留每次访问，有的只需要知道有哪些用户来过。List和Set应怎样选择？重复加入同一ID后，两种结构保存的信息有什么区别？\n评分点：\n- 区分事件序列和唯一成员集合。\n- 根据重复成员与顺序需求说明List/Set的选择。",
+      "productionStyleQuerySha256": "3739029ad99e629a73e49ca8377b6306286c6ec7464450bd3d5ded30220460c1"
+    },
+    {
+      "queryId": "P1I-Q08",
+      "questionText": "客户端通过TCP连续发送两条业务消息，服务端却在一次读取中拿到两条内容，也可能多次才读完一条。TCP已经保证有序，为什么还会这样？业务消息边界应由谁来确定？",
+      "testType": "INDEPENDENT_PARAPHRASE",
+      "requiredKnowledge": [
+        "说明可靠有序字节流不保留每次写入的消息边界。",
+        "区分传输顺序保证与应用分帧责任。"
+      ],
+      "knowledgePoint": "tcp_stream_application_framing",
+      "category": "NETWORK",
+      "coverageStatus": "COVERED_BY_DOCUMENT_CONTENT",
+      "coverageBasis": [
+        {
+          "bankId": "E05",
+          "path": "docs/rag/source-documents/e05_rfc9293_rfc768_tcp_vs_udp.md",
+          "sha256": "caa8af92609855354e83f0037af99e42bb9b3fc65125196103730bb2bf258d26",
+          "line": 16,
+          "quote": "字节流不保留应用每次写入的消息边界，应用需自行分帧"
+        }
+      ],
+      "uncoveredReason": null,
+      "builderInput": {
+        "mode": "MAIN_ANSWER",
+        "mainQuestionContent": "客户端通过TCP连续发送两条业务消息，服务端却在一次读取中拿到两条内容，也可能多次才读完一条。TCP已经保证有序，为什么还会这样？业务消息边界应由谁来确定？",
+        "followUpQuestionContent": null,
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012081,
+            "pointType": "CORE",
+            "content": "说明可靠有序字节流不保留每次写入的消息边界。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012082,
+            "pointType": "KEY",
+            "content": "区分传输顺序保证与应用分帧责任。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": []
+      },
+      "productionStyleQueryText": "主问题：客户端通过TCP连续发送两条业务消息，服务端却在一次读取中拿到两条内容，也可能多次才读完一条。TCP已经保证有序，为什么还会这样？业务消息边界应由谁来确定？\n评分点：\n- 说明可靠有序字节流不保留每次写入的消息边界。\n- 区分传输顺序保证与应用分帧责任。",
+      "productionStyleQuerySha256": "95a23e8d67a59e774b585a4be72664fd42ceebaccb40399961fb010ed92da646"
+    },
+    {
+      "queryId": "P1I-Q09",
+      "questionText": "在Java 21中，参数静态类型为List<Integer>时测试instanceof ArrayList<Integer>，与把任意Object测试为List<String>有什么不同？为什么反射读取到泛型声明，仍不能说明所有对象都携带可检查的元素类型？",
+      "testType": "BOUNDARY_FOLLOW_UP",
+      "requiredKnowledge": [
+        "根据操作数静态类型区分参数化instanceof的合法性。",
+        "区分声明Signature元数据与运行时可检查的对象类型实参。"
+      ],
+      "knowledgePoint": "generic_instanceof_static_type_boundary",
+      "category": "JAVA_BASIC",
+      "coverageStatus": "COVERED_BY_DOCUMENT_CONTENT",
+      "coverageBasis": [
+        {
+          "bankId": "H01",
+          "path": "docs/rag/source-documents/h01_java21_generic_type_erasure.md",
+          "sha256": "c11ca06913e220726cb279a36ee65124e5e52c4557cb272c1c37b78975fb565b",
+          "line": 28,
+          "quote": "`List<Integer>` 的 x 可以测试 `x instanceof ArrayList<Integer>`"
+        }
+      ],
+      "uncoveredReason": null,
+      "builderInput": {
+        "mode": "FOLLOW_UP_ANSWER",
+        "mainQuestionContent": "一个Java泛型库既要做编译期类型检查，也会通过反射读取字段声明。",
+        "followUpQuestionContent": "在Java 21中，参数静态类型为List<Integer>时测试instanceof ArrayList<Integer>，与把任意Object测试为List<String>有什么不同？为什么反射读取到泛型声明，仍不能说明所有对象都携带可检查的元素类型？",
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012091,
+            "pointType": "CORE",
+            "content": "根据操作数静态类型区分参数化instanceof的合法性。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012092,
+            "pointType": "KEY",
+            "content": "区分声明Signature元数据与运行时可检查的对象类型实参。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": [
+          8012091,
+          8012092
+        ]
+      },
+      "productionStyleQueryText": "主问题：一个Java泛型库既要做编译期类型检查，也会通过反射读取字段声明。\n追问：在Java 21中，参数静态类型为List<Integer>时测试instanceof ArrayList<Integer>，与把任意Object测试为List<String>有什么不同？为什么反射读取到泛型声明，仍不能说明所有对象都携带可检查的元素类型？\n追问目标评分点：\n- 根据操作数静态类型区分参数化instanceof的合法性。\n- 区分声明Signature元数据与运行时可检查的对象类型实参。",
+      "productionStyleQuerySha256": "638b8b14dee858e9cdfe71f8146f582036c164d1557d2e845d7d76213dda1023"
+    },
+    {
+      "queryId": "P1I-Q10",
+      "questionText": "当本次Collection Set只包含一部分Region时，怎样找到集合外指向集合内的引用？Remembered Set与并发标记获得的存活信息是在回答同一个问题吗？",
+      "testType": "BOUNDARY_FOLLOW_UP",
+      "requiredKnowledge": [
+        "说明跨Region引用位置与对象存活分析的职责。",
+        "解释部分Region回收仍需处理来自集合外的引用。"
+      ],
+      "knowledgePoint": "g1_cross_region_references_vs_liveness",
+      "category": "JVM",
+      "coverageStatus": "COVERED_BY_DOCUMENT_CONTENT",
+      "coverageBasis": [
+        {
+          "bankId": "H03",
+          "path": "docs/rag/source-documents/h03_hotspot21_g1_gc.md",
+          "sha256": "3879a27607bfd98ae4e28c329a63c47474fbe75e25607cc660b7a85c89851603",
+          "line": 37,
+          "quote": "Remembered Set 记录集合外指向集合内的引用位置"
+        }
+      ],
+      "uncoveredReason": null,
+      "builderInput": {
+        "mode": "FOLLOW_UP_ANSWER",
+        "mainQuestionContent": "一个Java 21服务使用G1，希望一次只回收部分Region来控制暂停。",
+        "followUpQuestionContent": "当本次Collection Set只包含一部分Region时，怎样找到集合外指向集合内的引用？Remembered Set与并发标记获得的存活信息是在回答同一个问题吗？",
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012101,
+            "pointType": "CORE",
+            "content": "说明跨Region引用位置与对象存活分析的职责。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012102,
+            "pointType": "KEY",
+            "content": "解释部分Region回收仍需处理来自集合外的引用。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": [
+          8012101,
+          8012102
+        ]
+      },
+      "productionStyleQueryText": "主问题：一个Java 21服务使用G1，希望一次只回收部分Region来控制暂停。\n追问：当本次Collection Set只包含一部分Region时，怎样找到集合外指向集合内的引用？Remembered Set与并发标记获得的存活信息是在回答同一个问题吗？\n追问目标评分点：\n- 说明跨Region引用位置与对象存活分析的职责。\n- 解释部分Region回收仍需处理来自集合外的引用。",
+      "productionStyleQuerySha256": "35b5160e8f41126d46975fee5e27ad09fd124058a65453bf4a804d638f611feb"
+    },
+    {
+      "queryId": "P1I-Q11",
+      "questionText": "持锁记录还没复制到副本，主节点就故障并发生副本提升。为什么两个客户端可能都认为自己持有锁？仅依靠唯一token和安全释放能解决这个获取阶段的问题吗？关键写入还需要什么约束？",
+      "testType": "BOUNDARY_FOLLOW_UP",
+      "requiredKnowledge": [
+        "分析异步复制丢失锁记录与另一个客户端获取租约的关系。",
+        "区分安全释放、获取互斥故障与权威数据层约束。"
+      ],
+      "knowledgePoint": "redis_lock_async_replication_safety_boundary",
+      "category": "REDIS",
+      "coverageStatus": "COVERED_BY_DOCUMENT_CONTENT",
+      "coverageBasis": [
+        {
+          "bankId": "H07",
+          "path": "docs/rag/source-documents/h07_redis_distributed_lock_baseline.md",
+          "sha256": "e79aff2f6d42ce77989566e6d7d611de77ac5720f962f325ffbae307a1ae88c7",
+          "line": 39,
+          "quote": "若 Redis 主节点在锁写入复制到副本前故障"
+        }
+      ],
+      "uncoveredReason": null,
+      "builderInput": {
+        "mode": "FOLLOW_UP_ANSWER",
+        "mainQuestionContent": "一个服务使用Redis单实例锁的租约来协调两个并发写入者。",
+        "followUpQuestionContent": "持锁记录还没复制到副本，主节点就故障并发生副本提升。为什么两个客户端可能都认为自己持有锁？仅依靠唯一token和安全释放能解决这个获取阶段的问题吗？关键写入还需要什么约束？",
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012111,
+            "pointType": "CORE",
+            "content": "分析异步复制丢失锁记录与另一个客户端获取租约的关系。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012112,
+            "pointType": "KEY",
+            "content": "区分安全释放、获取互斥故障与权威数据层约束。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": [
+          8012111,
+          8012112
+        ]
+      },
+      "productionStyleQueryText": "主问题：一个服务使用Redis单实例锁的租约来协调两个并发写入者。\n追问：持锁记录还没复制到副本，主节点就故障并发生副本提升。为什么两个客户端可能都认为自己持有锁？仅依靠唯一token和安全释放能解决这个获取阶段的问题吗？关键写入还需要什么约束？\n追问目标评分点：\n- 分析异步复制丢失锁记录与另一个客户端获取租约的关系。\n- 区分安全释放、获取互斥故障与权威数据层约束。",
+      "productionStyleQuerySha256": "5cb208b66b2e0b2f0fb6848d3a6d54f9445c5664d6edcfda945fc8ff34d0054e"
+    },
+    {
+      "queryId": "P1I-Q12",
+      "questionText": "线程池已经shutdown后继续提交，CallerRunsPolicy是否仍保证由调用线程执行？为什么这个拒绝策略不能作为任务不丢或跨进程崩溃恢复的保证？",
+      "testType": "BOUNDARY_FOLLOW_UP",
+      "requiredKnowledge": [
+        "说明shutdown时CallerRuns的边界。",
+        "区分进程内反压、业务接收成功和持久化恢复责任。"
+      ],
+      "knowledgePoint": "caller_runs_shutdown_and_acceptance_boundary",
+      "category": "JAVA_CONCURRENCY",
+      "coverageStatus": "COVERED_BY_DOCUMENT_CONTENT",
+      "coverageBasis": [
+        {
+          "bankId": "H04",
+          "path": "docs/rag/source-documents/h04_java21_thread_pool_design.md",
+          "sha256": "d3c05bc195af157dade05d3e99d312668cb7150206601f3542be0e5b2116c8dc",
+          "line": 28,
+          "quote": "CallerRuns 可让提交线程执行任务形成反压，但 shutdown 时会丢弃"
+        }
+      ],
+      "uncoveredReason": null,
+      "builderInput": {
+        "mode": "FOLLOW_UP_ANSWER",
+        "mainQuestionContent": "一个进程内任务池采用CallerRunsPolicy，调用方把提交任务当作接收成功。",
+        "followUpQuestionContent": "线程池已经shutdown后继续提交，CallerRunsPolicy是否仍保证由调用线程执行？为什么这个拒绝策略不能作为任务不丢或跨进程崩溃恢复的保证？",
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012121,
+            "pointType": "CORE",
+            "content": "说明shutdown时CallerRuns的边界。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012122,
+            "pointType": "KEY",
+            "content": "区分进程内反压、业务接收成功和持久化恢复责任。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": [
+          8012121,
+          8012122
+        ]
+      },
+      "productionStyleQueryText": "主问题：一个进程内任务池采用CallerRunsPolicy，调用方把提交任务当作接收成功。\n追问：线程池已经shutdown后继续提交，CallerRunsPolicy是否仍保证由调用线程执行？为什么这个拒绝策略不能作为任务不丢或跨进程崩溃恢复的保证？\n追问目标评分点：\n- 说明shutdown时CallerRuns的边界。\n- 区分进程内反压、业务接收成功和持久化恢复责任。",
+      "productionStyleQuerySha256": "1f815f1f0e41127b8a7f322315f785d73aed7bcc7870f3b815fbbb51bb8730eb"
+    },
+    {
+      "queryId": "P1I-Q13",
+      "questionText": "Kafka生产者使用acks=1时，Leader确认后立即故障，而消息尚未复制到其他副本，会有什么丢失风险？acks=all与min.insync.replicas怎样影响发送成功的条件？",
+      "testType": "OUT_OF_COVERAGE",
+      "requiredKnowledge": [
+        "解释Leader确认与副本复制完成的区别。",
+        "结合ISR与最小同步副本约束说明确认条件。"
+      ],
+      "knowledgePoint": "kafka_ack_isr_replication",
+      "category": "PROJECT_SCENARIO",
+      "coverageStatus": "NOT_COVERED",
+      "coverageBasis": [
+        {
+          "bankId": "H04",
+          "path": "docs/rag/source-documents/h04_java21_thread_pool_design.md",
+          "sha256": "d3c05bc195af157dade05d3e99d312668cb7150206601f3542be0e5b2116c8dc"
+        },
+        {
+          "bankId": "M07",
+          "path": "docs/rag/source-documents/m07_redis_classic_data_structures.md",
+          "sha256": "893c0e95adc06f18fb2877feb54c7d14f9a69b2329926046f72f129427354caa"
+        }
+      ],
+      "uncoveredReason": "H04只讨论进程内线程池，M07只讨论Redis经典结构与简单队列；21篇没有Kafka、ISR或生产者ack协议的机制证据。",
+      "builderInput": {
+        "mode": "MAIN_ANSWER",
+        "mainQuestionContent": "Kafka生产者使用acks=1时，Leader确认后立即故障，而消息尚未复制到其他副本，会有什么丢失风险？acks=all与min.insync.replicas怎样影响发送成功的条件？",
+        "followUpQuestionContent": null,
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012131,
+            "pointType": "CORE",
+            "content": "解释Leader确认与副本复制完成的区别。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012132,
+            "pointType": "KEY",
+            "content": "结合ISR与最小同步副本约束说明确认条件。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": []
+      },
+      "productionStyleQueryText": "主问题：Kafka生产者使用acks=1时，Leader确认后立即故障，而消息尚未复制到其他副本，会有什么丢失风险？acks=all与min.insync.replicas怎样影响发送成功的条件？\n评分点：\n- 解释Leader确认与副本复制完成的区别。\n- 结合ISR与最小同步副本约束说明确认条件。",
+      "productionStyleQuerySha256": "8d40e9b40ebc61b532e7be6d3e0878e417a64afc2a451841d2e4d4a00c3ca044"
+    },
+    {
+      "queryId": "P1I-Q14",
+      "questionText": "Elasticsearch里同一个字符串分别映射成text和keyword后，使用match与term查询可能出现哪些差异？分析器怎样影响倒排索引中的词项以及查询匹配？",
+      "testType": "OUT_OF_COVERAGE",
+      "requiredKnowledge": [
+        "区分分词字段与精确值字段。",
+        "解释分析器、索引词项与match/term查询的关联。"
+      ],
+      "knowledgePoint": "elasticsearch_analyzers_text_keyword",
+      "category": "PROJECT_SCENARIO",
+      "coverageStatus": "NOT_COVERED",
+      "coverageBasis": [
+        {
+          "bankId": "M06",
+          "path": "docs/rag/source-documents/m06_mysql_8_0_innodb_index_structure.md",
+          "sha256": "0a11be7250f287eacff2ab77234cb04b1d245ac453127fb1c61a868e305b814c"
+        }
+      ],
+      "uncoveredReason": "M06是InnoDB有序树/聚簇索引，不包含Elasticsearch倒排索引、分析器、text/keyword映射或match/term语义。",
+      "builderInput": {
+        "mode": "MAIN_ANSWER",
+        "mainQuestionContent": "Elasticsearch里同一个字符串分别映射成text和keyword后，使用match与term查询可能出现哪些差异？分析器怎样影响倒排索引中的词项以及查询匹配？",
+        "followUpQuestionContent": null,
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012141,
+            "pointType": "CORE",
+            "content": "区分分词字段与精确值字段。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012142,
+            "pointType": "KEY",
+            "content": "解释分析器、索引词项与match/term查询的关联。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": []
+      },
+      "productionStyleQueryText": "主问题：Elasticsearch里同一个字符串分别映射成text和keyword后，使用match与term查询可能出现哪些差异？分析器怎样影响倒排索引中的词项以及查询匹配？\n评分点：\n- 区分分词字段与精确值字段。\n- 解释分析器、索引词项与match/term查询的关联。",
+      "productionStyleQuerySha256": "bf0ffe1d8c72d974454502fda9047f474960b05b80f3bced4befa9798a33156e"
+    },
+    {
+      "queryId": "P1I-Q15",
+      "questionText": "移动客户端采用OAuth 2.0授权码流程时为什么需要PKCE？code_verifier与code_challenge如何防止被截获的授权码直接换取令牌？",
+      "testType": "OUT_OF_COVERAGE",
+      "requiredKnowledge": [
+        "识别公开客户端的授权码截获威胁。",
+        "说明verifier/challenge对令牌交换的绑定。"
+      ],
+      "knowledgePoint": "oauth2_pkce_authorization_code_interception",
+      "category": "PROJECT_SCENARIO",
+      "coverageStatus": "NOT_COVERED",
+      "coverageBasis": [
+        {
+          "bankId": "E05",
+          "path": "docs/rag/source-documents/e05_rfc9293_rfc768_tcp_vs_udp.md",
+          "sha256": "caa8af92609855354e83f0037af99e42bb9b3fc65125196103730bb2bf258d26"
+        },
+        {
+          "bankId": "H08",
+          "path": "docs/rag/source-documents/h08_rfc9293_tcp_connection_lifecycle.md",
+          "sha256": "82dec99995bddc1c7cd17705743598b1d57ae265da80ececb5220b46e8b5df44"
+        }
+      ],
+      "uncoveredReason": "E05/H08只解释TCP/UDP和连接状态；全部21篇没有OAuth授权码、PKCE或令牌交换机制。项目有JWT代码也不能充当知识库覆盖证据。",
+      "builderInput": {
+        "mode": "MAIN_ANSWER",
+        "mainQuestionContent": "移动客户端采用OAuth 2.0授权码流程时为什么需要PKCE？code_verifier与code_challenge如何防止被截获的授权码直接换取令牌？",
+        "followUpQuestionContent": null,
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012151,
+            "pointType": "CORE",
+            "content": "识别公开客户端的授权码截获威胁。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012152,
+            "pointType": "KEY",
+            "content": "说明verifier/challenge对令牌交换的绑定。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": []
+      },
+      "productionStyleQueryText": "主问题：移动客户端采用OAuth 2.0授权码流程时为什么需要PKCE？code_verifier与code_challenge如何防止被截获的授权码直接换取令牌？\n评分点：\n- 识别公开客户端的授权码截获威胁。\n- 说明verifier/challenge对令牌交换的绑定。",
+      "productionStyleQuerySha256": "7ffe92edc781ec9f0f2b12514040ccb01e8de9d261564cf571d2b948c50c2aa4"
+    },
+    {
+      "queryId": "P1I-Q16",
+      "questionText": "PostgreSQL的Serializable Snapshot Isolation怎样识别可能破坏可串行化的读写依赖？两个事务各自读取条件再更新不同行时，为什么其中一个可能需要中止并重试？",
+      "testType": "OUT_OF_COVERAGE",
+      "requiredKnowledge": [
+        "说明SSI读写依赖与可串行化冲突检测。",
+        "分析写偏斜场景中事务中止及重试责任。"
+      ],
+      "knowledgePoint": "postgresql_ssi_read_write_dependency",
+      "category": "MYSQL",
+      "coverageStatus": "NOT_COVERED",
+      "coverageBasis": [
+        {
+          "bankId": "E04",
+          "path": "docs/rag/source-documents/e04_mysql_8_0_transaction_acid.md",
+          "sha256": "fe159ec2e2c0de9c41b78b496e86cfcea89f846efc69940421306d8ba3613ef2"
+        },
+        {
+          "bankId": "H06",
+          "path": "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md",
+          "sha256": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea"
+        },
+        {
+          "bankId": "H09",
+          "path": "docs/rag/source-documents/h09_mysql_8_0_inventory_idempotency_scenario.md",
+          "sha256": "2ace6486655a2242f4a616b85c57d0cc9dae3f7130381d49326615d6cd72f65b"
+        }
+      ],
+      "uncoveredReason": "E04/H06/H09限定MySQL8 InnoDB事务、版本读和库存幂等；没有PostgreSQL SSI依赖检测或谓词锁的机制证据。MYSQL仅是测试容器的相邻现有枚举，不代表覆盖归属。",
+      "builderInput": {
+        "mode": "MAIN_ANSWER",
+        "mainQuestionContent": "PostgreSQL的Serializable Snapshot Isolation怎样识别可能破坏可串行化的读写依赖？两个事务各自读取条件再更新不同行时，为什么其中一个可能需要中止并重试？",
+        "followUpQuestionContent": null,
+        "scoringPoints": [
+          {
+            "scoringPointId": 8012161,
+            "pointType": "CORE",
+            "content": "说明SSI读写依赖与可串行化冲突检测。",
+            "weight": 50
+          },
+          {
+            "scoringPointId": 8012162,
+            "pointType": "KEY",
+            "content": "分析写偏斜场景中事务中止及重试责任。",
+            "weight": 50
+          }
+        ],
+        "followUpTargetPointIds": []
+      },
+      "productionStyleQueryText": "主问题：PostgreSQL的Serializable Snapshot Isolation怎样识别可能破坏可串行化的读写依赖？两个事务各自读取条件再更新不同行时，为什么其中一个可能需要中止并重试？\n评分点：\n- 说明SSI读写依赖与可串行化冲突检测。\n- 分析写偏斜场景中事务中止及重试责任。",
+      "productionStyleQuerySha256": "62d3107ac4d465635cf7f1624f9fd5eb076b2cc4483821b5c142a12a23cda2ed"
+    }
+  ]
+}

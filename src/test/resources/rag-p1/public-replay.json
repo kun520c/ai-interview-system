@@ -1,0 +1,948 @@
+{
+  "format": "public-rag-offline-v1",
+  "provenance": "AUTHORED_SYNTHETIC_OFFLINE_FIXTURE",
+  "basedOnPaidResponses": false,
+  "metric": "COSINE",
+  "topK": 5,
+  "scorePrecision": "FLOAT32",
+  "embeddingModel": "qwen3.7-text-embedding",
+  "advisoryReview": {
+    "provenance": "AUTHORED_TEST_SUGGESTIONS_NOT_HUMAN_GOLD",
+    "proposals": [
+      {
+        "queryId": "PUBLIC-03",
+        "rank": 1,
+        "suggestedLabel": 0,
+        "rationale": "合成建议不覆盖独立baselineLabel。"
+      },
+      {
+        "queryId": "PUBLIC-03",
+        "rank": 2,
+        "suggestedLabel": 1,
+        "rationale": "合成建议不覆盖独立baselineLabel。"
+      },
+      {
+        "queryId": "PUBLIC-03",
+        "rank": 3,
+        "suggestedLabel": 2,
+        "rationale": "合成建议不覆盖独立baselineLabel。"
+      },
+      {
+        "queryId": "PUBLIC-03",
+        "rank": 4,
+        "suggestedLabel": 0,
+        "rationale": "合成建议不覆盖独立baselineLabel。"
+      },
+      {
+        "queryId": "PUBLIC-03",
+        "rank": 5,
+        "suggestedLabel": 1,
+        "rationale": "合成建议不覆盖独立baselineLabel。"
+      },
+      {
+        "queryId": "PUBLIC-03",
+        "rank": 1,
+        "suggestedLabel": 2,
+        "rationale": "合成建议不覆盖独立baselineLabel。"
+      }
+    ]
+  },
+  "queries": [
+    {
+      "queryId": "PUBLIC-01",
+      "mode": "MAIN_ANSWER",
+      "knowledgePoint": "arraylist_vs_linkedlist",
+      "category": "JAVA_COLLECTION",
+      "originalQuestion": "ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？",
+      "referenceAnswer": "ArrayList 底层是可扩容数组，因此根据下标随机访问通常很快，`get` 是 O(1)。尾部追加通常也比较高效，但中间插入或删除往往需要移动后面的元素。\n\nLinkedList 是双向链表，根据下标查找需要从链表中遍历，因此随机访问是 O(n)。如果已经拿到了目标节点附近的位置，链表插入和删除不需要搬移大量元素。\n\n实际开发里不能简单说“增删多就一定用 LinkedList”。很多业务仍然更适合 ArrayList，因为它随机访问好、内存布局更紧凑；只有确实需要大量链表式操作时才考虑 LinkedList。",
+      "followUpQuestion": null,
+      "scoringPoints": [
+        {
+          "scoringPointId": 101,
+          "pointType": "CORE",
+          "content": "能说明 ArrayList 基于动态数组，而 LinkedList 基于双向链表，两者底层存储结构不同。",
+          "weight": 30
+        },
+        {
+          "scoringPointId": 102,
+          "pointType": "KEY",
+          "content": "能说明 ArrayList 根据下标随机访问通常为 O(1)，而 LinkedList 按下标访问通常需要遍历，为 O(n)。",
+          "weight": 25
+        },
+        {
+          "scoringPointId": 103,
+          "pointType": "KEY",
+          "content": "能说明 ArrayList 中间插入或删除通常需要移动元素；LinkedList 在已经定位到节点后修改链接本身开销较低，但定位节点仍可能需要 O(n)。",
+          "weight": 25
+        },
+        {
+          "scoringPointId": 104,
+          "pointType": "PRINCIPLE",
+          "content": "能结合实际访问模式选择集合，而不是机械地认为“增删多就用 LinkedList、查询多就用 ArrayList”。",
+          "weight": 20
+        }
+      ],
+      "followUpTargetPointIds": [],
+      "hits": [
+        {
+          "rank": 1,
+          "title": "公开合成知识 1-1",
+          "content": "公开合成证据 PUBLIC-01-1：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-01-1",
+          "documentId": 1011,
+          "chunkIndex": 1,
+          "cosineScore": "0.8500000238418579",
+          "scoreFloat32BitsHex": "3f59999a",
+          "baselineLabel": 1,
+          "chunkId": 2011,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 2,
+          "title": "公开合成知识 1-2",
+          "content": "公开合成证据 PUBLIC-01-2：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-01-2",
+          "documentId": 1012,
+          "chunkIndex": 2,
+          "cosineScore": "0.75",
+          "scoreFloat32BitsHex": "3f400000",
+          "baselineLabel": 0,
+          "chunkId": 2012,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 3,
+          "title": "公开合成知识 1-3",
+          "content": "公开合成证据 PUBLIC-01-3：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-01-3",
+          "documentId": 1013,
+          "chunkIndex": 3,
+          "cosineScore": "0.699999988079071",
+          "scoreFloat32BitsHex": "3f333333",
+          "baselineLabel": 1,
+          "chunkId": 2013,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 4,
+          "title": "公开合成知识 1-4",
+          "content": "公开合成证据 PUBLIC-01-4：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-01-4",
+          "documentId": 1014,
+          "chunkIndex": 4,
+          "cosineScore": "0.6499999761581421",
+          "scoreFloat32BitsHex": "3f266666",
+          "baselineLabel": 2,
+          "chunkId": 2014,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 5,
+          "title": "公开合成知识 1-5",
+          "content": "公开合成证据 PUBLIC-01-5：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-01-5",
+          "documentId": 1015,
+          "chunkIndex": 5,
+          "cosineScore": "0.5",
+          "scoreFloat32BitsHex": "3f000000",
+          "baselineLabel": 0,
+          "chunkId": 2015,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        }
+      ],
+      "embeddedQuery": "主问题：ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？\n评分点：\n- 能说明 ArrayList 基于动态数组，而 LinkedList 基于双向链表，两者底层存储结构不同。\n- 能说明 ArrayList 根据下标随机访问通常为 O(1)，而 LinkedList 按下标访问通常需要遍历，为 O(n)。\n- 能说明 ArrayList 中间插入或删除通常需要移动元素；LinkedList 在已经定位到节点后修改链接本身开销较低，但定位节点仍可能需要 O(n)。\n- 能结合实际访问模式选择集合，而不是机械地认为“增删多就用 LinkedList、查询多就用 ArrayList”。"
+    },
+    {
+      "queryId": "PUBLIC-02",
+      "mode": "MAIN_ANSWER",
+      "knowledgePoint": "volatile_jmm",
+      "category": "JAVA_CONCURRENCY",
+      "originalQuestion": "`volatile` 能保证什么？为什么 `volatile int count` 仍然不能保证 `count++` 在线程并发下是安全的？",
+      "referenceAnswer": "volatile 最重要的作用是提供线程之间的可见性和特定的内存顺序保证。一个线程对 volatile 变量的写，与之后另一个线程对同一变量的读之间存在 happens-before 关系。\n\n但 volatile 不是互斥锁。`count++` 不是单独一次不可分割操作，它包含读取 count、加一、再写回。两个线程可能同时读取相同旧值，然后分别写回，从而丢失更新。\n\n因此 volatile 很适合状态标记这类“一个线程写、其他线程观察”的场景；如果需要对共享计数做复合原子更新，应该考虑 `synchronized`、Lock 或 `AtomicInteger` 等机制。",
+      "followUpQuestion": null,
+      "scoringPoints": [
+        {
+          "scoringPointId": 201,
+          "pointType": "CORE",
+          "content": "能说明 volatile 能提供共享变量修改的可见性，使线程能够按照 Java Memory Model 的规则观察到其他线程的 volatile 写入。",
+          "weight": 30
+        },
+        {
+          "scoringPointId": 202,
+          "pointType": "PRINCIPLE",
+          "content": "能说明对 volatile 变量的写与后续对同一变量的读建立 happens-before 关系，并对相关内存操作提供顺序约束。",
+          "weight": 25
+        },
+        {
+          "scoringPointId": 203,
+          "pointType": "KEY",
+          "content": "能说明 count++ 属于读取、计算、写回组成的复合 read-modify-write 操作，volatile 不能把整个复合操作变成原子操作，因此可能发生丢失更新。",
+          "weight": 30
+        },
+        {
+          "scoringPointId": 204,
+          "pointType": "KEY",
+          "content": "能根据场景选择 volatile、synchronized/Lock 或 AtomicInteger，而不是认为 volatile 可以替代所有线程同步机制。",
+          "weight": 15
+        }
+      ],
+      "followUpTargetPointIds": [],
+      "hits": [
+        {
+          "rank": 1,
+          "title": "公开合成知识 2-1",
+          "content": "公开合成证据 PUBLIC-02-1：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-02-1",
+          "documentId": 1021,
+          "chunkIndex": 1,
+          "cosineScore": "0.800000011920929",
+          "scoreFloat32BitsHex": "3f4ccccd",
+          "baselineLabel": 1,
+          "chunkId": 2021,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 2,
+          "title": "公开合成知识 2-2",
+          "content": "公开合成证据 PUBLIC-02-2：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-02-2",
+          "documentId": 1022,
+          "chunkIndex": 2,
+          "cosineScore": "0.699999988079071",
+          "scoreFloat32BitsHex": "3f333333",
+          "baselineLabel": 0,
+          "chunkId": 2022,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 3,
+          "title": "公开合成知识 2-3",
+          "content": "公开合成证据 PUBLIC-02-3：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-02-3",
+          "documentId": 1023,
+          "chunkIndex": 3,
+          "cosineScore": "0.6000000238418579",
+          "scoreFloat32BitsHex": "3f19999a",
+          "baselineLabel": 1,
+          "chunkId": 2023,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 4,
+          "title": "公开合成知识 2-4",
+          "content": "公开合成证据 PUBLIC-02-4：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-02-4",
+          "documentId": 1024,
+          "chunkIndex": 4,
+          "cosineScore": "0.4000000059604645",
+          "scoreFloat32BitsHex": "3ecccccd",
+          "baselineLabel": 2,
+          "chunkId": 2024,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 5,
+          "title": "公开合成知识 2-5",
+          "content": "公开合成证据 PUBLIC-02-5：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-02-5",
+          "documentId": 1025,
+          "chunkIndex": 5,
+          "cosineScore": "-0.10000000149011612",
+          "scoreFloat32BitsHex": "bdcccccd",
+          "baselineLabel": 0,
+          "chunkId": 2025,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        }
+      ],
+      "embeddedQuery": "主问题：`volatile` 能保证什么？为什么 `volatile int count` 仍然不能保证 `count++` 在线程并发下是安全的？\n评分点：\n- 能说明 volatile 能提供共享变量修改的可见性，使线程能够按照 Java Memory Model 的规则观察到其他线程的 volatile 写入。\n- 能说明对 volatile 变量的写与后续对同一变量的读建立 happens-before 关系，并对相关内存操作提供顺序约束。\n- 能说明 count++ 属于读取、计算、写回组成的复合 read-modify-write 操作，volatile 不能把整个复合操作变成原子操作，因此可能发生丢失更新。\n- 能根据场景选择 volatile、synchronized/Lock 或 AtomicInteger，而不是认为 volatile 可以替代所有线程同步机制。"
+    },
+    {
+      "queryId": "PUBLIC-03",
+      "mode": "MAIN_ANSWER",
+      "knowledgePoint": "transaction_boundary",
+      "category": "SPRING",
+      "originalQuestion": "Spring 事务有哪些常见失效场景？如果一个业务方法同时调用多个数据库操作，应该如何设计事务边界和异常回滚策略？",
+      "referenceAnswer": "Spring 声明式事务通常依赖 AOP 代理，因此调用必须真正经过代理。常见问题包括同类内部自调用绕过代理、某些无法被代理的方法形式，以及错误的事务配置。\n\n另一个很常见的问题是异常处理。Spring 默认情况下，`RuntimeException` 和 `Error` 会触发回滚，而 checked exception 默认不触发回滚；如果业务需要，应该显式配置 `rollbackFor` 等回滚规则。\n\n如果事务内部把异常 catch 住以后正常返回，外层事务基础设施可能不知道应该回滚，所以异常处理和 rollback 语义必须一起设计。\n\n事务边界一般应该围绕一个完整业务用例，让必须保持原子一致的数据库操作处于同一个事务中。同时不应该随意把耗时远程调用放进长数据库事务，否则可能长时间占用数据库连接和锁。\n\n如果不同资源之间不能靠单数据库事务保证一致性，就需要另外设计消息、补偿或最终一致性机制，而不是扩大一个本地事务就认为问题解决了。",
+      "followUpQuestion": null,
+      "scoringPoints": [
+        {
+          "scoringPointId": 301,
+          "pointType": "CORE",
+          "content": "能说明 Spring 声明式事务主要建立在代理拦截之上，并识别 self-invocation 等绕过代理导致 @Transactional 不生效的情况。",
+          "weight": 20
+        },
+        {
+          "scoringPointId": 302,
+          "pointType": "KEY",
+          "content": "能说明 Spring 默认 rollback 规则与异常类型有关，RuntimeException/Error 默认触发回滚，而 checked exception 默认不触发回滚；业务需要时可配置 rollbackFor 等规则。",
+          "weight": 20
+        },
+        {
+          "scoringPointId": 303,
+          "pointType": "KEY",
+          "content": "能认识到 catch 后吞掉异常、错误的事务管理器或错误的调用边界都可能使实际事务行为与开发者预期不同。",
+          "weight": 20
+        },
+        {
+          "scoringPointId": 304,
+          "pointType": "PRINCIPLE",
+          "content": "能按照完整业务用例定义事务边界，使必须共同成功或失败的数据库操作位于同一事务，并避免不必要地扩大事务范围。",
+          "weight": 25
+        },
+        {
+          "scoringPointId": 305,
+          "pointType": "ADVANCED",
+          "content": "能意识到长时间远程调用、跨资源操作不能简单依赖单数据库本地事务解决，并能提出缩短事务或采用消息、补偿等一致性方案。",
+          "weight": 15
+        }
+      ],
+      "followUpTargetPointIds": [],
+      "hits": [
+        {
+          "rank": 1,
+          "title": "公开合成知识 3-1",
+          "content": "公开合成证据 PUBLIC-03-1：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-03-1",
+          "documentId": 1031,
+          "chunkIndex": 1,
+          "cosineScore": "0.8999999761581421",
+          "scoreFloat32BitsHex": "3f666666",
+          "baselineLabel": 1,
+          "chunkId": 2031,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 2,
+          "title": "公开合成知识 3-2",
+          "content": "公开合成证据 PUBLIC-03-2：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-03-2",
+          "documentId": 1032,
+          "chunkIndex": 2,
+          "cosineScore": "0.7000001072883606",
+          "scoreFloat32BitsHex": "3f333335",
+          "baselineLabel": 0,
+          "chunkId": 2032,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 3,
+          "title": "公开合成知识 3-3",
+          "content": "公开合成证据 PUBLIC-03-3：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-03-3",
+          "documentId": 1033,
+          "chunkIndex": 3,
+          "cosineScore": "0.6999999284744263",
+          "scoreFloat32BitsHex": "3f333332",
+          "baselineLabel": 1,
+          "chunkId": 2033,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 4,
+          "title": "公开合成知识 3-4",
+          "content": "公开合成证据 PUBLIC-03-4：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-03-4",
+          "documentId": 1034,
+          "chunkIndex": 4,
+          "cosineScore": "0.550000011920929",
+          "scoreFloat32BitsHex": "3f0ccccd",
+          "baselineLabel": 2,
+          "chunkId": 2034,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 5,
+          "title": "公开合成知识 3-5",
+          "content": "公开合成证据 PUBLIC-03-5：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-03-5",
+          "documentId": 1035,
+          "chunkIndex": 5,
+          "cosineScore": "0.0",
+          "scoreFloat32BitsHex": "00000000",
+          "baselineLabel": 0,
+          "chunkId": 2035,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        }
+      ],
+      "embeddedQuery": "主问题：Spring 事务有哪些常见失效场景？如果一个业务方法同时调用多个数据库操作，应该如何设计事务边界和异常回滚策略？\n评分点：\n- 能说明 Spring 声明式事务主要建立在代理拦截之上，并识别 self-invocation 等绕过代理导致 @Transactional 不生效的情况。\n- 能说明 Spring 默认 rollback 规则与异常类型有关，RuntimeException/Error 默认触发回滚，而 checked exception 默认不触发回滚；业务需要时可配置 rollbackFor 等规则。\n- 能认识到 catch 后吞掉异常、错误的事务管理器或错误的调用边界都可能使实际事务行为与开发者预期不同。\n- 能按照完整业务用例定义事务边界，使必须共同成功或失败的数据库操作位于同一事务，并避免不必要地扩大事务范围。\n- 能意识到长时间远程调用、跨资源操作不能简单依赖单数据库本地事务解决，并能提出缩短事务或采用消息、补偿等一致性方案。"
+    },
+    {
+      "queryId": "PUBLIC-04",
+      "mode": "MAIN_ANSWER",
+      "knowledgePoint": "concurrent_inventory_idempotency",
+      "category": "PROJECT_SCENARIO",
+      "originalQuestion": "假设库存最终以 MySQL 为事实来源，当前库存只剩 1 个，同时来了很多个扣减请求，而且客户端还可能因为超时重复请求。你会如何设计，保证不超卖、不重复扣减，并能够正确处理失败和重试？",
+      "referenceAnswer": "我会先把两个问题分开：一个是并发请求导致超卖，另一个是同一个业务请求因为重试导致重复扣减。\n\n对防超卖，如果库存最终以 MySQL 为准，可以使用数据库原子条件更新，例如：\n\n```sql\nUPDATE product\nSET stock = stock - 1\nWHERE id = ?\n  AND stock > 0;\n```\n\n然后检查 affected rows，只有更新成功的请求才算扣减成功。\n\n也可以使用带 version 的乐观锁。另一种正确方案是在一个事务里先通过 `SELECT ... FOR UPDATE` 锁住对应库存行，确认库存大于 0 后再扣减。关键点是库存检查和扣减必须受到同一个原子数据库操作或事务行锁临界区保护，不能无锁地先 SELECT，再在 Java 里判断后单独 UPDATE。\n\n对重复请求，我会让一次业务操作携带稳定的 requestId 或业务幂等键，并在数据库建立唯一约束。第一次请求创建处理记录并执行扣减；同一个 requestId 再进来时不能再次扣库存，而是返回之前的处理状态或结果。\n\n库存扣减、幂等记录以及与业务强相关的订单状态，应该设计清楚事务边界。事务中任何关键步骤失败，就不要留下“库存已经扣了但业务记录没成功”这种半完成状态。\n\n对数据库死锁、锁等待超时或者网络超时，可以设计有限重试，但重试必须继续携带同一个幂等键。特别是客户端或网络超时并不代表数据库操作一定失败，因此不能简单生成一个新的 requestId 再执行一次扣减，而应先结合已有幂等状态判断前一次操作结果。",
+      "followUpQuestion": null,
+      "scoringPoints": [
+        {
+          "scoringPointId": 401,
+          "pointType": "CORE",
+          "content": "能把库存检查和扣减放进同一次原子数据库操作，或者同一个数据库事务保护的行锁临界区，避免无锁地先查询库存、在 Java 中判断后再单独更新。条件 UPDATE 并检查更新行数、version 乐观锁、事务内 SELECT ... FOR UPDATE 后检查并扣减，任一正确方案均可覆盖。",
+          "weight": 30
+        },
+        {
+          "scoringPointId": 402,
+          "pointType": "KEY",
+          "content": "能为一次业务操作设计稳定的 requestId 或幂等键，并通过数据库唯一约束或等价的持久化机制保证同一业务请求即使被客户端重复提交，也不会再次执行库存扣减。",
+          "weight": 25
+        },
+        {
+          "scoringPointId": 403,
+          "pointType": "PRINCIPLE",
+          "content": "能明确设计事务边界，使库存变更、幂等状态以及必须保持一致的核心业务记录不会留下部分成功状态；事务失败时能够整体回滚或进入明确的可恢复状态。",
+          "weight": 20
+        },
+        {
+          "scoringPointId": 404,
+          "pointType": "ADVANCED",
+          "content": "能正确处理失败与重试语义：认识到客户端或网络超时不等于数据库操作失败；对死锁、锁等待超时等可重试失败采用有限重试；重试继续复用同一个业务幂等键，并能够根据已有处理状态避免重复扣减。",
+          "weight": 25
+        }
+      ],
+      "followUpTargetPointIds": [],
+      "hits": [
+        {
+          "rank": 1,
+          "title": "公开合成知识 4-1",
+          "content": "公开合成证据 PUBLIC-04-1：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-04-1",
+          "documentId": 1041,
+          "chunkIndex": 1,
+          "cosineScore": "0.7799999713897705",
+          "scoreFloat32BitsHex": "3f47ae14",
+          "baselineLabel": 1,
+          "chunkId": 2041,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 2,
+          "title": "公开合成知识 4-2",
+          "content": "公开合成证据 PUBLIC-04-2：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-04-2",
+          "documentId": 1042,
+          "chunkIndex": 2,
+          "cosineScore": "0.7200000286102295",
+          "scoreFloat32BitsHex": "3f3851ec",
+          "baselineLabel": 0,
+          "chunkId": 2042,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 3,
+          "title": "公开合成知识 4-3",
+          "content": "公开合成证据 PUBLIC-04-3：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-04-3",
+          "documentId": 1043,
+          "chunkIndex": 3,
+          "cosineScore": "0.6800000071525574",
+          "scoreFloat32BitsHex": "3f2e147b",
+          "baselineLabel": 1,
+          "chunkId": 2043,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 4,
+          "title": "公开合成知识 4-4",
+          "content": "公开合成证据 PUBLIC-04-4：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-04-4",
+          "documentId": 1044,
+          "chunkIndex": 4,
+          "cosineScore": "0.6200000047683716",
+          "scoreFloat32BitsHex": "3f1eb852",
+          "baselineLabel": 2,
+          "chunkId": 2044,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 5,
+          "title": "公开合成知识 4-5",
+          "content": "公开合成证据 PUBLIC-04-5：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-04-5",
+          "documentId": 1045,
+          "chunkIndex": 5,
+          "cosineScore": "0.44999998807907104",
+          "scoreFloat32BitsHex": "3ee66666",
+          "baselineLabel": 0,
+          "chunkId": 2045,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        }
+      ],
+      "embeddedQuery": "主问题：假设库存最终以 MySQL 为事实来源，当前库存只剩 1 个，同时来了很多个扣减请求，而且客户端还可能因为超时重复请求。你会如何设计，保证不超卖、不重复扣减，并能够正确处理失败和重试？\n评分点：\n- 能把库存检查和扣减放进同一次原子数据库操作，或者同一个数据库事务保护的行锁临界区，避免无锁地先查询库存、在 Java 中判断后再单独更新。条件 UPDATE 并检查更新行数、version 乐观锁、事务内 SELECT ... FOR UPDATE 后检查并扣减，任一正确方案均可覆盖。\n- 能为一次业务操作设计稳定的 requestId 或幂等键，并通过数据库唯一约束或等价的持久化机制保证同一业务请求即使被客户端重复提交，也不会再次执行库存扣减。\n- 能明确设计事务边界，使库存变更、幂等状态以及必须保持一致的核心业务记录不会留下部分成功状态；事务失败时能够整体回滚或进入明确的可恢复状态。\n- 能正确处理失败与重试语义：认识到客户端或网络超时不等于数据库操作失败；对死锁、锁等待超时等可重试失败采用有限重试；重试继续复用同一个业务幂等键，并能够根据已有处理状态避免重复扣减。"
+    },
+    {
+      "queryId": "PUBLIC-05",
+      "mode": "FOLLOW_UP_ANSWER",
+      "knowledgePoint": "arraylist_vs_linkedlist",
+      "category": "JAVA_COLLECTION",
+      "originalQuestion": "ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？",
+      "referenceAnswer": "ArrayList 底层是可扩容数组，因此根据下标随机访问通常很快，`get` 是 O(1)。尾部追加通常也比较高效，但中间插入或删除往往需要移动后面的元素。\n\nLinkedList 是双向链表，根据下标查找需要从链表中遍历，因此随机访问是 O(n)。如果已经拿到了目标节点附近的位置，链表插入和删除不需要搬移大量元素。\n\n实际开发里不能简单说“增删多就一定用 LinkedList”。很多业务仍然更适合 ArrayList，因为它随机访问好、内存布局更紧凑；只有确实需要大量链表式操作时才考虑 LinkedList。",
+      "followUpQuestion": "如果通过索引在中间删插，与已经定位的迭代器操作有什么区别？你会怎样按业务访问模式选这两个集合？",
+      "scoringPoints": [
+        {
+          "scoringPointId": 501,
+          "pointType": "CORE",
+          "content": "能说明 ArrayList 基于动态数组，而 LinkedList 基于双向链表，两者底层存储结构不同。",
+          "weight": 30
+        },
+        {
+          "scoringPointId": 502,
+          "pointType": "KEY",
+          "content": "能说明 ArrayList 根据下标随机访问通常为 O(1)，而 LinkedList 按下标访问通常需要遍历，为 O(n)。",
+          "weight": 25
+        },
+        {
+          "scoringPointId": 503,
+          "pointType": "KEY",
+          "content": "能说明 ArrayList 中间插入或删除通常需要移动元素；LinkedList 在已经定位到节点后修改链接本身开销较低，但定位节点仍可能需要 O(n)。",
+          "weight": 25
+        },
+        {
+          "scoringPointId": 504,
+          "pointType": "PRINCIPLE",
+          "content": "能结合实际访问模式选择集合，而不是机械地认为“增删多就用 LinkedList、查询多就用 ArrayList”。",
+          "weight": 20
+        }
+      ],
+      "followUpTargetPointIds": [
+        503,
+        504
+      ],
+      "hits": [
+        {
+          "rank": 1,
+          "title": "公开合成知识 5-1",
+          "content": "公开合成证据 PUBLIC-05-1：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-05-1",
+          "documentId": 1051,
+          "chunkIndex": 1,
+          "cosineScore": "0.8799999952316284",
+          "scoreFloat32BitsHex": "3f6147ae",
+          "baselineLabel": 1,
+          "chunkId": 2051,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 2,
+          "title": "公开合成知识 5-2",
+          "content": "公开合成证据 PUBLIC-05-2：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-05-2",
+          "documentId": 1052,
+          "chunkIndex": 2,
+          "cosineScore": "0.7599999904632568",
+          "scoreFloat32BitsHex": "3f428f5c",
+          "baselineLabel": 0,
+          "chunkId": 2052,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 3,
+          "title": "公开合成知识 5-3",
+          "content": "公开合成证据 PUBLIC-05-3：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-05-3",
+          "documentId": 1053,
+          "chunkIndex": 3,
+          "cosineScore": "0.699999988079071",
+          "scoreFloat32BitsHex": "3f333333",
+          "baselineLabel": 1,
+          "chunkId": 2053,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 4,
+          "title": "公开合成知识 5-4",
+          "content": "公开合成证据 PUBLIC-05-4：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-05-4",
+          "documentId": 1054,
+          "chunkIndex": 4,
+          "cosineScore": "0.5899999737739563",
+          "scoreFloat32BitsHex": "3f170a3d",
+          "baselineLabel": 2,
+          "chunkId": 2054,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 5,
+          "title": "公开合成知识 5-5",
+          "content": "公开合成证据 PUBLIC-05-5：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-05-5",
+          "documentId": 1055,
+          "chunkIndex": 5,
+          "cosineScore": "-0.20000000298023224",
+          "scoreFloat32BitsHex": "be4ccccd",
+          "baselineLabel": 0,
+          "chunkId": 2055,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        }
+      ],
+      "embeddedQuery": "主问题：ArrayList 和 LinkedList 在底层结构、常见操作复杂度和实际使用场景上有什么区别？\n追问：如果通过索引在中间删插，与已经定位的迭代器操作有什么区别？你会怎样按业务访问模式选这两个集合？\n追问目标评分点：\n- 能说明 ArrayList 中间插入或删除通常需要移动元素；LinkedList 在已经定位到节点后修改链接本身开销较低，但定位节点仍可能需要 O(n)。\n- 能结合实际访问模式选择集合，而不是机械地认为“增删多就用 LinkedList、查询多就用 ArrayList”。"
+    },
+    {
+      "queryId": "PUBLIC-06",
+      "mode": "FOLLOW_UP_ANSWER",
+      "knowledgePoint": "volatile_jmm",
+      "category": "JAVA_CONCURRENCY",
+      "originalQuestion": "`volatile` 能保证什么？为什么 `volatile int count` 仍然不能保证 `count++` 在线程并发下是安全的？",
+      "referenceAnswer": "volatile 最重要的作用是提供线程之间的可见性和特定的内存顺序保证。一个线程对 volatile 变量的写，与之后另一个线程对同一变量的读之间存在 happens-before 关系。\n\n但 volatile 不是互斥锁。`count++` 不是单独一次不可分割操作，它包含读取 count、加一、再写回。两个线程可能同时读取相同旧值，然后分别写回，从而丢失更新。\n\n因此 volatile 很适合状态标记这类“一个线程写、其他线程观察”的场景；如果需要对共享计数做复合原子更新，应该考虑 `synchronized`、Lock 或 `AtomicInteger` 等机制。",
+      "followUpQuestion": "volatile 的写读有哪些 happens-before 和顺序保证？停止标记与并发计数分别该用什么？",
+      "scoringPoints": [
+        {
+          "scoringPointId": 601,
+          "pointType": "CORE",
+          "content": "能说明 volatile 能提供共享变量修改的可见性，使线程能够按照 Java Memory Model 的规则观察到其他线程的 volatile 写入。",
+          "weight": 30
+        },
+        {
+          "scoringPointId": 602,
+          "pointType": "PRINCIPLE",
+          "content": "能说明对 volatile 变量的写与后续对同一变量的读建立 happens-before 关系，并对相关内存操作提供顺序约束。",
+          "weight": 25
+        },
+        {
+          "scoringPointId": 603,
+          "pointType": "KEY",
+          "content": "能说明 count++ 属于读取、计算、写回组成的复合 read-modify-write 操作，volatile 不能把整个复合操作变成原子操作，因此可能发生丢失更新。",
+          "weight": 30
+        },
+        {
+          "scoringPointId": 604,
+          "pointType": "KEY",
+          "content": "能根据场景选择 volatile、synchronized/Lock 或 AtomicInteger，而不是认为 volatile 可以替代所有线程同步机制。",
+          "weight": 15
+        }
+      ],
+      "followUpTargetPointIds": [
+        602,
+        604
+      ],
+      "hits": [
+        {
+          "rank": 1,
+          "title": "公开合成知识 6-1",
+          "content": "公开合成证据 PUBLIC-06-1：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-06-1",
+          "documentId": 1061,
+          "chunkIndex": 1,
+          "cosineScore": "0.8100000023841858",
+          "scoreFloat32BitsHex": "3f4f5c29",
+          "baselineLabel": 1,
+          "chunkId": 2061,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 2,
+          "title": "公开合成知识 6-2",
+          "content": "公开合成证据 PUBLIC-06-2：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-06-2",
+          "documentId": 1062,
+          "chunkIndex": 2,
+          "cosineScore": "0.7300000190734863",
+          "scoreFloat32BitsHex": "3f3ae148",
+          "baselineLabel": 0,
+          "chunkId": 2062,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 3,
+          "title": "公开合成知识 6-3",
+          "content": "公开合成证据 PUBLIC-06-3：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-06-3",
+          "documentId": 1063,
+          "chunkIndex": 3,
+          "cosineScore": "0.6600000262260437",
+          "scoreFloat32BitsHex": "3f28f5c3",
+          "baselineLabel": 1,
+          "chunkId": 2063,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 4,
+          "title": "公开合成知识 6-4",
+          "content": "公开合成证据 PUBLIC-06-4：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-06-4",
+          "documentId": 1064,
+          "chunkIndex": 4,
+          "cosineScore": "0.6000000238418579",
+          "scoreFloat32BitsHex": "3f19999a",
+          "baselineLabel": 2,
+          "chunkId": 2064,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 5,
+          "title": "公开合成知识 6-5",
+          "content": "公开合成证据 PUBLIC-06-5：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-06-5",
+          "documentId": 1065,
+          "chunkIndex": 5,
+          "cosineScore": "0.49000000953674316",
+          "scoreFloat32BitsHex": "3efae148",
+          "baselineLabel": 0,
+          "chunkId": 2065,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        }
+      ],
+      "embeddedQuery": "主问题：`volatile` 能保证什么？为什么 `volatile int count` 仍然不能保证 `count++` 在线程并发下是安全的？\n追问：volatile 的写读有哪些 happens-before 和顺序保证？停止标记与并发计数分别该用什么？\n追问目标评分点：\n- 能说明对 volatile 变量的写与后续对同一变量的读建立 happens-before 关系，并对相关内存操作提供顺序约束。\n- 能根据场景选择 volatile、synchronized/Lock 或 AtomicInteger，而不是认为 volatile 可以替代所有线程同步机制。"
+    },
+    {
+      "queryId": "PUBLIC-07",
+      "mode": "FOLLOW_UP_ANSWER",
+      "knowledgePoint": "transaction_boundary",
+      "category": "SPRING",
+      "originalQuestion": "Spring 事务有哪些常见失效场景？如果一个业务方法同时调用多个数据库操作，应该如何设计事务边界和异常回滚策略？",
+      "referenceAnswer": "Spring 声明式事务通常依赖 AOP 代理，因此调用必须真正经过代理。常见问题包括同类内部自调用绕过代理、某些无法被代理的方法形式，以及错误的事务配置。\n\n另一个很常见的问题是异常处理。Spring 默认情况下，`RuntimeException` 和 `Error` 会触发回滚，而 checked exception 默认不触发回滚；如果业务需要，应该显式配置 `rollbackFor` 等回滚规则。\n\n如果事务内部把异常 catch 住以后正常返回，外层事务基础设施可能不知道应该回滚，所以异常处理和 rollback 语义必须一起设计。\n\n事务边界一般应该围绕一个完整业务用例，让必须保持原子一致的数据库操作处于同一个事务中。同时不应该随意把耗时远程调用放进长数据库事务，否则可能长时间占用数据库连接和锁。\n\n如果不同资源之间不能靠单数据库事务保证一致性，就需要另外设计消息、补偿或最终一致性机制，而不是扩大一个本地事务就认为问题解决了。",
+      "followUpQuestion": "默认哪些异常会回滚，checked exception 怎么处理？在事务中 catch 后正常返回会怎样？",
+      "scoringPoints": [
+        {
+          "scoringPointId": 701,
+          "pointType": "CORE",
+          "content": "能说明 Spring 声明式事务主要建立在代理拦截之上，并识别 self-invocation 等绕过代理导致 @Transactional 不生效的情况。",
+          "weight": 20
+        },
+        {
+          "scoringPointId": 702,
+          "pointType": "KEY",
+          "content": "能说明 Spring 默认 rollback 规则与异常类型有关，RuntimeException/Error 默认触发回滚，而 checked exception 默认不触发回滚；业务需要时可配置 rollbackFor 等规则。",
+          "weight": 20
+        },
+        {
+          "scoringPointId": 703,
+          "pointType": "KEY",
+          "content": "能认识到 catch 后吞掉异常、错误的事务管理器或错误的调用边界都可能使实际事务行为与开发者预期不同。",
+          "weight": 20
+        },
+        {
+          "scoringPointId": 704,
+          "pointType": "PRINCIPLE",
+          "content": "能按照完整业务用例定义事务边界，使必须共同成功或失败的数据库操作位于同一事务，并避免不必要地扩大事务范围。",
+          "weight": 25
+        },
+        {
+          "scoringPointId": 705,
+          "pointType": "ADVANCED",
+          "content": "能意识到长时间远程调用、跨资源操作不能简单依赖单数据库本地事务解决，并能提出缩短事务或采用消息、补偿等一致性方案。",
+          "weight": 15
+        }
+      ],
+      "followUpTargetPointIds": [
+        702,
+        703
+      ],
+      "hits": [
+        {
+          "rank": 1,
+          "title": "公开合成知识 7-1",
+          "content": "公开合成证据 PUBLIC-07-1：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-07-1",
+          "documentId": 1071,
+          "chunkIndex": 1,
+          "cosineScore": "0.949999988079071",
+          "scoreFloat32BitsHex": "3f733333",
+          "baselineLabel": 1,
+          "chunkId": 2071,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 2,
+          "title": "公开合成知识 7-2",
+          "content": "公开合成证据 PUBLIC-07-2：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-07-2",
+          "documentId": 1072,
+          "chunkIndex": 2,
+          "cosineScore": "0.800000011920929",
+          "scoreFloat32BitsHex": "3f4ccccd",
+          "baselineLabel": 0,
+          "chunkId": 2072,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 3,
+          "title": "公开合成知识 7-3",
+          "content": "公开合成证据 PUBLIC-07-3：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-07-3",
+          "documentId": 1073,
+          "chunkIndex": 3,
+          "cosineScore": "0.75",
+          "scoreFloat32BitsHex": "3f400000",
+          "baselineLabel": 1,
+          "chunkId": 2073,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 4,
+          "title": "公开合成知识 7-4",
+          "content": "公开合成证据 PUBLIC-07-4：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-07-4",
+          "documentId": 1074,
+          "chunkIndex": 4,
+          "cosineScore": "0.699999988079071",
+          "scoreFloat32BitsHex": "3f333333",
+          "baselineLabel": 2,
+          "chunkId": 2074,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 5,
+          "title": "公开合成知识 7-5",
+          "content": "公开合成证据 PUBLIC-07-5：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-07-5",
+          "documentId": 1075,
+          "chunkIndex": 5,
+          "cosineScore": "0.6000000238418579",
+          "scoreFloat32BitsHex": "3f19999a",
+          "baselineLabel": 0,
+          "chunkId": 2075,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        }
+      ],
+      "embeddedQuery": "主问题：Spring 事务有哪些常见失效场景？如果一个业务方法同时调用多个数据库操作，应该如何设计事务边界和异常回滚策略？\n追问：默认哪些异常会回滚，checked exception 怎么处理？在事务中 catch 后正常返回会怎样？\n追问目标评分点：\n- 能说明 Spring 默认 rollback 规则与异常类型有关，RuntimeException/Error 默认触发回滚，而 checked exception 默认不触发回滚；业务需要时可配置 rollbackFor 等规则。\n- 能认识到 catch 后吞掉异常、错误的事务管理器或错误的调用边界都可能使实际事务行为与开发者预期不同。"
+    },
+    {
+      "queryId": "PUBLIC-08",
+      "mode": "FOLLOW_UP_ANSWER",
+      "knowledgePoint": "concurrent_inventory_idempotency",
+      "category": "PROJECT_SCENARIO",
+      "originalQuestion": "假设库存最终以 MySQL 为事实来源，当前库存只剩 1 个，同时来了很多个扣减请求，而且客户端还可能因为超时重复请求。你会如何设计，保证不超卖、不重复扣减，并能够正确处理失败和重试？",
+      "referenceAnswer": "我会先把两个问题分开：一个是并发请求导致超卖，另一个是同一个业务请求因为重试导致重复扣减。\n\n对防超卖，如果库存最终以 MySQL 为准，可以使用数据库原子条件更新，例如：\n\n```sql\nUPDATE product\nSET stock = stock - 1\nWHERE id = ?\n  AND stock > 0;\n```\n\n然后检查 affected rows，只有更新成功的请求才算扣减成功。\n\n也可以使用带 version 的乐观锁。另一种正确方案是在一个事务里先通过 `SELECT ... FOR UPDATE` 锁住对应库存行，确认库存大于 0 后再扣减。关键点是库存检查和扣减必须受到同一个原子数据库操作或事务行锁临界区保护，不能无锁地先 SELECT，再在 Java 里判断后单独 UPDATE。\n\n对重复请求，我会让一次业务操作携带稳定的 requestId 或业务幂等键，并在数据库建立唯一约束。第一次请求创建处理记录并执行扣减；同一个 requestId 再进来时不能再次扣库存，而是返回之前的处理状态或结果。\n\n库存扣减、幂等记录以及与业务强相关的订单状态，应该设计清楚事务边界。事务中任何关键步骤失败，就不要留下“库存已经扣了但业务记录没成功”这种半完成状态。\n\n对数据库死锁、锁等待超时或者网络超时，可以设计有限重试，但重试必须继续携带同一个幂等键。特别是客户端或网络超时并不代表数据库操作一定失败，因此不能简单生成一个新的 requestId 再执行一次扣减，而应先结合已有幂等状态判断前一次操作结果。",
+      "followUpQuestion": "库存、幂等处理记录和订单如何共同提交？客户端超时或数据库死锁后怎样确认结果并重试？",
+      "scoringPoints": [
+        {
+          "scoringPointId": 801,
+          "pointType": "CORE",
+          "content": "能把库存检查和扣减放进同一次原子数据库操作，或者同一个数据库事务保护的行锁临界区，避免无锁地先查询库存、在 Java 中判断后再单独更新。条件 UPDATE 并检查更新行数、version 乐观锁、事务内 SELECT ... FOR UPDATE 后检查并扣减，任一正确方案均可覆盖。",
+          "weight": 30
+        },
+        {
+          "scoringPointId": 802,
+          "pointType": "KEY",
+          "content": "能为一次业务操作设计稳定的 requestId 或幂等键，并通过数据库唯一约束或等价的持久化机制保证同一业务请求即使被客户端重复提交，也不会再次执行库存扣减。",
+          "weight": 25
+        },
+        {
+          "scoringPointId": 803,
+          "pointType": "PRINCIPLE",
+          "content": "能明确设计事务边界，使库存变更、幂等状态以及必须保持一致的核心业务记录不会留下部分成功状态；事务失败时能够整体回滚或进入明确的可恢复状态。",
+          "weight": 20
+        },
+        {
+          "scoringPointId": 804,
+          "pointType": "ADVANCED",
+          "content": "能正确处理失败与重试语义：认识到客户端或网络超时不等于数据库操作失败；对死锁、锁等待超时等可重试失败采用有限重试；重试继续复用同一个业务幂等键，并能够根据已有处理状态避免重复扣减。",
+          "weight": 25
+        }
+      ],
+      "followUpTargetPointIds": [
+        803,
+        804
+      ],
+      "hits": [
+        {
+          "rank": 1,
+          "title": "公开合成知识 8-1",
+          "content": "公开合成证据 PUBLIC-08-1：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-08-1",
+          "documentId": 1081,
+          "chunkIndex": 1,
+          "cosineScore": "0.7900000214576721",
+          "scoreFloat32BitsHex": "3f4a3d71",
+          "baselineLabel": 1,
+          "chunkId": 2081,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 2,
+          "title": "公开合成知识 8-2",
+          "content": "公开合成证据 PUBLIC-08-2：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-08-2",
+          "documentId": 1082,
+          "chunkIndex": 2,
+          "cosineScore": "0.7099999785423279",
+          "scoreFloat32BitsHex": "3f35c28f",
+          "baselineLabel": 0,
+          "chunkId": 2082,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 3,
+          "title": "公开合成知识 8-3",
+          "content": "公开合成证据 PUBLIC-08-3：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-08-3",
+          "documentId": 1083,
+          "chunkIndex": 3,
+          "cosineScore": "0.6899999976158142",
+          "scoreFloat32BitsHex": "3f30a3d7",
+          "baselineLabel": 1,
+          "chunkId": 2083,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 4,
+          "title": "公开合成知识 8-4",
+          "content": "公开合成证据 PUBLIC-08-4：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-08-4",
+          "documentId": 1084,
+          "chunkIndex": 4,
+          "cosineScore": "0.5799999833106995",
+          "scoreFloat32BitsHex": "3f147ae1",
+          "baselineLabel": 2,
+          "chunkId": 2084,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        },
+        {
+          "rank": 5,
+          "title": "公开合成知识 8-5",
+          "content": "公开合成证据 PUBLIC-08-5：此片段仅测试检索顺序、阈值、Prompt与Trace一致性。",
+          "vectorId": "public-vector-08-5",
+          "documentId": 1085,
+          "chunkIndex": 5,
+          "cosineScore": "0.30000001192092896",
+          "scoreFloat32BitsHex": "3e99999a",
+          "baselineLabel": 0,
+          "chunkId": 2085,
+          "documentVersion": 1,
+          "embeddingVersion": "public-synthetic-embedding-v1"
+        }
+      ],
+      "embeddedQuery": "主问题：假设库存最终以 MySQL 为事实来源，当前库存只剩 1 个，同时来了很多个扣减请求，而且客户端还可能因为超时重复请求。你会如何设计，保证不超卖、不重复扣减，并能够正确处理失败和重试？\n追问：库存、幂等处理记录和订单如何共同提交？客户端超时或数据库死锁后怎样确认结果并重试？\n追问目标评分点：\n- 能明确设计事务边界，使库存变更、幂等状态以及必须保持一致的核心业务记录不会留下部分成功状态；事务失败时能够整体回滚或进入明确的可恢复状态。\n- 能正确处理失败与重试语义：认识到客户端或网络超时不等于数据库操作失败；对死锁、锁等待超时等可重试失败采用有限重试；重试继续复用同一个业务幂等键，并能够根据已有处理状态避免重复扣减。"
+    }
+  ]
+}
