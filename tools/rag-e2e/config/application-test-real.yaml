@@ -1,0 +1,10 @@
+# Standalone E2E runtime uses production classes, never target/test-classes or local credentials.
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/ai_interview_test
+    username: ${E2E_DB_USERNAME}
+    password: ${E2E_DB_PASSWORD}
+milvus:
+  database-name: default
+  collection-name: knowledge_chunk_vectors_test
+# Explicit program property source supplies model gate, keys, dimensions and provider after authorization.

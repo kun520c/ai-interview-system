@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "rag-p3-admission-rule-v1",
+  "selectionStatus": "IN_SAMPLE_EXPLORATORY_SELECTED_FOR_PRELOCKED_HOLDOUT",
+  "primaryStrategy": "C_RERANK_TOP2_SCORE_GATE",
+  "minimumRelevanceScore": 0.5,
+  "comparisonOperator": ">=",
+  "candidateScope": "EXACT_FIRST_TWO_RERANK_RESULTS",
+  "maxEvidence": 2,
+  "fallbackWhenNone": "EMPTY_LIST",
+  "backfillFromRank3": false,
+  "lowInformationStrategy": "D_RERANK_TOP2_LOW_INFORMATION",
+  "lowInformationRuleVersion": "p2-reference-only-v1",
+  "scoreIsCalibratedProbability": false,
+  "evidenceSufficiency": "NOT_ASSESSED; never promoted from relevance score or partial label",
+  "productionDefaultModified": false
+}

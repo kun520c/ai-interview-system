@@ -1,0 +1,5 @@
+# Standalone experiment defaults only. Not imported by application.yaml or production component scan.
+rag:
+  experimental-evidence:
+    enabled: false
+    # True requires explicit Workspace/Key and an independently frozen gate-prompt-path.

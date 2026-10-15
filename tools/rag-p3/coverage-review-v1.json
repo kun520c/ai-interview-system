@@ -1,0 +1,1571 @@
+{
+  "schemaVersion": "rag-p3-coverage-audit-v1",
+  "independence": "Independent of new retrieval outputs, NOT an independent human review",
+  "corpusFilesReviewed": 21,
+  "corpusCombinedSha256": "153087dcca49ff9e230190cbb39dcf78093e103cb1e558e1397db295f3562690",
+  "missingKeywordIsNotSoleSemanticProof": true,
+  "reviews": [
+    {
+      "queryId": "P3-C01",
+      "expectedCoverage": "COVERED",
+      "reviewSource": "AI_SEMANTIC_DOCUMENT_REVIEW_BEFORE_RETRIEVAL",
+      "humanConfirmed": false,
+      "basisOrClosestNonAnswer": [
+        {
+          "path": "docs/rag/source-documents/e02_java21_arraylist_vs_linkedlist.md",
+          "line": 22,
+          "quote": "LinkedList 的下标操作从较近的头端或尾端遍历到目标位置；随机下标访问通常为 O(n)。插入或删除已定位节点时，调整相邻链接本身成本较低，但调用 add(index, value) 前的定位可能仍为 O(n)。已有 ListIterator 在当前游标位置修改与每次重新按下标定位，必须分开分析。[LINKED]",
+          "documentSha256": "8863861e7379cbb3120926a649eb0243945861732aec9975ce97cdcb7c640dec"
+        },
+        {
+          "path": "docs/rag/source-documents/e02_java21_arraylist_vs_linkedlist.md",
+          "line": 35,
+          "quote": "两端操作与中间按下标修改不是同一种需求。顺序遍历链表应沿 iterator 前进，反复用 get(i) 会不断重新定位。链表修改的优势需要“位置已知或只操作两端”等条件，不能由“写操作次数多”直接推出整体更快。[ARRAY][LINKED]",
+          "documentSha256": "8863861e7379cbb3120926a649eb0243945861732aec9975ce97cdcb7c640dec"
+        }
+      ],
+      "mechanismBoundaryReason": "链表下标定位、反复get与已有游标的区别。",
+      "all21DocumentTermAudit": [],
+      "officialMechanismReferences": [],
+      "officialReferencesAreNotAddedToCorpus": true,
+      "exactQuestionPreviouslyUsed": false,
+      "nearestPriorQuestionSource": "docs\\rag\\evaluation\\PHASE_4C2_HOLDOUT_QUERY_SET.json",
+      "nearestPriorQuestionSimilarity": 0.1869,
+      "noveltyScope": "New question text and scenario; same corpus/topics intentionally allowed; no retrieval preview"
+    },
+    {
+      "queryId": "P3-C02",
+      "expectedCoverage": "COVERED",
+      "reviewSource": "AI_SEMANTIC_DOCUMENT_REVIEW_BEFORE_RETRIEVAL",
+      "humanConfirmed": false,
+      "basisOrClosestNonAnswer": [
+        {
+          "path": "docs/rag/source-documents/h02_openjdk8u_concurrent_hashmap.md",
+          "line": 22,
+          "quote": "写入路径先检查 table 是否已经初始化，再定位目标桶。目标为空时，线程尝试用 CAS 将新节点安装到这个空位置；竞争失败后重新检查并重试，避免覆盖其他线程刚插入的节点。只有确认位置仍为空才能成功安装，并非看到空桶就直接普通赋值。[CHM8]",
+          "documentSha256": "7058c59a4c4c11cda492cb6cc565b85c79a09cbec5b7e3cbf1d9587f30114617"
+        },
+        {
+          "path": "docs/rag/source-documents/h02_openjdk8u_concurrent_hashmap.md",
+          "line": 24,
+          "quote": "非空桶修改链表或树时，putVal 对当前桶头对象 synchronized，并在取得锁后复核 table 该位置仍指向这个桶头，然后按桶类型查找、更新或插入。这主要串行化同一个桶的结构修改，不是锁住整个 Map。复核很关键：等待期间桶可能已被迁移或更换，不能继续按过期的头节点操作。[CHM8]",
+          "documentSha256": "7058c59a4c4c11cda492cb6cc565b85c79a09cbec5b7e3cbf1d9587f30114617"
+        }
+      ],
+      "mechanismBoundaryReason": "空桶CAS失败复核、非空桶头同步及位置复核。",
+      "all21DocumentTermAudit": [],
+      "officialMechanismReferences": [],
+      "officialReferencesAreNotAddedToCorpus": true,
+      "exactQuestionPreviouslyUsed": false,
+      "nearestPriorQuestionSource": "docs\\rag\\evaluation\\PHASE_4C2_HOLDOUT_QUERY_SET.json",
+      "nearestPriorQuestionSimilarity": 0.3333,
+      "noveltyScope": "New question text and scenario; same corpus/topics intentionally allowed; no retrieval preview"
+    },
+    {
+      "queryId": "P3-C03",
+      "expectedCoverage": "COVERED",
+      "reviewSource": "AI_SEMANTIC_DOCUMENT_REVIEW_BEFORE_RETRIEVAL",
+      "humanConfirmed": false,
+      "basisOrClosestNonAnswer": [
+        {
+          "path": "docs/rag/source-documents/m04_volatile_jmm_java21.md",
+          "line": 14,
+          "quote": "对同一个 `volatile` 变量，某次写入按照 synchronization order 后续发生的读，与该写入建立 synchronizes-with 关系。JLS 的 happens-before 规则进一步规定：对 `volatile` 字段的写 happens-before 后续对该字段的读。因而，如果线程 A 先完成普通数据写入，再写入 volatile 状态变量；线程 B 随后读到该状态变量的 volatile 写入，那么 happens-before 的传递关系为这些相关动作提供可见性和顺序约束。可见性应按这些关系理解，而不是把它说成“volatile 禁止所有指令重排”。",
+          "documentSha256": "fd1f73f1e1ce307567bcf6b4cf737315b9c36591f1de3620689a979dea2b760c"
+        },
+        {
+          "path": "docs/rag/source-documents/m04_volatile_jmm_java21.md",
+          "line": 16,
+          "quote": "`volatile` 单次读写提供同步语义，但不提供互斥。多个线程仍可以同时执行临界区中的代码；JMM 也不会因为变量声明为 volatile，就把围绕该变量的任意表达式自动合并成一个不可分割的同步动作。因此，若需求是让一个线程的状态标记被其他线程观察，且写入本身满足业务逻辑，volatile 可能合适；若需求是多个线程对共享状态执行互斥的复合更新，则必须选择能覆盖整个更新过程的同步机制。",
+          "documentSha256": "fd1f73f1e1ce307567bcf6b4cf737315b9c36591f1de3620689a979dea2b760c"
+        }
+      ],
+      "mechanismBoundaryReason": "volatile发布与传递happens-before只覆盖相应写入前的动作；不把可见性当互斥。",
+      "all21DocumentTermAudit": [],
+      "officialMechanismReferences": [],
+      "officialReferencesAreNotAddedToCorpus": true,
+      "exactQuestionPreviouslyUsed": false,
+      "nearestPriorQuestionSource": "docs\\rag\\evaluation\\PHASE_4C2_HOLDOUT_QUERY_SET.json",
+      "nearestPriorQuestionSimilarity": 0.4078,
+      "noveltyScope": "New question text and scenario; same corpus/topics intentionally allowed; no retrieval preview"
+    },
+    {
+      "queryId": "P3-C04",
+      "expectedCoverage": "COVERED",
+      "reviewSource": "AI_SEMANTIC_DOCUMENT_REVIEW_BEFORE_RETRIEVAL",
+      "humanConfirmed": false,
+      "basisOrClosestNonAnswer": [
+        {
+          "path": "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md",
+          "line": 22,
+          "quote": "未自定义时，RuntimeException 与 Error 默认触发回滚，checked exception 默认不触发。业务可设置 rollbackFor/noRollbackFor。示意入口应由外部经代理调用，异常须按既定契约传播或显式标记回滚：",
+          "documentSha256": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66"
+        },
+        {
+          "path": "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md",
+          "line": 35,
+          "quote": "Spring 6.2 可通过 @EnableTransactionManagement(rollbackOn=ALL_EXCEPTIONS) 改变全局默认，包括 checked exception；方法具体规则还可覆盖默认。因此“checked exception 永不回滚”不成立，应核对实际配置。[TX]",
+          "documentSha256": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66"
+        },
+        {
+          "path": "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md",
+          "line": 37,
+          "quote": "catch 后吞掉异常，代理通常看不到这个异常，可能按正常返回提交；但已有 rollback-only 标记时仍可能回滚，不能反推“catch 必定提交”。错误的事务管理器、未覆盖目标 DataSource 的资源绑定，或绕过代理的调用边界，同样可使行为与预期不符。[TX][ROLLBACK][TXRESOURCE]",
+          "documentSha256": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66"
+        }
+      ],
+      "mechanismBoundaryReason": "checked exception默认及全局/方法规则、吞异常与rollback-only边界。",
+      "all21DocumentTermAudit": [],
+      "officialMechanismReferences": [],
+      "officialReferencesAreNotAddedToCorpus": true,
+      "exactQuestionPreviouslyUsed": false,
+      "nearestPriorQuestionSource": "docs\\evaluation\\judge\\PHASE_5A_JUDGE_BENCHMARK.json",
+      "nearestPriorQuestionSimilarity": 0.2283,
+      "noveltyScope": "New question text and scenario; same corpus/topics intentionally allowed; no retrieval preview"
+    },
+    {
+      "queryId": "P3-C05",
+      "expectedCoverage": "COVERED",
+      "reviewSource": "AI_SEMANTIC_DOCUMENT_REVIEW_BEFORE_RETRIEVAL",
+      "humanConfirmed": false,
+      "basisOrClosestNonAnswer": [
+        {
+          "path": "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md",
+          "line": 20,
+          "quote": "在 `REPEATABLE READ` 隔离级别下，同一事务中的 consistent reads 使用该事务第一次 consistent read 建立的 snapshot；因此后续普通、非锁定 `SELECT` 会继续按该快照读取。这里的对象是 consistent read，不是事务中的所有 SQL。`READ COMMITTED` 则不同：同一事务内的每次 consistent read 都建立并读取一个新的 snapshot。回答隔离级别差异时，应说清比较的是一致性读的快照时点。",
+          "documentSha256": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea"
+        },
+        {
+          "path": "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md",
+          "line": 22,
+          "quote": "`SELECT ... FOR UPDATE` 是 locking read，不是普通的历史快照读。MySQL 8.0 手册说明，`SELECT ... FOR UPDATE` 读取最新可用数据，并对读取到的行设置排他锁。因此，普通 consistent nonlocking read 与 locking/current read 在可见数据和加锁行为上不同。MVCC 不代表“没有锁”；需要基于读后写保护时，应区分普通快照查询与 `FOR UPDATE` 等锁定读。",
+          "documentSha256": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea"
+        }
+      ],
+      "mechanismBoundaryReason": "RR第一次一致性读快照与FOR UPDATE最新可用数据的区别；未引入自身更新边界。",
+      "all21DocumentTermAudit": [],
+      "officialMechanismReferences": [],
+      "officialReferencesAreNotAddedToCorpus": true,
+      "exactQuestionPreviouslyUsed": false,
+      "nearestPriorQuestionSource": "docs\\rag\\evaluation\\PHASE_4C2_HOLDOUT_QUERY_SET.json",
+      "nearestPriorQuestionSimilarity": 0.4311,
+      "noveltyScope": "New question text and scenario; same corpus/topics intentionally allowed; no retrieval preview"
+    },
+    {
+      "queryId": "P3-C06",
+      "expectedCoverage": "COVERED",
+      "reviewSource": "AI_SEMANTIC_DOCUMENT_REVIEW_BEFORE_RETRIEVAL",
+      "humanConfirmed": false,
+      "basisOrClosestNonAnswer": [
+        {
+          "path": "docs/rag/source-documents/m07_redis_classic_data_structures.md",
+          "line": 34,
+          "quote": "Set 的成员唯一且无序，适合去重、成员判断和交集、并集、差集：重复加入同一成员不会产生第二份成员。Sorted Set 同样保持成员唯一，但每个成员关联 score 并按 score 排序，适合排行榜或按权重、时间排序。不同成员可以有相同 score，此时按成员的字典序区分，不是 score 也必须唯一。[SET][ZSET]",
+          "documentSha256": "893c0e95adc06f18fb2877feb54c7d14f9a69b2329926046f72f129427354caa"
+        },
+        {
+          "path": "docs/rag/source-documents/m07_redis_classic_data_structures.md",
+          "line": 41,
+          "quote": "对象字段缓存可考虑 Hash；整个对象序列化为一个单值也可用 String。元素去重用 Set，有序两端列表用 List，排行榜用 Sorted Set。这些是基于结构语义的选择，仍需明确更新与读取模式；命令示意不是本仓库已实现的功能。[STRING][HASH][SET][ZSET]",
+          "documentSha256": "893c0e95adc06f18fb2877feb54c7d14f9a69b2329926046f72f129427354caa"
+        }
+      ],
+      "mechanismBoundaryReason": "成员唯一、不同成员可同score及排序，重复成员仍唯一。",
+      "all21DocumentTermAudit": [],
+      "officialMechanismReferences": [],
+      "officialReferencesAreNotAddedToCorpus": true,
+      "exactQuestionPreviouslyUsed": false,
+      "nearestPriorQuestionSource": "docs\\rag\\evaluation\\PHASE_4C2_HOLDOUT_QUERY_SET.json",
+      "nearestPriorQuestionSimilarity": 0.3254,
+      "noveltyScope": "New question text and scenario; same corpus/topics intentionally allowed; no retrieval preview"
+    },
+    {
+      "queryId": "P3-N01",
+      "expectedCoverage": "NOT_COVERED",
+      "reviewSource": "AI_SEMANTIC_DOCUMENT_REVIEW_BEFORE_RETRIEVAL",
+      "humanConfirmed": false,
+      "basisOrClosestNonAnswer": [
+        {
+          "path": "docs/rag/source-documents/h07_redis_distributed_lock_baseline.md",
+          "line": 24,
+          "quote": "在该兼容基线中，可用 Lua 脚本执行 compare-and-delete，并通过 `EVAL` 调用：",
+          "documentSha256": "e79aff2f6d42ce77989566e6d7d611de77ac5720f962f325ffbae307a1ae88c7"
+        },
+        {
+          "path": "docs/rag/source-documents/h07_redis_distributed_lock_baseline.md",
+          "line": 33,
+          "quote": "脚本在 Redis 端完成 token 检查和删除，其他命令不会插入到这两个动作中间。调用方把锁 key 作为 `KEYS[1]`、自己的唯一 token 作为 `ARGV[1]` 传入。Redis 官方 `EVAL` 命令文档记录其自 2.6.0 可用；因此 `SET ... NX PX` 加唯一 token 与 Lua/EVAL 原子释放形成 Redis >= 2.6.12 的经典实现基线。",
+          "documentSha256": "e79aff2f6d42ce77989566e6d7d611de77ac5720f962f325ffbae307a1ae88c7"
+        },
+        {
+          "path": "docs/rag/source-documents/h07_redis_distributed_lock_baseline.md",
+          "line": 39,
+          "quote": "对关键业务不变量，Redis 锁不能替代权威数据存储本身的约束或条件更新。这个工程边界来自租约会到期、客户端可能仍继续运行这一事实：如果重复写入会破坏正确性，最终数据层仍应校验唯一性、版本或业务条件。Redis 锁可用于协调竞争，但不能据此取消数据库已经需要的正确性约束。网络分区使持锁客户端无法联系 Redis 时，客户端无法确认或完成释放；仍可访问 Redis 的竞争者可能要等 TTL 到期后才能再次获取。单实例方案也不能被理解为覆盖所有节点故障：若 Redis 主节点在锁写入复制到副本前故障，异步复制下的副本提升可能使另一个客户端取得同名锁。Redis 官方资料将互斥安全性、可用性与故障场景分开讨论；本文说明这些边界，但不展开多实例算法。",
+          "documentSha256": "e79aff2f6d42ce77989566e6d7d611de77ac5720f962f325ffbae307a1ae88c7"
+        }
+      ],
+      "mechanismBoundaryReason": "文档只说明单key compare-and-delete Lua及单实例边界；未解释Cluster槽、hash tag或多key路由。",
+      "all21DocumentTermAudit": [
+        {
+          "path": "docs/rag/source-documents/e01_java21_interface_vs_abstract_class.md",
+          "sha256": "4b82a2724e53946fffa082560fde1c348201114ac4f490e409c2ddbba5071de0",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e02_java21_arraylist_vs_linkedlist.md",
+          "sha256": "8863861e7379cbb3120926a649eb0243945861732aec9975ce97cdcb7c640dec",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e03_spring_6_2_ioc_di.md",
+          "sha256": "d71d9af393307ba3455dab8ffa945e5700f5bec0d3849bae7d37676bbbd352c6",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e04_mysql_8_0_transaction_acid.md",
+          "sha256": "fe159ec2e2c0de9c41b78b496e86cfcea89f846efc69940421306d8ba3613ef2",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e05_rfc9293_rfc768_tcp_vs_udp.md",
+          "sha256": "caa8af92609855354e83f0037af99e42bb9b3fc65125196103730bb2bf258d26",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h01_java21_generic_type_erasure.md",
+          "sha256": "c11ca06913e220726cb279a36ee65124e5e52c4557cb272c1c37b78975fb565b",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h02_openjdk8u_concurrent_hashmap.md",
+          "sha256": "7058c59a4c4c11cda492cb6cc565b85c79a09cbec5b7e3cbf1d9587f30114617",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h03_hotspot21_g1_gc.md",
+          "sha256": "3879a27607bfd98ae4e28c329a63c47474fbe75e25607cc660b7a85c89851603",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h04_java21_thread_pool_design.md",
+          "sha256": "d3c05bc195af157dade05d3e99d312668cb7150206601f3542be0e5b2116c8dc",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md",
+          "sha256": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md",
+          "sha256": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h07_redis_distributed_lock_baseline.md",
+          "sha256": "e79aff2f6d42ce77989566e6d7d611de77ac5720f962f325ffbae307a1ae88c7",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h08_rfc9293_tcp_connection_lifecycle.md",
+          "sha256": "82dec99995bddc1c7cd17705743598b1d57ae265da80ececb5220b46e8b5df44",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h09_mysql_8_0_inventory_idempotency_scenario.md",
+          "sha256": "2ace6486655a2242f4a616b85c57d0cc9dae3f7130381d49326615d6cd72f65b",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m01_java21_equals_hashcode_contract.md",
+          "sha256": "27a74088733409277eeb02d7e67b02722af8a2a1ec1d40ff1efac5c5596d0387",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m02_hashmap_jdk8u_put_resize_treeify.md",
+          "sha256": "c5e93fa3c3d3af8fb6e78b60db2d309ccb4e37a286e6ac47d4bb6f76fb053b22",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m03_jvm21_runtime_data_areas.md",
+          "sha256": "3daf071761e4dad10738c672acc6781b57a3092edb3e9ee43c943d0899a54d7e",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m04_volatile_jmm_java21.md",
+          "sha256": "fd1f73f1e1ce307567bcf6b4cf737315b9c36591f1de3620689a979dea2b760c",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m05_spring_6_2_aop_proxy_self_invocation.md",
+          "sha256": "b622cf633bb2ccf7320c33feede070f3875f7670e7f92c89488e2a5ee5457788",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m06_mysql_8_0_innodb_index_structure.md",
+          "sha256": "0a11be7250f287eacff2ab77234cb04b1d245ac453127fb1c61a868e305b814c",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m07_redis_classic_data_structures.md",
+          "sha256": "893c0e95adc06f18fb2877feb54c7d14f9a69b2329926046f72f129427354caa",
+          "mechanismTermHits": {
+            "CROSSSLOT": [],
+            "hash tag": [],
+            "哈希槽": []
+          }
+        }
+      ],
+      "officialMechanismReferences": [
+        "https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/"
+      ],
+      "officialReferencesAreNotAddedToCorpus": true,
+      "exactQuestionPreviouslyUsed": false,
+      "nearestPriorQuestionSource": "docs\\rag\\evaluation\\PHASE_4C2_HOLDOUT_QUERY_SET.json",
+      "nearestPriorQuestionSimilarity": 0.1923,
+      "noveltyScope": "New question text and scenario; same corpus/topics intentionally allowed; no retrieval preview"
+    },
+    {
+      "queryId": "P3-N02",
+      "expectedCoverage": "NOT_COVERED",
+      "reviewSource": "AI_SEMANTIC_DOCUMENT_REVIEW_BEFORE_RETRIEVAL",
+      "humanConfirmed": false,
+      "basisOrClosestNonAnswer": [
+        {
+          "path": "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md",
+          "line": 22,
+          "quote": "`SELECT ... FOR UPDATE` 是 locking read，不是普通的历史快照读。MySQL 8.0 手册说明，`SELECT ... FOR UPDATE` 读取最新可用数据，并对读取到的行设置排他锁。因此，普通 consistent nonlocking read 与 locking/current read 在可见数据和加锁行为上不同。MVCC 不代表“没有锁”；需要基于读后写保护时，应区分普通快照查询与 `FOR UPDATE` 等锁定读。",
+          "documentSha256": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea"
+        },
+        {
+          "path": "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md",
+          "line": 26,
+          "quote": "“Undo Log 只用于 rollback”忽略了 update undo log 也服务于一致性读中的旧版本构造。“REPEATABLE READ 下事务的所有 SQL 都读一个历史快照”把 consistent read 扩大到了锁定读和 DML。准确表达应限定为：同一 RR 事务的 consistent reads 通常沿用第一次一致性读建立的快照；locking read 有自己的锁定与最新数据语义。MVCC 能支持版本化读取，但不能据此断言所有读写都无锁或所有并发异常都已自动解决。",
+          "documentSha256": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea"
+        }
+      ],
+      "mechanismBoundaryReason": "文档区分快照与锁定读，但未定义间隙/next-key及非唯一索引范围锁区间。",
+      "all21DocumentTermAudit": [
+        {
+          "path": "docs/rag/source-documents/e01_java21_interface_vs_abstract_class.md",
+          "sha256": "4b82a2724e53946fffa082560fde1c348201114ac4f490e409c2ddbba5071de0",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e02_java21_arraylist_vs_linkedlist.md",
+          "sha256": "8863861e7379cbb3120926a649eb0243945861732aec9975ce97cdcb7c640dec",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e03_spring_6_2_ioc_di.md",
+          "sha256": "d71d9af393307ba3455dab8ffa945e5700f5bec0d3849bae7d37676bbbd352c6",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e04_mysql_8_0_transaction_acid.md",
+          "sha256": "fe159ec2e2c0de9c41b78b496e86cfcea89f846efc69940421306d8ba3613ef2",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e05_rfc9293_rfc768_tcp_vs_udp.md",
+          "sha256": "caa8af92609855354e83f0037af99e42bb9b3fc65125196103730bb2bf258d26",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h01_java21_generic_type_erasure.md",
+          "sha256": "c11ca06913e220726cb279a36ee65124e5e52c4557cb272c1c37b78975fb565b",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h02_openjdk8u_concurrent_hashmap.md",
+          "sha256": "7058c59a4c4c11cda492cb6cc565b85c79a09cbec5b7e3cbf1d9587f30114617",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h03_hotspot21_g1_gc.md",
+          "sha256": "3879a27607bfd98ae4e28c329a63c47474fbe75e25607cc660b7a85c89851603",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h04_java21_thread_pool_design.md",
+          "sha256": "d3c05bc195af157dade05d3e99d312668cb7150206601f3542be0e5b2116c8dc",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md",
+          "sha256": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md",
+          "sha256": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h07_redis_distributed_lock_baseline.md",
+          "sha256": "e79aff2f6d42ce77989566e6d7d611de77ac5720f962f325ffbae307a1ae88c7",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h08_rfc9293_tcp_connection_lifecycle.md",
+          "sha256": "82dec99995bddc1c7cd17705743598b1d57ae265da80ececb5220b46e8b5df44",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h09_mysql_8_0_inventory_idempotency_scenario.md",
+          "sha256": "2ace6486655a2242f4a616b85c57d0cc9dae3f7130381d49326615d6cd72f65b",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m01_java21_equals_hashcode_contract.md",
+          "sha256": "27a74088733409277eeb02d7e67b02722af8a2a1ec1d40ff1efac5c5596d0387",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m02_hashmap_jdk8u_put_resize_treeify.md",
+          "sha256": "c5e93fa3c3d3af8fb6e78b60db2d309ccb4e37a286e6ac47d4bb6f76fb053b22",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m03_jvm21_runtime_data_areas.md",
+          "sha256": "3daf071761e4dad10738c672acc6781b57a3092edb3e9ee43c943d0899a54d7e",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m04_volatile_jmm_java21.md",
+          "sha256": "fd1f73f1e1ce307567bcf6b4cf737315b9c36591f1de3620689a979dea2b760c",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m05_spring_6_2_aop_proxy_self_invocation.md",
+          "sha256": "b622cf633bb2ccf7320c33feede070f3875f7670e7f92c89488e2a5ee5457788",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m06_mysql_8_0_innodb_index_structure.md",
+          "sha256": "0a11be7250f287eacff2ab77234cb04b1d245ac453127fb1c61a868e305b814c",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m07_redis_classic_data_structures.md",
+          "sha256": "893c0e95adc06f18fb2877feb54c7d14f9a69b2329926046f72f129427354caa",
+          "mechanismTermHits": {
+            "gap lock": [],
+            "next-key": [],
+            "间隙锁": []
+          }
+        }
+      ],
+      "officialMechanismReferences": [
+        "https://dev.mysql.com/doc/refman/8.0/en/innodb-locking.html"
+      ],
+      "officialReferencesAreNotAddedToCorpus": true,
+      "exactQuestionPreviouslyUsed": false,
+      "nearestPriorQuestionSource": "docs\\rag\\evaluation\\PHASE_4C2_HOLDOUT_QUERY_SET.json",
+      "nearestPriorQuestionSimilarity": 0.1609,
+      "noveltyScope": "New question text and scenario; same corpus/topics intentionally allowed; no retrieval preview"
+    },
+    {
+      "queryId": "P3-N03",
+      "expectedCoverage": "NOT_COVERED",
+      "reviewSource": "AI_SEMANTIC_DOCUMENT_REVIEW_BEFORE_RETRIEVAL",
+      "humanConfirmed": false,
+      "basisOrClosestNonAnswer": [
+        {
+          "path": "docs/rag/source-documents/h03_hotspot21_g1_gc.md",
+          "line": 16,
+          "quote": "G1 将 Java 堆划分为大量等大小 Region，Region 在某时刻可以为空，或承担 Eden、Survivor、Old 等角色。年轻代与老年代是由这些 Region 组成的逻辑集合，不要求各代都占一块固定连续空间。Region 本身是连续的虚拟内存范围，不能把“不要求代连续”误写成“单个 Region 内存也不连续”。[G1]",
+          "documentSha256": "3879a27607bfd98ae4e28c329a63c47474fbe75e25607cc660b7a85c89851603"
+        },
+        {
+          "path": "docs/rag/source-documents/h03_hotspot21_g1_gc.md",
+          "line": 35,
+          "quote": "并发标记分析老年代区域的可达存活对象，为后续老年代回收选择提供依据；应用在标记的主要并发部分仍可执行。标记过程并非全程无停顿，Concurrent Start、Remark、Cleanup 等阶段仍有暂停。[G1]",
+          "documentSha256": "3879a27607bfd98ae4e28c329a63c47474fbe75e25607cc660b7a85c89851603"
+        },
+        {
+          "path": "docs/rag/source-documents/h03_hotspot21_g1_gc.md",
+          "line": 37,
+          "quote": "Mixed GC 同时处理年轻代和一部分候选 Old Region，复制相应存活对象并逐步回收空间。它不是 Full GC，也不是任意一次年轻代回收都称为 Mixed。Remembered Set 记录集合外指向集合内的引用位置，帮助处理跨区域引用；它不是另一份对象存活清单。[G1]",
+          "documentSha256": "3879a27607bfd98ae4e28c329a63c47474fbe75e25607cc660b7a85c89851603"
+        }
+      ],
+      "mechanismBoundaryReason": "冻结文档限定G1 Region、Collection Set及暂停复制；没有ZGC彩色指针和load barrier重定位机制。",
+      "all21DocumentTermAudit": [
+        {
+          "path": "docs/rag/source-documents/e01_java21_interface_vs_abstract_class.md",
+          "sha256": "4b82a2724e53946fffa082560fde1c348201114ac4f490e409c2ddbba5071de0",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e02_java21_arraylist_vs_linkedlist.md",
+          "sha256": "8863861e7379cbb3120926a649eb0243945861732aec9975ce97cdcb7c640dec",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e03_spring_6_2_ioc_di.md",
+          "sha256": "d71d9af393307ba3455dab8ffa945e5700f5bec0d3849bae7d37676bbbd352c6",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e04_mysql_8_0_transaction_acid.md",
+          "sha256": "fe159ec2e2c0de9c41b78b496e86cfcea89f846efc69940421306d8ba3613ef2",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e05_rfc9293_rfc768_tcp_vs_udp.md",
+          "sha256": "caa8af92609855354e83f0037af99e42bb9b3fc65125196103730bb2bf258d26",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h01_java21_generic_type_erasure.md",
+          "sha256": "c11ca06913e220726cb279a36ee65124e5e52c4557cb272c1c37b78975fb565b",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h02_openjdk8u_concurrent_hashmap.md",
+          "sha256": "7058c59a4c4c11cda492cb6cc565b85c79a09cbec5b7e3cbf1d9587f30114617",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h03_hotspot21_g1_gc.md",
+          "sha256": "3879a27607bfd98ae4e28c329a63c47474fbe75e25607cc660b7a85c89851603",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h04_java21_thread_pool_design.md",
+          "sha256": "d3c05bc195af157dade05d3e99d312668cb7150206601f3542be0e5b2116c8dc",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md",
+          "sha256": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md",
+          "sha256": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h07_redis_distributed_lock_baseline.md",
+          "sha256": "e79aff2f6d42ce77989566e6d7d611de77ac5720f962f325ffbae307a1ae88c7",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h08_rfc9293_tcp_connection_lifecycle.md",
+          "sha256": "82dec99995bddc1c7cd17705743598b1d57ae265da80ececb5220b46e8b5df44",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h09_mysql_8_0_inventory_idempotency_scenario.md",
+          "sha256": "2ace6486655a2242f4a616b85c57d0cc9dae3f7130381d49326615d6cd72f65b",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m01_java21_equals_hashcode_contract.md",
+          "sha256": "27a74088733409277eeb02d7e67b02722af8a2a1ec1d40ff1efac5c5596d0387",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m02_hashmap_jdk8u_put_resize_treeify.md",
+          "sha256": "c5e93fa3c3d3af8fb6e78b60db2d309ccb4e37a286e6ac47d4bb6f76fb053b22",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m03_jvm21_runtime_data_areas.md",
+          "sha256": "3daf071761e4dad10738c672acc6781b57a3092edb3e9ee43c943d0899a54d7e",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m04_volatile_jmm_java21.md",
+          "sha256": "fd1f73f1e1ce307567bcf6b4cf737315b9c36591f1de3620689a979dea2b760c",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m05_spring_6_2_aop_proxy_self_invocation.md",
+          "sha256": "b622cf633bb2ccf7320c33feede070f3875f7670e7f92c89488e2a5ee5457788",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m06_mysql_8_0_innodb_index_structure.md",
+          "sha256": "0a11be7250f287eacff2ab77234cb04b1d245ac453127fb1c61a868e305b814c",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m07_redis_classic_data_structures.md",
+          "sha256": "893c0e95adc06f18fb2877feb54c7d14f9a69b2329926046f72f129427354caa",
+          "mechanismTermHits": {
+            "ZGC": [],
+            "colored pointer": [],
+            "load barrier": [],
+            "彩色指针": []
+          }
+        }
+      ],
+      "officialMechanismReferences": [
+        "https://docs.oracle.com/en/java/javase/21/gctuning/z-garbage-collector.html"
+      ],
+      "officialReferencesAreNotAddedToCorpus": true,
+      "exactQuestionPreviouslyUsed": false,
+      "nearestPriorQuestionSource": "src\\test\\resources\\rag-p1-independent\\queries-v1.json",
+      "nearestPriorQuestionSimilarity": 0.1951,
+      "noveltyScope": "New question text and scenario; same corpus/topics intentionally allowed; no retrieval preview"
+    },
+    {
+      "queryId": "P3-N04",
+      "expectedCoverage": "NOT_COVERED",
+      "reviewSource": "AI_SEMANTIC_DOCUMENT_REVIEW_BEFORE_RETRIEVAL",
+      "humanConfirmed": false,
+      "basisOrClosestNonAnswer": [
+        {
+          "path": "docs/rag/source-documents/m03_jvm21_runtime_data_areas.md",
+          "line": 42,
+          "quote": "Method Area 是 JVMS 的逻辑区域，保存每类结构、运行时常量池、方法数据和代码等；Runtime Constant Pool 是各类或接口在 Method Area 中的运行时表示之一。规范对物理位置、垃圾回收与压缩方式留有实现自由，不能把逻辑区域名称直接当作操作系统内存分配方式。[JVMS2]",
+          "documentSha256": "3daf071761e4dad10738c672acc6781b57a3092edb3e9ee43c943d0899a54d7e"
+        },
+        {
+          "path": "docs/rag/source-documents/m03_jvm21_runtime_data_areas.md",
+          "line": 44,
+          "quote": "HotSpot 的 Metaspace 是具体实现中的类元数据存储，Oracle JDK 21 文档说明类元数据使用 native memory 分配。这不等于整个 Method Area 的全部内容都能逐项等同为 Metaspace，也不能把所有 JVM 实现都描述成 HotSpot 的布局。[META][JVMS2]",
+          "documentSha256": "3daf071761e4dad10738c672acc6781b57a3092edb3e9ee43c943d0899a54d7e"
+        }
+      ],
+      "mechanismBoundaryReason": "文档解释Method Area/Metaspace类元数据位置；H01解释泛型擦除的Class，不定义二进制名+defining loader类型身份。",
+      "all21DocumentTermAudit": [
+        {
+          "path": "docs/rag/source-documents/e01_java21_interface_vs_abstract_class.md",
+          "sha256": "4b82a2724e53946fffa082560fde1c348201114ac4f490e409c2ddbba5071de0",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e02_java21_arraylist_vs_linkedlist.md",
+          "sha256": "8863861e7379cbb3120926a649eb0243945861732aec9975ce97cdcb7c640dec",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e03_spring_6_2_ioc_di.md",
+          "sha256": "d71d9af393307ba3455dab8ffa945e5700f5bec0d3849bae7d37676bbbd352c6",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e04_mysql_8_0_transaction_acid.md",
+          "sha256": "fe159ec2e2c0de9c41b78b496e86cfcea89f846efc69940421306d8ba3613ef2",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e05_rfc9293_rfc768_tcp_vs_udp.md",
+          "sha256": "caa8af92609855354e83f0037af99e42bb9b3fc65125196103730bb2bf258d26",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h01_java21_generic_type_erasure.md",
+          "sha256": "c11ca06913e220726cb279a36ee65124e5e52c4557cb272c1c37b78975fb565b",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h02_openjdk8u_concurrent_hashmap.md",
+          "sha256": "7058c59a4c4c11cda492cb6cc565b85c79a09cbec5b7e3cbf1d9587f30114617",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h03_hotspot21_g1_gc.md",
+          "sha256": "3879a27607bfd98ae4e28c329a63c47474fbe75e25607cc660b7a85c89851603",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h04_java21_thread_pool_design.md",
+          "sha256": "d3c05bc195af157dade05d3e99d312668cb7150206601f3542be0e5b2116c8dc",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md",
+          "sha256": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md",
+          "sha256": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h07_redis_distributed_lock_baseline.md",
+          "sha256": "e79aff2f6d42ce77989566e6d7d611de77ac5720f962f325ffbae307a1ae88c7",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h08_rfc9293_tcp_connection_lifecycle.md",
+          "sha256": "82dec99995bddc1c7cd17705743598b1d57ae265da80ececb5220b46e8b5df44",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h09_mysql_8_0_inventory_idempotency_scenario.md",
+          "sha256": "2ace6486655a2242f4a616b85c57d0cc9dae3f7130381d49326615d6cd72f65b",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m01_java21_equals_hashcode_contract.md",
+          "sha256": "27a74088733409277eeb02d7e67b02722af8a2a1ec1d40ff1efac5c5596d0387",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m02_hashmap_jdk8u_put_resize_treeify.md",
+          "sha256": "c5e93fa3c3d3af8fb6e78b60db2d309ccb4e37a286e6ac47d4bb6f76fb053b22",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m03_jvm21_runtime_data_areas.md",
+          "sha256": "3daf071761e4dad10738c672acc6781b57a3092edb3e9ee43c943d0899a54d7e",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m04_volatile_jmm_java21.md",
+          "sha256": "fd1f73f1e1ce307567bcf6b4cf737315b9c36591f1de3620689a979dea2b760c",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m05_spring_6_2_aop_proxy_self_invocation.md",
+          "sha256": "b622cf633bb2ccf7320c33feede070f3875f7670e7f92c89488e2a5ee5457788",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m06_mysql_8_0_innodb_index_structure.md",
+          "sha256": "0a11be7250f287eacff2ab77234cb04b1d245ac453127fb1c61a868e305b814c",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m07_redis_classic_data_structures.md",
+          "sha256": "893c0e95adc06f18fb2877feb54c7d14f9a69b2329926046f72f129427354caa",
+          "mechanismTermHits": {
+            "ClassLoader": [],
+            "defining loader": [],
+            "类加载器": []
+          }
+        }
+      ],
+      "officialMechanismReferences": [
+        "https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-5.html#jvms-5.3"
+      ],
+      "officialReferencesAreNotAddedToCorpus": true,
+      "exactQuestionPreviouslyUsed": false,
+      "nearestPriorQuestionSource": "docs\\rag\\evaluation\\PHASE_4C2_HOLDOUT_QUERY_SET.json",
+      "nearestPriorQuestionSimilarity": 0.157,
+      "noveltyScope": "New question text and scenario; same corpus/topics intentionally allowed; no retrieval preview"
+    },
+    {
+      "queryId": "P3-N05",
+      "expectedCoverage": "NOT_COVERED",
+      "reviewSource": "AI_SEMANTIC_DOCUMENT_REVIEW_BEFORE_RETRIEVAL",
+      "humanConfirmed": false,
+      "basisOrClosestNonAnswer": [
+        {
+          "path": "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md",
+          "line": 20,
+          "quote": "Spring 声明式事务在默认 proxy 模式下由代理拦截外部调用。对象内部 this.method() 的 self-invocation 绕过代理，内部方法即使有 @Transactional，也不会因此额外触发事务拦截；若外层已有事务，它仍可能在已有事务中运行，不能把这说成内部数据库操作必然完全无事务。[TX]",
+          "documentSha256": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66"
+        },
+        {
+          "path": "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md",
+          "line": 41,
+          "quote": "应把数据库原子阶段尽量缩短，避免在持锁期间等待长时间远程调用；只把必须原子提交的相关数据库操作组合进事务。缩短范围不能拆散必须共同成功的步骤，原子性与持锁时长需要一起考虑。[COMMIT][TXRESOURCE]",
+          "documentSha256": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66"
+        },
+        {
+          "path": "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md",
+          "line": 43,
+          "quote": "单数据库本地 JDBC 事务不能原子回滚任意 HTTP 请求、邮件或另一资源上的效果。工程上可根据业务需要设计事务后触发、消息可靠交付或补偿，并明确失败恢复责任；这些是候选一致性方案，不是本仓库已经引入消息系统的声明。[TXRESOURCE]",
+          "documentSha256": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66"
+        }
+      ],
+      "mechanismBoundaryReason": "冻结文档只讨论默认proxy和本地JDBC资源边界，没有Reactor Context、响应式订阅及TransactionalOperator。",
+      "all21DocumentTermAudit": [
+        {
+          "path": "docs/rag/source-documents/e01_java21_interface_vs_abstract_class.md",
+          "sha256": "4b82a2724e53946fffa082560fde1c348201114ac4f490e409c2ddbba5071de0",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e02_java21_arraylist_vs_linkedlist.md",
+          "sha256": "8863861e7379cbb3120926a649eb0243945861732aec9975ce97cdcb7c640dec",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e03_spring_6_2_ioc_di.md",
+          "sha256": "d71d9af393307ba3455dab8ffa945e5700f5bec0d3849bae7d37676bbbd352c6",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e04_mysql_8_0_transaction_acid.md",
+          "sha256": "fe159ec2e2c0de9c41b78b496e86cfcea89f846efc69940421306d8ba3613ef2",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e05_rfc9293_rfc768_tcp_vs_udp.md",
+          "sha256": "caa8af92609855354e83f0037af99e42bb9b3fc65125196103730bb2bf258d26",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h01_java21_generic_type_erasure.md",
+          "sha256": "c11ca06913e220726cb279a36ee65124e5e52c4557cb272c1c37b78975fb565b",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h02_openjdk8u_concurrent_hashmap.md",
+          "sha256": "7058c59a4c4c11cda492cb6cc565b85c79a09cbec5b7e3cbf1d9587f30114617",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h03_hotspot21_g1_gc.md",
+          "sha256": "3879a27607bfd98ae4e28c329a63c47474fbe75e25607cc660b7a85c89851603",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h04_java21_thread_pool_design.md",
+          "sha256": "d3c05bc195af157dade05d3e99d312668cb7150206601f3542be0e5b2116c8dc",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md",
+          "sha256": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md",
+          "sha256": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h07_redis_distributed_lock_baseline.md",
+          "sha256": "e79aff2f6d42ce77989566e6d7d611de77ac5720f962f325ffbae307a1ae88c7",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h08_rfc9293_tcp_connection_lifecycle.md",
+          "sha256": "82dec99995bddc1c7cd17705743598b1d57ae265da80ececb5220b46e8b5df44",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h09_mysql_8_0_inventory_idempotency_scenario.md",
+          "sha256": "2ace6486655a2242f4a616b85c57d0cc9dae3f7130381d49326615d6cd72f65b",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m01_java21_equals_hashcode_contract.md",
+          "sha256": "27a74088733409277eeb02d7e67b02722af8a2a1ec1d40ff1efac5c5596d0387",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m02_hashmap_jdk8u_put_resize_treeify.md",
+          "sha256": "c5e93fa3c3d3af8fb6e78b60db2d309ccb4e37a286e6ac47d4bb6f76fb053b22",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m03_jvm21_runtime_data_areas.md",
+          "sha256": "3daf071761e4dad10738c672acc6781b57a3092edb3e9ee43c943d0899a54d7e",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m04_volatile_jmm_java21.md",
+          "sha256": "fd1f73f1e1ce307567bcf6b4cf737315b9c36591f1de3620689a979dea2b760c",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m05_spring_6_2_aop_proxy_self_invocation.md",
+          "sha256": "b622cf633bb2ccf7320c33feede070f3875f7670e7f92c89488e2a5ee5457788",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m06_mysql_8_0_innodb_index_structure.md",
+          "sha256": "0a11be7250f287eacff2ab77234cb04b1d245ac453127fb1c61a868e305b814c",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m07_redis_classic_data_structures.md",
+          "sha256": "893c0e95adc06f18fb2877feb54c7d14f9a69b2329926046f72f129427354caa",
+          "mechanismTermHits": {
+            "ReactiveTransactionManager": [],
+            "TransactionalOperator": [],
+            "Reactor Context": [],
+            "响应式": []
+          }
+        }
+      ],
+      "officialMechanismReferences": [
+        "https://docs.spring.io/spring-framework/reference/data-access/transaction/programmatic.html"
+      ],
+      "officialReferencesAreNotAddedToCorpus": true,
+      "exactQuestionPreviouslyUsed": false,
+      "nearestPriorQuestionSource": "docs\\rag\\evaluation\\PHASE_4C2_HOLDOUT_QUERY_SET.json",
+      "nearestPriorQuestionSimilarity": 0.1839,
+      "noveltyScope": "New question text and scenario; same corpus/topics intentionally allowed; no retrieval preview"
+    },
+    {
+      "queryId": "P3-N06",
+      "expectedCoverage": "NOT_COVERED",
+      "reviewSource": "AI_SEMANTIC_DOCUMENT_REVIEW_BEFORE_RETRIEVAL",
+      "humanConfirmed": false,
+      "basisOrClosestNonAnswer": [
+        {
+          "path": "docs/rag/source-documents/h08_rfc9293_tcp_connection_lifecycle.md",
+          "line": 30,
+          "quote": "TCP 是全双工，两个发送方向可以独立结束。一方发 FIN 表示自己不再发送，对方确认后仍可发送自己的剩余数据；对方应用也完成发送时再发 FIN，最后获 ACK，因此常见关闭为 FIN、ACK、FIN、ACK 四个报文。[TCP]",
+          "documentSha256": "82dec99995bddc1c7cd17705743598b1d57ae265da80ececb5220b46e8b5df44"
+        },
+        {
+          "path": "docs/rag/source-documents/h08_rfc9293_tcp_connection_lifecycle.md",
+          "line": 36,
+          "quote": "普通主动关闭端在确认对方 FIN 后进入 TIME-WAIT，等待 2MSL：它可在对方因最后 ACK 丢失而重传 FIN 时再次确认，并避免旧连接延迟报文影响后续连接。MSL 是报文最大生存时间，不在本文固定成某个系统秒数。同时关闭可使双方进入 TIME-WAIT，因此不能说该状态只可能出现在客户端。[TCP]",
+          "documentSha256": "82dec99995bddc1c7cd17705743598b1d57ae265da80ececb5220b46e8b5df44"
+        },
+        {
+          "path": "docs/rag/source-documents/h08_rfc9293_tcp_connection_lifecycle.md",
+          "line": 40,
+          "quote": "CLOSE-WAIT 表示本地已收到远端 FIN，但正在等待本地应用完成关闭；本地 close 后才进入后续发送 FIN 与等待确认的路径。若大量连接长期停留于此，可检查关闭遗漏、异常路径资源释放或处理阻塞；状态短暂出现本身合法，不能仅凭一次数量快照就证明资源泄漏。[TCP]",
+          "documentSha256": "82dec99995bddc1c7cd17705743598b1d57ae265da80ececb5220b46e8b5df44"
+        }
+      ],
+      "mechanismBoundaryReason": "冻结文档解释FIN关闭、TIME_WAIT/CLOSE_WAIT，不包含Linux keepalive与USER_TIMEOUT的计时和关闭语义。",
+      "all21DocumentTermAudit": [
+        {
+          "path": "docs/rag/source-documents/e01_java21_interface_vs_abstract_class.md",
+          "sha256": "4b82a2724e53946fffa082560fde1c348201114ac4f490e409c2ddbba5071de0",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e02_java21_arraylist_vs_linkedlist.md",
+          "sha256": "8863861e7379cbb3120926a649eb0243945861732aec9975ce97cdcb7c640dec",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e03_spring_6_2_ioc_di.md",
+          "sha256": "d71d9af393307ba3455dab8ffa945e5700f5bec0d3849bae7d37676bbbd352c6",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e04_mysql_8_0_transaction_acid.md",
+          "sha256": "fe159ec2e2c0de9c41b78b496e86cfcea89f846efc69940421306d8ba3613ef2",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/e05_rfc9293_rfc768_tcp_vs_udp.md",
+          "sha256": "caa8af92609855354e83f0037af99e42bb9b3fc65125196103730bb2bf258d26",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h01_java21_generic_type_erasure.md",
+          "sha256": "c11ca06913e220726cb279a36ee65124e5e52c4557cb272c1c37b78975fb565b",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h02_openjdk8u_concurrent_hashmap.md",
+          "sha256": "7058c59a4c4c11cda492cb6cc565b85c79a09cbec5b7e3cbf1d9587f30114617",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h03_hotspot21_g1_gc.md",
+          "sha256": "3879a27607bfd98ae4e28c329a63c47474fbe75e25607cc660b7a85c89851603",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h04_java21_thread_pool_design.md",
+          "sha256": "d3c05bc195af157dade05d3e99d312668cb7150206601f3542be0e5b2116c8dc",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": [
+              22
+            ]
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h05_spring_6_2_transaction_boundary.md",
+          "sha256": "6933b91b5ed6eda94a223c7026dde68d86c6bd3c35ab1729707b1c2ae5aa2c66",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h06_mysql_8_0_innodb_mvcc_consistent_read.md",
+          "sha256": "17f181b4460fb6deca4af8e23a7188df3de3a7640f41c254d39aa0af00a06bea",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h07_redis_distributed_lock_baseline.md",
+          "sha256": "e79aff2f6d42ce77989566e6d7d611de77ac5720f962f325ffbae307a1ae88c7",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h08_rfc9293_tcp_connection_lifecycle.md",
+          "sha256": "82dec99995bddc1c7cd17705743598b1d57ae265da80ececb5220b46e8b5df44",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/h09_mysql_8_0_inventory_idempotency_scenario.md",
+          "sha256": "2ace6486655a2242f4a616b85c57d0cc9dae3f7130381d49326615d6cd72f65b",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m01_java21_equals_hashcode_contract.md",
+          "sha256": "27a74088733409277eeb02d7e67b02722af8a2a1ec1d40ff1efac5c5596d0387",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m02_hashmap_jdk8u_put_resize_treeify.md",
+          "sha256": "c5e93fa3c3d3af8fb6e78b60db2d309ccb4e37a286e6ac47d4bb6f76fb053b22",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m03_jvm21_runtime_data_areas.md",
+          "sha256": "3daf071761e4dad10738c672acc6781b57a3092edb3e9ee43c943d0899a54d7e",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m04_volatile_jmm_java21.md",
+          "sha256": "fd1f73f1e1ce307567bcf6b4cf737315b9c36591f1de3620689a979dea2b760c",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m05_spring_6_2_aop_proxy_self_invocation.md",
+          "sha256": "b622cf633bb2ccf7320c33feede070f3875f7670e7f92c89488e2a5ee5457788",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m06_mysql_8_0_innodb_index_structure.md",
+          "sha256": "0a11be7250f287eacff2ab77234cb04b1d245ac453127fb1c61a868e305b814c",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        },
+        {
+          "path": "docs/rag/source-documents/m07_redis_classic_data_structures.md",
+          "sha256": "893c0e95adc06f18fb2877feb54c7d14f9a69b2329926046f72f129427354caa",
+          "mechanismTermHits": {
+            "SO_KEEPALIVE": [],
+            "TCP_USER_TIMEOUT": [],
+            "keepalive": []
+          }
+        }
+      ],
+      "officialMechanismReferences": [
+        "https://man7.org/linux/man-pages/man7/tcp.7.html"
+      ],
+      "officialReferencesAreNotAddedToCorpus": true,
+      "exactQuestionPreviouslyUsed": false,
+      "nearestPriorQuestionSource": "src\\test\\resources\\rag-p1-independent\\queries-v1.json",
+      "nearestPriorQuestionSimilarity": 0.1565,
+      "noveltyScope": "New question text and scenario; same corpus/topics intentionally allowed; no retrieval preview"
+    }
+  ]
+}

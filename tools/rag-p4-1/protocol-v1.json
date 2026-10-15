@@ -1,0 +1,30 @@
+{
+  "schema": "p4-1-partial-core-support-v1",
+  "scope": "TARGETED_DEVELOPMENT_MICRO_VALIDATION_NOT_GENERALIZATION",
+  "queryIds": ["P3-C01", "P3-N02", "P3-N06"],
+  "opaqueQuestionIds": ["t1", "t2", "t3"],
+  "maxCalls": 3,
+  "candidatesPerCall": 2,
+  "retryCount": 0,
+  "requestedModel": "deepseek-v4-flash",
+  "providerAliasNotice": "Official legacy alias serves DeepSeek-V4.1-Flash; record returned model. No other model fallback.",
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "maxOutputTokens": 3072,
+  "thinking": "disabled",
+  "budgetCny": 0.25,
+  "peakPricePerMillionTokensCny": {"inputCacheHit": 0.04, "inputCacheMiss": 2.0, "output": 8.0},
+  "pricingSource": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "pricingCheckedDate": "2026-10-13",
+  "costGate": "UTF8_INPUT_BYTES_PLUS_2048_PER_REQUEST_PROXY_AND_MAX_OUTPUT_PEAK_NO_CACHE; NOT_ACTUAL_TOKENS_OR_INVOICE",
+  "failurePolicy": "SAFE_EMPTY_AND_STOP_BATCH_NO_RETRY_NO_RESUME",
+  "otherCalls": {"embedding": 0, "milvusSearch": 0, "rerank": 0, "jev": 0, "mysqlConnections": 0, "mysqlWrites": 0, "milvusWrites": 0},
+  "acceptance": {
+    "allThreeResponsesValidated": true,
+    "C01BothCandidatesCoreSupport": true,
+    "C01C2QuoteDirectlySupportsRepeatedPositioningOrIteratorProgress": true,
+    "N02AndN06BothReturnZero": true,
+    "uncertaintyIsSafeButDoesNotCountAsQualitySuccess": true,
+    "requiresSemanticQuoteAndVersionReview": true,
+    "successMeaning": "TARGETED_MICRO_CHECK_ONLY_NEVER_FULL_P4_OR_GENERALIZATION_PASS"
+  }
+}

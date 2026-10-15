@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "p4-semantic-gate-v1",
+  "scope": "P4_DEVELOPMENT_SET_ONLY_NOT_INDEPENDENT_GENERALIZATION",
+  "requestedModel": "deepseek-v4-flash",
+  "providerAliasNotice": "Legacy alias is served by DeepSeek-V4.1-Flash per official pricing page checked 2026-10-13; returned model retained verbatim.",
+  "baseUrl": "https://api.deepseek.com",
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "thinking": "disabled",
+  "maxOutputTokens": 3072,
+  "maxCalls": 12,
+  "maxCandidatesPerCall": 2,
+  "retryCount": 0,
+  "onFailure": "EMPTY_EVIDENCE_AND_STOP_BATCH_NO_RETRY_NO_RESUME",
+  "budgetCny": 1.0,
+  "peakPricePerMillionTokensCny": {"inputCacheHit": 0.04, "inputCacheMiss": 2.0, "output": 8.0},
+  "offPeakPricePerMillionTokensCny": {"inputCacheHit": 0.02, "inputCacheMiss": 1.0, "output": 4.0},
+  "pricingSource": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "pricingCheckedDate": "2026-10-13",
+  "costGate": "UTF8_BYTES_PLUS_2048_FRAMING_PROXY_PER_CALL_NO_CACHE_PEAK_PLUS_MAX_OUTPUT; NOT_ACTUAL_TOKEN_COUNT_OR_INVOICE",
+  "productionDefaultChanged": false,
+  "acceptance": {
+    "completeValidCalls": 12,
+    "coveredQueriesWithCoreEvidence": 6,
+    "outsideQueriesWithZeroEvidence": 6,
+    "minimumCoveredUsefulRetentionRelativeToTop2": 0.9,
+    "minimumDirectRetentionRelativeToTop2": 0.9,
+    "irrelevantAdmissions": 0,
+    "requiresC03PartialCoreSupport": true,
+    "requiresN02AndN06Zero": true,
+    "requiresSeparateHumanSemanticReviewOfAll24Candidates": true,
+    "noIndependentGeneralizationClaim": true
+  }
+}
