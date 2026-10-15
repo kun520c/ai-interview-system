@@ -12,6 +12,8 @@ import com.kun.aiinterview.interview.enums.InterviewQuestionType;
 import com.kun.aiinterview.interview.mapper.InterviewAnswerMapper;
 import com.kun.aiinterview.interview.mapper.InterviewQuestionMapper;
 import com.kun.aiinterview.interview.mapper.InterviewSessionMapper;
+import com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult;
+import com.kun.aiinterview.knowledge.service.RagTracePersistenceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class InterviewWorkflowTransactionService {
 
+    private final RagTracePersistenceService ragTracePersistenceService;
     private final AnswerEvaluationMapper answerEvaluationMapper;
     private final InterviewAnswerMapper interviewAnswerMapper;
     private final InterviewQuestionMapper interviewQuestionMapper;
@@ -149,7 +152,8 @@ public class InterviewWorkflowTransactionService {
             InterviewSession session,
             InterviewQuestion followUpDraft,
             String attemptId,
-            AnswerEvaluation evaluation
+            AnswerEvaluation evaluation,
+            EvaluationRetrievalResult pendingTrace
     ) {
         requireQuestionIdentity(parentMain);
         requireSessionIdentity(session);
@@ -195,7 +199,7 @@ public class InterviewWorkflowTransactionService {
                             session.getCurrentInterviewQuestionId(),
                             followUp.getId()
                     )) {
-                persistOwnedEvaluation(answerId, attemptId, evaluation);
+                persistOwnedEvaluation(answerId, attemptId, evaluation, pendingTrace);
                 return followUp;
             }
         }
@@ -209,7 +213,7 @@ public class InterviewWorkflowTransactionService {
             );
         }
 
-        persistOwnedEvaluation(answerId, attemptId, evaluation);
+        persistOwnedEvaluation(answerId, attemptId, evaluation, pendingTrace);
 
         if (followUp == null) {
             followUp = prepareFollowUp(
@@ -280,7 +284,8 @@ public class InterviewWorkflowTransactionService {
             InterviewSession session,
             InterviewQuestion nextMain,
             String attemptId,
-            AnswerEvaluation evaluation
+            AnswerEvaluation evaluation,
+            EvaluationRetrievalResult pendingTrace
     ) {
         validateCurrentQuestionAndSession(
                 currentQuestion,
@@ -305,7 +310,7 @@ public class InterviewWorkflowTransactionService {
             );
         }
 
-        persistOwnedEvaluation(answerId, attemptId, evaluation);
+        persistOwnedEvaluation(answerId, attemptId, evaluation, pendingTrace);
 
         int answerRows =
                 interviewAnswerMapper.markEvaluated(answerId, attemptId);
@@ -349,14 +354,15 @@ public class InterviewWorkflowTransactionService {
             InterviewQuestion currentQuestion,
             InterviewSession session,
             String attemptId,
-            AnswerEvaluation evaluation
+            AnswerEvaluation evaluation,
+            EvaluationRetrievalResult pendingTrace
     ) {
         validateCurrentQuestionAndSession(
                 currentQuestion,
                 session
         );
 
-        persistOwnedEvaluation(answerId, attemptId, evaluation);
+        persistOwnedEvaluation(answerId, attemptId, evaluation, pendingTrace);
 
         int answerRows =
                 interviewAnswerMapper.markEvaluated(answerId, attemptId);
@@ -381,7 +387,8 @@ public class InterviewWorkflowTransactionService {
         }
     }
 
-    private void persistOwnedEvaluation(Long answerId, String attemptId, AnswerEvaluation evaluation) {
+    private void persistOwnedEvaluation(Long answerId, String attemptId, AnswerEvaluation evaluation,
+            EvaluationRetrievalResult pendingTrace) {
         InterviewAnswer current = interviewAnswerMapper.lockById(answerId);
         if (attemptId == null || current == null
                 || current.getStatus() != InterviewAnswerStatus.EVALUATING
@@ -398,6 +405,10 @@ public class InterviewWorkflowTransactionService {
             }
             return; // Legacy persisted evaluations are replayed under the current attempt.
         }
+        if (pendingTrace == null) {
+            throw new IllegalArgumentException("新评价缺少待提交RAG轨迹");
+        }
+        ragTracePersistenceService.persist(evaluation.getRetrievalBatchId(), answerId, pendingTrace);
         if (evaluation.getId() != null
                 || answerEvaluationMapper.insertEvaluation(evaluation) != 1) {
             throw new IllegalStateException("AnswerEvaluation写入失败");

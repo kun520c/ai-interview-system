@@ -105,6 +105,8 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
     void cleanUp() {
         claimBarrier.disarm();
         if (answerId != null) {
+            jdbcTemplate.update("DELETE FROM rag_hit_log WHERE answer_id = ?", answerId);
+            jdbcTemplate.update("DELETE FROM rag_retrieval_batch WHERE answer_id = ?", answerId);
             jdbcTemplate.update("DELETE FROM answer_evaluation WHERE answer_id = ?", answerId);
             jdbcTemplate.update(
                     "DELETE FROM interview_answer WHERE id = ?",
@@ -162,7 +164,7 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
         CountDownLatch evaluateEntered = new CountDownLatch(1);
         CountDownLatch releaseEvaluate = new CountDownLatch(1);
         AtomicInteger evaluateCalls = new AtomicInteger();
-        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean()))
+        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean(), org.mockito.ArgumentMatchers.anyString()))
                 .thenAnswer(invocation -> {
                     evaluateCalls.incrementAndGet();
                     evaluateEntered.countDown();
@@ -211,7 +213,7 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
                     .isEqualTo(DecisionAction.FINISH);
 
             verify(evaluationOrchestrationService, times(1))
-                    .evaluate(eq(answerId), anyBoolean());
+                    .evaluate(eq(answerId), anyBoolean(), org.mockito.ArgumentMatchers.anyString());
             assertThat(evaluateCalls.get()).isEqualTo(1);
             assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId)
                     .getStatus())
@@ -247,7 +249,9 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
                 null,
                 List.of(),
                 "retrieval-batch-claim",
-                evaluationDraft()
+                evaluationDraft(),
+                new com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult(
+                        "claim-test", 5, "test", "test-v1", List.of(), List.of())
         );
     }
 
@@ -271,7 +275,7 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
         CountDownLatch releaseOld = new CountDownLatch(1);
         CountDownLatch releaseNew = new CountDownLatch(1);
         AtomicInteger calls = new AtomicInteger();
-        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean())).thenAnswer(invocation -> {
+        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean(), org.mockito.ArgumentMatchers.anyString())).thenAnswer(invocation -> {
             boolean old = calls.incrementAndGet() == 1;
             (old ? oldEntered : newEntered).countDown();
             if (!(old ? releaseOld : releaseNew).await(15, TimeUnit.SECONDS)) {
@@ -280,7 +284,9 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
             if (old && oldThrows) { throw new IllegalArgumentException("old provider failed"); }
             var result = finishResult();
             result.evaluation().setLlmModel(old ? "worker-A" : "worker-B");
-            return result;
+            return result.withPendingTrace(
+                    new com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult(
+                            old ? "worker-A" : "worker-B", 5, "test", "test-v1", List.of(), List.of()));
         });
         try (var executor = Executors.newFixedThreadPool(2)) {
             Future<ClaimOutcome> old = executor.submit(this::runEvaluateAnswer);
@@ -303,10 +309,15 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
                 assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId).getStatus())
                         .isEqualTo(InterviewAnswerStatus.EVALUATING);
                 assertThat(countAnswerEvaluations()).isZero();
+                assertThat(countTraceBatches()).isZero();
                 releaseNew.countDown();
                 assertThat(replacement.get(10, TimeUnit.SECONDS).error()).isNull();
             }
             assertThat(countAnswerEvaluations()).isEqualTo(1);
+            assertThat(countTraceBatches()).isEqualTo(1);
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT query_text FROM rag_retrieval_batch WHERE answer_id = ?", String.class, answerId))
+                    .isEqualTo("worker-B");
             assertThat(evaluationMapper.getByAnswerId(answerId).getLlmModel()).isEqualTo("worker-B");
             assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId).getAttemptId()).isEqualTo(newAttempt);
             assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId).getStatus()).isEqualTo(InterviewAnswerStatus.EVALUATED);
@@ -322,11 +333,16 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
         seedAnswer(InterviewAnswerStatus.FAILED);
         var result = finishResult();
         assertThat(evaluationMapper.insertEvaluation(result.evaluation())).isEqualTo(1);
-        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean())).thenReturn(result);
+        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean(), org.mockito.ArgumentMatchers.anyString())).thenReturn(result);
         var replay = workflowService.evaluateAnswer(answerId);
         assertThat(replay.evaluationId()).isEqualTo(result.evaluation().getId());
         assertThat(countAnswerEvaluations()).isEqualTo(1);
         assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId).getStatus()).isEqualTo(InterviewAnswerStatus.EVALUATED);
+    }
+
+    private long countTraceBatches() {
+        return jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM rag_retrieval_batch WHERE answer_id = ?", Long.class, answerId);
     }
 
     private long countAnswerEvaluations() {

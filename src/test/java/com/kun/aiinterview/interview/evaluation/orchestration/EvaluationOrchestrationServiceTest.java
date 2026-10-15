@@ -134,7 +134,7 @@ class EvaluationOrchestrationServiceTest {
                 true
         );
 
-        EvaluationOrchestrationResult result = service.evaluate(ANSWER_ID, true);
+        EvaluationOrchestrationResult result = service.evaluate(ANSWER_ID, true, "attempt-test");
 
         assertThat(result.evaluationId()).isNull();
         assertThat(result.answerId()).isEqualTo(ANSWER_ID);
@@ -152,13 +152,8 @@ class EvaluationOrchestrationServiceTest {
                 .isEqualTo(result.retrievalBatchId());
         assertThat(result.retrievalBatchId()).hasSizeLessThanOrEqualTo(64);
 
-        ArgumentCaptor<String> traceBatchIdCaptor =
-                ArgumentCaptor.forClass(String.class);
-        verify(ragTracePersistenceService).persist(
-                traceBatchIdCaptor.capture(),
-                eq(fixture.context().currentAnswerId()),
-                same(fixture.retrievalResult())
-        );
+        verifyNoInteractions(ragTracePersistenceService);
+        assertThat(result.pendingTrace()).isSameAs(fixture.retrievalResult());
 
         verify(answerEvaluationMapper, never()).insertEvaluation(any());
         AnswerEvaluation evaluation = result.evaluation();
@@ -195,7 +190,7 @@ class EvaluationOrchestrationServiceTest {
         assertThat(evaluation.getSuggestedFollowUp())
                 .isEqualTo(fixture.validated().suggestedFollowUp());
         assertThat(evaluation.getDecisionAction()).isEqualTo(decision.decisionAction());
-        assertThat(traceBatchIdCaptor.getValue())
+        assertThat(result.retrievalBatchId())
                 .isEqualTo(evaluation.getRetrievalBatchId())
                 .isEqualTo(result.retrievalBatchId());
         assertThat(evaluation.getLlmModel()).isEqualTo(fixture.llmResult().model());
@@ -220,11 +215,6 @@ class EvaluationOrchestrationServiceTest {
         order.verify(answerEvaluationMapper).getByAnswerId(ANSWER_ID);
         order.verify(contextService).buildContext(ANSWER_ID);
         order.verify(retrievalAdapter).retrieve(fixture.context(), 5);
-        order.verify(ragTracePersistenceService).persist(
-                traceBatchIdCaptor.getValue(),
-                fixture.context().currentAnswerId(),
-                fixture.retrievalResult()
-        );
         order.verify(promptBuilder).build(
                 eq(fixture.context()),
                 same(fixture.retrievalResult())
@@ -258,7 +248,7 @@ class EvaluationOrchestrationServiceTest {
                 true
         );
 
-        EvaluationOrchestrationResult result = service.evaluate(ANSWER_ID, true);
+        EvaluationOrchestrationResult result = service.evaluate(ANSWER_ID, true, "attempt-test");
 
         assertThat(result.evaluationPhase()).isEqualTo(EvaluationPhase.FINAL);
         assertThat(result.decisionAction()).isEqualTo(DecisionAction.NEXT_MAIN);
@@ -284,7 +274,7 @@ class EvaluationOrchestrationServiceTest {
                 false
         );
 
-        EvaluationOrchestrationResult result = service.evaluate(ANSWER_ID, false);
+        EvaluationOrchestrationResult result = service.evaluate(ANSWER_ID, false, "attempt-test");
 
         assertThat(result.evaluationPhase()).isEqualTo(EvaluationPhase.FINAL);
         assertThat(result.decisionAction()).isEqualTo(DecisionAction.FINISH);
@@ -309,15 +299,10 @@ class EvaluationOrchestrationServiceTest {
                 false
         );
 
-        EvaluationOrchestrationResult result = service.evaluate(FOLLOW_UP_ANSWER_ID, true);
+        EvaluationOrchestrationResult result = service.evaluate(FOLLOW_UP_ANSWER_ID, true, "attempt-test");
 
-        ArgumentCaptor<String> traceBatchIdCaptor =
-                ArgumentCaptor.forClass(String.class);
-        verify(ragTracePersistenceService).persist(
-                traceBatchIdCaptor.capture(),
-                eq(FOLLOW_UP_ANSWER_ID),
-                same(fixture.retrievalResult())
-        );
+        verifyNoInteractions(ragTracePersistenceService);
+        assertThat(result.pendingTrace()).isSameAs(fixture.retrievalResult());
         AnswerEvaluation prepared = result.evaluation();
         assertThat(fixture.context().currentAnswerId()).isEqualTo(FOLLOW_UP_ANSWER_ID);
         assertThat(fixture.context().mainAnswerId()).isEqualTo(ANSWER_ID);
@@ -331,7 +316,7 @@ class EvaluationOrchestrationServiceTest {
         assertThat(result.answerId()).isEqualTo(FOLLOW_UP_ANSWER_ID);
         assertThat(result.evaluationPhase()).isEqualTo(EvaluationPhase.FINAL);
         assertThat(result.decisionAction()).isEqualTo(DecisionAction.NEXT_MAIN);
-        assertThat(traceBatchIdCaptor.getValue())
+        assertThat(result.retrievalBatchId())
                 .isEqualTo(prepared.getRetrievalBatchId())
                 .isEqualTo(result.retrievalBatchId());
     }
@@ -341,7 +326,7 @@ class EvaluationOrchestrationServiceTest {
         AnswerEvaluation existing = existingEvaluation("GOOD");
         when(answerEvaluationMapper.getByAnswerId(ANSWER_ID)).thenReturn(existing);
 
-        EvaluationOrchestrationResult result = service.evaluate(ANSWER_ID, true);
+        EvaluationOrchestrationResult result = service.evaluate(ANSWER_ID, true, "attempt-test");
 
         assertThat(result.evaluationId()).isEqualTo(7001L);
         assertThat(result.answerId()).isEqualTo(ANSWER_ID);
@@ -398,7 +383,7 @@ class EvaluationOrchestrationServiceTest {
         when(contextService.buildContext(ANSWER_ID))
                 .thenReturn(context);
         EvaluationOrchestrationResult result =
-                service.evaluate(ANSWER_ID, true);
+                service.evaluate(ANSWER_ID, true, "attempt-test");
 
         assertThat(result.evaluationPhase())
                 .isEqualTo(EvaluationPhase.INITIAL);
@@ -444,7 +429,7 @@ class EvaluationOrchestrationServiceTest {
                 .thenReturn(context);
 
         assertThatThrownBy(
-                () -> service.evaluate(ANSWER_ID, true)
+                () -> service.evaluate(ANSWER_ID, true, "attempt-test")
         )
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage(
@@ -469,7 +454,7 @@ class EvaluationOrchestrationServiceTest {
 
     @Test
     void shouldRejectNullAnswerIdBeforeMapperOrPipelineInteraction() {
-        assertThatThrownBy(() -> service.evaluate(null, true))
+        assertThatThrownBy(() -> service.evaluate(null, true, "attempt-test"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("answerId不能为空");
 
@@ -493,7 +478,7 @@ class EvaluationOrchestrationServiceTest {
     void shouldPropagateEveryUpstreamFailureWithoutInserting(FailureStage stage) {
         RuntimeException expected = stubFailure(stage);
 
-        Throwable actual = catchThrowable(() -> service.evaluate(ANSWER_ID, true));
+        Throwable actual = catchThrowable(() -> service.evaluate(ANSWER_ID, true, "attempt-test"));
 
         assertThat(actual).isSameAs(expected);
         verify(answerEvaluationMapper, never()).insertEvaluation(any());
@@ -501,11 +486,8 @@ class EvaluationOrchestrationServiceTest {
         if (stage == FailureStage.CONTEXT || stage == FailureStage.RETRIEVAL) {
             verifyNoInteractions(ragTracePersistenceService);
         } else {
-            verify(ragTracePersistenceService).persist(
-                    anyString(),
-                    eq(ANSWER_ID),
-                    any(EvaluationRetrievalResult.class)
-            );
+            verify(ragTracePersistenceService).persistFailedAttempt(
+                    anyString(), eq(ANSWER_ID), any(EvaluationRetrievalResult.class), eq("attempt-test"));
         }
 
         switch (stage) {
@@ -528,14 +510,6 @@ class EvaluationOrchestrationServiceTest {
                     evaluationStandard,
                     followUpPolicy
             );
-            case TRACE -> verifyNoInteractions(
-                    promptBuilder,
-                    deepSeekEvaluationClient,
-                    validator,
-                    scoreCalculator,
-                    evaluationStandard,
-                    followUpPolicy
-            );
             case PROMPT -> verifyNoInteractions(
                     deepSeekEvaluationClient,
                     validator,
@@ -550,9 +524,21 @@ class EvaluationOrchestrationServiceTest {
                     followUpPolicy
             );
             default -> {
-                // Later-stage tests only need to prove trace ran and evaluation was not inserted.
+                // Failure diagnostics are separate from the uncommitted evaluation.
             }
         }
+    }
+
+    @Test
+    void diagnosticFailureMustNotReplaceOriginalPreparationFailure() {
+        RuntimeException original = stubFailure(FailureStage.PROMPT);
+        RuntimeException auditFailure = new IllegalStateException("audit database unavailable");
+        doThrow(auditFailure).when(ragTracePersistenceService).persistFailedAttempt(
+                anyString(), eq(ANSWER_ID), any(EvaluationRetrievalResult.class), eq("attempt-test"));
+        Throwable actual = catchThrowable(() -> service.evaluate(ANSWER_ID, true, "attempt-test"));
+        assertThat(actual).isSameAs(original);
+        assertThat(actual.getSuppressed()).containsExactly(auditFailure);
+        verify(answerEvaluationMapper, never()).insertEvaluation(any());
     }
 
     @Test
@@ -574,7 +560,7 @@ class EvaluationOrchestrationServiceTest {
                 .thenThrow(new JsonProcessingException("test serialization failure") { });
         EvaluationOrchestrationService failingService = serviceWith(failingObjectMapper);
 
-        assertThatThrownBy(() -> failingService.evaluate(ANSWER_ID, true))
+        assertThatThrownBy(() -> failingService.evaluate(ANSWER_ID, true, "attempt-test"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("评价结果JSON序列化失败")
                 .hasCauseInstanceOf(JsonProcessingException.class);
@@ -590,7 +576,7 @@ class EvaluationOrchestrationServiceTest {
         when(answerEvaluationMapper.getByAnswerId(ANSWER_ID))
                 .thenReturn(existingEvaluation("UNKNOWN"));
 
-        assertThatThrownBy(() -> service.evaluate(ANSWER_ID, true))
+        assertThatThrownBy(() -> service.evaluate(ANSWER_ID, true, "attempt-test"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("AnswerEvaluation中的level非法")
                 .hasCauseInstanceOf(IllegalArgumentException.class);
@@ -623,7 +609,7 @@ class EvaluationOrchestrationServiceTest {
                 deepSeekEvaluationClient.evaluate(prompt).suggestion());
         service = serviceWith(objectMapper, selectedJudge);
 
-        var result = service.evaluate(ANSWER_ID, true);
+        var result = service.evaluate(ANSWER_ID, true, "attempt-test");
 
         AnswerEvaluation prepared = result.evaluation();
         assertThat(prepared.getLlmModel()).isEqualTo("jev-1.13.0");
@@ -706,14 +692,6 @@ class EvaluationOrchestrationServiceTest {
         when(retrievalAdapter.retrieve(fixture.context(), 5))
                 .thenReturn(fixture.retrievalResult());
 
-        if (stage == FailureStage.TRACE) {
-            doThrow(failure).when(ragTracePersistenceService).persist(
-                    anyString(),
-                    eq(ANSWER_ID),
-                    same(fixture.retrievalResult())
-            );
-            return failure;
-        }
 
         if (stage == FailureStage.PROMPT) {
             when(promptBuilder.build(fixture.context(), fixture.retrievalResult()))
@@ -894,7 +872,6 @@ class EvaluationOrchestrationServiceTest {
     private enum FailureStage {
         CONTEXT,
         RETRIEVAL,
-        TRACE,
         PROMPT,
         DEEPSEEK,
         VALIDATOR,

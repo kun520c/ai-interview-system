@@ -103,7 +103,8 @@ public class EvaluationOrchestrationService {
 
     public EvaluationOrchestrationResult evaluate(
             Long answerId,
-            boolean hasNextMainQuestion
+            boolean hasNextMainQuestion,
+            String attemptId
     ) {
 
         if (answerId == null) {
@@ -137,12 +138,24 @@ public class EvaluationOrchestrationService {
                         RETRIEVAL_TOP_K
                 );
 
-        ragTracePersistenceService.persist(
-                retrievalBatchId,
-                context.currentAnswerId(),
-                retrievalResult
-        );
+        try {
+            return prepareEvaluation(context, retrievalBatchId, retrievalResult, hasNextMainQuestion);
+        } catch (RuntimeException failure) {
+            // Keep the original failure audit contract, but never let a superseded attempt write.
+            try {
+                ragTracePersistenceService.persistFailedAttempt(
+                        retrievalBatchId, answerId, retrievalResult, attemptId);
+            } catch (RuntimeException auditFailure) {
+                failure.addSuppressed(auditFailure);
+            }
+            throw failure;
+        }
+    }
 
+    private EvaluationOrchestrationResult prepareEvaluation(
+            EvaluationContext context, String retrievalBatchId,
+            EvaluationRetrievalResult retrievalResult, boolean hasNextMainQuestion
+    ) {
         EvaluationPrompt prompt =
                 promptBuilder.build(
                         context,
@@ -194,7 +207,7 @@ public class EvaluationOrchestrationService {
         return toResult(
                 evaluation,
                 decision.followUpTargetPointIds()
-        );
+        ).withPendingTrace(retrievalResult);
     }
 
     private AnswerEvaluation buildAnswerEvaluation(

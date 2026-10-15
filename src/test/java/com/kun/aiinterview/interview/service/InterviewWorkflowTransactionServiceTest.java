@@ -77,6 +77,7 @@ class InterviewWorkflowTransactionServiceTest {
                         .status(InterviewAnswerStatus.EVALUATING).build());
         Mockito.lenient().when(answerEvaluationMapper.getByAnswerId(ANSWER_ID)).thenAnswer(i -> evaluation());
         service = new InterviewWorkflowTransactionService(
+                mock(com.kun.aiinterview.knowledge.service.RagTracePersistenceService.class),
                 answerEvaluationMapper,
                 interviewAnswerMapper,
                 interviewQuestionMapper,
@@ -96,7 +97,8 @@ class InterviewWorkflowTransactionServiceTest {
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
                         "attempt-test",
-                        draft
+                        draft,
+                        trace()
                 ))
                 .isInstanceOf(IllegalStateException.class).hasMessage("AnswerEvaluation写入失败");
         verify(interviewAnswerMapper, never()).markEvaluated(any(), any());
@@ -113,9 +115,22 @@ class InterviewWorkflowTransactionServiceTest {
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
                         "attempt-test",
-                        draft
+                        draft,
+                        trace()
                 ))
                 .isInstanceOf(IllegalStateException.class).hasMessage("AnswerEvaluation主键未回填");
+        verify(interviewAnswerMapper, never()).markEvaluated(any(), any());
+    }
+
+    @Test
+    void newEvaluationCannotBeSavedWithoutItsPendingTrace() {
+        var draft = evaluation();
+        draft.setId(null);
+        when(answerEvaluationMapper.getByAnswerId(ANSWER_ID)).thenReturn(null);
+        assertThatThrownBy(() -> service.finishSession(ANSWER_ID, mainQuestion(),
+                session(MAIN_QUESTION_ID), "attempt-test", draft, null))
+                .isInstanceOf(IllegalArgumentException.class).hasMessage("新评价缺少待提交RAG轨迹");
+        verify(answerEvaluationMapper, never()).insertEvaluation(any());
         verify(interviewAnswerMapper, never()).markEvaluated(any(), any());
     }
 
@@ -310,7 +325,8 @@ class InterviewWorkflowTransactionServiceTest {
                 session,
                 draft,
                 "attempt-test",
-                evaluation()
+                evaluation(),
+                trace()
         );
 
         assertThat(result).isSameAs(draft);
@@ -373,7 +389,8 @@ class InterviewWorkflowTransactionServiceTest {
                 session(MAIN_QUESTION_ID),
                 followUpDraft(),
                 "attempt-test",
-                evaluation()
+                evaluation(),
+                trace()
         );
 
         assertThat(result).isSameAs(existingFollowUp);
@@ -406,7 +423,8 @@ class InterviewWorkflowTransactionServiceTest {
                 session(FOLLOW_UP_QUESTION_ID),
                 followUpDraft(),
                 "attempt-test",
-                evaluation()
+                evaluation(),
+                trace()
         );
 
         assertThat(result).isSameAs(existingFollowUp);
@@ -438,7 +456,8 @@ class InterviewWorkflowTransactionServiceTest {
                         session(MAIN_QUESTION_ID),
                         draft,
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -464,7 +483,8 @@ class InterviewWorkflowTransactionServiceTest {
                         session(MAIN_QUESTION_ID),
                         draft,
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -487,7 +507,8 @@ class InterviewWorkflowTransactionServiceTest {
                         session(MAIN_QUESTION_ID),
                         draft,
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -515,7 +536,8 @@ class InterviewWorkflowTransactionServiceTest {
                         session(MAIN_QUESTION_ID),
                         draft,
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -542,7 +564,8 @@ class InterviewWorkflowTransactionServiceTest {
                         session(MAIN_QUESTION_ID),
                         draft,
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -568,7 +591,8 @@ class InterviewWorkflowTransactionServiceTest {
                 session,
                 nextMain,
                 "attempt-test",
-                evaluation()
+                evaluation(),
+                trace()
         );
 
         InOrder order = inOrder(
@@ -599,7 +623,8 @@ class InterviewWorkflowTransactionServiceTest {
                         session(MAIN_QUESTION_ID),
                         nextMainQuestion(),
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -627,7 +652,8 @@ class InterviewWorkflowTransactionServiceTest {
                         session(MAIN_QUESTION_ID),
                         nextMainQuestion(),
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -653,7 +679,8 @@ class InterviewWorkflowTransactionServiceTest {
                         session(MAIN_QUESTION_ID),
                         nextMainQuestion(),
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -675,7 +702,8 @@ class InterviewWorkflowTransactionServiceTest {
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 );
 
         InOrder order = inOrder(
@@ -703,7 +731,8 @@ class InterviewWorkflowTransactionServiceTest {
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -728,7 +757,8 @@ class InterviewWorkflowTransactionServiceTest {
                         mainQuestion(),
                         session(MAIN_QUESTION_ID),
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -746,7 +776,8 @@ class InterviewWorkflowTransactionServiceTest {
                         session(MAIN_QUESTION_ID),
                         invalidNext,
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalArgumentException.class)
@@ -771,7 +802,8 @@ class InterviewWorkflowTransactionServiceTest {
                         session(MAIN_QUESTION_ID),
                         invalidNext,
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalArgumentException.class)
@@ -792,7 +824,8 @@ class InterviewWorkflowTransactionServiceTest {
                         mainQuestion(),
                         session(NEXT_MAIN_QUESTION_ID),
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -818,7 +851,8 @@ class InterviewWorkflowTransactionServiceTest {
                         session(NEXT_MAIN_QUESTION_ID),
                         followUpDraft(),
                         "attempt-test",
-                        evaluation()
+                        evaluation(),
+                        trace()
                 )
         )
                 .isInstanceOf(IllegalStateException.class)
@@ -872,6 +906,8 @@ class InterviewWorkflowTransactionServiceTest {
                     InterviewSessionMapper.class,
                     () -> interviewSessionMapper
             );
+            context.registerBean(com.kun.aiinterview.knowledge.service.RagTracePersistenceService.class,
+                    () -> mock(com.kun.aiinterview.knowledge.service.RagTracePersistenceService.class));
             context.registerBean(
                     InterviewWorkflowTransactionService.class
             );
@@ -990,4 +1026,9 @@ class InterviewWorkflowTransactionServiceTest {
     @EnableTransactionManagement
     static class TransactionTestConfiguration {
     }
+    private com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult trace() {
+        return new com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult(
+                "test query", 5, "test-model", "test-v1", java.util.List.of(), java.util.List.of());
+    }
+
 }

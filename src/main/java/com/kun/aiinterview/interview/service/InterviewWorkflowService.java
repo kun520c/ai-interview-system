@@ -150,7 +150,8 @@ public class InterviewWorkflowService {
                     evaluationOrchestrationService
                             .evaluate(
                                     answerId,
-                                    hasNextMainQuestion
+                                    hasNextMainQuestion,
+                                    attemptId
                             );
 
             applyDecision(
@@ -432,7 +433,8 @@ public class InterviewWorkflowService {
                         session,
                         nextMain,
                         attemptId,
-                        result.evaluation()
+                        result.evaluation(),
+                        result.pendingTrace()
                 );
             }
             case FINISH -> {
@@ -447,7 +449,8 @@ public class InterviewWorkflowService {
                         currentQuestion,
                         session,
                         attemptId,
-                        result.evaluation()
+                        result.evaluation(),
+                        result.pendingTrace()
                 );
             }
         }
@@ -542,7 +545,8 @@ public class InterviewWorkflowService {
                 session,
                 followUpDraft,
                 attemptId,
-                result.evaluation()
+                result.evaluation(),
+                result.pendingTrace()
         );
     }
 

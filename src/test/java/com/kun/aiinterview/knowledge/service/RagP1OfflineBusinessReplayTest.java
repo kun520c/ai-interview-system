@@ -132,7 +132,7 @@ class RagP1OfflineBusinessReplayTest {
         }
         var retrievalService = new KnowledgeRetrievalService(embedding, vectors, chunks, properties);
         var adapter = new EvaluationRetrievalAdapter(new EvaluationRagQueryBuilder(), retrievalService);
-        var trace = new RagTracePersistenceService(batches, logs, properties);
+        var trace = new RagTracePersistenceService(batches, logs, properties, org.mockito.Mockito.mock(com.kun.aiinterview.interview.mapper.InterviewAnswerMapper.class));
         var promptBuilder = new EvaluationPromptBuilder();
         var targetResolver = new FollowUpTargetResolver();
         when(contexts.buildContext(1L)).thenReturn(context);
@@ -159,7 +159,9 @@ class RagP1OfflineBusinessReplayTest {
         var orchestrator = new EvaluationOrchestrationService(contexts, adapter, promptBuilder, offlineJudge,
                 new LlmEvaluationValidator(), new EvaluationScoreCalculator(), new EvaluationStandard(),
                 new FollowUpPolicy(targetResolver), targetResolver, answers, JSON, trace);
-        var result = orchestrator.evaluate(1L, false);
+        var result = orchestrator.evaluate(1L, false, "offline-attempt");
+        assertThat(traceBatches).isEmpty();
+        trace.persist(result.retrievalBatchId(), result.answerId(), result.pendingTrace());
         assertThat(result.totalScore()).isEqualTo(70);
         assertThat(result.evaluationPhase()).isEqualTo(EvaluationPhase.FINAL);
         assertThat(result.evaluation()).isNotNull();

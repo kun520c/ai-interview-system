@@ -1,6 +1,9 @@
 package com.kun.aiinterview.knowledge.service;
 
 import com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult;
+import com.kun.aiinterview.interview.entity.InterviewAnswer;
+import com.kun.aiinterview.interview.enums.InterviewAnswerStatus;
+import com.kun.aiinterview.interview.mapper.InterviewAnswerMapper;
 import com.kun.aiinterview.knowledge.entity.RagHitLog;
 import com.kun.aiinterview.knowledge.entity.RagRetrievalBatch;
 import com.kun.aiinterview.knowledge.mapper.RagHitLogMapper;
@@ -56,11 +59,13 @@ public class RagTracePersistenceService {
     private final RagRetrievalBatchMapper ragRetrievalBatchMapper;
     private final RagHitLogMapper ragHitLogMapper;
     private final RetrievalProperties retrievalProperties;
+    private final InterviewAnswerMapper interviewAnswerMapper;
 
     public RagTracePersistenceService(
             RagRetrievalBatchMapper ragRetrievalBatchMapper,
             RagHitLogMapper ragHitLogMapper,
-            RetrievalProperties retrievalProperties
+            RetrievalProperties retrievalProperties,
+            InterviewAnswerMapper interviewAnswerMapper
     ) {
         this.ragRetrievalBatchMapper =
                 ragRetrievalBatchMapper;
@@ -68,6 +73,19 @@ public class RagTracePersistenceService {
         this.ragHitLogMapper =
                 ragHitLogMapper;
         this.retrievalProperties = retrievalProperties;
+        this.interviewAnswerMapper = interviewAnswerMapper;
+    }
+
+    @Transactional
+    public void persistFailedAttempt(String batchId, Long answerId,
+            EvaluationRetrievalResult retrieval, String attemptId) {
+        InterviewAnswer current = interviewAnswerMapper.lockById(answerId);
+        if (attemptId == null || current == null
+                || current.getStatus() != InterviewAnswerStatus.EVALUATING
+                || !attemptId.equals(current.getAttemptId())) {
+            return;
+        }
+        persist(batchId, answerId, retrieval);
     }
 
     @Transactional
