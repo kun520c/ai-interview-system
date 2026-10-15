@@ -37,6 +37,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration;
+import com.kun.aiinterview.config.EnvironmentIsolationInitializer;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
@@ -61,9 +62,10 @@ import static org.awaitility.Awaitility.await;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = RealKnowledgeDocumentProcessingSmokeTest.PipelineTestConfiguration.class,
-        initializers = ConfigDataApplicationContextInitializer.class
+        initializers = {ConfigDataApplicationContextInitializer.class,
+                EnvironmentIsolationInitializer.class}
 )
-@ActiveProfiles("local")
+@ActiveProfiles({"local", "test-real"})
 @TestPropertySource(properties = {
         "milvus.enabled=true",
         "spring.main.web-application-type=none"

@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: ${EVALUATION_DB_URL:jdbc:mysql://localhost:3306/ai_interview_evaluation?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
+    username: ${EVALUATION_DB_USERNAME:${DB_USERNAME}}
+    password: ${EVALUATION_DB_PASSWORD:${DB_PASSWORD}}
+
+milvus:
+  enabled: ${MILVUS_ENABLED:false}
+  uri: ${EVALUATION_MILVUS_URI:http://127.0.0.1:19530}
+  database-name: ${EVALUATION_MILVUS_DATABASE_NAME:default}
+  collection-name: ${EVALUATION_MILVUS_COLLECTION_NAME:knowledge_chunk_vectors_evaluation}
+  dimension: 1024
+  connect-timeout: 15s
+  request-timeout: 20s

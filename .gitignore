@@ -33,3 +33,43 @@ build/
 .vscode/
 
 src/main/resources/application-local.yaml
+
+# Private environment and credential files
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Temporary scripts, Python caches and runtime logs
+.tmp-*.md
+__pycache__/
+*.py[cod]
+*.log
+
+# Database exports and private archive bundles (keep schema source SQL trackable)
+*.dump
+*.dumpstream
+*.sql.gz
+*.sql.zip
+/backup/
+/backups/
+/docs/99-历史归档/
+
+# Original evaluation evidence and workstation audit data stay local
+/docs/evaluation/evidence/
+/docs/evaluation/judge/*_RUN_EVIDENCE.json
+/docs/evaluation/judge/*_RESULTS.json
+/docs/environment/*.json
+/docs/**/screenshots*/
+/docs/release/GIT_RELEASE_AUDIT_20261015/
+
+# Original workstation retrieval provenance needs a separate public test fixture
+/src/test/resources/rag-p1/local-replay.json
+
+# One-off runtime resource identities and recovery authorization are local history
+/tools/rag-e2e/contract.json
+/tools/rag-e2e/recovery-plan.json
