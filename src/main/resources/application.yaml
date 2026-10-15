@@ -56,7 +56,7 @@ deepseek:
   enabled: ${DEEPSEEK_ENABLED:false}
   base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
   api-key: ${DEEPSEEK_API_KEY:}
-  model: ${DEEPSEEK_MODEL:deepseek-v4-flash}
+  model: ${DEEPSEEK_MODEL:deepseek-flash}
   max-tokens: ${DEEPSEEK_MAX_TOKENS:4096}
   connect-timeout: ${DEEPSEEK_CONNECT_TIMEOUT:3s}
   read-timeout: ${DEEPSEEK_READ_TIMEOUT:60s}
@@ -72,3 +72,7 @@ ai:
       read-timeout: ${JEV_READ_TIMEOUT:20s}
       # 0 disables confidence fallback until a threshold is calibrated on project data.
       min-confidence: ${JEV_MIN_CONFIDENCE:0.0}
+      proxy:
+        enabled: ${JEV_PROXY_ENABLED:false}
+        host: ${JEV_PROXY_HOST:}
+        port: ${JEV_PROXY_PORT:}

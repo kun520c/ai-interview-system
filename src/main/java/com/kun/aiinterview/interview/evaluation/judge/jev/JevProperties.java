@@ -1,6 +1,7 @@
 package com.kun.aiinterview.interview.evaluation.judge.jev;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -36,6 +37,40 @@ public class JevProperties {
     @DecimalMin("0.0")
     @DecimalMax("1.0")
     private Double minConfidence = 0.0;
+    @Valid
+    @NotNull
+    private ProxySettings proxy = new ProxySettings();
+
+    @Getter
+    @Setter
+    @ToString(exclude = "host")
+    public static class ProxySettings {
+        private boolean enabled;
+        private String host;
+        private Integer port;
+
+        @AssertTrue(message = "Jev代理启用时必须指定合法host和1至65535的port")
+        public boolean isConfigurationValid() {
+            if (port != null && (port < 1 || port > 65535)) {
+                return false;
+            }
+            if (!enabled) {
+                return true;
+            }
+            if (host == null || host.isBlank() || port == null
+                    || host.chars().anyMatch(Character::isWhitespace)) {
+                return false;
+            }
+            try {
+                URI address = URI.create("http://" + host + ":" + port);
+                return address.getHost() != null && address.getUserInfo() == null
+                        && address.getPort() == port && address.getRawPath().isEmpty()
+                        && address.getRawQuery() == null && address.getRawFragment() == null;
+            } catch (IllegalArgumentException exception) {
+                return false;
+            }
+        }
+    }
 
     @AssertTrue(message = "Jev服务地址必须是绝对HTTP(S)地址")
     public boolean isBaseUrlValid() {

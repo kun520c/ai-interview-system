@@ -46,7 +46,61 @@ class JudgeConfigurationTest {
             var props = context.getBean(JevProperties.class);
             assertThat(props.getMinConfidence()).isEqualTo(0.7);
             assertThat(props.getReadTimeout()).hasSeconds(20);
+            assertThat(props.getProxy().isEnabled()).isFalse();
             assertThat(props.toString()).doesNotContain("test-only-secret");
+        });
+    }
+
+    @Test
+    void bindsExplicitJevProxyWithoutMutatingSharedRestClientBuilderOrDefaultSelector() {
+        var defaultSelector = java.net.ProxySelector.getDefault();
+        runner.withPropertyValues("deepseek.enabled=true", "ai.judge.provider=jev",
+                "ai.judge.jev.api-key=test-only-secret", "ai.judge.jev.proxy.enabled=true",
+                "ai.judge.jev.proxy.host=127.0.0.1", "ai.judge.jev.proxy.port=7897").run(context -> {
+            assertThat(context).hasNotFailed();
+            var proxy = context.getBean(JevProperties.class).getProxy();
+            assertThat(proxy.isEnabled()).isTrue();
+            assertThat(proxy.getHost()).isEqualTo("127.0.0.1");
+            assertThat(proxy.getPort()).isEqualTo(7897);
+            assertThat(java.net.ProxySelector.getDefault()).isSameAs(defaultSelector);
+            var builder = context.getBean(RestClient.Builder.class);
+            var server = org.springframework.test.web.client.MockRestServiceServer.bindTo(builder).build();
+            var otherClient = builder.baseUrl("http://other-client.test").build();
+            server.expect(org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo("http://other-client.test/"))
+                    .andExpect(org.springframework.test.web.client.match.MockRestRequestMatchers.headerDoesNotExist("Authorization"))
+                    .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess());
+            otherClient.get().uri("/").retrieve().toBodilessEntity();
+            server.verify();
+        });
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ai.judge.jev.proxy.host=", "ai.judge.jev.proxy.host=http://localhost",
+            "ai.judge.jev.proxy.host=user:secret@localhost", "ai.judge.jev.proxy.host=localhost/path",
+            "ai.judge.jev.proxy.port=", "ai.judge.jev.proxy.port=0", "ai.judge.jev.proxy.port=-1",
+            "ai.judge.jev.proxy.port=65536", "ai.judge.jev.proxy.port=not-a-port"})
+    void rejectsIncompleteOrInvalidEnabledProxy(String invalidProperty) {
+        runner.withPropertyValues("deepseek.enabled=true", "ai.judge.provider=jev",
+                "ai.judge.jev.api-key=test-only-secret", "ai.judge.jev.proxy.enabled=true",
+                "ai.judge.jev.proxy.host=127.0.0.1", "ai.judge.jev.proxy.port=7897", invalidProperty)
+                .run(context -> assertThat(context).hasFailed());
+    }
+
+    @Test
+    void unusedJevProxyDoesNotChangeDeepSeekProviderSelection() {
+        runner.withPropertyValues("deepseek.enabled=true", "ai.judge.jev.proxy.enabled=true")
+                .run(context -> assertThat(context).hasNotFailed().doesNotHaveBean(JevClient.class)
+                        .hasSingleBean(JudgeProvider.class));
+    }
+
+    @Test
+    void disabledProxyAcceptsEmptyHostAndPortFromDefaultYaml() {
+        runner.withPropertyValues("deepseek.enabled=true", "ai.judge.provider=jev",
+                "ai.judge.jev.api-key=test-only-secret", "ai.judge.jev.proxy.enabled=false",
+                "ai.judge.jev.proxy.host=", "ai.judge.jev.proxy.port=").run(context -> {
+            assertThat(context).hasNotFailed();
+            assertThat(context.getBean(JevProperties.class).getProxy().isEnabled()).isFalse();
+            assertThat(context.getBean(JevProperties.class).getProxy().getPort()).isNull();
         });
     }
 

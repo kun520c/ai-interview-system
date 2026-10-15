@@ -15,8 +15,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
-import java.net.http.HttpClient;
-
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(prefix = "deepseek", name = "enabled", havingValue = "true")
 @EnableConfigurationProperties(JudgeProperties.class)
@@ -42,7 +40,7 @@ public class JudgeConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "ai.judge", name = "provider", havingValue = "jev")
     public JevClient jevClient(RestClient.Builder builder, JevProperties properties, ObjectMapper mapper) {
-        var httpClient = HttpClient.newBuilder().connectTimeout(properties.getConnectTimeout()).build();
+        var httpClient = JevClient.createHttpClient(properties);
         var factory = new JdkClientHttpRequestFactory(httpClient);
         factory.setReadTimeout(properties.getReadTimeout());
         RestClient restClient = builder.clone().baseUrl(properties.getBaseUrl().toString())
