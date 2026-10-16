@@ -142,24 +142,24 @@ class InterviewAnswerMapperTest {
                 "STALE_ERROR"
         );
 
-        assertEquals(0, interviewAnswerMapper.retryEvaluation(submittedAnswerId));
-        assertEquals(1, interviewAnswerMapper.claimEvaluation(submittedAnswerId));
+        assertEquals(0, interviewAnswerMapper.retryEvaluation(submittedAnswerId, "attempt-test"));
+        assertEquals(1, interviewAnswerMapper.claimEvaluation(submittedAnswerId, "attempt-test"));
         InterviewAnswer evaluatingFromSubmitted = interviewAnswerMapper
                 .getInterviewAnswerById(submittedAnswerId);
         assertEquals(InterviewAnswerStatus.EVALUATING, evaluatingFromSubmitted.getStatus());
         assertNull(evaluatingFromSubmitted.getErrorCode());
-        assertEquals(0, interviewAnswerMapper.claimEvaluation(submittedAnswerId));
-        assertEquals(0, interviewAnswerMapper.retryEvaluation(submittedAnswerId));
+        assertEquals(0, interviewAnswerMapper.claimEvaluation(submittedAnswerId, "attempt-test"));
+        assertEquals(0, interviewAnswerMapper.retryEvaluation(submittedAnswerId, "attempt-test"));
 
-        assertEquals(1, interviewAnswerMapper.markEvaluated(submittedAnswerId));
+        assertEquals(1, interviewAnswerMapper.markEvaluated(submittedAnswerId, "attempt-test"));
         assertEquals(
                 InterviewAnswerStatus.EVALUATED,
                 interviewAnswerMapper.getInterviewAnswerById(submittedAnswerId).getStatus()
         );
-        assertEquals(0, interviewAnswerMapper.markEvaluated(submittedAnswerId));
+        assertEquals(0, interviewAnswerMapper.markEvaluated(submittedAnswerId, "attempt-test"));
         assertEquals(
                 0,
-                interviewAnswerMapper.markFailed(submittedAnswerId, "LATE_FAILURE")
+                interviewAnswerMapper.markFailed(submittedAnswerId, "LATE_FAILURE", "attempt-test")
         );
 
         long failedQuestionId = insertMainInterviewQuestion();
@@ -170,8 +170,8 @@ class InterviewAnswerMapperTest {
                 "LLM_TIMEOUT"
         );
 
-        assertEquals(0, interviewAnswerMapper.claimEvaluation(failedAnswerId));
-        assertEquals(1, interviewAnswerMapper.retryEvaluation(failedAnswerId));
+        assertEquals(0, interviewAnswerMapper.claimEvaluation(failedAnswerId, "attempt-test"));
+        assertEquals(1, interviewAnswerMapper.retryEvaluation(failedAnswerId, "attempt-test"));
         InterviewAnswer evaluatingFromFailed = interviewAnswerMapper
                 .getInterviewAnswerById(failedAnswerId);
         assertEquals(InterviewAnswerStatus.EVALUATING, evaluatingFromFailed.getStatus());
@@ -181,7 +181,8 @@ class InterviewAnswerMapperTest {
                 1,
                 interviewAnswerMapper.markFailed(
                         failedAnswerId,
-                        "LLM_RESULT_VALIDATION_FAILED"
+                        "LLM_RESULT_VALIDATION_FAILED",
+                        "attempt-test"
                 )
         );
         InterviewAnswer failed = interviewAnswerMapper
@@ -190,9 +191,9 @@ class InterviewAnswerMapperTest {
         assertEquals("LLM_RESULT_VALIDATION_FAILED", failed.getErrorCode());
         assertEquals(
                 0,
-                interviewAnswerMapper.markFailed(failedAnswerId, "SECOND_FAILURE")
+                interviewAnswerMapper.markFailed(failedAnswerId, "SECOND_FAILURE", "attempt-test")
         );
-        assertEquals(0, interviewAnswerMapper.markEvaluated(failedAnswerId));
+        assertEquals(0, interviewAnswerMapper.markEvaluated(failedAnswerId, "attempt-test"));
     }
 
     @Test
@@ -219,7 +220,8 @@ class InterviewAnswerMapperTest {
                 1,
                 interviewAnswerMapper.reclaimStaleEvaluating(
                         staleAnswerId,
-                        cutoff
+                        cutoff,
+                        "attempt-test"
                 )
         );
         InterviewAnswer reclaimed = interviewAnswerMapper
@@ -230,14 +232,16 @@ class InterviewAnswerMapperTest {
                 0,
                 interviewAnswerMapper.reclaimStaleEvaluating(
                         staleAnswerId,
-                        cutoff
+                        cutoff,
+                        "attempt-test"
                 )
         );
         assertEquals(
                 0,
                 interviewAnswerMapper.reclaimStaleEvaluating(
                         freshAnswerId,
-                        cutoff
+                        cutoff,
+                        "attempt-test"
                 )
         );
         assertEquals(

@@ -45,6 +45,10 @@ class KnowledgeDocumentProcessingTransactionServiceTest {
 
     @BeforeEach
     void setUp() {
+        org.mockito.Mockito.lenient().when(knowledgeDocumentMapper.lockById(DOCUMENT_ID)).thenReturn(
+                com.kun.aiinterview.knowledge.entity.KnowledgeDocument.builder()
+                        .id(DOCUMENT_ID).documentVersion(1).processingAttemptId("attempt-test")
+                        .processingStatus(com.kun.aiinterview.knowledge.enums.KnowledgeProcessingStatus.PROCESSING).build());
         transactionService = new KnowledgeDocumentProcessingTransactionService(
                 knowledgeChunkMapper,
                 knowledgeDocumentMapper
@@ -61,7 +65,8 @@ class KnowledgeDocumentProcessingTransactionServiceTest {
                 IllegalArgumentException.class,
                 () -> transactionService.persistChunksAndMarkReady(
                         documentId,
-                        chunks(3)
+                        chunks(3),
+                        "attempt-test"
                 )
         );
 
@@ -78,7 +83,8 @@ class KnowledgeDocumentProcessingTransactionServiceTest {
                 IllegalArgumentException.class,
                 () -> transactionService.persistChunksAndMarkReady(
                         DOCUMENT_ID,
-                        chunks
+                        chunks,
+                        "attempt-test"
                 ),
                 scenario
         );
@@ -90,18 +96,19 @@ class KnowledgeDocumentProcessingTransactionServiceTest {
     void givenExpectedAffectedRows_whenPersisting_thenInsertsBeforeMarkingReady() {
         List<KnowledgeChunk> chunks = chunks(3);
         when(knowledgeChunkMapper.batchInsert(chunks)).thenReturn(chunks.size());
-        when(knowledgeDocumentMapper.markReady(DOCUMENT_ID)).thenReturn(1);
+        when(knowledgeDocumentMapper.markReady(DOCUMENT_ID, "attempt-test")).thenReturn(1);
 
         assertDoesNotThrow(
                 () -> transactionService.persistChunksAndMarkReady(
                         DOCUMENT_ID,
-                        chunks
+                        chunks,
+                        "attempt-test"
                 )
         );
 
         InOrder calls = inOrder(knowledgeChunkMapper, knowledgeDocumentMapper);
         calls.verify(knowledgeChunkMapper).batchInsert(chunks);
-        calls.verify(knowledgeDocumentMapper).markReady(DOCUMENT_ID);
+        calls.verify(knowledgeDocumentMapper).markReady(DOCUMENT_ID, "attempt-test");
     }
 
     @Test
@@ -113,29 +120,31 @@ class KnowledgeDocumentProcessingTransactionServiceTest {
                 BusinessException.class,
                 () -> transactionService.persistChunksAndMarkReady(
                         DOCUMENT_ID,
-                        chunks
+                        chunks,
+                        "attempt-test"
                 )
         );
 
-        verify(knowledgeDocumentMapper, never()).markReady(DOCUMENT_ID);
+        verify(knowledgeDocumentMapper, never()).markReady(DOCUMENT_ID, "attempt-test");
     }
 
     @Test
     void givenMarkReadyAffectsNoRow_whenPersisting_thenRejects() {
         List<KnowledgeChunk> chunks = chunks(3);
         when(knowledgeChunkMapper.batchInsert(chunks)).thenReturn(chunks.size());
-        when(knowledgeDocumentMapper.markReady(DOCUMENT_ID)).thenReturn(0);
+        when(knowledgeDocumentMapper.markReady(DOCUMENT_ID, "attempt-test")).thenReturn(0);
 
         assertThrows(
                 BusinessException.class,
                 () -> transactionService.persistChunksAndMarkReady(
                         DOCUMENT_ID,
-                        chunks
+                        chunks,
+                        "attempt-test"
                 )
         );
 
         verify(knowledgeChunkMapper).batchInsert(chunks);
-        verify(knowledgeDocumentMapper).markReady(DOCUMENT_ID);
+        verify(knowledgeDocumentMapper).markReady(DOCUMENT_ID, "attempt-test");
     }
 
     @Test
@@ -144,7 +153,7 @@ class KnowledgeDocumentProcessingTransactionServiceTest {
                 .getMethod(
                         "persistChunksAndMarkReady",
                         Long.class,
-                        List.class
+                        List.class, String.class
                 );
 
         assertNotNull(method.getAnnotation(Transactional.class));
@@ -163,7 +172,7 @@ class KnowledgeDocumentProcessingTransactionServiceTest {
                         .documentId(DOCUMENT_ID)
                         .documentVersion(1)
                         .chunkIndex(index)
-                        .content("chunk " + index)
+                        .content("chunk " + index).vectorId("attempt-test-" + index)
                         .build())
                 .toList();
     }

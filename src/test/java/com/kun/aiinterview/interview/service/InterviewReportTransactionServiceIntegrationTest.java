@@ -1,5 +1,19 @@
 package com.kun.aiinterview.interview.service;
 
+import org.mockito.Mockito;
+import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CountDownLatch;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.beans.factory.ObjectProvider;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.ParameterizedTest;
+import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
+import com.kun.aiinterview.interview.model.InterviewReportGenerationResult;
+import com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper;
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.entity.InterviewReport;
 import com.kun.aiinterview.interview.entity.InterviewSession;
@@ -24,6 +38,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
@@ -276,6 +291,74 @@ class InterviewReportTransactionServiceIntegrationTest {
         assertThat(unchanged.getTotalScore()).isNull();
         assertThat(unchanged.getVersion())
                 .isEqualTo(SESSION_VERSION);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"false,false", "true,false", "false,true", "true,true"})
+    void oldReportVersionCannotCommitOrFailReplacement(boolean oldThrows, boolean replacementFinishesFirst)
+            throws Exception {
+        jdbcTemplate.update("UPDATE interview_session SET report_status = 'NOT_STARTED' WHERE id = ?", sessionId);
+        var evaluations = List.of(evaluation(QuestionCategory.JAVA_COLLECTION, KNOWLEDGE_POINT, 60));
+        var evaluationMapper = Mockito.mock(AnswerEvaluationMapper.class);
+        Mockito.when(evaluationMapper.listFinalEffectiveEvaluationsBySessionId(sessionId)).thenReturn(evaluations);
+        var provider = Mockito.mock(ObjectProvider.class);
+        var oldEntered = new CountDownLatch(1);
+        var newEntered = new CountDownLatch(1);
+        var releaseOld = new CountDownLatch(1);
+        var releaseNew = new CountDownLatch(1);
+        var calls = new AtomicInteger();
+        InterviewReportGenerator generator = (session, rows, score) -> {
+            boolean old = calls.incrementAndGet() == 1;
+            (old ? oldEntered : newEntered).countDown();
+            try {
+                if (!(old ? releaseOld : releaseNew).await(15, TimeUnit.SECONDS)) {
+                    throw new IllegalStateException("report latch timed out");
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException(e);
+            }
+            if (old && oldThrows) { throw new IllegalArgumentException("old report provider failed"); }
+            return new InterviewReportGenerationResult(
+                    "PASS", old ? "worker-A" : "worker-B", List.of(), List.of(), List.of(), "fake", "fake");
+        };
+        Mockito.when(provider.getIfAvailable()).thenReturn(generator);
+        var service = new InterviewReportService(interviewSessionMapper, interviewReportMapper, evaluationMapper,
+                transactionService, provider, new ObjectMapper(),
+                new StaleRecoveryProperties());
+        try (var executor = Executors.newFixedThreadPool(2)) {
+            var old = executor.submit(() -> catchThrowable(() -> service.generateReport(userId, sessionId)));
+            assertThat(oldEntered.await(10, TimeUnit.SECONDS)).isTrue();
+            jdbcTemplate.update("UPDATE interview_session SET updated_at = ? WHERE id = ?",
+                    LocalDateTime.now().minusMinutes(20), sessionId);
+            var replacement = executor.submit(() -> service.generateReport(userId, sessionId));
+            assertThat(newEntered.await(10, TimeUnit.SECONDS)).isTrue();
+            int replacementVersion = interviewSessionMapper.getInterviewSessionById(sessionId).getVersion();
+            if (replacementFinishesFirst) {
+                releaseNew.countDown();
+                assertThat(replacement.get(10, TimeUnit.SECONDS).getSummary()).isEqualTo("worker-B");
+            }
+            releaseOld.countDown();
+            Throwable oldFailure = old.get(10, TimeUnit.SECONDS);
+            if (oldThrows) { assertThat(oldFailure).isInstanceOf(IllegalArgumentException.class); }
+            else { assertThat(oldFailure).isInstanceOfAny(IllegalStateException.class, DuplicateKeyException.class); }
+            if (!replacementFinishesFirst) {
+                assertThat(interviewSessionMapper.getInterviewSessionById(sessionId).getReportStatus()).isEqualTo(InterviewReportStatus.GENERATING);
+                assertThat(interviewSessionMapper.getInterviewSessionById(sessionId).getVersion()).isEqualTo(replacementVersion);
+                assertThat(interviewReportMapper.getBySessionId(sessionId)).isNull();
+                releaseNew.countDown();
+                assertThat(replacement.get(10, TimeUnit.SECONDS).getSummary()).isEqualTo("worker-B");
+            }
+            assertThat(interviewReportMapper.getBySessionId(sessionId).getSummary()).isEqualTo("worker-B");
+            assertThat(interviewSessionMapper.getInterviewSessionById(sessionId).getReportStatus()).isEqualTo(InterviewReportStatus.READY);
+            assertThat(userWeaknessMapper.getByUserCategoryAndKnowledgePoint(userId, QuestionCategory.JAVA_COLLECTION, KNOWLEDGE_POINT)
+                    .getDiscoveredCount()).isEqualTo(1);
+            assertThat(service.generateReport(userId, sessionId).getSummary()).isEqualTo("worker-B");
+            assertThat(calls.get()).isEqualTo(2);
+        } finally {
+            releaseOld.countDown();
+            releaseNew.countDown();
+        }
     }
 
     private InterviewReport report() {

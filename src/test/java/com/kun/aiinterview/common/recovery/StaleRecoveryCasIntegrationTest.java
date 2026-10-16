@@ -96,7 +96,8 @@ class StaleRecoveryCasIntegrationTest {
         List<Integer> results = runConcurrentCas(() ->
                 interviewAnswerMapper.reclaimStaleEvaluating(
                         answerId,
-                        cutoff
+                        cutoff,
+                        "attempt-test"
                 )
         );
 
@@ -115,7 +116,8 @@ class StaleRecoveryCasIntegrationTest {
         List<Integer> results = runConcurrentCas(() ->
                 interviewSessionMapper.reclaimStaleGenerating(
                         sessionId,
-                        cutoff
+                        cutoff,
+                        4
                 )
         );
 
@@ -136,7 +138,8 @@ class StaleRecoveryCasIntegrationTest {
         List<Integer> results = runConcurrentCas(() ->
                 knowledgeDocumentMapper.reclaimStaleProcessing(
                         documentId,
-                        cutoff
+                        cutoff,
+                        "attempt-test"
                 )
         );
 
@@ -221,7 +224,7 @@ class StaleRecoveryCasIntegrationTest {
                 .build();
         assertThat(knowledgeDocumentMapper.insertDocument(document)).isEqualTo(1);
         documentId = document.getId();
-        assertThat(knowledgeDocumentMapper.claimProcessing(documentId))
+        assertThat(knowledgeDocumentMapper.claimProcessing(documentId, "attempt-test"))
                 .isEqualTo(1);
     }
 

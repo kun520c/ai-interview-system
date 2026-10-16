@@ -79,7 +79,8 @@ class RagTracePersistenceServiceTest {
         service = new RagTracePersistenceService(
                 ragRetrievalBatchMapper,
                 ragHitLogMapper,
-                new RetrievalProperties()
+                new RetrievalProperties(),
+                org.mockito.Mockito.mock(com.kun.aiinterview.interview.mapper.InterviewAnswerMapper.class)
         );
     }
 
@@ -245,7 +246,7 @@ class RagTracePersistenceServiceTest {
         RagTracePersistenceService enabledService = new RagTracePersistenceService(
                 ragRetrievalBatchMapper,
                 ragHitLogMapper,
-                properties
+                properties, org.mockito.Mockito.mock(com.kun.aiinterview.interview.mapper.InterviewAnswerMapper.class)
         );
         when(ragRetrievalBatchMapper.insertBatch(any())).thenReturn(1);
         when(ragHitLogMapper.batchInsert(any())).thenReturn(1);

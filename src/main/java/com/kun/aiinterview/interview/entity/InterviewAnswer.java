@@ -24,6 +24,8 @@ public class InterviewAnswer {
 
     private String requestId;
 
+    private String attemptId;
+
     private String errorCode;
 
     private LocalDateTime submittedAt;

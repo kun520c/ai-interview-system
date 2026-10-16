@@ -13,19 +13,23 @@ public interface KnowledgeDocumentMapper {
 
     KnowledgeDocument selectById(@Param("id") Long id);
 
-    int claimProcessing(@Param("id") Long id);
+    KnowledgeDocument lockById(@Param("id") Long id);
+
+    int claimProcessing(@Param("id") Long id, @Param("attemptId") String attemptId);
 
     int reclaimStaleProcessing(
             @Param("id") Long id,
-            @Param("cutoff") LocalDateTime cutoff
+            @Param("cutoff") LocalDateTime cutoff,
+            @Param("attemptId") String attemptId
     );
 
-    int claimFailedProcessing(@Param("id") Long id);
+    int claimFailedProcessing(@Param("id") Long id, @Param("attemptId") String attemptId);
 
-    int markReady(@Param("id") Long id);
+    int markReady(@Param("id") Long id, @Param("attemptId") String attemptId);
 
     int markFailed(
             @Param("id") Long id,
-            @Param("errorMessage") String errorMessage
+            @Param("errorMessage") String errorMessage,
+            @Param("attemptId") String attemptId
     );
 }
