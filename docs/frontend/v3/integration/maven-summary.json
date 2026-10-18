@@ -1,0 +1,114 @@
+{
+  "counts": {
+    "tests": 1659,
+    "failures": 0,
+    "errors": 1,
+    "skipped": 19
+  },
+  "failures": [
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.jev.JevE06ReliabilityReplayTest",
+      "case": "",
+      "kind": "error",
+      "message": "docs\\evaluation\\judge\\PHASE_5B_EPOCH_06_RUN_EVIDENCE.json (系统找不到指定的文件。)",
+      "stack": "java.io.FileNotFoundException: docs\\evaluation\\judge\\PHASE_5B_EPOCH_06_RUN_EVIDENCE.json (系统找不到指定的文件。)\n\tat java.base/java.io.FileInputStream.open0(Native Method)\n\tat java.base/java.io.FileInputStream.open(FileInputStream.java:213)\n\tat java.base/java.io.FileInputStream.<init>(FileInputStream.java:152)\n\tat com.fasterxml.jackson.core.TokenStreamFactory._fileInputStream(TokenStreamFactory.java:328)\n\tat com.fasterxml.jackson.core.JsonFactory.createParser(JsonFactory.java:1239)\n\tat com.fasterxml.jackson.databind.ObjectMapper.readTree(ObjectMapper.java:3382)\n\tat com.kun.aiinterview.interview.evaluation.judge.jev.JevE06ReliabilityReplayTest.readFrozenArchive(JevE06ReliabilityReplayTest.java:39)\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:580)\n\tat java.base/java.util.ArrayList.forEach(ArrayList.java:1596)\n"
+    }
+  ],
+  "skips": [
+    {
+      "suite": "com.kun.aiinterview.evaluation.AiSystemBaselineEvaluationTest",
+      "case": "evaluateBaseline",
+      "reason": "Environment variable [RUN_REAL_AI_BASELINE] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.embedding.RealEmbeddingSmokeTest",
+      "case": "shouldRequestRealEmbeddingsAndReturnValidVectors",
+      "reason": "Environment variable [RUN_REAL_EMBEDDING_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgePersistenceIntegrationTest",
+      "case": "transactionServiceRollsBackBatchWhenMarkReadyRejectsRealState",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_DB_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgePersistenceIntegrationTest",
+      "case": "transactionServiceCommitsChunksAndReadyTogetherAgainstRealMysql",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_DB_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgePersistenceIntegrationTest",
+      "case": "selectRetrievableByVectorIdsMapsBatchAndExcludesUnrequestedVectorAgainstRealMysql",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_DB_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgePersistenceIntegrationTest",
+      "case": "selectRetrievableByVectorIdsFiltersEmbeddingMetadataAndMapsNullSourceAgainstRealMysql",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_DB_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgePersistenceIntegrationTest",
+      "case": "markReadyRequiresProcessingStateAgainstRealMysql",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_DB_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgePersistenceIntegrationTest",
+      "case": "selectRetrievableByVectorIdsKeepsOnlyCurrentDocumentVersionAgainstRealMysql",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_DB_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgePersistenceIntegrationTest",
+      "case": "markFailedRequiresProcessingStateAgainstRealMysql",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_DB_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgePersistenceIntegrationTest",
+      "case": "insertSelectAndClaimCasExecuteAgainstRealMysql",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_DB_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgePersistenceIntegrationTest",
+      "case": "batchInsertMapsNullableTokensAndDeleteUsesDocumentAndVersion",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_DB_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgePersistenceIntegrationTest",
+      "case": "selectRetrievableByVectorIdsExcludesInactiveChunksAndNonReadyDocumentsAgainstRealMysql",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_DB_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.RealKnowledgeDocumentProcessingFailureIntegrationTest",
+      "case": "mysqlUniqueConstraintFailureTriggersCrossStoreCompensation",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_FAILURE_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.RealKnowledgeDocumentProcessingFailureIntegrationTest",
+      "case": "postWriteFaultTriggersRealTargetedMilvusCompensation",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_FAILURE_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.RealKnowledgeDocumentProcessingSmokeTest",
+      "case": "shouldCompleteRealKnowledgeDocumentProcessingPipeline",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_PIPELINE_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.RealKnowledgeDocumentProcessingSmokeTest",
+      "case": "shouldRetrieveProcessedDocumentThroughRealEmbeddingMilvusAndMysql",
+      "reason": "Environment variable [RUN_REAL_KNOWLEDGE_PIPELINE_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.vector.milvus.RealMilvusSchemaValidationSmokeTest",
+      "case": "shouldFailFastForRealTemporaryCollectionWithWrongDimension",
+      "reason": "Environment variable [RUN_REAL_MILVUS_SCHEMA_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.vector.milvus.RealMilvusSchemaValidationSmokeTest",
+      "case": "shouldValidateCurrentRealCollectionSchemaAndIndex",
+      "reason": "Environment variable [RUN_REAL_MILVUS_SCHEMA_TEST] does not exist"
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.vector.milvus.RealMilvusVectorStoreSmokeTest",
+      "case": "shouldCompleteRealEmbeddingAndMilvusLifecycle",
+      "reason": "Environment variable [RUN_REAL_MILVUS_TEST] does not exist"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "originalStagedPaths": 229,
+  "pathsRemoved": [],
+  "unchangedOriginalBlobs": 221,
+  "explicitAdditiveToolAndNavigationChanges": [
+    "docs/README.md",
+    "tools/browser-e2e/BrowserE2eServer.java",
+    "tools/browser-e2e/README.md",
+    "tools/browser-e2e/acceptance.mjs",
+    "tools/browser-e2e/environment.ps1",
+    "tools/browser-e2e/mock-provider.mjs",
+    "tools/browser-e2e/regression.ps1",
+    "tools/browser-e2e/verify.mjs"
+  ],
+  "frontendFilesUnchanged": 33,
+  "originalIndexStillExact": true
+}

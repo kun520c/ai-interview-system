@@ -1,0 +1,45 @@
+diff --git a/src/main/java/com/kun/aiinterview/interview/orchestration/EvaluationOrchestrationService.java b/src/main/java/com/kun/aiinterview/interview/orchestration/EvaluationOrchestrationService.java
+index a519e96..a2d79e1 100644
+--- a/src/main/java/com/kun/aiinterview/interview/orchestration/EvaluationOrchestrationService.java
++++ b/src/main/java/com/kun/aiinterview/interview/orchestration/EvaluationOrchestrationService.java
+@@ -3,6 +3,7 @@ package com.kun.aiinterview.interview.orchestration;
+ import com.fasterxml.jackson.core.JsonProcessingException;
+ import com.fasterxml.jackson.core.type.TypeReference;
+ import com.fasterxml.jackson.databind.ObjectMapper;
++import com.kun.aiinterview.common.exception.ExternalServiceException;
+ import com.kun.aiinterview.interview.entity.AnswerEvaluation;
+ import com.kun.aiinterview.interview.enums.DecisionAction;
+ import com.kun.aiinterview.interview.evaluation.decision.EvaluationDecision;
+@@ -156,10 +157,7 @@ public class EvaluationOrchestrationService {
+                 );
+ 
+         ValidatedEvaluationSuggestion validated =
+-                validator.validate(
+-                        context,
+-                        llmResult.suggestion()
+-                );
++                validateModelSuggestion(context, llmResult);
+ 
+         EvaluationScore score =
+                 scoreCalculator.calculate(
+@@ -212,6 +210,20 @@ public class EvaluationOrchestrationService {
+         );
+     }
+ 
++    private ValidatedEvaluationSuggestion validateModelSuggestion(
++            EvaluationContext context,
++            JudgeProvider.Result llmResult
++    ) {
++        if (llmResult == null) {
++            throw new ExternalServiceException("模型评价结果不能为空");
++        }
++        try {
++            return validator.validate(context, llmResult.suggestion());
++        } catch (IllegalArgumentException | IllegalStateException exception) {
++            throw new ExternalServiceException("模型评价结果未通过校验", exception);
++        }
++    }
++
+     private AnswerEvaluation buildAnswerEvaluation(
+             EvaluationContext context,
+             ValidatedEvaluationSuggestion validated,

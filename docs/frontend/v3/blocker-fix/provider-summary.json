@@ -1,0 +1,8 @@
+{
+  "requests": 36,
+  "embedding": 17,
+  "chat": 19,
+  "paidModelCalls": 0,
+  "transport": "Loopback deterministic mock only",
+  "rawWireSha256": "baec033b7bd6dbbf8828662774f2f8bcaf2b7c6186e5b22ddacbed8a58a1c64d"
+}

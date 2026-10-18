@@ -1,0 +1,20 @@
+{
+  "counts": {
+    "tests": 258,
+    "failures": 2,
+    "errors": 74,
+    "skipped": 0
+  },
+  "bad": [
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.jev.JevE06ReliabilityReplayTest",
+      "failures": "2",
+      "errors": "0"
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.FullInterviewBusinessOfflineTest",
+      "failures": "0",
+      "errors": "74"
+    }
+  ]
+}

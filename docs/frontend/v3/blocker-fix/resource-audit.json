@@ -1,0 +1,32 @@
+[
+  {
+    "test": "src/test/java/com/kun/aiinterview/evaluation/AiSystemBaselineEvaluationTest.java",
+    "reference": "docs/evaluation/data",
+    "exists": true,
+    "guardedRealBaseline": true
+  },
+  {
+    "test": "src/test/java/com/kun/aiinterview/evaluation/AiSystemBaselineEvaluationTest.java",
+    "reference": "docs/evaluation/evidence/e2e.json",
+    "exists": false,
+    "guardedRealBaseline": true
+  },
+  {
+    "test": "src/test/java/com/kun/aiinterview/evaluation/AiSystemBaselineEvaluationTest.java",
+    "reference": "docs/evaluation/evidence/e2e-first.json",
+    "exists": false,
+    "guardedRealBaseline": true
+  },
+  {
+    "test": "src/test/java/com/kun/aiinterview/evaluation/AiSystemBaselineEvaluationTest.java",
+    "reference": "docs/evaluation/evidence",
+    "exists": false,
+    "guardedRealBaseline": true
+  },
+  {
+    "test": "src/test/java/com/kun/aiinterview/evaluation/BaselineTraceConfiguration.java",
+    "reference": "docs/evaluation/evidence/runtime-",
+    "exists": false,
+    "guardedRealBaseline": false
+  }
+]

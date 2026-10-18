@@ -1,0 +1,29 @@
+{
+  "tree": "65830dfd49f7fe6650aad6d62a43dbd5521e11a7",
+  "initialStagedTree": "c339473fdb417220d30313cc86db09d509bd5406",
+  "exportedFromTemporaryIndex": true,
+  "realIndexUnchanged": true,
+  "privateArchivePresent": false,
+  "localApplicationConfigPresent": false,
+  "preexistingBuildOutputsPresent": false,
+  "candidateSourceFiles": [
+    "src/main/java/com/kun/aiinterview/interview/evaluation/judge/jev/JevJudgeProvider.java",
+    "src/main/java/com/kun/aiinterview/interview/evaluation/llm/deepseek/DeepSeekEvaluationClient.java",
+    "src/main/java/com/kun/aiinterview/interview/evaluation/validation/LlmEvaluationValidator.java",
+    "src/test/java/com/kun/aiinterview/interview/evaluation/judge/jev/JevE06ReliabilityReplayTest.java",
+    "src/test/java/com/kun/aiinterview/interview/evaluation/judge/jev/JevFeedbackReliabilityTest.java",
+    "src/test/java/com/kun/aiinterview/interview/evaluation/llm/deepseek/DeepSeekEvaluationClientTest.java",
+    "src/test/java/com/kun/aiinterview/interview/evaluation/prompt/FollowUpOutputCompletenessHardeningTest.java",
+    "src/test/java/com/kun/aiinterview/interview/evaluation/validation/LlmEvaluationValidatorTest.java",
+    "src/test/java/com/kun/aiinterview/interview/service/FullInterviewBusinessOfflineTest.java",
+    "tools/browser-e2e/BrowserE2eServer.java",
+    "tools/browser-e2e/acceptance.mjs",
+    "tools/browser-e2e/environment.ps1",
+    "tools/browser-e2e/mock-provider.mjs",
+    "tools/browser-e2e/regression.ps1",
+    "tools/browser-e2e/verify.mjs",
+    "src/test/resources/evaluation/README.md",
+    "src/test/resources/evaluation/jev-reliability-synthetic-scenarios.json"
+  ],
+  "archiveSha256": "0cbbbe07d5424d2214daec9fcbb369f039ea9eeceffef7a5e523553124bd1f23"
+}

@@ -1,0 +1,204 @@
+{
+  "comparison": "Original uncommitted frontend snapshot vs V3 worktree",
+  "branch": "codex/frontend-v3",
+  "files": [
+    {
+      "path": "frontend/src/app/styles/shells.css",
+      "change": "modified",
+      "beforeSha256": "331645448b3a3b620bb0801c5729a17034cc2731098b3adbb3677486bbb3c2aa",
+      "afterSha256": "eab756fd607ba86303a61ee903f99f4b3c4cad7b1c6c37c753140cbab6ca5c8f"
+    },
+    {
+      "path": "frontend/src/app/styles/tokens.css",
+      "change": "modified",
+      "beforeSha256": "a1d4014ad284469350bf9df1c4a0c16f8efbb0034f7d8834fc647a171166c95e",
+      "afterSha256": "c4089bb3e0de3840443ec796d460b54f9e93df460ac9396a8b09389e96e9a97c"
+    },
+    {
+      "path": "frontend/src/components/shell/InterviewFocusShell.vue",
+      "change": "modified",
+      "beforeSha256": "33ef0db4790b321ecf23d2029ef431122c0b8226d9c17cc6948c6f31b190b028",
+      "afterSha256": "49905569088ce22653e4f33edd622ecb248aadeebca7bbaf9d71e59a564f4222"
+    },
+    {
+      "path": "frontend/src/components/shell/ProductShell.vue",
+      "change": "modified",
+      "beforeSha256": "51ea94ebe157d28c78663c65e9c20b451ce02993b23d43fd25c31a4dc39be464",
+      "afterSha256": "998921e06a078e83e7a14655218818cd6d86a4d1d33dc854090be9eff9285d2a"
+    },
+    {
+      "path": "frontend/src/components/shell/SessionSplitWorkspace.vue",
+      "change": "modified",
+      "beforeSha256": "5ffc6391434eeb7dbe186fb1b5ad15e55e8f067a2101ca89864d267a67739241",
+      "afterSha256": "8ce28e1c913f6a923c92fae73e1f5a5a807d3176db18a0a5d5839a51f1fd049d"
+    },
+    {
+      "path": "frontend/src/components/ui/BaseButton.vue",
+      "change": "modified",
+      "beforeSha256": "70240b2e20abf9cb886c089cdb1a043a0947b8e252b4219157de9bb2f8789f0d",
+      "afterSha256": "8c9a5e92696d7204cbbbaa16e6eec0774d5f20a8089846c6b2154f7bacb94ad7"
+    },
+    {
+      "path": "frontend/src/components/ui/BaseInput.vue",
+      "change": "modified",
+      "beforeSha256": "428b0c26d1bc3dbd5f0fd175fb70837a5d9930ad8bd8deb3137c88d64e2193a6",
+      "afterSha256": "a5e55766635a9e5bc5526f2274c2994cf1b31fbdf3233165e44a83806bda996d"
+    },
+    {
+      "path": "frontend/src/components/ui/BaseTextarea.vue",
+      "change": "modified",
+      "beforeSha256": "99bdda857889115a182ae7ff8492986199cfdc076b8a51c76c92b30c15076b09",
+      "afterSha256": "8d09f7235d90ae012d74503ec0c1435837a2385f6fabd302d4d7b64fd06bf2bb"
+    },
+    {
+      "path": "frontend/src/components/ui/EmptyState.vue",
+      "change": "modified",
+      "beforeSha256": "55a4dec78b01a5a2b54dcbd53b25fec79c049adf8e05938ec192eb261826cf89",
+      "afterSha256": "ceab396bfe93cb7c041bf791803960d69b85aa4eebb5035cf3232cc10f9d2ea0"
+    },
+    {
+      "path": "frontend/src/components/ui/PageHeader.vue",
+      "change": "modified",
+      "beforeSha256": "2e42f11b057b3bcb43e816b6a1cc7e416035da1f8613a037064f36b6147c9f59",
+      "afterSha256": "0f3f0e28260e3cdd4707e94de003166bf571f86818932c7a50a0cceb0eb2ef77"
+    },
+    {
+      "path": "frontend/src/components/ui/ProductMark.vue",
+      "change": "modified",
+      "beforeSha256": "a1127d1b6e6e68b7a3afa38164b55803bad0cbf2d30d06397bc0b365d6ef985a",
+      "afterSha256": "5418e5166c5fac7dfb91f3c5957f49ebe7e88388db77b4eb5f93ceeaad093536"
+    },
+    {
+      "path": "frontend/src/components/ui/StatusNotice.vue",
+      "change": "modified",
+      "beforeSha256": "f8800ba668a8a123ea7c54229bc56368c3b4e0f89a727fad2439a50603750262",
+      "afterSha256": "993c0045ba7b791bc6a4833f0b917965f7c4210da4e62a00320a344c0a272397"
+    },
+    {
+      "path": "frontend/src/features/admin/knowledge/views/AdminKnowledgeView.vue",
+      "change": "modified",
+      "beforeSha256": "e442ad70f034e57414fe2ff82e3e077f043f43f4f2bea82b602662de2301b592",
+      "afterSha256": "b56bae0cb9f777f3f9be7a3050112a45903f662b2b9cbe4080d42f28ed7992b3"
+    },
+    {
+      "path": "frontend/src/features/admin/questions/views/AdminQuestionDetailView.vue",
+      "change": "modified",
+      "beforeSha256": "f321add348b6ed4cd5c94e03bedd53d89017c9edd905fa42c3d51aca211b1417",
+      "afterSha256": "61ad92ab2e727627c7997418e31ff91668c4ead7e4d04940ff975f8385e2e9f1"
+    },
+    {
+      "path": "frontend/src/features/admin/questions/views/AdminQuestionFormView.vue",
+      "change": "modified",
+      "beforeSha256": "df2cb14959b85fa0e3642af59bdaa06f96ccd84c9b128d44de30a663c2886d95",
+      "afterSha256": "2230c430feeb45bf109253075288245244be1fc60d7d64fa40ef83e261f39d23"
+    },
+    {
+      "path": "frontend/src/features/admin/questions/views/AdminQuestionListView.vue",
+      "change": "modified",
+      "beforeSha256": "7b418b56e6e366f991a43cddba94375a4820dbe4211344316c5e2306a860f02c",
+      "afterSha256": "12e8aec95ff9dd6494809b2aed46d97bedcdac848b5cd6d6a275648b2539ba0b"
+    },
+    {
+      "path": "frontend/src/features/dashboard/components/DashboardInterviewFlow.vue",
+      "change": "modified",
+      "beforeSha256": "b3d69cda17f37963d315bccfd1c83fbe7cfc1c762cf3972230583e782e9d90a5",
+      "afterSha256": "e678b2b24f071031bb8f9e913063c219d86b7cbf7d66014e42212c6391d4c0b2"
+    },
+    {
+      "path": "frontend/src/features/dashboard/components/DashboardRecentList.vue",
+      "change": "modified",
+      "beforeSha256": "0c8c1682fc7337a18c73025bcbcbeea262f21997f0e794523fbe73b1c7ec782e",
+      "afterSha256": "67c5b8f77905e45759c03a9b2d0dc1eae4da517b0d2c9b9c5ac1456539281521"
+    },
+    {
+      "path": "frontend/src/features/dashboard/views/DashboardView.vue",
+      "change": "modified",
+      "beforeSha256": "79a3c1c6f8a7cddb90e2518b2fae38bfbd73b8905034a2fc3a161849a790d7d4",
+      "afterSha256": "8980ef39e6da705a8a5dd2927268ff954faef280924ae1a4c04f91d907870c5f"
+    },
+    {
+      "path": "frontend/src/features/history/components/HistoryRow.vue",
+      "change": "modified",
+      "beforeSha256": "af2849a991a55d723b48941fc1639b217655ba8585b6e46e07714c211c8aa733",
+      "afterSha256": "c72bb3edc4fb827ea26c63ba0db1ccc8131cf18f8ff9da4a933d100a5d82f25f"
+    },
+    {
+      "path": "frontend/src/features/interview/components/DifficultyCard.vue",
+      "change": "modified",
+      "beforeSha256": "cef04a7b577367549a6b9ff24c734c79792acef640bc82069ae6f61046f410b4",
+      "afterSha256": "b6d44b89eb3786c1cf37770a18897d5997c34ef6d08121cc295ba471284b3f59"
+    },
+    {
+      "path": "frontend/src/features/interview/components/InterviewAnswerPane.vue",
+      "change": "modified",
+      "beforeSha256": "db090970d67551fb771dc62f659cace95263bb1e5ab93f4f6f4b11eaac9360ea",
+      "afterSha256": "8ded31860d694e3b00de3f1fe8539dda4b6dfe973500ea3008ce27582cc04b27"
+    },
+    {
+      "path": "frontend/src/features/interview/components/InterviewEvaluationPane.vue",
+      "change": "modified",
+      "beforeSha256": "32c8e5a0d197a2b772b51719072895b4e4af1728a82957d211688aa0d69a1988",
+      "afterSha256": "f77ca7e8b1147c43145be1aaa41d2ad6d6bee4b3b439370c2142dab48eceaddf"
+    },
+    {
+      "path": "frontend/src/features/interview/components/InterviewProgress.vue",
+      "change": "modified",
+      "beforeSha256": "848f17c9c6dc863be377d0130b721c41cb8363cb0c0b8459efee4bfa462dc211",
+      "afterSha256": "09deb3016aadbe1c30367ea47c43d51c31ebc537913f7319fbd4fffc463e5b34"
+    },
+    {
+      "path": "frontend/src/features/interview/components/InterviewQuestionPane.vue",
+      "change": "modified",
+      "beforeSha256": "7761ef4b88a74c51b6a12ef4391b3ed568688398a95d2e45d5d34d71b1ba956f",
+      "afterSha256": "d6e14927167e37a0a8cec02ce460549692ae7d7743ad4f2bfd031dee6c3033d3"
+    },
+    {
+      "path": "frontend/src/features/interview/components/InterviewSessionDock.vue",
+      "change": "modified",
+      "beforeSha256": "6cbba9bd3294f9c8d17c1de8c4a67b94bdd9fb38cd0666b14ff6c702215c6aab",
+      "afterSha256": "b35fdf3e5517718499d18f10299aaed59a71b6d76d0fa431e8f5d0714b9df60d"
+    },
+    {
+      "path": "frontend/src/features/interview/components/InterviewTimelineItem.vue",
+      "change": "modified",
+      "beforeSha256": "861fd2e6b4e618b8986035811f209df83024c46034657fa16e8ecc1cccb40a83",
+      "afterSha256": "bf501afea29cc439a86fa713858bb2fc0b926793a1fb26e185f77ee8fecbd4e2"
+    },
+    {
+      "path": "frontend/src/features/interview/views/CreateInterviewView.vue",
+      "change": "modified",
+      "beforeSha256": "7e366f42e4380700b23a7e43158b20c0eb04d425733bb005c2cb5d038df84ef7",
+      "afterSha256": "009ad797d3f356f95b2be9330cb97133318e372996e749acc3c9505ce68bb316"
+    },
+    {
+      "path": "frontend/src/features/interview/views/InterviewReportView.vue",
+      "change": "modified",
+      "beforeSha256": "83fc6395a0747fbd976936fcde1c8569323cca864beeda0e6f106ea5bd398cb8",
+      "afterSha256": "62dafe038a077400471dda1d3d92510fb6e6055f765a6b26d7766cd622bb7138"
+    },
+    {
+      "path": "frontend/src/features/profile/views/ProfileView.vue",
+      "change": "modified",
+      "beforeSha256": "daf8d427dac689050a429278349a0859f8ca2e11e50493ecb5598b7a62957cc4",
+      "afterSha256": "a564ca8c0fadfbbf0a86d0c453af44af16d6e7bdd13670a393ef3a9a58695ef5"
+    },
+    {
+      "path": "frontend/tests/DifficultyCard.spec.ts",
+      "change": "modified",
+      "beforeSha256": "511dd0a66c3f92b8cdb555beef9f33078af07739e7d9d6252da7a3c032e90d46",
+      "afterSha256": "8a74c74c2f5717f95372c59404e44d8d99fd760c8d852abc11e4b63c690a88fe"
+    },
+    {
+      "path": "frontend/tests/InterviewEvaluationPane.spec.ts",
+      "change": "modified",
+      "beforeSha256": "84ee4a0361b381df52753de4f863df27c4645689ef800071bcc6d38c62c40d3e",
+      "afterSha256": "dc8c3eac4151834b032fdc75138396bedce31c9dc08d935ee6bc5eee8d0e134a"
+    },
+    {
+      "path": "frontend/scripts/v3-visual-check.mjs",
+      "change": "created",
+      "beforeSha256": null,
+      "afterSha256": "e8d945bffe8723e92dc6bd364892102556163325f4c457972de1f2dee18b7f60"
+    }
+  ]
+}

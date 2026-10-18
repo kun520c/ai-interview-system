@@ -1,0 +1,226 @@
+[
+  {
+    "path": "frontend/src/app/styles/shells.css",
+    "rawSha256": "c957ce7056fa5fb0ff0f03c1bffccc9939fc0af40cd8f7a7673f3c5b179abeb3",
+    "lfSha256": "331645448b3a3b620bb0801c5729a17034cc2731098b3adbb3677486bbb3c2aa",
+    "expected": "331645448b3a3b620bb0801c5729a17034cc2731098b3adbb3677486bbb3c2aa",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/app/styles/tokens.css",
+    "rawSha256": "ca133d44e8828371df537e3ae2baa7b5732ecfac6ce3e41ab942841ab651395b",
+    "lfSha256": "a1d4014ad284469350bf9df1c4a0c16f8efbb0034f7d8834fc647a171166c95e",
+    "expected": "a1d4014ad284469350bf9df1c4a0c16f8efbb0034f7d8834fc647a171166c95e",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/components/shell/InterviewFocusShell.vue",
+    "rawSha256": "9d64892820ab7783685270d197afa8fa7e4b1eb5082e6628ee1cbe8ae648e346",
+    "lfSha256": "33ef0db4790b321ecf23d2029ef431122c0b8226d9c17cc6948c6f31b190b028",
+    "expected": "33ef0db4790b321ecf23d2029ef431122c0b8226d9c17cc6948c6f31b190b028",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/components/shell/ProductShell.vue",
+    "rawSha256": "e0bc1586806c564fa5fba896a3425ccbc045f2d494f9138f70d67e04ce187b86",
+    "lfSha256": "51ea94ebe157d28c78663c65e9c20b451ce02993b23d43fd25c31a4dc39be464",
+    "expected": "51ea94ebe157d28c78663c65e9c20b451ce02993b23d43fd25c31a4dc39be464",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/components/shell/SessionSplitWorkspace.vue",
+    "rawSha256": "1233708da9a5f6804e66384e83f30a17ce4015c7b140ce384f8ae6b187579c6e",
+    "lfSha256": "5ffc6391434eeb7dbe186fb1b5ad15e55e8f067a2101ca89864d267a67739241",
+    "expected": "5ffc6391434eeb7dbe186fb1b5ad15e55e8f067a2101ca89864d267a67739241",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/components/ui/BaseButton.vue",
+    "rawSha256": "cc3ea6cc275a9c103a4a7fee241b5206a4c1708d284ad4097ff16dca899a8ac1",
+    "lfSha256": "70240b2e20abf9cb886c089cdb1a043a0947b8e252b4219157de9bb2f8789f0d",
+    "expected": "70240b2e20abf9cb886c089cdb1a043a0947b8e252b4219157de9bb2f8789f0d",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/components/ui/BaseInput.vue",
+    "rawSha256": "4a79f828135f81450f74119171a6c0d9c182c9fae688cf3ce80a955e0b25a8f3",
+    "lfSha256": "428b0c26d1bc3dbd5f0fd175fb70837a5d9930ad8bd8deb3137c88d64e2193a6",
+    "expected": "428b0c26d1bc3dbd5f0fd175fb70837a5d9930ad8bd8deb3137c88d64e2193a6",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/components/ui/BaseTextarea.vue",
+    "rawSha256": "51c8d19f7817728d50650b8bc07ce82e2c95989864ee34e5362b6d177deebabf",
+    "lfSha256": "99bdda857889115a182ae7ff8492986199cfdc076b8a51c76c92b30c15076b09",
+    "expected": "99bdda857889115a182ae7ff8492986199cfdc076b8a51c76c92b30c15076b09",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/components/ui/EmptyState.vue",
+    "rawSha256": "56b12de79121ddb20c4b352880ec3c38956a57a4ac72367bc0ba3ba1ba91241d",
+    "lfSha256": "55a4dec78b01a5a2b54dcbd53b25fec79c049adf8e05938ec192eb261826cf89",
+    "expected": "55a4dec78b01a5a2b54dcbd53b25fec79c049adf8e05938ec192eb261826cf89",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/components/ui/PageHeader.vue",
+    "rawSha256": "31c6b7b9cf17ff83be72df19f485289b90ca75548f4fec3395d5b61c750d82d1",
+    "lfSha256": "2e42f11b057b3bcb43e816b6a1cc7e416035da1f8613a037064f36b6147c9f59",
+    "expected": "2e42f11b057b3bcb43e816b6a1cc7e416035da1f8613a037064f36b6147c9f59",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/components/ui/ProductMark.vue",
+    "rawSha256": "d6ce337befb93ad227fb5dd647658dcd73960038b9f3aa21cfd0716b9be36ef2",
+    "lfSha256": "a1127d1b6e6e68b7a3afa38164b55803bad0cbf2d30d06397bc0b365d6ef985a",
+    "expected": "a1127d1b6e6e68b7a3afa38164b55803bad0cbf2d30d06397bc0b365d6ef985a",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/components/ui/StatusNotice.vue",
+    "rawSha256": "b109725abc1b5981cbac31359ddd8e330c879eed1fdd54074cee9ea163df6fb5",
+    "lfSha256": "f8800ba668a8a123ea7c54229bc56368c3b4e0f89a727fad2439a50603750262",
+    "expected": "f8800ba668a8a123ea7c54229bc56368c3b4e0f89a727fad2439a50603750262",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/admin/knowledge/views/AdminKnowledgeView.vue",
+    "rawSha256": "367ffe4fb3cea6115e868f419bb86189afc202d4df19efd0abbf126d9f004b92",
+    "lfSha256": "e442ad70f034e57414fe2ff82e3e077f043f43f4f2bea82b602662de2301b592",
+    "expected": "e442ad70f034e57414fe2ff82e3e077f043f43f4f2bea82b602662de2301b592",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/admin/questions/views/AdminQuestionDetailView.vue",
+    "rawSha256": "3756a8fdb57fee8534c610b0f3d16211ba2635992381b0ef77cf99a046e25272",
+    "lfSha256": "f321add348b6ed4cd5c94e03bedd53d89017c9edd905fa42c3d51aca211b1417",
+    "expected": "f321add348b6ed4cd5c94e03bedd53d89017c9edd905fa42c3d51aca211b1417",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/admin/questions/views/AdminQuestionFormView.vue",
+    "rawSha256": "857c504ab5350d5c3d8a4b58f5be89702fef79ec5d584db21cbc06b5e0d249a0",
+    "lfSha256": "df2cb14959b85fa0e3642af59bdaa06f96ccd84c9b128d44de30a663c2886d95",
+    "expected": "df2cb14959b85fa0e3642af59bdaa06f96ccd84c9b128d44de30a663c2886d95",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/admin/questions/views/AdminQuestionListView.vue",
+    "rawSha256": "5fbed8580ff8ccf09937320beceb1ceea1dc2abd5a94d3891da9f8ca3c600adb",
+    "lfSha256": "7b418b56e6e366f991a43cddba94375a4820dbe4211344316c5e2306a860f02c",
+    "expected": "7b418b56e6e366f991a43cddba94375a4820dbe4211344316c5e2306a860f02c",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/dashboard/components/DashboardInterviewFlow.vue",
+    "rawSha256": "238061be5297a38ffe5036ec347e98445b5f460233ff0b08b32c4b03ab3eadc9",
+    "lfSha256": "b3d69cda17f37963d315bccfd1c83fbe7cfc1c762cf3972230583e782e9d90a5",
+    "expected": "b3d69cda17f37963d315bccfd1c83fbe7cfc1c762cf3972230583e782e9d90a5",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/dashboard/components/DashboardRecentList.vue",
+    "rawSha256": "64f4a529ea9d370abe7fa51e96e12b23c58b3231e553ee36ded1dc6e5e32b317",
+    "lfSha256": "0c8c1682fc7337a18c73025bcbcbeea262f21997f0e794523fbe73b1c7ec782e",
+    "expected": "0c8c1682fc7337a18c73025bcbcbeea262f21997f0e794523fbe73b1c7ec782e",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/dashboard/views/DashboardView.vue",
+    "rawSha256": "2172bea43a97053836152e43ae133a5b214f7119d60339a71e323109649fa43e",
+    "lfSha256": "79a3c1c6f8a7cddb90e2518b2fae38bfbd73b8905034a2fc3a161849a790d7d4",
+    "expected": "79a3c1c6f8a7cddb90e2518b2fae38bfbd73b8905034a2fc3a161849a790d7d4",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/history/components/HistoryRow.vue",
+    "rawSha256": "2cd3e1c2485fef8378c7ca5c12f6817fd250dc6c48e588c34fb1144f4ba86e32",
+    "lfSha256": "af2849a991a55d723b48941fc1639b217655ba8585b6e46e07714c211c8aa733",
+    "expected": "af2849a991a55d723b48941fc1639b217655ba8585b6e46e07714c211c8aa733",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/DifficultyCard.vue",
+    "rawSha256": "30d82673129fef477a19b262475184e41828f14ec0c307d18fca3bd6d242e4ec",
+    "lfSha256": "cef04a7b577367549a6b9ff24c734c79792acef640bc82069ae6f61046f410b4",
+    "expected": "cef04a7b577367549a6b9ff24c734c79792acef640bc82069ae6f61046f410b4",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/InterviewAnswerPane.vue",
+    "rawSha256": "6fb58edff446554153f4b704ec4d380862093110f7d6e029ddee49558959721a",
+    "lfSha256": "db090970d67551fb771dc62f659cace95263bb1e5ab93f4f6f4b11eaac9360ea",
+    "expected": "db090970d67551fb771dc62f659cace95263bb1e5ab93f4f6f4b11eaac9360ea",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/InterviewEvaluationPane.vue",
+    "rawSha256": "118454b6db91985f73baadce243cc16d324f0e9e5e1bd2c5bfccfc87e2ee5e5e",
+    "lfSha256": "32c8e5a0d197a2b772b51719072895b4e4af1728a82957d211688aa0d69a1988",
+    "expected": "32c8e5a0d197a2b772b51719072895b4e4af1728a82957d211688aa0d69a1988",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/InterviewProgress.vue",
+    "rawSha256": "d29f971a68f4b5042cd231b902a76faebcf9a43ebb8bedc0056eddb6252444c8",
+    "lfSha256": "848f17c9c6dc863be377d0130b721c41cb8363cb0c0b8459efee4bfa462dc211",
+    "expected": "848f17c9c6dc863be377d0130b721c41cb8363cb0c0b8459efee4bfa462dc211",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/InterviewQuestionPane.vue",
+    "rawSha256": "ff9d0c4eaa570806071e6ad081324f08468cf80f84f760492151a2bb6aa2e550",
+    "lfSha256": "7761ef4b88a74c51b6a12ef4391b3ed568688398a95d2e45d5d34d71b1ba956f",
+    "expected": "7761ef4b88a74c51b6a12ef4391b3ed568688398a95d2e45d5d34d71b1ba956f",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/InterviewSessionDock.vue",
+    "rawSha256": "5048386e9c6317c9a90be36d2edc40d64d306ad79ca9567453cbc5afce03e812",
+    "lfSha256": "6cbba9bd3294f9c8d17c1de8c4a67b94bdd9fb38cd0666b14ff6c702215c6aab",
+    "expected": "6cbba9bd3294f9c8d17c1de8c4a67b94bdd9fb38cd0666b14ff6c702215c6aab",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/InterviewTimelineItem.vue",
+    "rawSha256": "b13e8a04811a305946d717c3300b82babaa61d9ce054c58c1f9698725ec6fbcf",
+    "lfSha256": "861fd2e6b4e618b8986035811f209df83024c46034657fa16e8ecc1cccb40a83",
+    "expected": "861fd2e6b4e618b8986035811f209df83024c46034657fa16e8ecc1cccb40a83",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/interview/views/CreateInterviewView.vue",
+    "rawSha256": "68bf4457e13568439e6dc6987e4b6562d2001dd87ea67c2b2e8692dc8c8fa31c",
+    "lfSha256": "7e366f42e4380700b23a7e43158b20c0eb04d425733bb005c2cb5d038df84ef7",
+    "expected": "7e366f42e4380700b23a7e43158b20c0eb04d425733bb005c2cb5d038df84ef7",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/interview/views/InterviewReportView.vue",
+    "rawSha256": "d956547701310f129dcd2f594f32e88d92b591c74e5f475ef7f3ed54fd670d6b",
+    "lfSha256": "83fc6395a0747fbd976936fcde1c8569323cca864beeda0e6f106ea5bd398cb8",
+    "expected": "83fc6395a0747fbd976936fcde1c8569323cca864beeda0e6f106ea5bd398cb8",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/src/features/profile/views/ProfileView.vue",
+    "rawSha256": "5f5078b7fde702fbe18fc86bf8b1ccb9d702be94e9003acf86fd819277a4520d",
+    "lfSha256": "daf8d427dac689050a429278349a0859f8ca2e11e50493ecb5598b7a62957cc4",
+    "expected": "daf8d427dac689050a429278349a0859f8ca2e11e50493ecb5598b7a62957cc4",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/tests/DifficultyCard.spec.ts",
+    "rawSha256": "2baf94a5d146790e568e84744b096894befbb97ac4ef872f0b5279270163804a",
+    "lfSha256": "511dd0a66c3f92b8cdb555beef9f33078af07739e7d9d6252da7a3c032e90d46",
+    "expected": "511dd0a66c3f92b8cdb555beef9f33078af07739e7d9d6252da7a3c032e90d46",
+    "lfMatch": true
+  },
+  {
+    "path": "frontend/tests/InterviewEvaluationPane.spec.ts",
+    "rawSha256": "14c63082afbc8c01565f001e08aa4b8257213958bf60da9d2b0559146df29699",
+    "lfSha256": "84ee4a0361b381df52753de4f863df27c4645689ef800071bcc6d38c62c40d3e",
+    "expected": "84ee4a0361b381df52753de4f863df27c4645689ef800071bcc6d38c62c40d3e",
+    "lfMatch": true
+  }
+]

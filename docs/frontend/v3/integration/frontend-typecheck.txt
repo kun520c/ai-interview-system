@@ -1,0 +1,4 @@
+
+> ai-interview-frontend@0.0.0 typecheck
+> vue-tsc -b --pretty false
+

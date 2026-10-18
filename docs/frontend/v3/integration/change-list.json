@@ -1,0 +1,929 @@
+{
+  "base": "d0b7d59b5a135d78240a6188c2f1f08a4c69a302",
+  "branch": "codex/frontend-v3-integration-20261018",
+  "status": "STAGED_NOT_COMMITTED_NOT_PUSHED",
+  "backendChanged": false,
+  "fileCount": 229,
+  "counts": {
+    "M": 33,
+    "A": 196
+  },
+  "files": [
+    {
+      "status": "M",
+      "path": "docs/README.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/V3_DESIGN_SYSTEM.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/V3_FILE_MANIFEST.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/V3_INTEGRATION_20261018.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/V3_OPEN_SOURCE_RESEARCH.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/V3_VERIFICATION.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/.gitattributes"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/COMPARISON.html"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/V3_SOURCE.patch"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/MOCK-manual-evaluation.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/admin-knowledge-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/admin-knowledge-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/admin-knowledge-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/admin-question-form-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/admin-question-form-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/admin-question-form-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/admin-questions-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/admin-questions-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/admin-questions-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/auth-expired-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/auth-expired-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/browser-log.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/create-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/create-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/create-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/dashboard-empty-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/dashboard-empty-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/dashboard-error-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/dashboard-error-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/dashboard-loading-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/dashboard-loading-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/dashboard-resume-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/dashboard-resume-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/dashboard-resume-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/dashboard-start-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/dashboard-start-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/dashboard-start-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/difficulty-keyboard-focus-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/difficulty-keyboard-focus-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/history-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/history-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/history-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/history-empty-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/history-empty-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/login-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/login-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/login-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/mobile-menu-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/profile-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/profile-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/profile-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/register-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/register-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/register-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/report-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/report-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/report-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/report-failed-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/report-failed-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/report-generating-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/report-generating-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/report-not-started-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/report-not-started-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/report-recovered-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/report-recovered-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-answering-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-answering-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-answering-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-blocked-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-blocked-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-blocked-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-created-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-created-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-evaluation-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-evaluation-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-evaluation-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-feedback-bottom-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-feedback-bottom-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-feedback-bottom-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-feedback-reading-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-feedback-reading-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-feedback-reading-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-finish-gate-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-finish-gate-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-followup-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-followup-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-followup-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-long-answer-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-long-answer-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-pending-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-pending-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-pending-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-resumed-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/after/session-resumed-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/admin-knowledge-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/admin-knowledge-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/admin-knowledge-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/admin-question-form-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/admin-question-form-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/admin-question-form-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/admin-questions-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/admin-questions-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/admin-questions-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/browser-log.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/create-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/create-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/create-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/dashboard-resume-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/dashboard-resume-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/dashboard-resume-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/dashboard-start-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/dashboard-start-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/dashboard-start-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/history-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/history-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/history-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/login-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/login-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/login-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/profile-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/profile-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/profile-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/register-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/register-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/register-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/report-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/report-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/report-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-answering-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-answering-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-answering-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-blocked-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-blocked-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-blocked-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-evaluation-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-evaluation-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-evaluation-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-followup-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-followup-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-followup-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-pending-1024.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-pending-1440.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/before/session-pending-390.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/change-manifest.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/RESULT.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/after-patch-check.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/attempt-01-result.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/attempt-02-result.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/attempt-03-result.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/blocker-http.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/change-list.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/consistency-after-regression.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/consistency.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/final-source-integrity.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/frontend-build.txt"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/frontend-exit-codes.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/frontend-lint.txt"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/frontend-test-unit.txt"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/frontend-typecheck.txt"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/index-integrity.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/known-blocker.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/line-ending-analysis.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/local-replay-resource.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/maven-summary-with-local-archive.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/maven-summary.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/proposed-model-error-classification.patch"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/provider-summary.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-admin-knowledge.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-admin-question-list.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-final-first-question.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-final-report.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-main-feedback-1.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/service-safety-checks.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/integration/workspace-preservation.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/references/README.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/references/pure-admin-browser.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/references/shadcn-vue-login.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/references/shadcn-vue-sidebar.png"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/verification/baseline-browser.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/verification/baseline-unit-retry.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/verification/baseline-unit.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/verification/integrity.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/verification/v3-browser.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/verification/v3-build.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/verification/v3-lint.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/verification/v3-typecheck.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/frontend/v3/verification/v3-unit.log"
+    },
+    {
+      "status": "A",
+      "path": "frontend/scripts/v3-visual-check.mjs"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/app/styles/shells.css"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/app/styles/tokens.css"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/components/shell/InterviewFocusShell.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/components/shell/ProductShell.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/components/shell/SessionSplitWorkspace.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/components/ui/BaseButton.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/components/ui/BaseInput.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/components/ui/BaseTextarea.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/components/ui/EmptyState.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/components/ui/PageHeader.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/components/ui/ProductMark.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/components/ui/StatusNotice.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/admin/knowledge/views/AdminKnowledgeView.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/admin/questions/views/AdminQuestionDetailView.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/admin/questions/views/AdminQuestionFormView.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/admin/questions/views/AdminQuestionListView.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/dashboard/components/DashboardInterviewFlow.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/dashboard/components/DashboardRecentList.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/dashboard/views/DashboardView.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/history/components/HistoryRow.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/interview/components/DifficultyCard.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/interview/components/InterviewAnswerPane.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/interview/components/InterviewEvaluationPane.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/interview/components/InterviewProgress.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/interview/components/InterviewQuestionPane.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/interview/components/InterviewSessionDock.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/interview/components/InterviewTimelineItem.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/interview/views/CreateInterviewView.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/interview/views/InterviewReportView.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/src/features/profile/views/ProfileView.vue"
+    },
+    {
+      "status": "M",
+      "path": "frontend/tests/DifficultyCard.spec.ts"
+    },
+    {
+      "status": "M",
+      "path": "frontend/tests/InterviewEvaluationPane.spec.ts"
+    },
+    {
+      "status": "A",
+      "path": "tools/browser-e2e/BrowserE2eServer.java"
+    },
+    {
+      "status": "A",
+      "path": "tools/browser-e2e/README.md"
+    },
+    {
+      "status": "A",
+      "path": "tools/browser-e2e/acceptance.mjs"
+    },
+    {
+      "status": "A",
+      "path": "tools/browser-e2e/environment.ps1"
+    },
+    {
+      "status": "A",
+      "path": "tools/browser-e2e/fixtures.sql"
+    },
+    {
+      "status": "A",
+      "path": "tools/browser-e2e/mock-provider.mjs"
+    },
+    {
+      "status": "A",
+      "path": "tools/browser-e2e/regression.ps1"
+    },
+    {
+      "status": "A",
+      "path": "tools/browser-e2e/verify-blocker.mjs"
+    },
+    {
+      "status": "A",
+      "path": "tools/browser-e2e/verify.mjs"
+    }
+  ]
+}

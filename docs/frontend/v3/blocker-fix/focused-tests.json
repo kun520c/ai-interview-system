@@ -1,0 +1,31 @@
+{
+  "counts": {
+    "tests": 107,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "suites": [
+    {
+      "name": "com.kun.aiinterview.interview.evaluation.judge.jev.JevE06ReliabilityReplayTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.kun.aiinterview.interview.evaluation.judge.jev.JevFeedbackReliabilityTest",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.kun.aiinterview.interview.service.FullInterviewBusinessOfflineTest",
+      "tests": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ]
+}

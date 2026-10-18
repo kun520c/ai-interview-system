@@ -1,0 +1,54 @@
+{
+  "conclusion": "NOT_READY_TO_MERGE",
+  "base": "d0b7d59b5a135d78240a6188c2f1f08a4c69a302",
+  "branch": "codex/frontend-v3-integration-20261018",
+  "transplant": "PASS",
+  "frontend": {
+    "typecheck": 0,
+    "lint": 0,
+    "build": 0,
+    "unit": {
+      "tests": 293,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "browser": {
+    "full": "FAIL",
+    "fullAttempt": "attempt-02",
+    "passedChecksBeforeBlocker": 28,
+    "happy": "PASS",
+    "happyAttempt": "attempt-03",
+    "happyChecks": 39,
+    "uncaughtPageErrors": 0,
+    "databaseConsistencyBeforeAndAfterMaven": "PASS"
+  },
+  "backendMavenCleanWorktree": {
+    "tests": 1659,
+    "failures": 0,
+    "errors": 1,
+    "skipped": 19
+  },
+  "backendMavenWithLocalArchive": {
+    "tests": 1661,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 19
+  },
+  "blockers": [
+    "B1: invalid model suggestion maps to HTTP 500 instead of existing 502 contract",
+    "B2: published offline replay test depends on a historical archive absent from Git"
+  ],
+  "backendFixApplied": false,
+  "userDecision": "Keep main backend unchanged; record merge blocker",
+  "paidModelCalls": 0,
+  "realMilvusVerified": false,
+  "servicesStopped": true,
+  "git": {
+    "staged": true,
+    "committed": false,
+    "pushed": false,
+    "mergedToMain": false
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "sessionId": 38,
+      "status": "PASS",
+      "mains": 5,
+      "followups": 2,
+      "evaluatedAnswers": 7,
+      "finalScores": 5,
+      "ragBatches": 7,
+      "persistedEvidence": 35,
+      "reports": 1,
+      "weaknesses": 2,
+      "mean": 70
+    },
+    {
+      "sessionId": 81,
+      "status": "PASS",
+      "mains": 5,
+      "followups": 2,
+      "evaluatedAnswers": 7,
+      "finalScores": 5,
+      "ragBatches": 7,
+      "persistedEvidence": 35,
+      "reports": 1,
+      "weaknesses": 2,
+      "mean": 70
+    },
+    {
+      "sessionId": 75,
+      "status": "PASS",
+      "timeoutReplay": "one answer/evaluation/batch for two requests",
+      "doubleClick": "one request/answer/evaluation",
+      "invalidModel": "FAILED, no evaluation, no advance, no report/weakness"
+    }
+  ],
+  "requests": {
+    "allApi": 115,
+    "answers": 18,
+    "reportGeneration": 2
+  },
+  "browserChecks": 49,
+  "scope": "full",
+  "fullAcceptancePassed": true,
+  "uncaughtPageErrors": 0
+}

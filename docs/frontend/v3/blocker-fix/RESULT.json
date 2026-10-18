@@ -1,0 +1,48 @@
+{
+  "conclusion": "READY_TO_MERGE",
+  "branch": "codex/frontend-v3-integration-20261018",
+  "base": "d0b7d59b5a135d78240a6188c2f1f08a4c69a302",
+  "verifiedCodeTree": "65830dfd49f7fe6650aad6d62a43dbd5521e11a7",
+  "blockers": {
+    "B1": "RESOLVED",
+    "B2": "RESOLVED"
+  },
+  "frontend": {
+    "typecheck": 0,
+    "lint": 0,
+    "build": 0,
+    "tests": 293,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "focusedTests": 107,
+  "integrationMaven": {
+    "tests": 1741,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 19
+  },
+  "cleanDefaultMaven": {
+    "tests": 1741,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 19
+  },
+  "sameExistingSkippedCases": true,
+  "strictBrowser": {
+    "scope": "full",
+    "status": "PASS",
+    "checks": 49,
+    "uncaughtPageErrors": 0
+  },
+  "databaseConsistencyBeforeAndAfter": "PASS",
+  "privateHistoryUsed": false,
+  "paidModelCalls": 0,
+  "realMilvusVerified": false,
+  "allOwnedServicesStopped": true,
+  "original229PathsPreserved": true,
+  "committed": false,
+  "pushed": false,
+  "merged": false
+}

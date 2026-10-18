@@ -1,0 +1,9 @@
+{
+  "scope": "All three browser attempts",
+  "transport": "Loopback local mock server only",
+  "requests": 53,
+  "embeddingRequests": 25,
+  "chatRequests": 28,
+  "paidModelCalls": 0,
+  "rawWireSha256": "0773d24811b5eae0ae511c07d7a03b16a43ed13dd343d248ea8603eb50fa88f7"
+}

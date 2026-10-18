@@ -1,0 +1,15 @@
+{
+  "diagnosis": "KNOWN_BLOCKER_REPRODUCED",
+  "readiness": "NOT_READY_TO_MERGE",
+  "expectedHttpStatus": 502,
+  "actualHttpStatus": 500,
+  "message": "系统异常，请稍后重试",
+  "sessionId": 3,
+  "answerId": 11,
+  "databaseSafety": "PASS: failed answer, no evaluation, no workflow advance, no report or weakness",
+  "replayAndDoubleClick": "PASS: one durable answer/evaluation/retrieval batch for each request identity",
+  "sourceUnchangedFromMain": true,
+  "sourceSha256LF": "c9719d3b41090da05765d35e3c0a1ec9cd377ae31af2a44e308b1199a7d7fb31",
+  "backendFixApplied": false,
+  "userDecision": "Keep main backend unchanged; classify as merge blocker"
+}

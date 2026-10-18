@@ -1,0 +1,367 @@
+
+> ai-interview-frontend@0.0.0 test:unit
+> vitest run
+
+
+ RUN  v5.0.1 <repo>/frontend
+
+ ❯ tests/knowledgeRecentStorage.spec.ts (0 test)
+ ❯ tests/questionQuery.spec.ts (0 test)
+ ❯ tests/submitRecordStorage.spec.ts (0 test)
+ ❯ tests/evaluationGateStorage.spec.ts (0 test)
+ ❯ tests/authLogin.spec.ts (0 test)
+ ❯ tests/AdminKnowledge.spec.ts (0 test)
+ ❯ tests/RegisterView.spec.ts (0 test)
+ ❯ tests/ProductShell.spec.ts (0 test)
+ ❯ tests/InterviewSessionView.spec.ts (0 test)
+ ❯ tests/LoginView.spec.ts (0 test)
+ ❯ tests/AdminQuestions.spec.ts (0 test)
+ ❯ tests/DashboardView.spec.ts (0 test)
+ ❯ tests/ProfileView.spec.ts (0 test)
+ ❯ tests/CreateInterviewView.spec.ts (0 test)
+ ❯ tests/authInitialize.spec.ts (0 test)
+ ❯ tests/knowledgeFileRules.spec.ts (0 test)
+ ❯ tests/currentInterview.spec.ts (0 test)
+ ❯ tests/apiError.spec.ts (0 test)
+ ❯ tests/routerGuards.spec.ts (0 test)
+ ❯ tests/HistoryView.spec.ts (0 test)
+ ❯ tests/InterviewEvaluationPane.spec.ts (0 test)
+ ❯ tests/InterviewDetailView.spec.ts (0 test)
+ ❯ tests/DifficultyCard.spec.ts (0 test)
+ ❯ tests/InterviewReportView.spec.ts (0 test)
+ ❯ tests/resultEnvelope.spec.ts (0 test)
+ ❯ tests/sessionScope.spec.ts (0 test)
+ ❯ tests/submissionRecovery.spec.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 27 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/AdminKnowledge.spec.ts [ tests/AdminKnowledge.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/AdminKnowledge.spec.ts:10:1
+      8|   uploadKnowledgeDocument,
+      9| } from '@/features/admin/knowledge/api/knowledgeAdminApi'
+     10| import {
+       | ^
+     11|   persistKnowledgeRecent,
+     12|   readKnowledgeRecent,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/27]⎯
+
+ FAIL  tests/AdminQuestions.spec.ts [ tests/AdminQuestions.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/AdminQuestions.spec.ts:15:1
+     13| import { fetchCurrentInterview } from '@/features/interview/api/interv…
+     14| import { fetchInterviewHistory } from '@/features/history/api/historyA…
+     15| import { QuestionCategory, QuestionDifficulty, QuestionPointType, Ques…
+       | ^
+     16| import { authenticate, mountApp } from './helpers/mountApp'
+     17| import { emptyHistoryPage } from './helpers/interviewFixtures'
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/27]⎯
+
+ FAIL  tests/apiError.spec.ts [ tests/apiError.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/api/httpClient.ts:7:1
+      5| import { isAuthPublicPath } from '@/api/endpoints'
+      6| import { isResultEnvelope, unwrapResultData } from '@/api/resultEnvelo…
+      7| import { notifyUnauthorized } from '@/api/unauthorized'
+       | ^
+      8| import { getSessionGeneration, isCurrentIdentityScope } from '@/app/se…
+      9| import { readAuthCredential } from '@/features/auth/storage/authStorag…
+ ❯ tests/apiError.spec.ts:5:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/27]⎯
+
+ FAIL  tests/authInitialize.spec.ts [ tests/authInitialize.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/features/auth/api/authApi.ts:1:1
+      1| import { apiPost } from '@/api/httpClient'
+       | ^
+      2| import { endpoints } from '@/api/endpoints'
+      3| import type { LoginRequest, LoginResponse, RegisterRequest } from '@/t…
+ ❯ src/app/stores/auth.ts:5:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/27]⎯
+
+ FAIL  tests/authLogin.spec.ts [ tests/authLogin.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/authLogin.spec.ts:6:1
+      4| import { ApiError, ErrorKind } from '@/api/apiError'
+      5| import { resetSessionScopeForTests } from '@/app/session/sessionScope'
+      6| import { useAuthStore } from '@/app/stores/auth'
+       | ^
+      7| import { login as loginRequest } from '@/features/auth/api/authApi'
+      8| import { fetchCurrentUser } from '@/features/auth/api/userApi'
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/27]⎯
+
+ FAIL  tests/CreateInterviewView.spec.ts [ tests/CreateInterviewView.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/CreateInterviewView.spec.ts:9:1
+      7| import { createInterview, fetchCurrentInterview } from '@/features/int…
+      8| import { fetchInterviewHistory } from '@/features/history/api/historyA…
+      9| import { resetInterviewResumeNoticeForTests } from '@/features/intervi…
+       | ^
+     10| import { QuestionDifficulty, UserRole } from '@/types/enums'
+     11| import { authenticate, mountApp } from './helpers/mountApp'
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/27]⎯
+
+ FAIL  tests/currentInterview.spec.ts [ tests/currentInterview.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/features/auth/api/userApi.ts:1:1
+      1| import { apiGet, apiPut } from '@/api/httpClient'
+       | ^
+      2| import { endpoints } from '@/api/endpoints'
+      3| import type { ChangePasswordRequest, CurrentUserResponse } from '@/typ…
+ ❯ src/app/stores/auth.ts:4:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/27]⎯
+
+ FAIL  tests/DashboardView.spec.ts [ tests/DashboardView.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/DashboardView.spec.ts:9:1
+      7| import { fetchInterviewHistory } from '@/features/history/api/historyA…
+      8| import { IdentityStatus } from '@/types/auth'
+      9| import { InterviewQuestionType, InterviewReportStatus } from '@/types/…
+       | ^
+     10| import { authenticate, mountApp } from './helpers/mountApp'
+     11| import { currentSession, emptyHistoryPage, historyItem } from './helpe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/27]⎯
+
+ FAIL  tests/DifficultyCard.spec.ts [ tests/DifficultyCard.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/features/interview/copy/categoryDisplay.ts:1:1
+      1| import { QuestionCategory } from '@/types/enums'
+       | ^
+      2|
+      3| export const CATEGORY_DISPLAY: Record<QuestionCategory, string> = {
+ ❯ src/features/interview/components/DifficultyCard.vue:5:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/27]⎯
+
+ FAIL  tests/evaluationGateStorage.spec.ts [ tests/evaluationGateStorage.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/features/interview/storage/evaluationGateStorage.ts:1:1
+      1| import { DecisionAction, EvaluationLevel, EvaluationPhase, InterviewQu…
+       | ^
+      2| import type { InterviewEvaluationResponse, InterviewQuestionResponse }…
+      3| import type { EvaluationGate } from '@/features/interview/types/evalua…
+ ❯ tests/evaluationGateStorage.spec.ts:3:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/27]⎯
+
+ FAIL  tests/HistoryView.spec.ts [ tests/HistoryView.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/helpers/mountApp.ts:6:1
+      4|
+      5| import App from '@/App.vue'
+      6| import { createAppRouter } from '@/app/router'
+       | ^
+      7| import { useAuthStore } from '@/app/stores/auth'
+      8| import { IdentityStatus } from '@/types/auth'
+ ❯ tests/HistoryView.spec.ts:8:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/27]⎯
+
+ FAIL  tests/InterviewDetailView.spec.ts [ tests/InterviewDetailView.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/helpers/mountApp.ts:6:1
+      4|
+      5| import App from '@/App.vue'
+      6| import { createAppRouter } from '@/app/router'
+       | ^
+      7| import { useAuthStore } from '@/app/stores/auth'
+      8| import { IdentityStatus } from '@/types/auth'
+ ❯ tests/InterviewDetailView.spec.ts:13:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/27]⎯
+
+ FAIL  tests/InterviewEvaluationPane.spec.ts [ tests/InterviewEvaluationPane.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/features/interview/copy/evaluationLevelDisplay.ts:1:1
+      1| import { EvaluationLevel } from '@/types/enums'
+       | ^
+      2|
+      3| export const EVALUATION_LEVEL_LABEL: Record<EvaluationLevel, string> =…
+ ❯ src/features/interview/components/InterviewEvaluationPane.vue:5:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/27]⎯
+
+ FAIL  tests/InterviewReportView.spec.ts [ tests/InterviewReportView.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/features/interview/utils/completedSession.ts:1:1
+      1| import { InterviewSessionStatus } from '@/types/enums'
+       | ^
+      2|
+      3| export function isActiveInterviewStatus(status: InterviewSessionStatus…
+ ❯ src/features/interview/composables/useInterviewReport.ts:18:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/27]⎯
+
+ FAIL  tests/InterviewSessionView.spec.ts [ tests/InterviewSessionView.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/InterviewSessionView.spec.ts:6:1
+      4| import { ApiError, ErrorKind } from '@/api/apiError'
+      5| import { resetSessionScopeForTests } from '@/app/session/sessionScope'
+      6| import { persistSubmitRecord } from '@/features/interview/storage/subm…
+       | ^
+      7| import { readEvaluationGate, writeEvaluationGate } from '@/features/in…
+      8| import { fetchCurrentInterview, fetchInterviewDetail, submitInterviewA…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/27]⎯
+
+ FAIL  tests/knowledgeFileRules.spec.ts [ tests/knowledgeFileRules.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/features/admin/knowledge/api/knowledgeAdminApi.ts:1:1
+      1| import { apiPost, apiPostForm } from '@/api/httpClient'
+       | ^
+      2| import { endpoints } from '@/api/endpoints'
+      3| import type { QuestionCategory } from '@/types/enums'
+ ❯ tests/knowledgeFileRules.spec.ts:5:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/27]⎯
+
+ FAIL  tests/knowledgeRecentStorage.spec.ts [ tests/knowledgeRecentStorage.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/features/admin/knowledge/storage/knowledgeRecentStorage.ts:2:1
+      1| import type { QuestionCategory } from '@/types/enums'
+      2| import {
+       | ^
+      3|   KnowledgeFileType,
+      4|   KnowledgeProcessingStatus,
+ ❯ tests/knowledgeRecentStorage.spec.ts:3:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/27]⎯
+
+ FAIL  tests/LoginView.spec.ts [ tests/LoginView.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/LoginView.spec.ts:8:1
+      6| import { login as loginRequest } from '@/features/auth/api/authApi'
+      7| import { fetchCurrentUser } from '@/features/auth/api/userApi'
+      8| import { AUTH_STORAGE_KEY } from '@/features/auth/storage/authStorage'
+       | ^
+      9| import { IdentityStatus } from '@/types/auth'
+     10| import { UserRole, UserStatus } from '@/types/enums'
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/27]⎯
+
+ FAIL  tests/ProductShell.spec.ts [ tests/ProductShell.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/ProductShell.spec.ts:6:1
+      4| import { resetSessionScopeForTests } from '@/app/session/sessionScope'
+      5| import { fetchCurrentUser } from '@/features/auth/api/userApi'
+      6| import { persistSubmitRecord, readSubmitRecord } from '@/features/inte…
+       | ^
+      7| import { useCurrentInterviewStore } from '@/features/interview/stores/…
+      8| import { fetchCurrentInterview } from '@/features/interview/api/interv…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/27]⎯
+
+ FAIL  tests/ProfileView.spec.ts [ tests/ProfileView.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/ProfileView.spec.ts:8:1
+      6| import { resetPasswordChangedNoticeForTests } from '@/features/auth/na…
+      7| import { changePassword, fetchCurrentUser } from '@/features/auth/api/…
+      8| import { persistSubmitRecord, readSubmitRecord } from '@/features/inte…
+       | ^
+      9| import { fetchCurrentInterview } from '@/features/interview/api/interv…
+     10| import { fetchInterviewHistory } from '@/features/history/api/historyA…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/27]⎯
+
+ FAIL  tests/questionQuery.spec.ts [ tests/questionQuery.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/features/admin/questions/utils/questionQuery.ts:3:1
+      1| import type { LocationQuery, LocationQueryValue } from 'vue-router'
+      2|
+      3| import {
+       | ^
+      4|   QuestionCategory,
+      5|   QuestionDifficulty,
+ ❯ tests/questionQuery.spec.ts:3:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/27]⎯
+
+ FAIL  tests/RegisterView.spec.ts [ tests/RegisterView.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/RegisterView.spec.ts:7:1
+      5| import { resetSessionScopeForTests } from '@/app/session/sessionScope'
+      6| import { registerAccount } from '@/features/auth/api/authApi'
+      7| import { AUTH_STORAGE_KEY } from '@/features/auth/storage/authStorage'
+       | ^
+      8| import { mountApp } from './helpers/mountApp'
+      9|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/27]⎯
+
+ FAIL  tests/resultEnvelope.spec.ts [ tests/resultEnvelope.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/resultEnvelope.spec.ts:3:1
+      1| import { describe, expect, it } from 'vitest'
+      2|
+      3| import { ApiError } from '@/api/apiError'
+       | ^
+      4| import { isResultEnvelope, unwrapResultData } from '@/api/resultEnvelo…
+      5| import type { InterviewSessionResponse } from '@/types/interview'
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/27]⎯
+
+ FAIL  tests/routerGuards.spec.ts [ tests/routerGuards.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/app/router/guards.ts:4:1
+      2| import type { NavigationGuardWithThis, Router } from 'vue-router'
+      3|
+      4| import { useAuthStore } from '@/app/stores/auth'
+       | ^
+      5| import { IdentityStatus } from '@/types/auth'
+      6| import { resolveSafeRedirect } from '@/utils/safeRedirect'
+ ❯ src/app/router/index.ts:4:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/27]⎯
+
+ FAIL  tests/sessionScope.spec.ts [ tests/sessionScope.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ tests/sessionScope.spec.ts:3:1
+      1| import { beforeEach, describe, expect, it } from 'vitest'
+      2|
+      3| import {
+       | ^
+      4|   getSessionGeneration,
+      5|   isCurrentIdentityScope,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/27]⎯
+
+ FAIL  tests/submissionRecovery.spec.ts [ tests/submissionRecovery.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/features/interview/utils/submissionRecovery.ts:1:1
+      1| import { ErrorKind, isApiError } from '@/api/apiError'
+       | ^
+      2|
+      3| export const AnswerConflictKind = {
+ ❯ tests/submissionRecovery.spec.ts:3:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/27]⎯
+
+ FAIL  tests/submitRecordStorage.spec.ts [ tests/submitRecordStorage.spec.ts ]
+Error: ENOENT: no such file or directory, open '<sandbox-temp>'
+ ❯ src/features/interview/storage/submitRecordStorage.ts:1:1
+      1| import { isValidRequestId } from '@/utils/requestId'
+       | ^
+      2| import {
+      3|   RECOVERY_BLOCKED_REASONS,
+ ❯ tests/submitRecordStorage.spec.ts:3:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/27]⎯
+
+
+ Test Files  27 failed | 9 passed (36)
+      Tests  30 passed (30)
+   Start at  20:42:03
+   Duration  20.09s (environment 97%, transform 3%)
+
+Environment  jsdom was created 36 times · 367.78s total, 97% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+

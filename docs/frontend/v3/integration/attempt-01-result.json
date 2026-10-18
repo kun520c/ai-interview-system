@@ -1,0 +1,119 @@
+{
+  "browser": "Google Chrome via Playwright, headless, dedicated process/context",
+  "ai": "LOCAL_MOCK",
+  "paidModelCalls": 0,
+  "sessions": [
+    {
+      "label": "main",
+      "account": "browser_main_1792299531119",
+      "userId": 2,
+      "sessionId": 1,
+      "mains": 1,
+      "followups": 0,
+      "evaluations": 1,
+      "finalEvaluations": 0,
+      "submissions": [
+        {
+          "questionId": 1,
+          "type": "MAIN",
+          "requestId": "1486e5e4-cb63-42b0-be92-d7a16b9776ac",
+          "evaluation": {
+            "evaluationPhase": "INITIAL",
+            "correctnessScore": 8,
+            "completenessScore": 8,
+            "depthScore": 8,
+            "clarityScore": 8,
+            "practiceScore": 8,
+            "totalScore": 40,
+            "level": "WEAK",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "FOLLOW_UP"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "anonymous-protected-http-401",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous-admin-http-401",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous-protected-page-redirects-login",
+      "status": "PASS"
+    },
+    {
+      "name": "main:invalid-login-shows-error",
+      "status": "PASS"
+    },
+    {
+      "name": "main:user-admin-http-403",
+      "status": "PASS"
+    },
+    {
+      "name": "main:register-login-refresh-auth",
+      "status": "PASS",
+      "userId": 2
+    },
+    {
+      "name": "main:create-five-fixed-main-questions",
+      "status": "PASS",
+      "sessionId": 1
+    },
+    {
+      "name": "main:blank-answer-disabled",
+      "status": "PASS"
+    }
+  ],
+  "errors": [
+    {
+      "type": "console",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    }
+  ],
+  "status": "FAIL",
+  "failure": {
+    "stage": "complete-main-browser-flow",
+    "message": "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.evaluation-pane .total-number') to be visible\u001b[22m\n",
+    "stack": "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.evaluation-pane .total-number') to be visible\u001b[22m\n\n    at complete (<repo>\\tools\\browser-e2e\\acceptance.mjs:167:60)\n    at async file:///<repo>/tools/browser-e2e/acceptance.mjs:335:5"
+  },
+  "requestCounts": {
+    "allApi": 17,
+    "answers": 1,
+    "reportGeneration": 0
+  }
+}
