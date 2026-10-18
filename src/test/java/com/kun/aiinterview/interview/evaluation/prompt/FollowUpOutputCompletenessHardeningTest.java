@@ -1,6 +1,7 @@
 package com.kun.aiinterview.interview.evaluation.prompt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kun.aiinterview.common.exception.ExternalServiceException;
 import com.kun.aiinterview.interview.evaluation.EvaluationContext;
 import com.kun.aiinterview.interview.evaluation.EvaluationMode;
 import com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult;
@@ -73,7 +74,7 @@ class FollowUpOutputCompletenessHardeningTest {
                     .containsExactly(101L, 102L, 103L, 104L);
         } else {
             assertThatThrownBy(() -> new LlmEvaluationValidator().validate(context, result.suggestion()))
-                    .isInstanceOf(IllegalStateException.class)
+                    .isInstanceOf(ExternalServiceException.class)
                     .hasMessage("scoringPointResults数量与MAIN评分点数量不一致");
         }
         server.verify();

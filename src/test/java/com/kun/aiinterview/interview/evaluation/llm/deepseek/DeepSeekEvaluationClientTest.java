@@ -82,6 +82,12 @@ class DeepSeekEvaluationClientTest {
     }
 
     @Test
+    void strictModelParsingDoesNotChangeApplicationObjectMapper() {
+        assertThat(objectMapper.isEnabled(com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_FLOAT_AS_INT)).isTrue();
+        assertThat(objectMapper.isEnabled(com.fasterxml.jackson.databind.MapperFeature.ALLOW_COERCION_OF_SCALARS)).isTrue();
+    }
+
+    @Test
     void givenValidPromptAndResponse_whenEvaluate_thenSendsContractAndReturnsParsedResult()
             throws JsonProcessingException {
         String rawJson = validSuggestionJson();

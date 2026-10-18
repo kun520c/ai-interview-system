@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.kun.aiinterview.common.exception.ExternalServiceException;
 import com.kun.aiinterview.interview.evaluation.llm.DeepSeekEvaluationResult;
 import com.kun.aiinterview.interview.evaluation.llm.LlmEvaluationSuggestion;
@@ -40,7 +42,10 @@ public class DeepSeekEvaluationClient {
     ) {
         this.restClient = restClient;
         this.properties = properties;
-        this.objectMapper = objectMapper;
+        // Model score fields must be JSON integers, never coerced strings or truncated fractions.
+        this.objectMapper = objectMapper.copy()
+                .disable(DeserializationFeature.ACCEPT_FLOAT_AS_INT)
+                .disable(MapperFeature.ALLOW_COERCION_OF_SCALARS);
     }
 
     public DeepSeekEvaluationResult evaluate(
