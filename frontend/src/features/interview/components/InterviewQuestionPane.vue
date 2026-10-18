@@ -33,7 +33,7 @@ const typeLabel = computed(() =>
 <style scoped>
 .question-pane {
   display: grid;
-  gap: 16px;
+  gap: 24px;
   min-width: 0;
 }
 
@@ -41,33 +41,39 @@ const typeLabel = computed(() =>
   display: flex;
   flex-wrap: wrap;
   gap: 8px 16px;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-2);
 }
 
 .question-type {
-  color: var(--text);
+  color: var(--primary);
   font-weight: 600;
+  padding: 3px 10px;
+  border: 1px solid var(--primary-border);
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
 }
 
 .question-content {
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 650;
-  line-height: 1.55;
+  line-height: 1.75;
+  letter-spacing: -.02em;
   color: var(--text);
   overflow-wrap: anywhere;
 }
 
 .submitted-answer {
-  padding: 12px;
+  padding: 18px;
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface-subtle);
   min-width: 0;
 }
 
 .submitted-answer h3 {
-  margin-bottom: 8px;
-  font-size: 13px;
+  margin-bottom: 12px;
+  font-size: 12px;
   font-weight: 650;
   color: var(--text-2);
 }
@@ -78,12 +84,18 @@ const typeLabel = computed(() =>
   overflow-wrap: anywhere;
   font-family: var(--font);
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.8;
 }
 
 @media (max-width: 720px) {
-  .question-content {
-    font-size: 18px;
+  .question-pane {
+    gap: 18px;
   }
+
+  .question-content {
+    font-size: 19px;
+    line-height: 1.7;
+  }
+
 }
 </style>

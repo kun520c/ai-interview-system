@@ -335,18 +335,11 @@ async function retryCurrent(): Promise<void> {
   font-size: 14px;
 }
 
-.create-skeleton,
-.create-verifying,
-.create-uncertain,
-.resume-facts,
-.resume-explain {
+.create-skeleton, .create-verifying, .create-uncertain, .resume-facts, .resume-explain {
   min-width: 0;
 }
 
-.create-skeleton,
-.resume-facts,
-.create-verifying,
-.create-uncertain {
+.create-skeleton, .resume-facts, .create-verifying, .create-uncertain {
   padding: 24px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -360,9 +353,7 @@ async function retryCurrent(): Promise<void> {
   align-items: start;
 }
 
-.resume-facts h2,
-.create-verifying h2,
-.create-uncertain h2 {
+.resume-facts h2, .create-verifying h2, .create-uncertain h2 {
   margin-bottom: 16px;
   font-size: 20px;
   font-weight: 650;
@@ -383,8 +374,7 @@ async function retryCurrent(): Promise<void> {
   font-size: 14px;
 }
 
-.resume-cta,
-.start-button {
+.resume-cta, .start-button {
   margin-top: 24px;
 }
 
@@ -417,10 +407,7 @@ async function retryCurrent(): Promise<void> {
   font-weight: 650;
 }
 
-.resume-explain p,
-.notice-copy,
-.create-verifying p,
-.create-uncertain p {
+.resume-explain p, .notice-copy, .create-verifying p, .create-uncertain p {
   font-size: 14px;
   color: var(--text-2);
   line-height: 1.6;
@@ -507,8 +494,7 @@ async function retryCurrent(): Promise<void> {
   min-width: 1.6em;
 }
 
-.skeleton-line,
-.skeleton-card {
+.skeleton-line, .skeleton-card {
   display: block;
   border-radius: var(--radius);
   background: var(--surface-subtle);
@@ -536,28 +522,81 @@ async function retryCurrent(): Promise<void> {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .skeleton-line,
-  .skeleton-card {
+  .skeleton-line, .skeleton-card {
     animation: pulse 1.6s ease-in-out infinite;
   }
+
 }
 
 @keyframes pulse {
   50% {
     opacity: 0.65;
   }
+
 }
 
 @media (max-width: 1024px) {
   .resume-layout {
     grid-template-columns: minmax(0, 1fr);
   }
+
 }
 
 @media (max-width: 720px) {
-  .difficulty-grid,
-  .skeleton-cards {
+  .difficulty-grid, .skeleton-cards {
     grid-template-columns: minmax(0, 1fr);
   }
+
+}
+
+.create-header h1 {
+  font-size: 28px;
+  letter-spacing: -.035em;
+}
+
+.difficulty-fieldset legend {
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.start-button {
+  margin-top: 0;
+}
+
+.create-flow {
+  margin-top: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 22px;
+}
+
+.create-flow ol {
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 20px;
+}
+
+.create-flow li {
+  font-size: 12px;
+}
+
+.resume-facts {
+  box-shadow: var(--shadow-panel);
+  border-color: var(--primary-border);
+}
+
+@media (max-width:720px) {
+  .create-flow ol {
+    grid-template-columns: minmax(0,1fr);
+    gap: 12px;
+  }
+
+  .create-header h1 {
+    font-size: 25px;
+  }
+
+  .start-button {
+    width: 100%;
+  }
+
 }
 </style>

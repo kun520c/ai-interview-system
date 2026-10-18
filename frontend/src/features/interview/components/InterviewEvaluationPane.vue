@@ -49,11 +49,12 @@ function levelClass(level: EvaluationLevel): string {
     >
       {{ SESSION_COPY.feedbackPane }}
     </component>
-    <p class="evaluation-phase">{{ EVALUATION_PHASE_LABEL[evaluation.evaluationPhase] }}</p>
+    <p class="evaluation-phase">{{ EVALUATION_PHASE_LABEL[evaluation.evaluationPhase] }}<span class="dimension-scale">五维单项满分 20 分</span></p>
 
     <div class="evaluation-score">
       <p class="total-score">
         <span class="total-number">{{ evaluation.totalScore }}</span>
+        <span class="score-maximum">/ 100</span>
         <span class="total-label">总分</span>
       </p>
       <p class="level-word" :class="levelClass(evaluation.level)">
@@ -65,6 +66,7 @@ function levelClass(level: EvaluationLevel): string {
       <li v-for="dimension in SCORE_DIMENSIONS" :key="dimension.key">
         <span class="score-label">{{ dimension.label }}</span>
         <span class="score-value">{{ evaluation[dimension.key] }}</span>
+        <span class="score-track" aria-hidden="true"><span :style="{ width: `${Math.max(0, Math.min(100, evaluation[dimension.key] * 5))}%` }"></span></span>
       </li>
     </ul>
 
@@ -98,14 +100,15 @@ function levelClass(level: EvaluationLevel): string {
 <style scoped>
 .evaluation-pane {
   display: grid;
-  gap: 16px;
+  gap: 18px;
   min-width: 0;
 }
 
 .evaluation-heading {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   outline: none;
+  letter-spacing: -.02em;
 }
 
 .evaluation-heading:focus-visible {
@@ -114,33 +117,59 @@ function levelClass(level: EvaluationLevel): string {
 }
 
 .evaluation-phase {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-2);
+  margin-top: -12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+.dimension-scale {
+  margin-left: auto;
 }
 
 .evaluation-score {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: 12px 20px;
+  padding: 18px 20px;
+  background: var(--surface-subtle);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
 }
 
 .total-number {
-  font-size: 32px;
-  font-weight: 700;
+  font-family: var(--mono);
+  font-size: 46px;
+  font-weight: 600;
+  letter-spacing: -.06em;
   line-height: 1;
   color: var(--text);
 }
 
-.total-label {
+.score-maximum {
   margin-left: 8px;
+  font-family: var(--mono);
   font-size: 13px;
   color: var(--text-2);
 }
 
+.total-label {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-2);
+}
+
 .level-word {
-  font-size: 16px;
+  margin-left: auto;
+  font-size: 13px;
   font-weight: 650;
+  border: 1px solid currentColor;
+  padding: 4px 12px;
+  border-radius: 999px;
 }
 
 .level-word.is-success {
@@ -158,83 +187,128 @@ function levelClass(level: EvaluationLevel): string {
 .score-row {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px;
-  padding: 12px;
-  border-radius: var(--radius);
-  background: var(--surface-subtle);
+  gap: 16px;
 }
 
 .score-row li {
   display: grid;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
 }
 
 .score-label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-2);
 }
 
 .score-value {
-  font-size: 16px;
-  font-weight: 650;
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 600;
   color: var(--text);
 }
 
+.score-track {
+  display: block;
+  height: 4px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.score-track > span {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+  border-radius: inherit;
+}
+
 .feedback-block {
-  padding: 12px 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   min-width: 0;
+  background: var(--surface);
 }
 
 .feedback-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
-  font-size: 14px;
+  margin-bottom: 10px;
+  font-size: 13px;
   font-weight: 650;
 }
 
-.feedback-block ul,
-.feedback-block p {
-  font-size: 14px;
-  line-height: 1.65;
+.feedback-block ul, .feedback-block p {
+  font-size: 13px;
+  line-height: 1.85;
   overflow-wrap: anywhere;
+  color: var(--text);
+}
+
+.feedback-block li {
+  position: relative;
+  padding-left: 12px;
+}
+
+.feedback-block li::before {
+  content: '';
+  width: 3px;
+  height: 3px;
+  background: var(--text-2);
+  border-radius: 50%;
+  position: absolute;
+  left: 0;
+  top: .85em;
 }
 
 .feedback-block li + li {
   margin-top: 6px;
 }
 
-.is-success {
-  background: var(--success-soft);
+.feedback-block.is-success {
+  border-left: 3px solid var(--success);
+}
+
+.is-success .feedback-title {
   color: var(--success);
 }
 
-.is-warning {
-  background: var(--warning-soft);
+.feedback-block.is-warning {
+  border-left: 3px solid var(--warning);
+}
+
+.is-warning .feedback-title {
   color: var(--warning);
 }
 
 .is-correction {
   background: var(--primary-soft);
-  color: var(--text);
+  border-color: var(--primary-border);
+}
+
+.is-correction .feedback-title {
+  color: var(--primary);
 }
 
 @media (max-width: 720px) {
   .score-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px 12px;
-    padding: 12px;
+    grid-template-columns: repeat(5, minmax(0,1fr));
+    gap: 10px;
   }
 
-  .score-label {
-    font-size: 13px;
+  .total-number {
+    font-size: 40px;
   }
 
-  .score-value {
-    font-size: 16px;
+  .evaluation-score {
+    padding: 16px;
   }
+
+  .feedback-block {
+    padding: 14px;
+  }
+
 }
 </style>

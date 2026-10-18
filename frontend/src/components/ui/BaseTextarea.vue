@@ -34,7 +34,7 @@ const emit = defineEmits<{
 .base-textarea {
   width: 100%;
   min-height: 180px;
-  padding: 12px;
+  padding: 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
@@ -52,8 +52,11 @@ const emit = defineEmits<{
   box-shadow: 0 0 0 3px var(--primary-soft);
 }
 
-.base-textarea:disabled,
-.base-textarea:read-only {
+.base-textarea:disabled, .base-textarea:read-only {
   background: var(--surface-subtle);
+}
+
+.base-textarea[aria-invalid='true'] {
+  border-color: var(--danger);
 }
 </style>

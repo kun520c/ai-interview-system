@@ -139,9 +139,7 @@ const showBody = computed(() => !props.collapsible || props.expanded !== false)
   background: transparent;
 }
 
-.timeline-answer,
-.timeline-evaluation,
-.missing-evaluation {
+.timeline-answer, .timeline-evaluation, .missing-evaluation {
   margin-top: 16px;
 }
 
@@ -152,8 +150,7 @@ const showBody = computed(() => !props.collapsible || props.expanded !== false)
   min-width: 0;
 }
 
-.timeline-answer h4,
-.answer-meta {
+.timeline-answer h4, .answer-meta {
   margin-bottom: 8px;
   font-size: 13px;
   font-weight: 650;
@@ -171,5 +168,44 @@ const showBody = computed(() => !props.collapsible || props.expanded !== false)
 
 .timeline-evaluation :deep(.evaluation-heading) {
   font-size: 16px;
+}
+
+.timeline-item {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.timeline-item + .timeline-item {
+  margin-top: 16px;
+  padding-top: 24px;
+}
+
+.timeline-title {
+  font-size: 16px;
+}
+
+.timeline-title[aria-expanded]::after {
+  content: '−';
+  float: right;
+  margin-left: 12px;
+  color: var(--primary);
+}
+
+.timeline-title[aria-expanded='false']::after {
+  content: '+';
+}
+
+@media (max-width:720px) {
+  .timeline-item {
+    padding: 18px;
+  }
+
+  .timeline-item + .timeline-item {
+    padding-top: 18px;
+  }
+
 }
 </style>

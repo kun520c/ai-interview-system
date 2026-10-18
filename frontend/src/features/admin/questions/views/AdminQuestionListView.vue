@@ -189,9 +189,7 @@ const statuses = Object.values(QuestionStatus)
   font-weight: 600;
 }
 
-.filter-field select,
-.filter-bar :deep(.base-input),
-.filter-bar :deep(.base-button) {
+.filter-field select, .filter-bar :deep(.base-input), .filter-bar :deep(.base-button) {
   min-height: 44px;
   width: 100%;
 }
@@ -203,8 +201,7 @@ const statuses = Object.values(QuestionStatus)
   background: var(--surface);
 }
 
-.list-skeleton,
-.table-wrap {
+.list-skeleton, .table-wrap {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
@@ -233,8 +230,7 @@ const statuses = Object.values(QuestionStatus)
   border-collapse: collapse;
 }
 
-.question-table th,
-.question-table td {
+.question-table th, .question-table td {
   padding: 14px 16px;
   text-align: left;
   vertical-align: top;
@@ -279,6 +275,7 @@ const statuses = Object.values(QuestionStatus)
   .col-secondary {
     display: none;
   }
+
 }
 
 @media (max-width: 720px) {
@@ -317,5 +314,45 @@ const statuses = Object.values(QuestionStatus)
   .content-cell {
     max-width: none;
   }
+
+}
+
+.filter-bar {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.question-table thead {
+  background: var(--surface-subtle);
+}
+
+.question-table th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  padding-block: 14px;
+}
+
+.question-table td {
+  padding-block: 18px;
+  font-size: 13px;
+}
+
+.question-table tbody tr:hover {
+  background: var(--primary-soft);
+}
+
+@media (max-width:720px) {
+  .filter-bar {
+    padding: 16px;
+  }
+
+  .question-table td {
+    padding-block: 8px;
+  }
+
 }
 </style>

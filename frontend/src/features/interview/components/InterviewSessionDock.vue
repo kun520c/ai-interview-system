@@ -23,6 +23,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="session-dock-actions">
+    <p class="dock-context">{{ phase === SessionPhase.EVALUATION_GATE ? '阅读本题反馈后，确认继续。' : '专注当前问题，清晰表达你的思路。' }}</p>
     <template v-if="phase === SessionPhase.ANSWERING">
       <BaseButton :disabled="!canSubmit || submitLocked" :loading="submitLocked" @click="emit('submit')">
         {{ SESSION_COPY.submit }}
@@ -63,13 +64,31 @@ const emit = defineEmits<{
 .session-dock-actions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 12px;
   align-items: center;
 }
 
+.dock-context {
+  margin-right: auto;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
 @media (max-width: 720px) {
+  .dock-context {
+    display: none;
+  }
+
+  .session-dock-actions {
+    justify-content: stretch;
+    gap: 8px;
+  }
+
   .session-dock-actions :deep(.base-button) {
+    flex: 1;
     min-height: 44px;
   }
+
 }
 </style>
