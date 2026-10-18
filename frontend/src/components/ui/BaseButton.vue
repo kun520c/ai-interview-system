@@ -34,8 +34,8 @@ withDefaults(
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 40px;
-  padding: 8px 16px;
+  min-height: 44px;
+  padding: 10px 18px;
   border-radius: var(--radius);
   font-size: 14px;
   font-weight: 600;
@@ -51,6 +51,7 @@ withDefaults(
 .is-primary {
   background: var(--primary);
   color: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
 .is-primary:hover:not(:disabled) {
@@ -66,6 +67,7 @@ withDefaults(
 .is-danger {
   background: var(--danger);
   color: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
 .base-button-spinner {
@@ -81,5 +83,10 @@ withDefaults(
   to {
     transform: rotate(360deg);
   }
+
+}
+
+.is-ghost:hover:not(:disabled) {
+  background: var(--surface-subtle);
 }
 </style>

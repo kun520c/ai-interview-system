@@ -7,6 +7,17 @@ import DifficultyCard from '@/features/interview/components/DifficultyCard.vue'
 import { QuestionDifficulty } from '@/types/enums'
 
 describe('DifficultyCard', () => {
+  it.each([
+    [QuestionDifficulty.EASY, '基础巩固'],
+    [QuestionDifficulty.MEDIUM, '综合进阶'],
+    [QuestionDifficulty.HARD, '深度挑战'],
+  ])('adds a readable name for %s while keeping the API value and no default selection', (difficulty, label) => {
+    const wrapper = mount(DifficultyCard, { props: { difficulty, selected: false } })
+    expect(wrapper.get('.difficulty-title').text()).toBe(label)
+    expect(wrapper.get('input').element.value).toBe(difficulty)
+    expect((wrapper.get('input').element as HTMLInputElement).checked).toBe(false)
+  })
+
   it('keeps a native radio in the keyboard path', () => {
     const wrapper = mount(DifficultyCard, {
       props: { difficulty: QuestionDifficulty.MEDIUM, selected: false },

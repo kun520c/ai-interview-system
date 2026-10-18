@@ -69,8 +69,9 @@ async function retryHistoryLoad(): Promise<void> {
 <template>
   <section class="dashboard">
     <header class="dashboard-greeting">
+      <p class="studio-eyebrow">YOUR INTERVIEW STUDIO</p>
       <h1>{{ greeting }}</h1>
-      <p class="u-muted">我现在应该做什么？开始一场新的模拟面试，或继续未完成的训练。</p>
+      <p class="u-muted">从一次认真作答，到下一次从容表达。</p>
     </header>
 
     <div class="dashboard-grid">
@@ -79,6 +80,7 @@ async function retryHistoryLoad(): Promise<void> {
         aria-labelledby="dashboard-training-title"
         :aria-busy="currentBusy ? 'true' : undefined"
       >
+        <p class="training-label"><span class="training-indicator" aria-hidden="true"></span>JAVA 后端 · 结构化面试</p>
         <div v-if="currentBusy" class="training-skeleton" aria-label="正在加载当前面试状态">
           <span class="skeleton-line is-title"></span>
           <span class="skeleton-line"></span>
@@ -96,7 +98,7 @@ async function retryHistoryLoad(): Promise<void> {
           <h2 id="dashboard-training-title">继续当前面试</h2>
           <InterviewProgress :session="session" />
           <RouterLink class="training-cta-link" :to="{ name: 'interview-session' }">
-            继续面试
+            继续面试<span class="cta-arrow" aria-hidden="true"></span>
           </RouterLink>
         </div>
 
@@ -107,9 +109,10 @@ async function retryHistoryLoad(): Promise<void> {
           <h2 id="dashboard-training-title">开始一次模拟面试</h2>
           <p class="training-copy">选择难度后，系统会进入连续面试流程。</p>
           <RouterLink class="training-cta-link" :to="{ name: 'interview-create' }">
-            开始面试
+            开始面试<span class="cta-arrow" aria-hidden="true"></span>
           </RouterLink>
         </div>
+        <p class="training-footnote">逐题作答 <span aria-hidden="true">/</span> 针对性评价 <span aria-hidden="true">/</span> 完整复盘</p>
       </section>
 
       <DashboardInterviewFlow />
@@ -128,55 +131,88 @@ async function retryHistoryLoad(): Promise<void> {
 <style scoped>
 .dashboard {
   display: grid;
-  gap: 40px;
+  gap: 32px;
   min-width: 0;
 }
 
-.dashboard-greeting h1 {
-  font-size: 24px;
+.studio-eyebrow {
+  color: var(--primary);
+  font-size: 11px;
   font-weight: 700;
-  line-height: 1.3;
+  letter-spacing: .14em;
+  margin-bottom: 10px;
 }
 
-.dashboard-greeting p {
-  margin-top: 8px;
+.dashboard-greeting h1 {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -.03em;
+}
+
+.dashboard-greeting > .u-muted {
+  margin-top: 10px;
   font-size: 14px;
 }
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
   gap: 24px;
-  align-items: stretch;
 }
 
 .training-surface {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
-  padding: 28px 24px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  padding: 28px 32px;
+  background: var(--training-wash);
+  border: 1px solid var(--primary-border);
   border-radius: var(--radius-lg);
-  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04);
+  box-shadow: var(--shadow-panel);
+}
+
+.training-label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .06em;
+  margin-bottom: 24px;
+}
+
+.training-indicator {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 50%;
 }
 
 .training-surface h2 {
-  font-size: 20px;
-  font-weight: 650;
-  line-height: 1.35;
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: -.025em;
+  line-height: 1.4;
 }
 
-.training-copy,
-.training-surface .u-muted {
-  margin-top: 8px;
+.training-surface :deep(.interview-progress) {
+  margin-top: 20px;
+  max-width: 400px;
+}
+
+.training-copy, .training-surface .u-muted {
+  margin-top: 10px;
   font-size: 14px;
   color: var(--text-2);
 }
 
 .idle-mark {
-  margin-bottom: 16px;
+  display: none;
 }
 
-.training-cta {
+.training-cta, .training-cta-link {
   margin-top: 24px;
 }
 
@@ -184,18 +220,39 @@ async function retryHistoryLoad(): Promise<void> {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 40px;
-  margin-top: 24px;
-  padding: 8px 16px;
+  gap: 24px;
+  min-height: 44px;
+  padding: 10px 20px;
   border-radius: var(--radius);
   background: var(--primary);
   color: #fff;
   font-size: 14px;
   font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--move);
 }
 
 .training-cta-link:hover {
   background: var(--primary-hover);
+}
+
+.cta-arrow::after {
+  content: '→';
+}
+
+.training-footnote {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--primary-border);
+  font-size: 12px;
+  color: var(--text-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.training-footnote span {
+  color: var(--border-strong);
 }
 
 .training-skeleton {
@@ -203,10 +260,9 @@ async function retryHistoryLoad(): Promise<void> {
   gap: 12px;
 }
 
-.skeleton-line,
-.skeleton-button {
+.skeleton-line, .skeleton-button {
   display: block;
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   background: var(--surface-subtle);
 }
 
@@ -225,26 +281,47 @@ async function retryHistoryLoad(): Promise<void> {
 
 .skeleton-button {
   width: 112px;
-  height: 40px;
+  height: 44px;
   margin-top: 12px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .skeleton-line,
-  .skeleton-button {
+  .skeleton-line, .skeleton-button {
     animation: pulse 1.6s ease-in-out infinite;
   }
+
 }
 
 @keyframes pulse {
   50% {
-    opacity: 0.65;
+    opacity: .65;
   }
+
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
   .dashboard-grid {
     grid-template-columns: minmax(0, 1fr);
   }
+
+}
+
+@media (max-width: 720px) {
+  .dashboard {
+    gap: 24px;
+  }
+
+  .dashboard-greeting h1 {
+    font-size: 26px;
+  }
+
+  .training-surface {
+    padding: 24px;
+  }
+
+  .training-surface h2 {
+    font-size: 24px;
+  }
+
 }
 </style>

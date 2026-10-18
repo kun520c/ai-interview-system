@@ -30,7 +30,7 @@ defineProps<{
 
 <style scoped>
 .product-mark {
-  color: var(--primary);
+  color: var(--mark-color, var(--primary));
   flex-shrink: 0;
 }
 </style>

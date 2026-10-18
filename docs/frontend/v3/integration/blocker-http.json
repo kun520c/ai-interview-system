@@ -1,0 +1,17 @@
+{
+  "type": "response",
+  "method": "POST",
+  "path": "/api/interviews/3/answers",
+  "status": 500,
+  "hasBearer": true,
+  "request": {
+    "interviewQuestionId": 15,
+    "answerContent": "E2E_INVALID_MODEL 【浏览器非法模型验收】请安全拒绝超范围分数。",
+    "requestId": "2495224a-28fd-47dc-9b84-22d52c4b3ac2"
+  },
+  "response": {
+    "code": 500,
+    "message": "系统异常，请稍后重试",
+    "data": null
+  }
+}

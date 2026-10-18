@@ -1,0 +1,8 @@
+{
+  "localOnly": true,
+  "modelCalls": 0,
+  "file": "docs/evaluation/judge/PHASE_5B_EPOCH_06_RUN_EVIDENCE.json",
+  "bytes": 4834654,
+  "sha256": "960805d571c6a6dcf8787a74286d5c83aec4368dc2b1fb2180bec5f76993caab",
+  "reason": "Published offline replay test depends on ignored historical evidence; local copy only, never staged"
+}

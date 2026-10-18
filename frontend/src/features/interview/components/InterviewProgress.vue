@@ -66,21 +66,26 @@ const progressWidth = computed(() => {
 .progress-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 16px;
-  font-size: 14px;
+  align-items: center;
+  gap: 8px 14px;
+  font-size: 13px;
   color: var(--text-2);
 }
 
 .progress-difficulty {
   font-family: var(--mono);
-  font-weight: 500;
-  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
 }
 
 .progress-bar {
-  height: 8px;
+  height: 5px;
   border-radius: 999px;
-  background: var(--surface-subtle);
+  background: var(--border);
   overflow: hidden;
 }
 
@@ -94,12 +99,19 @@ const progressWidth = computed(() => {
 .progress-context {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 16px;
-  font-size: 13px;
+  gap: 6px 12px;
+  font-size: 12px;
   color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+
+.progress-context > span {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .progress-follow-up {
-  color: var(--text);
+  color: var(--primary);
+  font-weight: 600;
 }
 </style>

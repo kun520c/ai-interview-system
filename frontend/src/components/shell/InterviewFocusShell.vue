@@ -19,7 +19,7 @@ const headerDifficulty = computed(() => session.value?.difficulty ?? null)
       <div class="focus-brand">
         <ProductMark :size="20" />
         <div>
-          <p class="focus-title">面试训练</p>
+          <p class="focus-title">面试训练 <span class="focus-studio">/ STUDIO</span></p>
           <p class="focus-meta">面试进行中</p>
         </div>
       </div>

@@ -1,0 +1,17 @@
+{
+  "counts": {
+    "tests": 1741,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 19
+  },
+  "bad": [
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.prompt.FollowUpOutputCompletenessHardeningTest",
+      "case": "sendsAllMainConstraintButNeverFillsMissingModelResults(boolean)[1]",
+      "kind": "failure",
+      "message": "\nExpecting actual throwable to be an instance of:\n  java.lang.IllegalStateException\nbut was:\n  com.kun.aiinterview.common.exception.ExternalServiceException: scoringPointResults数量与MAIN评分点数量不一致\n at com.kun.aiinterview.interview.evaluation.validation.LlmEvaluationValidator.validateScoringPointResults(LlmEvaluationValidator.java:180)\n at com.kun.aiinterview.interview.evaluation.validation.LlmEvaluationValidator.validate(LlmEvaluationValidator.java:79)\n at com.kun.aiinterview.interview.evaluation.prompt.FollowUpOutputCompletenessHardeningTest.lambda$sendsAllMainConstraintButNeverFillsMissingModelResults$1(FollowUpOutputCompletenessHardeningTest.java:75)\n ...(133 remaining lines not displayed - this can be changed with Assertions.setMaxStackTraceElementsDisplayed)",
+      "stack": "java.lang.AssertionError: \n\nExpecting actual throwable to be an instance of:\n  java.lang.IllegalStateException\nbut was:\n  com.kun.aiinterview.common.exception.ExternalServiceException: scoringPointResults数量与MAIN评分点数量不一致\n\tat com.kun.aiinterview.interview.evaluation.validation.LlmEvaluationValidator.validateScoringPointResults(LlmEvaluationValidator.java:180)\n\tat com.kun.aiinterview.interview.evaluation.validation.LlmEvaluationValidator.validate(LlmEvaluationValidator.java:79)\n\tat com.kun.aiinterview.interview.evaluation.prompt.FollowUpOutputCompletenessHardeningTest.lambda$sendsAllMainConstraintButNeverFillsMissingModelResults$1(FollowUpOutputCompletenessHardeningTest.java:75)\n\t...(133 remaining lines not displayed - this can be changed with Assertions.setMaxStackTraceElementsDisplayed)\n\tat com.kun.aiinterview.interview.evaluation.prompt.FollowUpOutputCompletenessHardeningTest.sendsAllMainConstraintButNeverFillsMissingModelResults(FollowUpOutputCompletenessHardeningTest.java:76)\n\tat jav"
+    }
+  ]
+}

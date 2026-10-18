@@ -201,9 +201,7 @@ const { pageState, detail, statusBusy, statusMessage, statusUncertain, retry, up
   font-weight: 650;
 }
 
-.detail-block p,
-.detail-block pre,
-.point-list p {
+.detail-block p, .detail-block pre, .point-list p {
   font-size: 15px;
   line-height: 1.7;
   overflow-wrap: anywhere;
@@ -235,11 +233,31 @@ const { pageState, detail, statusBusy, statusMessage, statusUncertain, retry, up
   .meta-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
 }
 
 @media (max-width: 720px) {
   .meta-list {
     grid-template-columns: minmax(0, 1fr);
   }
+
+}
+
+.meta-list, .detail-block {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.meta-list dd {
+  margin-left: 0;
+}
+
+@media (max-width:720px) {
+  .meta-list, .detail-block {
+    padding: 18px;
+  }
+
 }
 </style>

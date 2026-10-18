@@ -152,15 +152,13 @@ const {
   gap: 32px;
 }
 
-.identity-block,
-.password-block {
+.identity-block, .password-block {
   display: grid;
   gap: 16px;
   min-width: 0;
 }
 
-.identity-block h2,
-.password-block h2 {
+.identity-block h2, .password-block h2 {
   font-size: 18px;
   font-weight: 650;
 }
@@ -192,8 +190,7 @@ const {
   max-width: 480px;
 }
 
-.password-form :deep(.base-input),
-.password-form :deep(.base-button) {
+.password-form :deep(.base-input), .password-form :deep(.base-button) {
   min-height: 44px;
 }
 
@@ -209,5 +206,30 @@ const {
   .password-form {
     max-width: none;
   }
+
+}
+
+.identity-block, .password-block {
+  padding: 26px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.identity-list {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.identity-list dd {
+  margin-left: 0;
+}
+
+@media (max-width:720px) {
+  .identity-block, .password-block {
+    padding: 20px;
+  }
+
 }
 </style>

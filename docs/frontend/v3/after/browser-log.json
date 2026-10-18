@@ -1,0 +1,1033 @@
+{
+  "mode": "REAL_CHROME_MOCK_API",
+  "paidModelCalls": 0,
+  "captures": [
+    {
+      "filename": "login-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 登录",
+      "overflowingElements": []
+    },
+    {
+      "filename": "register-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 注册",
+      "overflowingElements": []
+    },
+    {
+      "filename": "dashboard-start-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 工作台",
+      "overflowingElements": []
+    },
+    {
+      "filename": "create-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 开始面试",
+      "overflowingElements": []
+    },
+    {
+      "filename": "dashboard-resume-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 工作台",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-answering-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-pending-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-evaluation-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-feedback-reading-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-feedback-bottom-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-followup-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-blocked-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "report-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 报告",
+      "overflowingElements": []
+    },
+    {
+      "filename": "history-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 历史",
+      "overflowingElements": []
+    },
+    {
+      "filename": "profile-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 账号",
+      "overflowingElements": []
+    },
+    {
+      "filename": "admin-questions-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 题库管理",
+      "overflowingElements": []
+    },
+    {
+      "filename": "admin-question-form-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 新建题目",
+      "overflowingElements": []
+    },
+    {
+      "filename": "admin-knowledge-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 知识文档",
+      "overflowingElements": []
+    },
+    {
+      "filename": "login-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 登录",
+      "overflowingElements": []
+    },
+    {
+      "filename": "register-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 注册",
+      "overflowingElements": []
+    },
+    {
+      "filename": "dashboard-start-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 工作台",
+      "overflowingElements": []
+    },
+    {
+      "filename": "create-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 开始面试",
+      "overflowingElements": []
+    },
+    {
+      "filename": "dashboard-resume-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 工作台",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-answering-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-pending-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-evaluation-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-feedback-reading-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-feedback-bottom-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-followup-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-blocked-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "report-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 报告",
+      "overflowingElements": []
+    },
+    {
+      "filename": "history-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 历史",
+      "overflowingElements": []
+    },
+    {
+      "filename": "profile-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 账号",
+      "overflowingElements": []
+    },
+    {
+      "filename": "admin-questions-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 题库管理",
+      "overflowingElements": []
+    },
+    {
+      "filename": "admin-question-form-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 新建题目",
+      "overflowingElements": []
+    },
+    {
+      "filename": "admin-knowledge-1024.png",
+      "viewport": [
+        1024,
+        768
+      ],
+      "width": 1024,
+      "scrollWidth": 1024,
+      "height": 768,
+      "title": "面试训练 · 知识文档",
+      "overflowingElements": []
+    },
+    {
+      "filename": "login-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 登录",
+      "overflowingElements": []
+    },
+    {
+      "filename": "register-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 注册",
+      "overflowingElements": []
+    },
+    {
+      "filename": "dashboard-start-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 工作台",
+      "overflowingElements": []
+    },
+    {
+      "filename": "create-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 开始面试",
+      "overflowingElements": []
+    },
+    {
+      "filename": "dashboard-resume-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 工作台",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-answering-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-pending-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-evaluation-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-feedback-reading-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-feedback-bottom-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-followup-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-blocked-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "report-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 报告",
+      "overflowingElements": []
+    },
+    {
+      "filename": "history-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 历史",
+      "overflowingElements": []
+    },
+    {
+      "filename": "mobile-menu-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 历史",
+      "overflowingElements": []
+    },
+    {
+      "filename": "profile-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 账号",
+      "overflowingElements": []
+    },
+    {
+      "filename": "admin-questions-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 题库管理",
+      "overflowingElements": []
+    },
+    {
+      "filename": "admin-question-form-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 新建题目",
+      "overflowingElements": []
+    },
+    {
+      "filename": "admin-knowledge-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 知识文档",
+      "overflowingElements": []
+    },
+    {
+      "filename": "dashboard-empty-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 工作台",
+      "overflowingElements": []
+    },
+    {
+      "filename": "dashboard-loading-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 工作台",
+      "overflowingElements": []
+    },
+    {
+      "filename": "dashboard-error-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 工作台",
+      "overflowingElements": []
+    },
+    {
+      "filename": "history-empty-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 历史",
+      "overflowingElements": []
+    },
+    {
+      "filename": "difficulty-keyboard-focus-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 开始面试",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-created-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-resumed-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "report-not-started-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 报告",
+      "overflowingElements": []
+    },
+    {
+      "filename": "report-generating-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 报告",
+      "overflowingElements": []
+    },
+    {
+      "filename": "report-failed-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 报告",
+      "overflowingElements": []
+    },
+    {
+      "filename": "report-recovered-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 报告",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-long-answer-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-finish-gate-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "auth-expired-1440.png",
+      "viewport": [
+        1440,
+        900
+      ],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 900,
+      "title": "面试训练 · 登录",
+      "overflowingElements": []
+    },
+    {
+      "filename": "dashboard-empty-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 工作台",
+      "overflowingElements": []
+    },
+    {
+      "filename": "dashboard-loading-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 工作台",
+      "overflowingElements": []
+    },
+    {
+      "filename": "dashboard-error-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 工作台",
+      "overflowingElements": []
+    },
+    {
+      "filename": "history-empty-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 历史",
+      "overflowingElements": []
+    },
+    {
+      "filename": "difficulty-keyboard-focus-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 开始面试",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-created-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-resumed-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "report-not-started-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 报告",
+      "overflowingElements": []
+    },
+    {
+      "filename": "report-generating-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 报告",
+      "overflowingElements": []
+    },
+    {
+      "filename": "report-failed-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 报告",
+      "overflowingElements": []
+    },
+    {
+      "filename": "report-recovered-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 报告",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-long-answer-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "session-finish-gate-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 面试进行中",
+      "overflowingElements": []
+    },
+    {
+      "filename": "auth-expired-390.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 844,
+      "title": "面试训练 · 登录",
+      "overflowingElements": []
+    }
+  ],
+  "checks": [
+    "feedback bottom clear of dock at 1440",
+    "future question hidden until explicit continue at 1440",
+    "USER admin route forbidden at 1440",
+    "feedback bottom clear of dock at 1024",
+    "future question hidden until explicit continue at 1024",
+    "USER admin route forbidden at 1024",
+    "feedback bottom clear of dock at 390",
+    "future question hidden until explicit continue at 390",
+    "mobile menu Escape restores focus",
+    "USER admin route forbidden at 390",
+    "native radio keyboard selection at 1440",
+    "create with selected API enum and resume after reload at 1440",
+    "report not-started → generating → failed → explicit retry → ready at 1440",
+    "long unbroken question / knowledge point / multiline answer and NEXT_MAIN gate at 1440",
+    "FINISH gate survives reload and requires explicit report navigation at 1440",
+    "401 returns to login at 1440",
+    "native radio keyboard selection at 390",
+    "create with selected API enum and resume after reload at 390",
+    "report not-started → generating → failed → explicit retry → ready at 390",
+    "long unbroken question / knowledge point / multiline answer and NEXT_MAIN gate at 390",
+    "FINISH gate survives reload and requires explicit report navigation at 390",
+    "401 returns to login at 390",
+    "0 uncaught browser errors",
+    "difficulty remains unselected",
+    "blank answer disabled",
+    "pending answer readonly",
+    "explicit follow-up gate",
+    "all viewports fit"
+  ],
+  "errors": []
+}

@@ -1,0 +1,167 @@
+[
+  {
+    "path": "frontend/src/app/styles/shells.css",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/app/styles/tokens.css",
+    "eolAdjustedOnly": true,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/components/shell/InterviewFocusShell.vue",
+    "eolAdjustedOnly": true,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/components/shell/ProductShell.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/components/shell/SessionSplitWorkspace.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/components/ui/BaseButton.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/components/ui/BaseInput.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/components/ui/BaseTextarea.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/components/ui/EmptyState.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/components/ui/PageHeader.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/components/ui/ProductMark.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/components/ui/StatusNotice.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/admin/knowledge/views/AdminKnowledgeView.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/admin/questions/views/AdminQuestionDetailView.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/admin/questions/views/AdminQuestionFormView.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/admin/questions/views/AdminQuestionListView.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/dashboard/components/DashboardInterviewFlow.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/dashboard/components/DashboardRecentList.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/dashboard/views/DashboardView.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/history/components/HistoryRow.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/DifficultyCard.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/InterviewAnswerPane.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/InterviewEvaluationPane.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/InterviewProgress.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/InterviewQuestionPane.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/InterviewSessionDock.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/interview/components/InterviewTimelineItem.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/interview/views/CreateInterviewView.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/interview/views/InterviewReportView.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/src/features/profile/views/ProfileView.vue",
+    "eolAdjustedOnly": false,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/tests/DifficultyCard.spec.ts",
+    "eolAdjustedOnly": true,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/tests/InterviewEvaluationPane.spec.ts",
+    "eolAdjustedOnly": true,
+    "afterHashMatches": true
+  },
+  {
+    "path": "frontend/scripts/v3-visual-check.mjs",
+    "eolAdjustedOnly": true,
+    "afterHashMatches": true
+  }
+]

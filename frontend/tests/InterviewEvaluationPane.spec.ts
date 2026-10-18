@@ -5,6 +5,21 @@ import InterviewEvaluationPane from '@/features/interview/components/InterviewEv
 import { evaluation } from './helpers/interviewFixtures'
 
 describe('InterviewEvaluationPane heading hierarchy', () => {
+  it('renders the actual five scores on the documented 20-point scale', () => {
+    const wrapper = mount(InterviewEvaluationPane, {
+      props: { evaluation: evaluation({ correctnessScore: 0, completenessScore: 20 }) },
+    })
+    const dimensions = wrapper.findAll('.score-row li')
+    expect(dimensions).toHaveLength(5)
+    expect(dimensions[0]!.get('.score-value').text()).toBe('0')
+    expect(dimensions[0]!.get('.score-track > span').attributes('style')).toBe('width: 0%;')
+    expect(dimensions[1]!.get('.score-value').text()).toBe('20')
+    expect(dimensions[1]!.get('.score-track > span').attributes('style')).toBe('width: 100%;')
+    // The UI displays the backend total; it never recalculates a business score.
+    expect(wrapper.get('.total-number').text()).toBe('70')
+    expect(wrapper.get('.score-track').attributes('aria-hidden')).toBe('true')
+  })
+
   it('keeps session subheadings below h2', () => {
     const wrapper = mount(InterviewEvaluationPane, {
       props: {

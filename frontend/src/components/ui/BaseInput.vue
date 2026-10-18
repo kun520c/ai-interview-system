@@ -33,12 +33,14 @@ const emit = defineEmits<{
 <style scoped>
 .base-input {
   width: 100%;
-  min-height: 40px;
+  min-height: 44px;
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--text);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--move), box-shadow var(--move);
 }
 
 .base-input::placeholder {

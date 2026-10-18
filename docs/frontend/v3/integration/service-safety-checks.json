@@ -1,0 +1,31 @@
+{
+  "ports": [
+    13326,
+    18096,
+    18097,
+    15183
+  ],
+  "freePortsGuard": "PASS",
+  "occupiedPortRejected": "PASS",
+  "privateDatadirSnapshotGuard": "PASS",
+  "ownedServices": [
+    {
+      "name": "mysql",
+      "ownedProcessExited": true
+    },
+    {
+      "name": "mock-provider",
+      "ownedProcessExited": true
+    },
+    {
+      "name": "backend",
+      "ownedProcessExited": true
+    },
+    {
+      "name": "frontend",
+      "ownedProcessExited": true
+    }
+  ],
+  "powershellSyntax": "PASS",
+  "dataDirectoryRetained": true
+}

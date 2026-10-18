@@ -1,5 +1,6 @@
 package com.kun.aiinterview.interview.evaluation.validation;
 
+import com.kun.aiinterview.common.exception.ExternalServiceException;
 import com.kun.aiinterview.interview.evaluation.EvaluationContext;
 import com.kun.aiinterview.interview.evaluation.EvaluationMode;
 import com.kun.aiinterview.interview.evaluation.llm.LlmEvaluationSuggestion;
@@ -26,7 +27,7 @@ public class LlmEvaluationValidator {
         }
 
         if (suggestion == null) {
-            throw new IllegalArgumentException(
+            throw new ExternalServiceException(
                     "Llm评价结果不能为空"
             );
         }
@@ -115,13 +116,13 @@ public class LlmEvaluationValidator {
     ) {
 
         if (score == null) {
-            throw new IllegalStateException(
+            throw new ExternalServiceException(
                     fieldName + "不能为空"
             );
         }
 
         if (score < 0 || score > 20) {
-            throw new IllegalArgumentException(
+            throw new ExternalServiceException(
                     fieldName + "必须在0到20之间"
             );
         }
@@ -135,7 +136,7 @@ public class LlmEvaluationValidator {
     ) {
 
         if (values == null) {
-            throw new IllegalStateException(
+            throw new ExternalServiceException(
                     fieldName + "不能为空"
             );
         }
@@ -145,7 +146,7 @@ public class LlmEvaluationValidator {
             String value = values.get(index);
 
             if (value == null || value.isBlank()) {
-                throw new IllegalStateException(
+                throw new ExternalServiceException(
                         fieldName
                             + "包含空白内容，索引："
                             + index
@@ -162,7 +163,7 @@ public class LlmEvaluationValidator {
     ) {
 
         if (results == null) {
-            throw new IllegalStateException(
+            throw new ExternalServiceException(
                     "scoringPointResults不能为空"
             );
         }
@@ -176,7 +177,7 @@ public class LlmEvaluationValidator {
                         .collect(Collectors.toSet());
 
         if (results.size() != expectedIds.size()) {
-            throw new IllegalStateException(
+            throw new ExternalServiceException(
                     "scoringPointResults数量与MAIN评分点数量不一致"
             );
         }
@@ -190,7 +191,7 @@ public class LlmEvaluationValidator {
                     results.get(index);
 
             if (result == null) {
-                throw new IllegalStateException(
+                throw new ExternalServiceException(
                         "scoringPointResults包含空结果，索引："
                                 + index
                 );
@@ -201,25 +202,25 @@ public class LlmEvaluationValidator {
 
             if (scoringPointId == null || scoringPointId <= 0) {
 
-                throw new IllegalStateException(
+                throw new ExternalServiceException(
                         "scoringPointResult的scoringPointId非法"
                 );
             }
 
             if (!expectedIds.contains(scoringPointId)) {
-                throw new IllegalStateException(
+                throw new ExternalServiceException(
                         "LLM返回了不属于MAIN评分标准的评分点"
                 );
             }
 
             if (!actualIds.add(scoringPointId)) {
-                throw new IllegalStateException(
+                throw new ExternalServiceException(
                         "LLM返回了重复的评分点结果"
                 );
             }
 
             if (result.covered() == null) {
-                throw new IllegalStateException(
+                throw new ExternalServiceException(
                         "scoringPointResult.covered不能为空"
                 );
             }
@@ -228,14 +229,14 @@ public class LlmEvaluationValidator {
                 && (result.evidence() == null
                 || result.evidence().isBlank())) {
 
-                throw new IllegalStateException(
+                throw new ExternalServiceException(
                         "已覆盖评分点必须提供回答证据"
                 );
             }
         }
 
         if (!actualIds.equals(expectedIds)) {
-            throw new IllegalStateException(
+            throw new ExternalServiceException(
                     "LLM评分点结果未完整覆盖MAIN评分标准"
             );
         }
@@ -250,7 +251,7 @@ public class LlmEvaluationValidator {
     ) {
 
         if (followUpRecommended == null) {
-            throw new IllegalStateException(
+            throw new ExternalServiceException(
                     "followUpRecommended不能为空"
             );
         }
@@ -259,7 +260,7 @@ public class LlmEvaluationValidator {
                 == EvaluationMode.FOLLOW_UP_ANSWER) {
 
             if (followUpRecommended) {
-                throw new IllegalStateException(
+                throw new ExternalServiceException(
                         "FOLLOW_UP回答不能再次建议追问"
                 );
             }
@@ -267,7 +268,7 @@ public class LlmEvaluationValidator {
             if (suggestedFollowUp != null
                 && !suggestedFollowUp.isBlank()) {
 
-                throw new IllegalStateException(
+                throw new ExternalServiceException(
                         "FOLLOW_UP回答不能返回新的候选追问"
                 );
             }
@@ -280,7 +281,7 @@ public class LlmEvaluationValidator {
             if (suggestedFollowUp == null
                     ||suggestedFollowUp.isBlank()) {
 
-                throw new IllegalStateException(
+                throw new ExternalServiceException(
                         "建议追问时必须提供候选追问问题"
                 );
             }
@@ -291,7 +292,7 @@ public class LlmEvaluationValidator {
         if (suggestedFollowUp != null
             && !suggestedFollowUp.isBlank()) {
 
-            throw new IllegalStateException(
+            throw new ExternalServiceException(
                     "为建议追问时不能提供候选追问问题"
             );
         }

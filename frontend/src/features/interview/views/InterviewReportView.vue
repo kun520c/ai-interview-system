@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { Check, TriangleAlert, ListChecks } from '@lucide/vue'
 import { RouterLink } from 'vue-router'
 
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -185,39 +186,43 @@ const generating = computed(() => {
         </StatusNotice>
 
         <template v-else>
-          <section class="report-outcome" aria-labelledby="report-outcome-title">
-            <h2 id="report-outcome-title" class="u-sr-only">{{ REPORT_COPY.outcome }}</h2>
-            <p class="report-score">
-              <span class="score-number">{{ formatScore(report.overallScore) }}</span>
-              <span class="score-label">{{ REPORT_COPY.overallScore }}</span>
-            </p>
-            <p class="report-result" :class="resultClass">
-              {{ displayReportResult(report.result) }}
-            </p>
-          </section>
+          <div class="report-summary">
+            <section class="report-outcome" aria-labelledby="report-outcome-title">
+              <h2 id="report-outcome-title" class="u-sr-only">{{ REPORT_COPY.outcome }}</h2>
+              <p class="report-score-caption">本场综合表现</p>
+              <p class="report-score">
+                <span class="score-number">{{ formatScore(report.overallScore) }}</span>
+                <span class="score-maximum">/ 100</span>
+                <span class="score-label">{{ REPORT_COPY.overallScore }}</span>
+              </p>
+              <p class="report-result" :class="resultClass">
+                {{ displayReportResult(report.result) }}
+              </p>
+            </section>
 
-          <section class="report-block" aria-labelledby="report-meaning-title">
-            <h2 id="report-meaning-title">{{ REPORT_COPY.meaning }}</h2>
-            <p>{{ report.summary }}</p>
-          </section>
+            <section class="report-block report-meaning" aria-labelledby="report-meaning-title">
+              <h2 id="report-meaning-title">{{ REPORT_COPY.meaning }}</h2>
+              <p>{{ report.summary }}</p>
+            </section>
+          </div>
 
           <div class="report-pair">
-            <section class="report-block" aria-labelledby="report-strength-title">
-              <h2 id="report-strength-title">{{ REPORT_COPY.strength }}</h2>
+            <section class="report-block report-strength" aria-labelledby="report-strength-title">
+              <h2 id="report-strength-title"><Check :size="18" aria-hidden="true" />{{ REPORT_COPY.strength }}</h2>
               <ol v-if="report.strengths?.length">
                 <li v-for="(item, index) in report.strengths" :key="`s-${index}`">{{ item }}</li>
               </ol>
             </section>
-            <section class="report-block" aria-labelledby="report-gap-title">
-              <h2 id="report-gap-title">{{ REPORT_COPY.gap }}</h2>
+            <section class="report-block report-gap" aria-labelledby="report-gap-title">
+              <h2 id="report-gap-title"><TriangleAlert :size="18" aria-hidden="true" />{{ REPORT_COPY.gap }}</h2>
               <ol v-if="report.weaknesses?.length">
                 <li v-for="(item, index) in report.weaknesses" :key="`w-${index}`">{{ item }}</li>
               </ol>
             </section>
           </div>
 
-          <section class="report-block" aria-labelledby="report-action-title">
-            <h2 id="report-action-title">{{ REPORT_COPY.action }}</h2>
+          <section class="report-block report-actions" aria-labelledby="report-action-title">
+            <h2 id="report-action-title"><ListChecks :size="18" aria-hidden="true" />{{ REPORT_COPY.action }}</h2>
             <ol v-if="report.suggestions?.length" class="suggestion-list">
               <li v-for="(item, index) in report.suggestions" :key="`a-${index}`">{{ item }}</li>
             </ol>
@@ -239,6 +244,10 @@ const generating = computed(() => {
   min-width: 0;
   display: grid;
   gap: 24px;
+}
+
+.report-page :deep(.page-header) {
+  margin-bottom: 0;
 }
 
 .report-skeleton {
@@ -265,57 +274,88 @@ const generating = computed(() => {
 .report-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 20px;
+  gap: 8px 16px;
 }
 
 .report-link {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--primary);
 }
 
 .report-state {
   display: grid;
-  gap: 12px;
+  gap: 16px;
   justify-items: start;
-}
-
-.report-state :deep(.base-button) {
-  min-height: 44px;
+  padding: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .report-state h2 {
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 650;
+}
+
+.report-state p {
+  font-size: 14px;
+}
+
+.report-summary {
+  display: grid;
+  grid-template-columns: minmax(0,.8fr) minmax(0,2fr);
+  border: 1px solid var(--primary-border);
+  border-radius: var(--radius-lg);
+  background: var(--training-wash);
+  box-shadow: var(--shadow-panel);
 }
 
 .report-outcome {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 12px 20px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 28px;
+  border-right: 1px solid var(--border);
+}
+
+.report-score-caption {
+  font-size: 12px;
+  color: var(--text-2);
 }
 
 .score-number {
   font-family: var(--mono);
-  font-size: 36px;
+  font-size: 56px;
   font-weight: 500;
-  line-height: 1;
+  line-height: 1.1;
+  letter-spacing: -.06em;
+}
+
+.score-maximum {
+  margin-left: 8px;
+  font: 12px var(--mono);
+  color: var(--text-2);
 }
 
 .score-label {
-  margin-left: 8px;
-  font-size: 13px;
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
   color: var(--text-2);
 }
 
 .report-result {
-  font-size: 18px;
+  font-size: 12px;
   font-weight: 650;
+  border: 1px solid currentColor;
+  padding: 3px 12px;
+  border-radius: 999px;
 }
 
 .report-result.is-success {
@@ -330,29 +370,74 @@ const generating = computed(() => {
   color: var(--danger);
 }
 
-.report-block h2,
-.report-evidence h2 {
-  margin-bottom: 12px;
-  font-size: 16px;
+.report-block {
+  padding: 26px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  min-width: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.report-meaning {
+  align-self: center;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.report-block h2, .report-evidence > h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 15px;
   font-weight: 650;
 }
 
-.report-block p,
-.report-block li {
-  font-size: 16px;
-  line-height: 1.7;
+.report-block p, .report-block li {
+  font-size: 14px;
+  line-height: 1.85;
   overflow-wrap: anywhere;
 }
 
-.report-block li + li,
-.suggestion-list li + li {
-  margin-top: 8px;
+.report-block li + li {
+  margin-top: 10px;
+}
+
+.report-strength h2 {
+  color: var(--success);
+}
+
+.report-gap h2 {
+  color: var(--warning);
+}
+
+.report-strength li, .report-gap li {
+  position: relative;
+  padding-left: 16px;
+}
+
+.report-strength li::before, .report-gap li::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  top: .8em;
+  left: 0;
+  border-radius: 50%;
+  background: var(--border-strong);
 }
 
 .report-pair {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 32px;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 24px;
+}
+
+.report-actions h2 {
+  color: var(--primary);
 }
 
 .suggestion-list {
@@ -363,35 +448,62 @@ const generating = computed(() => {
 
 .suggestion-list li {
   position: relative;
-  padding-left: 28px;
+  padding: 10px 0 10px 42px;
+}
+
+.suggestion-list li + li {
+  border-top: 1px solid var(--border);
+  margin-top: 0;
 }
 
 .suggestion-list li::before {
   counter-increment: suggestion;
-  content: counter(suggestion);
+  content: counter(suggestion, decimal-leading-zero);
   position: absolute;
   left: 0;
-  top: 0;
+  top: 12px;
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border-radius: 7px;
   font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-2);
+  font-size: 11px;
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.report-evidence {
+  min-width: 0;
+  padding-top: 8px;
 }
 
 .notice-copy {
   margin: 8px 0 12px;
 }
 
-@media (max-width: 1024px) {
-  .report-pair {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 24px;
-  }
-}
-
 @media (max-width: 720px) {
-  .score-number {
-    font-size: 32px;
+  .report-summary, .report-pair {
+    grid-template-columns: minmax(0,1fr);
   }
+
+  .report-outcome {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 22px;
+  }
+
+  .report-block {
+    padding: 22px;
+  }
+
+  .score-number {
+    font-size: 48px;
+  }
+
+  .report-pair {
+    gap: 16px;
+  }
+
 }
 </style>

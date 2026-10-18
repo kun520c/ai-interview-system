@@ -52,6 +52,12 @@
 
 ## 6. 前端
 
+V3 当前入口：[设计系统](frontend/V3_DESIGN_SYSTEM.md)、[交付清单](frontend/V3_FILE_MANIFEST.md)、[2026-10-18 集成验证与合并阻塞](frontend/V3_INTEGRATION_20261018.md)。历史 Mock 视觉验收与本次真实后端／本地 AI 替身联调分别记录。
+
+B1/B2 后续修复与技术验收见 [V3 最终合并阻塞修复](frontend/V3_BLOCKER_FIX_20261018.md)。前一份集成报告和原失败证据完整保留，当前结论以这份后续报告为准。
+
+GitHub 交付审查见 [V3 发布前独立审查](frontend/V3_PUBLICATION_REVIEW_20261018.md)及[逐文件发布清单](frontend/V3_PUBLICATION_FILE_REVIEW.md)。
+
 七份核心契约采用“磁盘英文稳定路径 + 中文导航”：
 
 - [前端设计系统](frontend/DESIGN_SYSTEM.md)

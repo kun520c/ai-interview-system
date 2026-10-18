@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "sessionId": 4,
+      "status": "PASS",
+      "mains": 5,
+      "followups": 2,
+      "evaluatedAnswers": 7,
+      "finalScores": 5,
+      "ragBatches": 7,
+      "persistedEvidence": 35,
+      "reports": 1,
+      "weaknesses": 2,
+      "mean": 70
+    },
+    {
+      "sessionId": 5,
+      "status": "PASS",
+      "mains": 5,
+      "followups": 2,
+      "evaluatedAnswers": 7,
+      "finalScores": 5,
+      "ragBatches": 7,
+      "persistedEvidence": 35,
+      "reports": 1,
+      "weaknesses": 2,
+      "mean": 70
+    }
+  ],
+  "requests": {
+    "allApi": 88,
+    "answers": 14,
+    "reportGeneration": 2
+  },
+  "browserChecks": 39,
+  "scope": "happy",
+  "fullAcceptancePassed": false,
+  "uncaughtPageErrors": 0
+}

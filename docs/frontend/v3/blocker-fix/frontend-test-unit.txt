@@ -1,0 +1,17 @@
+
+> ai-interview-frontend@0.0.0 test:unit
+> vitest run
+
+
+ RUN  v5.0.1 <repo>/frontend
+
+
+ Test Files  36 passed (36)
+      Tests  293 passed (293)
+   Start at  13:23:37
+   Duration  13.96s (environment 73%, transform 14%, tests 9%, import 4%)
+
+Environment  jsdom was created 36 times · 235.73s total, 73% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+

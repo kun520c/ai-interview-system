@@ -266,15 +266,11 @@ const difficulties = Object.values(QuestionDifficulty)
   max-width: 760px;
 }
 
-.form-select,
-.weight-input,
-.question-form :deep(.base-input),
-.question-form :deep(.base-button) {
+.form-select, .weight-input, .question-form :deep(.base-input), .question-form :deep(.base-button) {
   min-height: 44px;
 }
 
-.form-select,
-.weight-input {
+.form-select, .weight-input {
   width: 100%;
   padding: 8px 12px;
   border: 1px solid var(--border);
@@ -343,5 +339,32 @@ const difficulties = Object.values(QuestionDifficulty)
   .point-row {
     grid-template-columns: minmax(0, 1fr);
   }
+
+}
+
+.question-form {
+  max-width: 960px;
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  gap: 20px;
+}
+
+.point-card {
+  background: var(--surface-subtle);
+}
+
+.form-actions {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+@media (max-width:720px) {
+  .question-form {
+    padding: 18px;
+  }
+
 }
 </style>

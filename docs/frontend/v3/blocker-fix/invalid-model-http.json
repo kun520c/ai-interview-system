@@ -1,0 +1,17 @@
+{
+  "type": "response",
+  "method": "POST",
+  "path": "/api/interviews/75/answers",
+  "status": 502,
+  "hasBearer": true,
+  "request": {
+    "interviewQuestionId": 375,
+    "answerContent": "E2E_INVALID_MODEL 【浏览器非法模型验收】请安全拒绝超范围分数。",
+    "requestId": "492cd10c-ea15-4342-8883-1ba118ef7755"
+  },
+  "response": {
+    "code": 502,
+    "message": "外部服务暂时不可用",
+    "data": null
+  }
+}

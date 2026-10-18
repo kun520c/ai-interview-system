@@ -1,0 +1,14 @@
+{
+  "classification": "ENVIRONMENT_INTERRUPTION",
+  "privateMysqlWasNotRunning": true,
+  "error": "Connection refused: getsockopt",
+  "partialXmlCounts": {
+    "tests": 610,
+    "failures": 0,
+    "errors": 48,
+    "skipped": 1
+  },
+  "abortedOwnedJvmOnly": true,
+  "replacementCheckout": "clean-checkout-verified",
+  "sameCandidateTree": "65830dfd49f7fe6650aad6d62a43dbd5521e11a7"
+}

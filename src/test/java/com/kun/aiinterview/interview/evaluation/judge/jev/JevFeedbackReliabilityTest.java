@@ -78,6 +78,24 @@ class JevFeedbackReliabilityTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"argument", "state"})
+    void internalValidatorErrorsNeverTriggerFeedbackRetryOrFallback(String kind) throws Exception {
+        var row = capture("E02-EXCELLENT");
+        var context = arrange(row);
+        when(feedback.completeJson(anyString(), anyString())).thenReturn(
+                completion(structuralFeedback(mapper, row.path("nativeResponse"), context).toString()));
+        var internal = mock(LlmEvaluationValidator.class);
+        RuntimeException failure = kind.equals("argument")
+                ? new IllegalArgumentException("internal defect") : new IllegalStateException("internal defect");
+        when(internal.validate(any(), any())).thenThrow(failure);
+        var provider = new JevJudgeProvider(nativeClient, properties, feedback, fallback, mapper, internal);
+        assertThatThrownBy(() -> provider.evaluate(context, prompt)).isSameAs(failure);
+        verify(nativeClient, times(1)).evaluate(any());
+        verify(feedback, times(1)).completeJson(anyString(), anyString());
+        verifyNoInteractions(fallback);
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"E02-EXCELLENT", "E02-OFF_TOPIC", "H05-BOUNDARY", "E02-REPAIR", "H09-FAILED_REPAIR"})
     void retriesOnlyFeedbackAndKeepsFrozenNativeDecision(String id, CapturedOutput output) throws Exception {
         var row = capture(id);

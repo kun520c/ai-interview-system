@@ -1,5 +1,6 @@
 package com.kun.aiinterview.interview.evaluation.validation;
 
+import com.kun.aiinterview.common.exception.ExternalServiceException;
 import com.kun.aiinterview.interview.evaluation.EvaluationContext;
 import com.kun.aiinterview.interview.evaluation.EvaluationMode;
 import com.kun.aiinterview.interview.evaluation.llm.LlmEvaluationSuggestion;
@@ -94,7 +95,7 @@ class LlmEvaluationValidatorTest {
     @Test
     void givenNullSuggestion_whenValidate_thenRejects() {
         assertThatThrownBy(() -> validator.validate(mainContext(), null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ExternalServiceException.class)
                 .hasMessageContaining("评价结果");
     }
 
@@ -130,7 +131,7 @@ class LlmEvaluationValidatorTest {
         );
 
         assertThatThrownBy(() -> validator.validate(mainContext(), suggestion))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ExternalServiceException.class);
     }
 
     @Test
@@ -224,7 +225,7 @@ class LlmEvaluationValidatorTest {
         );
 
         assertThatThrownBy(() -> validator.validate(mainContext(), suggestion))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ExternalServiceException.class)
                 .hasMessageContaining("followUpRecommended");
     }
 
@@ -238,7 +239,7 @@ class LlmEvaluationValidatorTest {
                 mainContext(),
                 validSuggestion(true, suggestedFollowUp)
         ))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ExternalServiceException.class)
                 .hasMessageContaining("候选追问");
     }
 
@@ -248,7 +249,7 @@ class LlmEvaluationValidatorTest {
                 mainContext(),
                 validSuggestion(false, "请继续说明扩容风险？")
         ))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ExternalServiceException.class)
                 .hasMessageContaining("候选追问");
     }
 
@@ -258,7 +259,7 @@ class LlmEvaluationValidatorTest {
                 followUpContext(),
                 validSuggestion(true, "请再补充一个细节？")
         ))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ExternalServiceException.class)
                 .hasMessageContaining("不能再次建议追问");
     }
 
@@ -268,7 +269,7 @@ class LlmEvaluationValidatorTest {
                 followUpContext(),
                 validSuggestion(false, "请再补充一个细节？")
         ))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ExternalServiceException.class)
                 .hasMessageContaining("不能返回新的候选追问");
     }
 
@@ -289,7 +290,7 @@ class LlmEvaluationValidatorTest {
         );
 
         assertThatThrownBy(() -> validator.validate(mainContext(), suggestion))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ExternalServiceException.class);
     }
 
     private static Stream<Arguments> invalidScoreSuggestions() {
@@ -308,19 +309,19 @@ class LlmEvaluationValidatorTest {
                                 fieldNames[index],
                                 index,
                                 null,
-                                IllegalStateException.class
+                                ExternalServiceException.class
                         ),
                         invalidScoreArgument(
                                 fieldNames[index],
                                 index,
                                 -1,
-                                IllegalArgumentException.class
+                                ExternalServiceException.class
                         ),
                         invalidScoreArgument(
                                 fieldNames[index],
                                 index,
                                 21,
-                                IllegalArgumentException.class
+                                ExternalServiceException.class
                         )
                 ));
     }

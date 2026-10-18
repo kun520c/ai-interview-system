@@ -165,15 +165,13 @@ function processLabel(document: LocalKnowledgeDocument): string {
   gap: 32px;
 }
 
-.upload-block,
-.recent-block {
+.upload-block, .recent-block {
   display: grid;
   gap: 12px;
   min-width: 0;
 }
 
-.upload-block h2,
-.recent-block h2 {
+.upload-block h2, .recent-block h2 {
   font-size: 18px;
   font-weight: 650;
 }
@@ -184,11 +182,7 @@ function processLabel(document: LocalKnowledgeDocument): string {
   max-width: 560px;
 }
 
-.file-input,
-.form-select,
-.upload-form :deep(.base-input),
-.upload-form :deep(.base-button),
-.recent-item :deep(.base-button) {
+.file-input, .form-select, .upload-form :deep(.base-input), .upload-form :deep(.base-button), .recent-item :deep(.base-button) {
   min-height: 44px;
 }
 
@@ -229,8 +223,7 @@ function processLabel(document: LocalKnowledgeDocument): string {
   overflow-wrap: anywhere;
 }
 
-.recent-meta,
-.recent-status {
+.recent-meta, .recent-status {
   margin-top: 4px;
   font-size: 13px;
   color: var(--text-2);
@@ -244,5 +237,55 @@ function processLabel(document: LocalKnowledgeDocument): string {
   .recent-item {
     display: grid;
   }
+
+}
+
+.upload-block, .recent-block {
+  padding: 26px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.upload-form {
+  max-width: 760px;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 20px;
+}
+
+.upload-form > :first-child {
+  grid-column: 1 / -1;
+  padding: 20px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface-subtle);
+}
+
+.upload-form > .base-button {
+  justify-self: start;
+  grid-column: 1 / -1;
+}
+
+.file-input::file-selector-button {
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  background: var(--surface);
+  padding: 8px 12px;
+  color: var(--text);
+  margin-right: 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (max-width:720px) {
+  .upload-block, .recent-block {
+    padding: 18px;
+  }
+
+  .upload-form {
+    grid-template-columns: minmax(0,1fr);
+  }
+
 }
 </style>

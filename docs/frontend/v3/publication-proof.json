@@ -1,0 +1,52 @@
+{
+  "verifiedCandidateTree": "65830dfd49f7fe6650aad6d62a43dbd5521e11a7",
+  "checked": 554,
+  "unchanged": 550,
+  "publicationOnlyToolChanges": [
+    "frontend/scripts/v3-visual-check.mjs",
+    "tools/browser-e2e/acceptance.mjs",
+    "tools/browser-e2e/environment.ps1",
+    "tools/browser-e2e/regression.ps1"
+  ],
+  "productionAndTestSourcesMatch": true,
+  "integration": {
+    "suites": 135,
+    "tests": 1741,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 19
+  },
+  "clean": {
+    "suites": 135,
+    "tests": 1741,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 19
+  },
+  "workspaces": {
+    "original": {
+      "files": 6299,
+      "changedOrMissing": [],
+      "gitStatusUnchanged": true
+    },
+    "v3": {
+      "files": 863,
+      "changedOrMissing": [],
+      "gitStatusUnchanged": true
+    }
+  },
+  "runtimeChecks": {
+    "powershellAst": "PASS",
+    "runtimePathResolution": "PASS",
+    "javascriptSyntax": "PASS",
+    "chromeModuleAndChannelAndPage": "PASS",
+    "networkRequests": 0
+  },
+  "binaryPublication": {
+    "originalImages": 140,
+    "selectedImages": 45,
+    "selectedBytes": 2712088,
+    "duplicateSelectedImages": 0,
+    "omittedPathsPreservedOnDisk": 97
+  }
+}

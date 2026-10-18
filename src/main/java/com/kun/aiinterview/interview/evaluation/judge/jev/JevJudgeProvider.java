@@ -160,7 +160,7 @@ public class JevJudgeProvider implements JudgeProvider {
                             var merged = mergeFeedback(context, nativeDecision.decision(), feedback);
                             try {
                                 validator.validate(context, merged);
-                            } catch (IllegalArgumentException | IllegalStateException exception) {
+                            } catch (ExternalServiceException exception) {
                                 throw new JevStageException(FEEDBACK_VALIDATION_FAILED);
                             }
                             return new FeedbackResult(generation, merged);

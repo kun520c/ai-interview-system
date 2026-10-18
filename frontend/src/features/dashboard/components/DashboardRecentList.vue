@@ -55,8 +55,8 @@ function actionAriaLabel(item: InterviewHistoryItemResponse): string {
 
 <template>
   <section class="recent" aria-labelledby="dashboard-recent-title" :aria-busy="loading ? 'true' : undefined">
-    <h2 id="dashboard-recent-title">最近完成的面试</h2>
-    <p class="u-muted">只包含已完成的场次。进行中的面试不会出现在这里。</p>
+    <div class="recent-heading"><h2 id="dashboard-recent-title">最近完成的面试</h2><RouterLink :to="{ name: 'interview-history' }">全部记录 <span aria-hidden="true">↗</span></RouterLink></div>
+    <p class="u-muted">回看回答与反馈，找到下一次训练的方向。</p>
 
     <div v-if="loading" class="recent-skeleton" aria-label="正在加载最近面试">
       <div v-for="index in 3" :key="index" class="recent-skeleton-row">
@@ -130,16 +130,14 @@ function actionAriaLabel(item: InterviewHistoryItemResponse): string {
   font-size: 14px;
 }
 
-.recent-skeleton,
-.recent-list {
+.recent-skeleton, .recent-list {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
   overflow: hidden;
 }
 
-.recent-skeleton-row,
-.recent-row {
+.recent-skeleton-row, .recent-row {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
   gap: 16px;
@@ -148,8 +146,7 @@ function actionAriaLabel(item: InterviewHistoryItemResponse): string {
   min-width: 0;
 }
 
-.recent-skeleton-row + .recent-skeleton-row,
-.recent-row + .recent-row {
+.recent-skeleton-row + .recent-skeleton-row, .recent-row + .recent-row {
   border-top: 1px solid var(--border);
 }
 
@@ -173,9 +170,7 @@ function actionAriaLabel(item: InterviewHistoryItemResponse): string {
   font-weight: 500;
 }
 
-.recent-date,
-.recent-status,
-.recent-level {
+.recent-date, .recent-status, .recent-level {
   font-size: 13px;
   color: var(--text-2);
 }
@@ -212,8 +207,7 @@ function actionAriaLabel(item: InterviewHistoryItemResponse): string {
 }
 
 @media (max-width: 720px) {
-  .recent-skeleton-row,
-  .recent-row {
+  .recent-skeleton-row, .recent-row {
     grid-template-columns: minmax(0, 1fr);
     gap: 8px;
   }
@@ -221,5 +215,73 @@ function actionAriaLabel(item: InterviewHistoryItemResponse): string {
   .recent-action {
     justify-self: start;
   }
+
+}
+
+.recent-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.recent-heading h2 {
+  font-size: 18px;
+}
+
+.recent-heading > a {
+  color: var(--primary);
+  font-size: 12px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recent-row {
+  padding: 20px 24px;
+}
+
+.recent-difficulty {
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.recent-date {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.recent-score p:first-child {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+
+.recent-action {
+  font-size: 12px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+@media (max-width:720px) {
+  .recent-row {
+    grid-template-columns: minmax(0,1fr) auto;
+    padding: 18px;
+    gap: 12px;
+  }
+
+  .recent-action {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    justify-content: center;
+  }
+
+  .recent-score {
+    text-align: right;
+  }
+
 }
 </style>

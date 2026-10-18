@@ -1,0 +1,7 @@
+# Preserve the exact delivery patch, manifests and historical visual evidence.
+* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# A saved unified diff contains meaningful space-only context lines.
+*.patch -whitespace
+# Captured command output legitimately ends with blank lines.
+*.log whitespace=blank-at-eol,-blank-at-eof,space-before-tab,cr-at-eol
+*.txt whitespace=blank-at-eol,-blank-at-eof,space-before-tab,cr-at-eol

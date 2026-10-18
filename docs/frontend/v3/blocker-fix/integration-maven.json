@@ -1,0 +1,955 @@
+{
+  "counts": {
+    "tests": 1741,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 19
+  },
+  "suites": [
+    {
+      "suite": "com.kun.aiinterview.AiInterviewSystemApplicationTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.DatabaseConnectionTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.auth.controller.AuthControllerTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.auth.service.AuthServiceTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.auth.service.AuthServiceUniquenessTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.common.exception.GlobalExceptionHandlerMultipartTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.common.exception.GlobalExceptionHandlerMvcTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.common.recovery.StaleRecoveryCasIntegrationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.common.recovery.StaleRecoveryPropertiesTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.common.validation.Utf8ByteSizeValidatorTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.common.validation.Utf8TextRequestValidationTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.config.EnvironmentIsolationInitializerTest",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.config.TestProfileExternalServiceIsolationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.evaluation.AiSystemBaselineEvaluationTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.config.InterviewPlanConfigTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.controller.HttpErrorTaxonomyControllerTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.controller.InterviewControllerTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.EvaluationRagQueryBuilderTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.EvaluationRetrievalAdapterTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.decision.EvaluationDecisionTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.decision.FollowUpPolicyTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.decision.FollowUpTargetResolverTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.DeepSeekJudgeProviderTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.JudgeConfigurationTest",
+      "tests": 34,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.jev.JevClientTest",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.jev.JevDisplayQuantizationHardeningTest",
+      "tests": 32,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.jev.JevE06ReliabilityReplayTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.jev.JevFeedbackPromptHardeningTest",
+      "tests": 29,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.jev.JevFeedbackReliabilityTest",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.jev.JevJudgeProviderTest",
+      "tests": 49,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.jev.JevProxyTransportTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.jev.JevRequestBudgetTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.jev.JevScoreMappingTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.judge.jev.JevScorePrecisionCompatibilityTest",
+      "tests": 63,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.llm.deepseek.DeepSeekConfigurationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.llm.deepseek.DeepSeekEvaluationClientTest",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.llm.deepseek.DeepSeekPropertiesTest",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.orchestration.EvaluationOrchestrationServiceTest",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.prompt.EvaluationPromptBuilderTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.prompt.EvaluationPromptTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.prompt.FollowUpOutputCompletenessHardeningTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.score.EvaluationScoreCalculatorTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.standard.EvaluationStandardTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.evaluation.validation.LlmEvaluationValidatorTest",
+      "tests": 47,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.mapper.AnswerEvaluationMapperTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.mapper.InterviewAnswerMapperTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.mapper.InterviewDetailMapperTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.mapper.InterviewHistoryMapperTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.mapper.InterviewQuestionMapperTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.mapper.InterviewSessionCreationMapperTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.mapper.InterviewSessionMapperTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.report.deepseek.DeepSeekInterviewReportGeneratorConfigurationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.report.deepseek.DeepSeekInterviewReportGeneratorTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.report.prompt.InterviewReportPromptBuilderTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.EvaluationContextServiceTest",
+      "tests": 52,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.FullInterviewBusinessOfflineTest",
+      "tests": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewEvaluationClaimConcurrencyIntegrationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewHistoryServiceTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewQuestionPlanSnapshotIntegrationTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewQuestionPlanSnapshotServiceTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewQuestionSnapshotFactoryTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewReportApiServiceTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewReportServiceTest",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewReportTransactionServiceIntegrationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewReportTransactionServiceTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewServiceTest",
+      "tests": 29,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewSessionServiceTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewSessionTransactionIntegrationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewSessionTransactionServiceTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewWorkflowServiceTest",
+      "tests": 29,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewWorkflowTransactionServiceIntegrationTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.InterviewWorkflowTransactionServiceTest",
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.interview.service.QuestionPlanSelectorTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.chunk.KnowledgeTextChunkerTest",
+      "tests": 27,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.controller.AdminKnowledgeDocumentControllerIntegrationTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.controller.AdminKnowledgeDocumentControllerTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.controller.AdminKnowledgeDocumentProcessApiTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.controller.KnowledgeMultipartServletLimitTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.embedding.EmbeddingBatchResultTest",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.embedding.EmbeddingConfigurationTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.embedding.EmbeddingPropertiesTest",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.embedding.EmbeddingVectorTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.embedding.RealEmbeddingSmokeTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.embedding.springai.EmbeddingProviderSwitchContractTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.embedding.springai.SpringAiEmbeddingClientTest",
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.embedding.springai.SpringAiEmbeddingHttpContractTest",
+      "tests": 24,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.mapper.KnowledgeDocumentMapperTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.mapper.RagTraceMapperTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgeDocumentAdminServiceTest",
+      "tests": 48,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgeDocumentProcessingServiceConfigurationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgeDocumentProcessingServiceTest",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgeDocumentProcessingTransactionServiceTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgePersistenceIntegrationTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 10
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgeRetrievalRawHitTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgeRetrievalServiceTest",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.KnowledgeRetrievalThresholdTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.RagP1IndependentQuerySetTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.RagP1OfflineBusinessReplayTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.RagTracePersistenceServiceIntegrationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.RagTracePersistenceServiceTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.RealKnowledgeDocumentProcessingFailureIntegrationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.service.RealKnowledgeDocumentProcessingSmokeTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.vector.VectorSearchHitTest",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.vector.VectorWriteItemTest",
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.vector.milvus.MilvusCollectionInitializerTest",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.vector.milvus.MilvusConfigurationTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.vector.milvus.MilvusPropertiesTest",
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.vector.milvus.MilvusVectorStoreClientTest",
+      "tests": 89,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.vector.milvus.RealMilvusSchemaValidationSmokeTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2
+    },
+    {
+      "suite": "com.kun.aiinterview.knowledge.vector.milvus.RealMilvusVectorStoreSmokeTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    {
+      "suite": "com.kun.aiinterview.question.controller.AdminQuestionControllerIntegrationTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.question.controller.AdminQuestionControllerTest",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.question.controller.AdminQuestionPaginationControllerTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.question.controller.AdminQuestionPaginationIntegrationTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.question.dto.CreateQuestionRequestValidationTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.question.mapper.QuestionMapperTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.question.mapper.QuestionPaginationMapperTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.question.mapper.QuestionScoringPointMapperTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.question.service.QuestionAdminPaginationServiceTest",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.question.service.QuestionAdminServiceTest",
+      "tests": 53,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.question.service.QuestionAdminServiceTransactionTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.security.config.SecurityConfigurationTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.security.filter.JwtAuthenticationFilterTest",
+      "tests": 32,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.security.handler.RestAccessDeniedHandlerTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.security.handler.RestAuthenticationEntryPointTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.security.jwt.JwtPropertiesTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.security.jwt.JwtTokenServiceTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.security.model.AuthenticatedUserTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.user.controller.UserControllerIntegrationTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.user.dto.ChangePasswordRequestTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.user.mapper.UserMapperTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.user.mapper.UserWeaknessMapperTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.user.service.ConcurrentPasswordChangeIntegrationTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.user.service.UserServiceTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.kun.aiinterview.user.service.UserWeaknessServiceTest",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ]
+}

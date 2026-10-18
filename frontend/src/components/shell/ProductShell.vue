@@ -119,9 +119,10 @@ async function retryIdentity(): Promise<void> {
         <ProductMark :size="22" />
         <span class="product-brand-copy">
           <span class="product-brand-name">面试训练</span>
-          <span class="product-brand-sub">技术面试工作台</span>
+          <span class="product-brand-sub">INTERVIEW STUDIO</span>
         </span>
       </RouterLink>
+      <p class="nav-group-label nav-workspace-label">训练空间</p>
       <nav class="product-nav">
         <RouterLink
           v-for="item in mainNav"
@@ -184,6 +185,10 @@ async function retryIdentity(): Promise<void> {
     </aside>
 
     <div class="product-main">
+      <header class="desktop-topbar" aria-label="工作空间">
+        <p><span class="studio-path">Interview Studio</span><span aria-hidden="true"> / </span>Java 后端训练</p>
+        <span class="studio-edition">TECHNICAL INTERVIEW</span>
+      </header>
       <header class="mobile-topbar">
         <RouterLink class="product-brand" :to="{ name: 'dashboard' }">
           <ProductMark :size="20" />
@@ -277,8 +282,7 @@ async function retryIdentity(): Promise<void> {
   gap: 8px;
 }
 
-.sidebar-user,
-.mobile-identity {
+.sidebar-user, .mobile-identity {
   padding: 0 12px;
   min-width: 0;
 }

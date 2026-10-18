@@ -1,0 +1,656 @@
+{
+  "browser": "Google Chrome via Playwright, headless, dedicated process/context",
+  "ai": "LOCAL_MOCK",
+  "paidModelCalls": 0,
+  "scope": "happy",
+  "sessions": [
+    {
+      "label": "main",
+      "account": "browser_main_1792299679359",
+      "userId": 5,
+      "sessionId": 4,
+      "mains": 5,
+      "followups": 2,
+      "evaluations": 7,
+      "finalEvaluations": 5,
+      "submissions": [
+        {
+          "questionId": 20,
+          "type": "MAIN",
+          "requestId": "2c1f2898-6a45-47d4-abef-9227f6ec6134",
+          "evaluation": {
+            "evaluationPhase": "INITIAL",
+            "correctnessScore": 8,
+            "completenessScore": 8,
+            "depthScore": 8,
+            "clarityScore": 8,
+            "practiceScore": 8,
+            "totalScore": 40,
+            "level": "WEAK",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "FOLLOW_UP"
+        },
+        {
+          "questionId": 25,
+          "type": "FOLLOW_UP",
+          "requestId": "b6b8d655-7f17-4ee2-9980-a1ec67ce5a38",
+          "evaluation": {
+            "evaluationPhase": "FINAL",
+            "correctnessScore": 8,
+            "completenessScore": 8,
+            "depthScore": 8,
+            "clarityScore": 8,
+            "practiceScore": 8,
+            "totalScore": 40,
+            "level": "WEAK",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "NEXT_MAIN"
+        },
+        {
+          "questionId": 21,
+          "type": "MAIN",
+          "requestId": "be6d4131-1453-4a02-8d48-d22b1e4ee849",
+          "evaluation": {
+            "evaluationPhase": "FINAL",
+            "correctnessScore": 18,
+            "completenessScore": 18,
+            "depthScore": 18,
+            "clarityScore": 18,
+            "practiceScore": 18,
+            "totalScore": 90,
+            "level": "EXCELLENT",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "NEXT_MAIN"
+        },
+        {
+          "questionId": 22,
+          "type": "MAIN",
+          "requestId": "c588c49a-ce4e-4099-a051-87c44bd10568",
+          "evaluation": {
+            "evaluationPhase": "FINAL",
+            "correctnessScore": 18,
+            "completenessScore": 18,
+            "depthScore": 18,
+            "clarityScore": 18,
+            "practiceScore": 18,
+            "totalScore": 90,
+            "level": "EXCELLENT",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "NEXT_MAIN"
+        },
+        {
+          "questionId": 23,
+          "type": "MAIN",
+          "requestId": "24d4f8f5-e657-4f7b-9af1-e7c75ba34ae3",
+          "evaluation": {
+            "evaluationPhase": "FINAL",
+            "correctnessScore": 18,
+            "completenessScore": 18,
+            "depthScore": 18,
+            "clarityScore": 18,
+            "practiceScore": 18,
+            "totalScore": 90,
+            "level": "EXCELLENT",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "NEXT_MAIN"
+        },
+        {
+          "questionId": 24,
+          "type": "MAIN",
+          "requestId": "beaecdd1-a98e-4b94-bf94-e8193fc43e34",
+          "evaluation": {
+            "evaluationPhase": "INITIAL",
+            "correctnessScore": 8,
+            "completenessScore": 8,
+            "depthScore": 8,
+            "clarityScore": 8,
+            "practiceScore": 8,
+            "totalScore": 40,
+            "level": "WEAK",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "FOLLOW_UP"
+        },
+        {
+          "questionId": 26,
+          "type": "FOLLOW_UP",
+          "requestId": "b8a13c11-1f76-4d5f-8023-c02436b815a4",
+          "evaluation": {
+            "evaluationPhase": "FINAL",
+            "correctnessScore": 8,
+            "completenessScore": 8,
+            "depthScore": 8,
+            "clarityScore": 8,
+            "practiceScore": 8,
+            "totalScore": 40,
+            "level": "WEAK",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "FINISH"
+        }
+      ],
+      "report": {
+        "sessionId": 4,
+        "reportStatus": "READY",
+        "overallScore": 70,
+        "result": "FAIR",
+        "summary": "【本地模拟AI】五道主问题已完成，Java 后端计算最终分数。",
+        "strengths": [
+          "【本地模拟AI】集合、Spring 与 MySQL 的回答覆盖核心要点。"
+        ],
+        "weaknesses": [
+          "【本地模拟AI】Java 基础与网络的边界条件仍需复习。"
+        ],
+        "suggestions": [
+          "【本地模拟AI】结合示例复习核心机制及异常场景。"
+        ]
+      }
+    },
+    {
+      "label": "final",
+      "account": "browser_final_1792299687531",
+      "userId": 6,
+      "sessionId": 5,
+      "mains": 5,
+      "followups": 2,
+      "evaluations": 7,
+      "finalEvaluations": 5,
+      "submissions": [
+        {
+          "questionId": 27,
+          "type": "MAIN",
+          "requestId": "495d06cc-212a-4109-881e-8f2476162f42",
+          "evaluation": {
+            "evaluationPhase": "INITIAL",
+            "correctnessScore": 8,
+            "completenessScore": 8,
+            "depthScore": 8,
+            "clarityScore": 8,
+            "practiceScore": 8,
+            "totalScore": 40,
+            "level": "WEAK",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "FOLLOW_UP"
+        },
+        {
+          "questionId": 32,
+          "type": "FOLLOW_UP",
+          "requestId": "82482b90-8e76-4b89-a0c2-da680b44318d",
+          "evaluation": {
+            "evaluationPhase": "FINAL",
+            "correctnessScore": 8,
+            "completenessScore": 8,
+            "depthScore": 8,
+            "clarityScore": 8,
+            "practiceScore": 8,
+            "totalScore": 40,
+            "level": "WEAK",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "NEXT_MAIN"
+        },
+        {
+          "questionId": 28,
+          "type": "MAIN",
+          "requestId": "069300bc-af3d-44fe-8b7e-e90ed5978f35",
+          "evaluation": {
+            "evaluationPhase": "FINAL",
+            "correctnessScore": 18,
+            "completenessScore": 18,
+            "depthScore": 18,
+            "clarityScore": 18,
+            "practiceScore": 18,
+            "totalScore": 90,
+            "level": "EXCELLENT",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "NEXT_MAIN"
+        },
+        {
+          "questionId": 29,
+          "type": "MAIN",
+          "requestId": "4c6ee24e-e870-4cb0-9881-64610e52fb86",
+          "evaluation": {
+            "evaluationPhase": "FINAL",
+            "correctnessScore": 18,
+            "completenessScore": 18,
+            "depthScore": 18,
+            "clarityScore": 18,
+            "practiceScore": 18,
+            "totalScore": 90,
+            "level": "EXCELLENT",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "NEXT_MAIN"
+        },
+        {
+          "questionId": 30,
+          "type": "MAIN",
+          "requestId": "7f3d3b4a-c9db-4125-adad-4ac20d600f81",
+          "evaluation": {
+            "evaluationPhase": "FINAL",
+            "correctnessScore": 18,
+            "completenessScore": 18,
+            "depthScore": 18,
+            "clarityScore": 18,
+            "practiceScore": 18,
+            "totalScore": 90,
+            "level": "EXCELLENT",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "NEXT_MAIN"
+        },
+        {
+          "questionId": 31,
+          "type": "MAIN",
+          "requestId": "6378fc4d-6989-4b12-a997-c90be8ff736c",
+          "evaluation": {
+            "evaluationPhase": "INITIAL",
+            "correctnessScore": 8,
+            "completenessScore": 8,
+            "depthScore": 8,
+            "clarityScore": 8,
+            "practiceScore": 8,
+            "totalScore": 40,
+            "level": "WEAK",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "FOLLOW_UP"
+        },
+        {
+          "questionId": 33,
+          "type": "FOLLOW_UP",
+          "requestId": "1418c666-742f-44c0-b9b9-b470a900d654",
+          "evaluation": {
+            "evaluationPhase": "FINAL",
+            "correctnessScore": 8,
+            "completenessScore": 8,
+            "depthScore": 8,
+            "clarityScore": 8,
+            "practiceScore": 8,
+            "totalScore": 40,
+            "level": "WEAK",
+            "strengths": [
+              "【本地模拟AI】已表达基本思路。"
+            ],
+            "missingPoints": [
+              "【本地模拟AI】请补充边界情况。"
+            ],
+            "correction": "【本地模拟AI】结合实际示例说明核心机制。"
+          },
+          "action": "FINISH"
+        }
+      ],
+      "report": {
+        "sessionId": 5,
+        "reportStatus": "READY",
+        "overallScore": 70,
+        "result": "FAIR",
+        "summary": "【本地模拟AI】五道主问题已完成，Java 后端计算最终分数。",
+        "strengths": [
+          "【本地模拟AI】集合、Spring 与 MySQL 的回答覆盖核心要点。"
+        ],
+        "weaknesses": [
+          "【本地模拟AI】Java 基础与网络的边界条件仍需复习。"
+        ],
+        "suggestions": [
+          "【本地模拟AI】结合示例复习核心机制及异常场景。"
+        ]
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "anonymous-protected-http-401",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous-admin-http-401",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous-protected-page-redirects-login",
+      "status": "PASS"
+    },
+    {
+      "name": "main:invalid-login-shows-error",
+      "status": "PASS"
+    },
+    {
+      "name": "main:user-admin-http-403",
+      "status": "PASS"
+    },
+    {
+      "name": "main:register-login-refresh-auth",
+      "status": "PASS",
+      "userId": 5
+    },
+    {
+      "name": "main:create-five-fixed-main-questions",
+      "status": "PASS",
+      "sessionId": 4
+    },
+    {
+      "name": "main:blank-answer-disabled",
+      "status": "PASS"
+    },
+    {
+      "name": "main:evaluation-awaits-explicit-confirmation-1",
+      "status": "PASS"
+    },
+    {
+      "name": "main:evaluation-awaits-explicit-confirmation-2",
+      "status": "PASS"
+    },
+    {
+      "name": "main:evaluation-awaits-explicit-confirmation-3",
+      "status": "PASS"
+    },
+    {
+      "name": "main:evaluation-awaits-explicit-confirmation-4",
+      "status": "PASS"
+    },
+    {
+      "name": "main:evaluation-awaits-explicit-confirmation-5",
+      "status": "PASS"
+    },
+    {
+      "name": "main:evaluation-awaits-explicit-confirmation-6",
+      "status": "PASS"
+    },
+    {
+      "name": "main:evaluation-awaits-explicit-confirmation-7",
+      "status": "PASS"
+    },
+    {
+      "name": "main:evaluation-confirmation-survives-refresh-7",
+      "status": "PASS"
+    },
+    {
+      "name": "main:five-main-two-followup-report-refresh",
+      "status": "PASS",
+      "sessionId": 4,
+      "evaluations": 7,
+      "final": 5,
+      "score": 70
+    },
+    {
+      "name": "main:history-view",
+      "status": "PASS"
+    },
+    {
+      "name": "main:detail-saved-answers",
+      "status": "PASS"
+    },
+    {
+      "name": "main:user-admin-route-forbidden",
+      "status": "PASS"
+    },
+    {
+      "name": "final:invalid-login-shows-error",
+      "status": "PASS"
+    },
+    {
+      "name": "final:user-admin-http-403",
+      "status": "PASS"
+    },
+    {
+      "name": "final:register-login-refresh-auth",
+      "status": "PASS",
+      "userId": 6
+    },
+    {
+      "name": "final:create-five-fixed-main-questions",
+      "status": "PASS",
+      "sessionId": 5
+    },
+    {
+      "name": "final:blank-answer-disabled",
+      "status": "PASS"
+    },
+    {
+      "name": "final:evaluation-awaits-explicit-confirmation-1",
+      "status": "PASS"
+    },
+    {
+      "name": "final:evaluation-awaits-explicit-confirmation-2",
+      "status": "PASS"
+    },
+    {
+      "name": "final:evaluation-awaits-explicit-confirmation-3",
+      "status": "PASS"
+    },
+    {
+      "name": "final:evaluation-awaits-explicit-confirmation-4",
+      "status": "PASS"
+    },
+    {
+      "name": "final:evaluation-awaits-explicit-confirmation-5",
+      "status": "PASS"
+    },
+    {
+      "name": "final:evaluation-awaits-explicit-confirmation-6",
+      "status": "PASS"
+    },
+    {
+      "name": "final:evaluation-awaits-explicit-confirmation-7",
+      "status": "PASS"
+    },
+    {
+      "name": "final:evaluation-confirmation-survives-refresh-7",
+      "status": "PASS"
+    },
+    {
+      "name": "final:five-main-two-followup-report-refresh",
+      "status": "PASS",
+      "sessionId": 5,
+      "evaluations": 7,
+      "final": 5,
+      "score": 70
+    },
+    {
+      "name": "final:history-view",
+      "status": "PASS"
+    },
+    {
+      "name": "final:detail-saved-answers",
+      "status": "PASS"
+    },
+    {
+      "name": "final:user-admin-route-forbidden",
+      "status": "PASS"
+    },
+    {
+      "name": "final:other-user-report-hidden-404",
+      "status": "PASS"
+    },
+    {
+      "name": "admin:normal-login-database-role-http-200-and-management-pages",
+      "status": "PASS"
+    }
+  ],
+  "errors": [
+    {
+      "type": "console",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    }
+  ],
+  "status": "PASS",
+  "requestCounts": {
+    "allApi": 88,
+    "answers": 14,
+    "reportGeneration": 2
+  }
+}

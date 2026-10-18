@@ -80,8 +80,7 @@ function scoreTone(item: InterviewHistoryItemResponse): string {
   font-weight: 500;
 }
 
-.history-date,
-.history-progress {
+.history-date, .history-progress {
   font-size: 13px;
   color: var(--text-2);
 }
@@ -96,8 +95,7 @@ function scoreTone(item: InterviewHistoryItemResponse): string {
   font-weight: 500;
 }
 
-.is-failed p,
-.is-abnormal p {
+.is-failed p, .is-abnormal p {
   color: var(--danger);
 }
 
@@ -152,6 +150,7 @@ function scoreTone(item: InterviewHistoryItemResponse): string {
   .history-actions {
     grid-area: actions;
   }
+
 }
 
 @media (max-width: 720px) {
@@ -162,10 +161,7 @@ function scoreTone(item: InterviewHistoryItemResponse): string {
     padding: 16px;
   }
 
-  .history-primary,
-  .history-score,
-  .history-progress,
-  .history-actions {
+  .history-primary, .history-score, .history-progress, .history-actions {
     grid-area: auto;
   }
 
@@ -174,5 +170,17 @@ function scoreTone(item: InterviewHistoryItemResponse): string {
     flex-direction: column;
     align-items: flex-start;
   }
+
+}
+
+.history-row {
+  padding: 22px 24px;
+}
+
+@media (max-width:720px) {
+  .history-row {
+    padding: 18px;
+  }
+
 }
 </style>

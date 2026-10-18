@@ -1,18 +1,19 @@
 :root {
-  --bg: #f7f8fa;
+  --bg: #f5f7fb;
   --surface: #ffffff;
-  --surface-subtle: #f2f4f7;
+  --surface-subtle: #f3f5f9;
 
-  --text: #101828;
-  --text-2: #667085;
-  --text-3: #98a2b3;
+  --text: #17243c;
+  --text-2: #59677e;
+  --text-3: #78869b;
 
-  --border: #e4e7ec;
+  --border: #e1e7f0;
+  --border-strong: #c6d0df;
 
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-soft: #eff6ff;
-  --primary-border: #bfdbfe;
+  --primary: #245cdb;
+  --primary-hover: #1949ba;
+  --primary-soft: #edf3ff;
+  --primary-border: #c7d7fc;
 
   --success: #16803c;
   --success-soft: #ecfdf3;
@@ -21,18 +22,23 @@
   --danger: #b42318;
   --danger-soft: #fef3f2;
 
-  --placeholder: #667085;
+  --placeholder: #63718a;
 
-  --font: system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
 
-  --radius: 8px;
-  --radius-lg: 10px;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 2px 5px rgb(23 36 60 / 3%), 0 0 1px rgb(23 36 60 / 6%);
+  --shadow-panel: 0 6px 24px -12px rgb(23 36 60 / 14%);
+  --shadow-focus: 0 0 0 3px var(--primary-soft);
+  --training-wash: linear-gradient(115deg, #ffffff 35%, #edf3ff 100%);
 
-  --sidebar: 224px;
-  --sidebar-compact: 200px;
-  --session-max: 1240px;
-  --workspace-max: 1200px;
+  --sidebar: 232px;
+  --sidebar-compact: 204px;
+  --session-max: 1360px;
+  --workspace-max: 1400px;
   --focus: 2px solid var(--primary);
 
   --space-1: 4px;
