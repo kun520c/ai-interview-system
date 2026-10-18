@@ -1,0 +1,11 @@
+{
+  "provenance": "Authored synthetic protocol scenarios; not historical captures or quality measurements",
+  "scenarios": [
+    {"id":"valid-without-retry","retries":0,"invalidFeedbackAttempts":0,"nativeInvalid":false,"fallbackInvalid":false},
+    {"id":"invalid-feedback-no-retry","retries":0,"invalidFeedbackAttempts":1,"nativeInvalid":false,"fallbackInvalid":false},
+    {"id":"feedback-retry-recovers","retries":1,"invalidFeedbackAttempts":1,"nativeInvalid":false,"fallbackInvalid":false},
+    {"id":"feedback-retry-exhausted","retries":1,"invalidFeedbackAttempts":2,"nativeInvalid":false,"fallbackInvalid":false},
+    {"id":"native-invalid-fallback","retries":1,"invalidFeedbackAttempts":0,"nativeInvalid":true,"fallbackInvalid":false},
+    {"id":"fallback-score-rejected","retries":1,"invalidFeedbackAttempts":2,"nativeInvalid":false,"fallbackInvalid":true}
+  ]
+}
