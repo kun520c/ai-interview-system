@@ -8,7 +8,7 @@
 
 [查看前端页面](#界面预览) · [了解系统架构](#系统架构) · [查看工程亮点](#核心工程设计) · [本地运行](docs/GETTING_STARTED.md) · [验证记录](#测试与验证)
 
-> **展示边界**：当前公开 Java 后端与 Vue 前端源码，**尚无线上演示地址**。下方界面截图来自浏览器与 Mock 数据；部分集成测试使用真实 Spring Boot + 独立 MySQL，但 AI 模型与向量服务为本地替身。截图中的成绩不是真实模型质量指标。
+> **展示边界**：当前公开 Java 后端与 Vue 前端源码，**尚无线上演示地址**。下方 V3 截图使用本地 Mock 数据，分数不代表真实模型质量。业务浏览器验收使用真实 Spring Boot + 隔离 MySQL、模型与向量替身；另有**独立的真实 MySQL/Milvus 并发专项测试**。不将本地测试等同于线上部署或 AI 评分质量验证。
 
 ## 界面预览
 
@@ -69,7 +69,8 @@ flowchart TB
 
 - `request_id` 与 `interview_question_id` 唯一约束防重复写入；同一请求身份只有在问题及答案内容一致时才能重放。
 - 用数据库状态 CAS 抢占评价资格，使用 `interview_session.version` 乐观锁保护会话推进；避免重复评价、重复追问和越序推进。
-- 评分和报告生成与外部网络调用分离，尽量保持 MySQL 事务短小。
+- **Attempt Fencing（任务身份隔离）**：评价与知识文档处理在每次领取、重试或超时接管时更换 `attemptId`；旧任务即使晚于新任务返回，也无法通过锁定读和带身份条件的 SQL 提交成功/失败状态。报告生成使用本次抢占获得的固定 Version。
+- RAG 轨迹、评价、答案状态和 Session 推进在一个短事务中提交；外部模型与向量请求不持有长数据库事务。详见[并发超时接管设计](docs/design/timeout-task-fencing.md)。
 
 **2. 题目快照与评分一致性**
 
@@ -81,11 +82,12 @@ flowchart TB
 
 - 根据主问题与评分点生成 Query，**检索 Query 不包含用户答案**；Milvus 返回候选后，再由 MySQL 检查文档状态、版本与 Embedding 配置。
 - `rag_retrieval_batch` / `rag_hit_log` 保留检索轨迹，可定位哪些证据真正进入评价。
-- 知识入库涉及 MySQL 与 Milvus 两套存储，使用定向删除与状态回收处理失败；不声称跨存储具有原子事务。
+- 知识入库涉及 MySQL 与 Milvus 两套存储：每批向量 ID 带独立 Attempt 前缀，失败时仅补偿本批明确 ID，避免旧线程删除接管线程的数据；MySQL 在锁内确认任务身份后才提交 Chunk/READY。
+- 超时后的旧 Milvus RPC 仍可能迟到写入，孤立向量通过 MySQL 资格过滤排除；项目提供[独立维护窗口使用的手动对账工具](tools/orphan-vectors/README.md)（默认 dry-run），**不是自动定期清理，也不保证跨存储原子事务**。
 
 **4. 外部模型失败后的恢复**
 
-- 使用 `EVALUATING` / `GENERATING` / `PROCESSING` 超时状态回收、幂等重放和持久化结果复用处理失败。
+- 使用 `EVALUATING` / `GENERATING` / `PROCESSING` 超时状态回收、幂等重放和持久化结果复用处理失败；**超时接管由后续请求触发，并非后台定时任务**。
 - DeepSeek 为默认 Judge；可选 Jev 负责原生判分与建议，再由 DeepSeek 生成反馈，校验失败时按受限预算重试或回退。
 - 外部调用可能重试，不承诺恰好执行一次；异常与状态恢复必须以数据库事实为准。
 
@@ -125,19 +127,24 @@ npm run dev
 
 ## 测试与验证
 
-以下为 **2026-10-18 V3 合并前的本地验收结果**，不代表在线生产环境或实时 GitHub CI 状态。
+以下为 **2026-10-19 并发最终集成与本地同步的验收记录**，均为本地隔离环境结果，**不等同于 GitHub CI、线上可用性或真实模型评分质量**。不同运行有重复用例，不能相加作为独立测试总数。
 
 | 验证范围 | 已记录结果 |
 | --- | --- |
-| Vue Typecheck / ESLint / Build | 通过 |
-| Vue Vitest | **293 项通过**，0 失败、0 跳过 |
-| 后端 Maven 全量 | **1741 项**，0 failures、0 errors、19 skipped（其余 1722 执行通过） |
-| 独立干净检出 Maven | 同为 1741 / 0 / 0 / 19；无需未公开历史 JSON |
-| 严格浏览器 `full` | **49 项检查通过**，真实 Spring Boot + 独立 MySQL；模型与 Milvus 为本地替身 |
+| 后端 Maven 全量 | **1,790 项**：1,771 通过、0 失败、0 错误、19 跳过 |
+| 并发与数据库迁移聚焦回归 | 本地同步阶段 **124 项通过**，0 失败、0 跳过 |
+| 真实 MySQL 知识持久化 | 独立启用 **10 项通过** |
+| 真实 Milvus 现有 Smoke Tests | 独立启用 **7 项通过** |
+| 真实 MySQL + Milvus A/B 任务交错和维护验收 | 独立运行 **10 项通过**；包括超时接管、迟到插入、定向补偿和安全对账 |
+| Vue Typecheck / ESLint / Build | 均通过 |
+| Vue Vitest | **293 项通过**，0 失败 |
+| 完整浏览器 `full` | **49 项检查通过**；真实 Spring Boot + 隔离 MySQL，模型/向量为本地替身 |
 
-19 项跳过属于原有需显式开启的真实外部服务/AI baseline 测试。上述结果证明业务合同与隔离联调，不证明真实模型评分准确率、RAG 质量或线上部署可靠性。
+默认 Maven 的 19 项跳过为需要显式启用的外部服务 / AI Baseline 测试；真实 MySQL/Milvus 测试是在隔离环境中**另行启用**，并非默认 Maven 全量自动执行。真实交错专项中的部分临时测试源码、日志保存在开发者本地忽略的验收目录；公开仓库包含设计、核心回归及结果报告，不将临时证据描述为云端 CI。
 
-[查看 V3 验收报告](docs/frontend/V3_BLOCKER_FIX_20261018.md) · [隔离浏览器验收工具](tools/browser-e2e/README.md) · [发布范围](docs/RELEASE_SCOPE.md)
+测试使用本地 Fake Embedding / Judge，**收费模型调用为 0**；未验证付费模型的评分准确性、所有真实网络故障或正式环境部署。GitHub Actions 的 [Frontend checks](https://github.com/kun520c/ai-interview-system/actions/workflows/frontend-checks.yml) 仅检查前端，不代表后端 Maven/真实 Milvus 已在云端运行。
+
+[并发最终验收](docs/verification/CONCURRENCY_FINAL_ACCEPTANCE_20261019.md) · [最终集成与迁移说明](docs/verification/CONCURRENCY_FINAL_INTEGRATION_20261019.md) · [V3 原始验收（2026-10-18）](docs/frontend/V3_BLOCKER_FIX_20261018.md) · [隔离浏览器验收工具](tools/browser-e2e/README.md)
 
 ## 仓库导航
 
@@ -145,8 +152,9 @@ npm run dev
 - [`src/main/java/` — Java 后端](src/main/java/com/kun/aiinterview/)：认证、题库、面试编排、评价、RAG 与知识入库
 - [`src/test/` — 自动化测试](src/test/)：状态、幂等、检索、异常与真实数据库合同
 - [`sql/` — MySQL Schema](sql/ai_interview.sql)
-- [`docs/` — 设计和验证文档](docs/README.md)
-- [`tools/` — 独立测试与历史实验](tools/README.md)
+- [`docs/` — 设计和验证文档](docs/README.md)：包含 [Attempt Fencing 设计](docs/design/timeout-task-fencing.md)与[2026-10-19 真实服务验收](docs/verification/CONCURRENCY_FINAL_ACCEPTANCE_20261019.md)
+- [`sql/migrations/` — 旧库增量迁移](sql/migrations/20261015_timeout_attempt_fencing.sql)：新增两个任务身份字段，不用于空库初始化
+- [`tools/` — 独立测试与历史实验](tools/README.md)：含[孤立向量手动对账工具](tools/orphan-vectors/README.md)
 
 **项目状态：** 学习与作品展示用途，核心源代码与测试公开；当前不提供公开测试账号、在线部署或真实模型质量保证。
 
