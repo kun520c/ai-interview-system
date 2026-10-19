@@ -24,19 +24,23 @@ public interface InterviewAnswerMapper {
 
     int insertInterviewAnswer(InterviewAnswer interviewAnswer);
 
-    int claimEvaluation(@Param("id") Long id);
+    InterviewAnswer lockById(@Param("id") Long id);
 
-    int retryEvaluation(@Param("id") Long id);
+    int claimEvaluation(@Param("id") Long id, @Param("attemptId") String attemptId);
+
+    int retryEvaluation(@Param("id") Long id, @Param("attemptId") String attemptId);
 
     int reclaimStaleEvaluating(
             @Param("id") Long id,
-            @Param("cutoff") LocalDateTime cutoff
+            @Param("cutoff") LocalDateTime cutoff,
+            @Param("attemptId") String attemptId
     );
 
-    int markEvaluated(@Param("id") Long id);
+    int markEvaluated(@Param("id") Long id, @Param("attemptId") String attemptId);
 
     int markFailed(
             @Param("id") Long id,
-            @Param("errorCode") String errorCode
+            @Param("errorCode") String errorCode,
+            @Param("attemptId") String attemptId
     );
 }

@@ -35,6 +35,11 @@
         </foreach>
     </insert>
 
+    <select id="listVectorIdsByDocumentIdAndVersion" resultType="java.lang.String">
+        SELECT vector_id FROM knowledge_chunk
+        WHERE document_id = #{documentId} AND document_version = #{documentVersion}
+    </select>
+
     <delete id="deleteByDocumentIdAndVersion">
         DELETE FROM knowledge_chunk
         WHERE document_id = #{documentId}

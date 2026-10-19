@@ -25,6 +25,7 @@ public class KnowledgeDocument {
     private String source;
     private Integer documentVersion;
     private KnowledgeProcessingStatus processingStatus;
+    private String processingAttemptId;
     private String errorMessage;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -13,7 +13,6 @@ import com.kun.aiinterview.knowledge.entity.KnowledgeChunk;
 import com.kun.aiinterview.knowledge.entity.KnowledgeDocument;
 import com.kun.aiinterview.knowledge.enums.KnowledgeChunkStatus;
 import com.kun.aiinterview.knowledge.enums.KnowledgeProcessingStatus;
-import com.kun.aiinterview.knowledge.mapper.KnowledgeChunkMapper;
 import com.kun.aiinterview.knowledge.mapper.KnowledgeDocumentMapper;
 import com.kun.aiinterview.knowledge.vector.VectorStoreClient;
 import com.kun.aiinterview.knowledge.vector.VectorWriteItem;
@@ -37,7 +36,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class KnowledgeDocumentProcessingService {
     private final KnowledgeDocumentMapper knowledgeDocumentMapper;
-    private final KnowledgeChunkMapper knowledgeChunkMapper;
     private final KnowledgeTextChunker knowledgeTextChunker;
     private final EmbeddingClient embeddingClient;
     private final VectorStoreClient vectorStoreClient;
@@ -52,11 +50,12 @@ public class KnowledgeDocumentProcessingService {
         String failureMessage = "知识文档处理失败";
 
         boolean milvusWriteMayExist = false;
+        boolean mysqlCommitAttempted = false;
 
         List<String> vectorIds = new ArrayList<>();
 
+        List<String> previousVectorIds;
         try {
-            reconcileExistingVectors(occupied);
 
             failureMessage = "知识文档切片失败";
 
@@ -96,13 +95,36 @@ public class KnowledgeDocumentProcessingService {
 
             failureMessage = "知识切片持久化或文档状态更新失败";
 
-            knowledgeDocumentProcessingTransactionService
+            mysqlCommitAttempted = true;
+            previousVectorIds = knowledgeDocumentProcessingTransactionService
                     .persistChunksAndMarkReady(
                             documentId,
-                            processingItems.chunks()
+                            processingItems.chunks(),
+                            occupied.getProcessingAttemptId()
                     );
         } catch (RuntimeException originalException) {
-            if (milvusWriteMayExist && !vectorIds.isEmpty()) {
+            boolean mayCompensate = milvusWriteMayExist;
+            if (mysqlCommitAttempted) {
+                try {
+                    // A current locking read waits for any unresolved commit holding this row.
+                    // A snapshot read could still see PROCESSING and wrongly compensate a commit in flight.
+                    KnowledgeDocument current = knowledgeDocumentMapper.lockById(documentId);
+                    if (current != null
+                            && current.getProcessingStatus() == KnowledgeProcessingStatus.READY
+                            && occupied.getProcessingAttemptId().equals(current.getProcessingAttemptId())) {
+                        // A lost commit acknowledgement must not delete this committed batch.
+                        log.warn("Processing commit confirmed after transaction error, documentId = {}, attemptId = {}",
+                                documentId, occupied.getProcessingAttemptId(), originalException);
+                        return;
+                    }
+                } catch (RuntimeException confirmationFailure) {
+                    originalException.addSuppressed(confirmationFailure);
+                    mayCompensate = false;
+                    log.error("Cannot confirm MySQL commit; retaining vectors, documentId = {}, vectorIds = {}",
+                            documentId, vectorIds, confirmationFailure);
+                }
+            }
+            if (mayCompensate && !vectorIds.isEmpty()) {
                 compensateMilvus(
                         documentId,
                         vectorIds,
@@ -112,11 +134,21 @@ public class KnowledgeDocumentProcessingService {
 
             markDocumentFailed(
                     documentId,
+                    occupied.getProcessingAttemptId(),
                     failureMessage,
                     originalException
             );
 
             throw originalException;
+        }
+        // MySQL is already committed. Cleanup failure must never compensate the active batch.
+        if (!previousVectorIds.isEmpty()) {
+            try {
+                vectorStoreClient.deleteByVectorIds(previousVectorIds);
+            } catch (RuntimeException cleanupFailure) {
+                log.error("Retired vector cleanup failed, documentId = {}, vectorIds = {}",
+                        documentId, previousVectorIds, cleanupFailure);
+            }
         }
     }
 
@@ -127,6 +159,7 @@ public class KnowledgeDocumentProcessingService {
             throw new ResourceNotFoundException("知识文档不存在");
         }
 
+        String attemptId = UUID.randomUUID().toString().replace("-", "");
         KnowledgeProcessingStatus status =
                 document.getProcessingStatus();
         if (status == KnowledgeProcessingStatus.READY) {
@@ -135,42 +168,43 @@ public class KnowledgeDocumentProcessingService {
             );
         }
         if (status == KnowledgeProcessingStatus.PROCESSING) {
-            occupyStaleProcessing(document);
+            occupyStaleProcessing(document, attemptId);
         } else if (status == KnowledgeProcessingStatus.FAILED) {
-            occupyFailedProcessing(documentId);
+            occupyFailedProcessing(documentId, attemptId);
         } else if (status == KnowledgeProcessingStatus.UPLOADED) {
-            occupyUploaded(documentId);
+            occupyUploaded(documentId, attemptId);
         } else {
             throw new ConflictException(
                     "文档当前状态不允许处理"
             );
         }
 
-        KnowledgeDocument occupied =
-                knowledgeDocumentMapper.selectById(documentId);
-        validateClaimedDocument(occupied);
-        return occupied;
+        // Never adopt a later worker's identity by reloading after the claim.
+        document.setProcessingStatus(KnowledgeProcessingStatus.PROCESSING);
+        document.setProcessingAttemptId(attemptId);
+        validateClaimedDocument(document);
+        return document;
     }
 
-    private void occupyUploaded(Long documentId) {
+    private void occupyUploaded(Long documentId, String attemptId) {
         int claimedRows =
-                knowledgeDocumentMapper.claimProcessing(documentId);
+                knowledgeDocumentMapper.claimProcessing(documentId, attemptId);
         if (claimedRows == 1) {
             return;
         }
         rejectLostProcessingRace(documentId);
     }
 
-    private void occupyFailedProcessing(Long documentId) {
+    private void occupyFailedProcessing(Long documentId, String attemptId) {
         int claimedRows =
-                knowledgeDocumentMapper.claimFailedProcessing(documentId);
+                knowledgeDocumentMapper.claimFailedProcessing(documentId, attemptId);
         if (claimedRows == 1) {
             return;
         }
         rejectLostProcessingRace(documentId);
     }
 
-    private void occupyStaleProcessing(KnowledgeDocument document) {
+    private void occupyStaleProcessing(KnowledgeDocument document, String attemptId) {
         if (!staleRecoveryProperties
                 .isProcessingStale(document.getUpdatedAt())) {
             throw new ConflictException(
@@ -181,7 +215,8 @@ public class KnowledgeDocumentProcessingService {
         int reclaimed =
                 knowledgeDocumentMapper.reclaimStaleProcessing(
                         document.getId(),
-                        staleRecoveryProperties.processingCutoff()
+                        staleRecoveryProperties.processingCutoff(),
+                        attemptId
                 );
         if (reclaimed == 1) {
             return;
@@ -206,14 +241,6 @@ public class KnowledgeDocumentProcessingService {
         );
     }
 
-    private void reconcileExistingVectors(KnowledgeDocument document) {
-        vectorStoreClient.deleteByDocumentId(document.getId());
-        knowledgeChunkMapper.deleteByDocumentIdAndVersion(
-                document.getId(),
-                document.getDocumentVersion()
-        );
-    }
-
     private ProcessingItems buildProcessingItems(
             KnowledgeDocument document,
             List<KnowledgeChunkDraft> drafts,
@@ -230,7 +257,7 @@ public class KnowledgeDocumentProcessingService {
 
             EmbeddingVector embeddingVector = orderedVectors.get(index);
 
-            String vectorId = UUID.randomUUID().toString();
+            String vectorId = document.getProcessingAttemptId() + "-" + draft.chunkIndex();
 
             vectorIds.add(vectorId);
 
@@ -342,8 +369,9 @@ public class KnowledgeDocumentProcessingService {
             );
         } catch (RuntimeException compensationException) {
             log.error(
-                    "Milvus compensation failed,documentId = {}",
+                    "Milvus compensation failed, documentId = {}, vectorIds = {}",
                     documentId,
+                    vectorIds,
                     compensationException
             );
 
@@ -353,6 +381,7 @@ public class KnowledgeDocumentProcessingService {
 
     private void markDocumentFailed(
             Long documentId,
+            String attemptId,
             String failureMessage,
             RuntimeException originalException
     ) {
@@ -360,7 +389,8 @@ public class KnowledgeDocumentProcessingService {
             int updatedRows =
                         knowledgeDocumentMapper.markFailed(
                                 documentId,
-                                failureMessage
+                                failureMessage,
+                                attemptId
                         );
 
             if (updatedRows != 1) {

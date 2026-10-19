@@ -10,6 +10,11 @@ import java.util.List;
 @Mapper
 public interface KnowledgeChunkMapper {
 
+    List<String> listVectorIdsByDocumentIdAndVersion(
+            @Param("documentId") Long documentId,
+            @Param("documentVersion") Integer documentVersion
+    );
+
     int batchInsert(@Param("chunks") List<KnowledgeChunk> chunks);
 
     int deleteByDocumentIdAndVersion(

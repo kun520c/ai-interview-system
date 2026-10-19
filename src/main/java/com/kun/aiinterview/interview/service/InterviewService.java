@@ -33,6 +33,7 @@ import com.kun.aiinterview.question.enums.QuestionDifficulty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -285,6 +286,10 @@ public class InterviewService {
                     request,
                     exception
             );
+        } catch (PessimisticLockingFailureException exception) {
+            // The short submission transaction has rolled back. Keep the original requestId
+            // for a later replay; do not turn expected InnoDB lock contention into HTTP 500.
+            throw new ConflictException("答案提交发生并发冲突，请使用原requestId重试", exception);
         }
 
         workflowService.evaluateAnswer(answer.getId());
