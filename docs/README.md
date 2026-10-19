@@ -1,6 +1,6 @@
 # AI 模拟面试系统文档导航
 
-> 初次查看项目建议从 [项目展示首页](../README.md) 开始；需要本地运行时查看 [环境初始化与启动教程](GETTING_STARTED.md)。[旧版完整技术说明（截至 2026-10-15）](PROJECT_TECHNICAL_DETAILS_20261015.md) 留存历史设计及配置细节，最新测试结果以项目首页和 V3 验收报告为准。
+> 初次查看项目建议从 [项目展示首页](../README.md) 开始；需要本地运行时查看 [环境初始化与启动教程](GETTING_STARTED.md)。[旧版完整技术说明（截至 2026-10-15）](PROJECT_TECHNICAL_DETAILS_20261015.md) 留存历史设计及配置细节，最新测试结果以项目首页和 [2026-10-19 并发最终验收](verification/CONCURRENCY_FINAL_ACCEPTANCE_20261019.md)为准；V3 验收报告保留 10 月 18 日的历史基线。
 
 ## 1. 我第一次看这个项目应该看什么
 
@@ -19,6 +19,9 @@
 - [设计目录](design/)
 - [AI 模拟面试系统项目设计记录 v1.1](design/AI模拟面试系统-项目设计记录-v1.1.md)
 - [项目规则与当前阶段](../AGENTS.md)
+- [Attempt Fencing 与超时接管设计](design/timeout-task-fencing.md)：旧线程晚返回时如何阻止覆盖新线程的 MySQL 结果，并隔离 Milvus 向量
+- [并发专项真实 MySQL/Milvus 验收（2026-10-19）](verification/CONCURRENCY_FINAL_ACCEPTANCE_20261019.md)：真实交错、迟到插入与对账清理的测试结论
+- [并发最终集成和迁移验收（2026-10-19）](verification/CONCURRENCY_FINAL_INTEGRATION_20261019.md)：事务、测试统计与升级注意事项
 
 ## 3. 题库
 
@@ -88,7 +91,9 @@ GitHub 交付审查见 [V3 发布前独立审查](frontend/V3_PUBLICATION_REVIEW
 - [数据环境审计闭环验证](environment/数据环境审计-闭环验证.md)
 - [Phase 0.5 环境清理与隔离验证](environment/Phase0.5-环境清理与隔离验证.md)
 - [环境清理 manifest](environment/PHASE_0_5_CLEANUP_MANIFEST.md)：自动生成，保留文件名。
-- [数据库 SQL](../sql/ai_interview.sql)：原路径与结构不变。
+- [数据库 SQL](../sql/ai_interview.sql)：供新建数据库初始化
+- [旧库并发身份字段增量迁移](../sql/migrations/20261015_timeout_attempt_fencing.sql)：仅在完成备份和停止旧实例后，按缺失列情况执行；新建库不重复迁移
+- [Milvus 孤立向量手动维护](../tools/orphan-vectors/README.md)：需排空旧任务、核对目标，默认 dry-run，不自动定期删除
 - [环境工具目录](environment/scripts/)：机器固定路径，JSON 证据保留原始内容。
 
 普通测试使用独立 test schema；真实 Smoke Tests 与 AI Baseline 必须遵循 [AGENTS.md](../AGENTS.md) 中的隔离和显式 opt-in 规则。
