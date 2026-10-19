@@ -33,6 +33,27 @@ EXIT;
 
 `sql/ai_interview.sql` 建立 `ai_interview` 数据库及 13 张表，**不会创建演示账号或初始化面试题目**。请使用你自己新建的本地数据库，不要在已有数据的生产数据库运行此脚本。
 
+### 已有数据库升级到 2026-10-19 并发修复版
+
+如果使用本仓库最新 `sql/ai_interview.sql` **新建空库**，其中已经包含任务身份字段，**不要重复运行增量迁移**。
+
+如果是在**保留原有数据的旧版 `ai_interview` 库**上升级：
+
+1. 先停止并排空所有旧版 Spring Boot 实例以及可能继续写入的文档处理任务，禁止新旧版本同时写入。
+2. 备份旧库并确认备份可恢复；核对当前连接地址、Schema，切勿在其他项目数据库或生产库直接试验。
+3. 检查以下字段是否存在：
+
+   ```sql
+   SELECT DATABASE();
+   SHOW COLUMNS FROM interview_answer LIKE 'attempt_id';
+   SHOW COLUMNS FROM knowledge_document LIKE 'processing_attempt_id';
+   ```
+
+4. 仅为**缺失**的字段执行 `sql/migrations/20261015_timeout_attempt_fencing.sql` 中对应的 `ALTER TABLE`。新增字段分别是 `interview_answer.attempt_id`、`knowledge_document.processing_attempt_id`，均为可空 `varchar(32)`；历史记录无需回填。
+5. 核验两个字段及旧数据、约束后，再启动新版本。MySQL 两条 DDL **不能作为一个整体事务回滚**；部分成功时检查字段状态并补齐，不要盲目重跑。
+
+本项目的超时接管由**后续请求触发**，不是自动后台调度。已发出的 Milvus RPC 可能迟到，正式数据的孤立向量只允许在独立维护窗口依照[手动对账指南](../tools/orphan-vectors/README.md)安全处理；默认 dry-run，不应在日常启动时运行删除。详见[并发设计说明](design/timeout-task-fencing.md)及[2026-10-19 验收记录](verification/CONCURRENCY_FINAL_ACCEPTANCE_20261019.md)。
+
 ## 3. 启动基础后端
 
 在仓库根目录的 PowerShell 中配置本机环境变量：
