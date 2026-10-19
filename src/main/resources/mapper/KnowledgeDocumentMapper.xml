@@ -50,11 +50,16 @@
         <result property="source" column="source"/>
         <result property="documentVersion" column="document_version"/>
         <result property="processingStatus" column="processing_status"/>
+        <result property="processingAttemptId" column="processing_attempt_id"/>
         <result property="errorMessage" column="error_message"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
 
     </resultMap>
+
+    <select id="lockById" resultMap="KnowledgeDocumentResultMap">
+        SELECT * FROM knowledge_document WHERE id = #{id} FOR UPDATE
+    </select>
 
     <update id="markReady">
         UPDATE knowledge_document
@@ -63,6 +68,7 @@
         error_message = NULL
         WHERE id = #{id}
             AND processing_status = 'PROCESSING'
+            AND processing_attempt_id = #{attemptId}
     </update>
 
     <update id="markFailed">
@@ -72,6 +78,7 @@
         error_message = #{errorMessage}
         WHERE id = #{id}
             AND processing_status = 'PROCESSING'
+            AND processing_attempt_id = #{attemptId}
     </update>
 
     <select
@@ -89,6 +96,7 @@
         source,
         document_version,
         processing_status,
+        processing_attempt_id,
         error_message,
         created_at,
         updated_at
@@ -100,6 +108,7 @@
     <update id="claimProcessing">
         UPDATE knowledge_document
         SET
+        processing_attempt_id = #{attemptId},
         processing_status = 'PROCESSING',
         error_message = NULL
         WHERE id = #{id}
@@ -109,6 +118,7 @@
     <update id="reclaimStaleProcessing">
         UPDATE knowledge_document
         SET
+        processing_attempt_id = #{attemptId},
         error_message = NULL,
         updated_at = CURRENT_TIMESTAMP
         WHERE id = #{id}
@@ -119,6 +129,7 @@
     <update id="claimFailedProcessing">
         UPDATE knowledge_document
         SET
+        processing_attempt_id = #{attemptId},
         processing_status = 'PROCESSING',
         error_message = NULL,
         updated_at = CURRENT_TIMESTAMP

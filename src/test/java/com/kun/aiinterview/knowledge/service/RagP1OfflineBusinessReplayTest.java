@@ -132,7 +132,7 @@ class RagP1OfflineBusinessReplayTest {
         }
         var retrievalService = new KnowledgeRetrievalService(embedding, vectors, chunks, properties);
         var adapter = new EvaluationRetrievalAdapter(new EvaluationRagQueryBuilder(), retrievalService);
-        var trace = new RagTracePersistenceService(batches, logs, properties);
+        var trace = new RagTracePersistenceService(batches, logs, properties, org.mockito.Mockito.mock(com.kun.aiinterview.interview.mapper.InterviewAnswerMapper.class));
         var promptBuilder = new EvaluationPromptBuilder();
         var targetResolver = new FollowUpTargetResolver();
         when(contexts.buildContext(1L)).thenReturn(context);
@@ -147,13 +147,6 @@ class RagP1OfflineBusinessReplayTest {
             traceHits.addAll(inserted);
             return inserted.size();
         });
-        var saved = new ArrayList<AnswerEvaluation>();
-        when(answers.insertEvaluation(any())).thenAnswer(inv -> {
-            AnswerEvaluation evaluation = inv.getArgument(0);
-            evaluation.setId(10L);
-            saved.add(evaluation);
-            return 1;
-        });
         var prompts = new ArrayList<EvaluationPrompt>();
         JudgeProvider offlineJudge = (c, prompt) -> {
             prompts.add(prompt);
@@ -166,11 +159,14 @@ class RagP1OfflineBusinessReplayTest {
         var orchestrator = new EvaluationOrchestrationService(contexts, adapter, promptBuilder, offlineJudge,
                 new LlmEvaluationValidator(), new EvaluationScoreCalculator(), new EvaluationStandard(),
                 new FollowUpPolicy(targetResolver), targetResolver, answers, JSON, trace);
-        var result = orchestrator.evaluate(1L, false);
+        var result = orchestrator.evaluate(1L, false, "offline-attempt");
+        assertThat(traceBatches).isEmpty();
+        trace.persist(result.retrievalBatchId(), result.answerId(), result.pendingTrace());
         assertThat(result.totalScore()).isEqualTo(70);
         assertThat(result.evaluationPhase()).isEqualTo(EvaluationPhase.FINAL);
-        assertThat(saved).hasSize(1);
-        assertThat(saved.get(0).getRetrievalBatchId()).isEqualTo(traceBatches.get(0).getRetrievalBatchId());
+        assertThat(result.evaluation()).isNotNull();
+        verify(answers, never()).insertEvaluation(any());
+        assertThat(result.evaluation().getRetrievalBatchId()).isEqualTo(traceBatches.get(0).getRetrievalBatchId());
         assertThat(traceBatches.get(0).getRawHitCount()).isEqualTo(5);
         assertThat(traceBatches.get(0).getEvidenceHitCount()).isEqualTo(retained.size());
         var snapshot = JSON.readTree(traceBatches.get(0).getFilterSnapshot());

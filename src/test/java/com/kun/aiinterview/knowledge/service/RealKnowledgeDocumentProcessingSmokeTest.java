@@ -710,6 +710,8 @@ class RealKnowledgeDocumentProcessingSmokeTest {
             RestClientAutoConfiguration.class
     })
     @Import({
+            com.kun.aiinterview.common.recovery.RecoveryConfiguration.class,
+            com.kun.aiinterview.knowledge.retrieval.RetrievalProperties.class,
             EmbeddingConfiguration.class,
             MilvusConfiguration.class,
             MilvusCollectionInitializer.class,

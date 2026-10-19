@@ -4,6 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.common.exception.ConflictException;
 import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
 import com.kun.aiinterview.interview.entity.InterviewAnswer;
+import com.kun.aiinterview.interview.entity.AnswerEvaluation;
+import com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import com.kun.aiinterview.interview.dto.SubmitInterviewAnswerRequest;
+import com.kun.aiinterview.interview.vo.SubmitInterviewAnswerResponse;
+import org.springframework.beans.factory.ObjectProvider;
 import com.kun.aiinterview.interview.enums.DecisionAction;
 import com.kun.aiinterview.interview.enums.EvaluationPhase;
 import com.kun.aiinterview.interview.enums.InterviewAnswerStatus;
@@ -49,6 +57,9 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles({"local", "test"})
 @Import(InterviewEvaluationClaimConcurrencyIntegrationTest.PausingMapperConfiguration.class)
 class InterviewEvaluationClaimConcurrencyIntegrationTest {
+
+    @Autowired
+    private AnswerEvaluationMapper evaluationMapper;
 
     @Autowired
     private InterviewAnswerMapper interviewAnswerMapper;
@@ -98,6 +109,9 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
     void cleanUp() {
         claimBarrier.disarm();
         if (answerId != null) {
+            jdbcTemplate.update("DELETE FROM rag_hit_log WHERE answer_id = ?", answerId);
+            jdbcTemplate.update("DELETE FROM rag_retrieval_batch WHERE answer_id = ?", answerId);
+            jdbcTemplate.update("DELETE FROM answer_evaluation WHERE answer_id = ?", answerId);
             jdbcTemplate.update(
                     "DELETE FROM interview_answer WHERE id = ?",
                     answerId
@@ -154,7 +168,7 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
         CountDownLatch evaluateEntered = new CountDownLatch(1);
         CountDownLatch releaseEvaluate = new CountDownLatch(1);
         AtomicInteger evaluateCalls = new AtomicInteger();
-        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean()))
+        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean(), org.mockito.ArgumentMatchers.anyString()))
                 .thenAnswer(invocation -> {
                     evaluateCalls.incrementAndGet();
                     evaluateEntered.countDown();
@@ -203,12 +217,12 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
                     .isEqualTo(DecisionAction.FINISH);
 
             verify(evaluationOrchestrationService, times(1))
-                    .evaluate(eq(answerId), anyBoolean());
+                    .evaluate(eq(answerId), anyBoolean(), org.mockito.ArgumentMatchers.anyString());
             assertThat(evaluateCalls.get()).isEqualTo(1);
             assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId)
                     .getStatus())
                     .isEqualTo(InterviewAnswerStatus.EVALUATED);
-            assertThat(countAnswerEvaluations()).isZero();
+            assertThat(countAnswerEvaluations()).isEqualTo(1);
         } finally {
             releaseEvaluate.countDown();
             executor.shutdownNow();
@@ -228,7 +242,7 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
 
     private EvaluationOrchestrationResult finishResult() {
         return new EvaluationOrchestrationResult(
-                401L,
+                null,
                 answerId,
                 interviewQuestionId,
                 EvaluationPhase.FINAL,
@@ -238,8 +252,101 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
                 false,
                 null,
                 List.of(),
-                "retrieval-batch-claim"
+                "retrieval-batch-claim",
+                evaluationDraft(),
+                new com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult(
+                        "claim-test", 5, "test", "test-v1", List.of(), List.of())
         );
+    }
+
+    private AnswerEvaluation evaluationDraft() {
+        return AnswerEvaluation.builder().answerId(answerId).mainInterviewQuestionId(interviewQuestionId)
+                .evaluationPhase(EvaluationPhase.FINAL).decisionAction(DecisionAction.FINISH)
+                .correctnessScore(16).completenessScore(16).depthScore(16).clarityScore(16).practiceScore(16)
+                .totalScore(80).level("GOOD").strengths("[]").missingPoints("[]").correction("")
+                .scoringPointResults("[]").followUpRecommended(false).retrievalBatchId("retrieval-batch-claim")
+                .llmModel("fake").promptVersion("fake").evaluationStandardVersion("fake").rawResult("{}")
+                .build();
+    }
+
+    @ParameterizedTest
+    @CsvSource({"false,false", "true,false", "false,true", "true,true"})
+    void staleWorkerCannotSaveEvaluationOrFailReplacement(boolean oldThrows, boolean replacementFinishesFirst)
+            throws Exception {
+        seedAnswer(InterviewAnswerStatus.SUBMITTED);
+        CountDownLatch oldEntered = new CountDownLatch(1);
+        CountDownLatch newEntered = new CountDownLatch(1);
+        CountDownLatch releaseOld = new CountDownLatch(1);
+        CountDownLatch releaseNew = new CountDownLatch(1);
+        AtomicInteger calls = new AtomicInteger();
+        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean(), org.mockito.ArgumentMatchers.anyString())).thenAnswer(invocation -> {
+            boolean old = calls.incrementAndGet() == 1;
+            (old ? oldEntered : newEntered).countDown();
+            if (!(old ? releaseOld : releaseNew).await(15, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("evaluation latch timed out");
+            }
+            if (old && oldThrows) { throw new IllegalArgumentException("old provider failed"); }
+            var result = finishResult();
+            result.evaluation().setLlmModel(old ? "worker-A" : "worker-B");
+            return result.withPendingTrace(
+                    new com.kun.aiinterview.interview.evaluation.EvaluationRetrievalResult(
+                            old ? "worker-A" : "worker-B", 5, "test", "test-v1", List.of(), List.of()));
+        });
+        try (var executor = Executors.newFixedThreadPool(2)) {
+            Future<ClaimOutcome> old = executor.submit(this::runEvaluateAnswer);
+            assertThat(oldEntered.await(10, TimeUnit.SECONDS)).isTrue();
+            String oldAttempt = interviewAnswerMapper.getInterviewAnswerById(answerId).getAttemptId();
+            jdbcTemplate.update("UPDATE interview_answer SET updated_at = ? WHERE id = ?",
+                    LocalDateTime.now().minusMinutes(20), answerId);
+            Future<ClaimOutcome> replacement = executor.submit(this::runEvaluateAnswer);
+            assertThat(newEntered.await(10, TimeUnit.SECONDS)).isTrue();
+            String newAttempt = interviewAnswerMapper.getInterviewAnswerById(answerId).getAttemptId();
+            assertThat(newAttempt).isNotEqualTo(oldAttempt).hasSize(32);
+            if (replacementFinishesFirst) {
+                releaseNew.countDown();
+                assertThat(replacement.get(10, TimeUnit.SECONDS).error()).isNull();
+            }
+            releaseOld.countDown();
+            var oldOutcome = old.get(10, TimeUnit.SECONDS);
+            assertThat(oldOutcome.error()).isInstanceOf(oldThrows ? IllegalArgumentException.class : ConflictException.class);
+            if (!replacementFinishesFirst) {
+                assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId).getStatus())
+                        .isEqualTo(InterviewAnswerStatus.EVALUATING);
+                assertThat(countAnswerEvaluations()).isZero();
+                assertThat(countTraceBatches()).isZero();
+                releaseNew.countDown();
+                assertThat(replacement.get(10, TimeUnit.SECONDS).error()).isNull();
+            }
+            assertThat(countAnswerEvaluations()).isEqualTo(1);
+            assertThat(countTraceBatches()).isEqualTo(1);
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT query_text FROM rag_retrieval_batch WHERE answer_id = ?", String.class, answerId))
+                    .isEqualTo("worker-B");
+            assertThat(evaluationMapper.getByAnswerId(answerId).getLlmModel()).isEqualTo("worker-B");
+            assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId).getAttemptId()).isEqualTo(newAttempt);
+            assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId).getStatus()).isEqualTo(InterviewAnswerStatus.EVALUATED);
+            assertThat(interviewSessionMapper.getInterviewSessionById(sessionId).getVersion()).isEqualTo(1);
+        } finally {
+            releaseOld.countDown();
+            releaseNew.countDown();
+        }
+    }
+
+    @Test
+    void retryReusesLegacyPersistedEvaluationWithoutDuplicateInsert() {
+        seedAnswer(InterviewAnswerStatus.FAILED);
+        var result = finishResult();
+        assertThat(evaluationMapper.insertEvaluation(result.evaluation())).isEqualTo(1);
+        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean(), org.mockito.ArgumentMatchers.anyString())).thenReturn(result);
+        var replay = workflowService.evaluateAnswer(answerId);
+        assertThat(replay.evaluationId()).isEqualTo(result.evaluation().getId());
+        assertThat(countAnswerEvaluations()).isEqualTo(1);
+        assertThat(interviewAnswerMapper.getInterviewAnswerById(answerId).getStatus()).isEqualTo(InterviewAnswerStatus.EVALUATED);
+    }
+
+    private long countTraceBatches() {
+        return jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM rag_retrieval_batch WHERE answer_id = ?", Long.class, answerId);
     }
 
     private long countAnswerEvaluations() {
@@ -251,6 +358,100 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
         assertThat(count).isNotNull();
         return count;
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"SAME", "CHANGED_CONTENT", "CHANGED_REQUEST"})
+    void simultaneousSubmissionsKeepOneAnswerAndAllowExactReplay(String scenario) throws Exception {
+        seedAnswer(InterviewAnswerStatus.SUBMITTED);
+        jdbcTemplate.update("DELETE FROM interview_answer WHERE id = ?", answerId);
+        answerId = null;
+        jdbcTemplate.update("UPDATE interview_question SET status = 'WAITING_ANSWER' WHERE id = ?", interviewQuestionId);
+        var beforeInsert = new CountDownLatch(2);
+        var releaseInsert = new CountDownLatch(1);
+        var evaluating = new CountDownLatch(1);
+        var releaseEvaluation = new CountDownLatch(1);
+        var submissionTransactions = mock(InterviewWorkflowTransactionService.class);
+        org.mockito.Mockito.doAnswer(i -> {
+            beforeInsert.countDown();
+            assertThat(releaseInsert.await(10, TimeUnit.SECONDS)).isTrue();
+            InterviewAnswer answer = transactionService.submitAnswer(i.getArgument(0), i.getArgument(1));
+            answerId = answer.getId();
+            return answer;
+        }).when(submissionTransactions).submitAnswer(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
+        @SuppressWarnings("unchecked")
+        ObjectProvider<InterviewWorkflowService> provider = mock(ObjectProvider.class);
+        when(provider.getIfAvailable()).thenReturn(workflowService);
+        var service = new InterviewService(mock(InterviewSessionService.class), interviewSessionMapper,
+                interviewQuestionMapper, interviewAnswerMapper, submissionTransactions, evaluationMapper,
+                provider, objectMapper);
+        when(evaluationOrchestrationService.evaluate(org.mockito.ArgumentMatchers.any(), anyBoolean(),
+                org.mockito.ArgumentMatchers.anyString())).thenAnswer(i -> {
+            evaluating.countDown();
+            assertThat(releaseEvaluation.await(10, TimeUnit.SECONDS)).isTrue();
+            return finishResult();
+        });
+        String requestId = UUID.randomUUID().toString();
+        var first = new SubmitInterviewAnswerRequest(interviewQuestionId, "original answer", requestId);
+        var second = new SubmitInterviewAnswerRequest(interviewQuestionId,
+                scenario.equals("CHANGED_CONTENT") ? "different answer" : first.answerContent(),
+                scenario.equals("CHANGED_REQUEST") ? UUID.randomUUID().toString() : requestId);
+        var executor = Executors.newFixedThreadPool(2);
+        var completion = new ExecutorCompletionService<SubmissionOutcome>(executor);
+        try {
+            for (var request : List.of(first, second)) {
+                completion.submit(() -> {
+                    try { return new SubmissionOutcome(service.submitAnswer(userId, sessionId, request), null); }
+                    catch (RuntimeException error) { return new SubmissionOutcome(null, error); }
+                });
+            }
+            assertThat(beforeInsert.await(10, TimeUnit.SECONDS)).isTrue();
+            releaseInsert.countDown();
+            assertThat(evaluating.await(10, TimeUnit.SECONDS)).isTrue();
+            var loser = completion.poll(10, TimeUnit.SECONDS);
+            assertThat(loser).isNotNull();
+            assertThat(loser.get().error()).isInstanceOf(ConflictException.class);
+            releaseEvaluation.countDown();
+            var winner = completion.poll(10, TimeUnit.SECONDS);
+            assertThat(winner).isNotNull();
+            var successful = winner.get();
+            assertThat(successful.error()).isNull();
+            var saved = interviewAnswerMapper.getInterviewAnswerByInterviewQuestionId(interviewQuestionId);
+            assertThat(saved.getStatus()).isEqualTo(InterviewAnswerStatus.EVALUATED);
+            assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM interview_answer WHERE interview_question_id = ?",
+                    Integer.class, interviewQuestionId)).isEqualTo(1);
+            assertThat(countAnswerEvaluations()).isEqualTo(1);
+            assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM rag_retrieval_batch WHERE answer_id = ?",
+                    Integer.class, answerId)).isEqualTo(1);
+            var replay = new SubmitInterviewAnswerRequest(interviewQuestionId, saved.getAnswerContent(), saved.getRequestId());
+            assertThat(service.submitAnswer(userId, sessionId, replay)).isEqualTo(successful.response());
+            assertThat(org.assertj.core.api.Assertions.catchThrowable(() -> service.submitAnswer(userId, sessionId,
+                    new SubmitInterviewAnswerRequest(interviewQuestionId, "altered replay", saved.getRequestId()))))
+                    .isInstanceOf(ConflictException.class).hasMessage("requestId已用于不同的答案内容");
+            verify(evaluationOrchestrationService, times(1)).evaluate(eq(answerId), anyBoolean(),
+                    org.mockito.ArgumentMatchers.anyString());
+        } finally {
+            releaseInsert.countDown();
+            releaseEvaluation.countDown();
+            executor.shutdownNow();
+            assertThat(executor.awaitTermination(10, TimeUnit.SECONDS)).isTrue();
+        }
+    }
+
+    @Test
+    void newRequestRecoversCrashedEvaluatingWithNoLiveOldWorker() {
+        seedAnswer(InterviewAnswerStatus.EVALUATING);
+        jdbcTemplate.update("UPDATE interview_answer SET attempt_id = 'crashed-worker', updated_at = ? WHERE id = ?",
+                LocalDateTime.now().minusMinutes(11), answerId);
+        when(evaluationOrchestrationService.evaluate(eq(answerId), anyBoolean(),
+                org.mockito.ArgumentMatchers.anyString())).thenAnswer(i -> finishResult());
+        assertThat(workflowService.evaluateAnswer(answerId).decisionAction()).isEqualTo(DecisionAction.FINISH);
+        var recovered = interviewAnswerMapper.getInterviewAnswerById(answerId);
+        assertThat(recovered.getStatus()).isEqualTo(InterviewAnswerStatus.EVALUATED);
+        assertThat(recovered.getAttemptId()).isNotEqualTo("crashed-worker");
+        assertThat(countAnswerEvaluations()).isEqualTo(1);
+    }
+
+    private record SubmissionOutcome(SubmitInterviewAnswerResponse response, RuntimeException error) { }
 
     private void seedAnswer(InterviewAnswerStatus status) {
         String unique = UUID.randomUUID().toString().replace("-", "");
@@ -377,6 +578,9 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
         ) {
             return new InterviewAnswerMapper() {
                 @Override
+                public InterviewAnswer lockById(Long id) { return delegate.lockById(id); }
+
+                @Override
                 public InterviewAnswer getInterviewAnswerById(Long id) {
                     return delegate.getInterviewAnswerById(id);
                 }
@@ -412,39 +616,40 @@ class InterviewEvaluationClaimConcurrencyIntegrationTest {
                 }
 
                 @Override
-                public int claimEvaluation(Long id) {
+                public int claimEvaluation(Long id, String attemptId) {
                     return barrier.awaitThenRun(
                             id,
                             EvaluationClaimBarrier.Mode.CLAIM,
-                            () -> delegate.claimEvaluation(id)
+                            () -> delegate.claimEvaluation(id, attemptId)
                     );
                 }
 
                 @Override
-                public int retryEvaluation(Long id) {
+                public int retryEvaluation(Long id, String attemptId) {
                     return barrier.awaitThenRun(
                             id,
                             EvaluationClaimBarrier.Mode.RETRY,
-                            () -> delegate.retryEvaluation(id)
+                            () -> delegate.retryEvaluation(id, attemptId)
                     );
                 }
 
                 @Override
                 public int reclaimStaleEvaluating(
                         Long id,
-                        LocalDateTime cutoff
+                        LocalDateTime cutoff,
+                        String attemptId
                 ) {
-                    return delegate.reclaimStaleEvaluating(id, cutoff);
+                    return delegate.reclaimStaleEvaluating(id, cutoff, attemptId);
                 }
 
                 @Override
-                public int markEvaluated(Long id) {
-                    return delegate.markEvaluated(id);
+                public int markEvaluated(Long id, String attemptId) {
+                    return delegate.markEvaluated(id, attemptId);
                 }
 
                 @Override
-                public int markFailed(Long id, String errorCode) {
-                    return delegate.markFailed(id, errorCode);
+                public int markFailed(Long id, String errorCode, String attemptId) {
+                    return delegate.markFailed(id, errorCode, attemptId);
                 }
             };
         }

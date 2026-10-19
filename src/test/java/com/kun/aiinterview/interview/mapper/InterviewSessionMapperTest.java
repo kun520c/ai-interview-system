@@ -576,7 +576,8 @@ class InterviewSessionMapperTest {
                 1,
                 interviewSessionMapper.reclaimStaleGenerating(
                         staleSessionId,
-                        cutoff
+                        cutoff,
+                        4
                 )
         );
         InterviewSession reclaimed = interviewSessionMapper
@@ -592,14 +593,16 @@ class InterviewSessionMapperTest {
                 0,
                 interviewSessionMapper.reclaimStaleGenerating(
                         staleSessionId,
-                        cutoff
+                        cutoff,
+                        4
                 )
         );
         assertEquals(
                 0,
                 interviewSessionMapper.reclaimStaleGenerating(
                         freshSessionId,
-                        cutoff
+                        cutoff,
+                        4
                 )
         );
         assertEquals(

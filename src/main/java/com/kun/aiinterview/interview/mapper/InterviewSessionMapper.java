@@ -57,7 +57,8 @@ public interface InterviewSessionMapper {
 
     int reclaimStaleGenerating(
             @Param("id") Long id,
-            @Param("cutoff") LocalDateTime cutoff
+            @Param("cutoff") LocalDateTime cutoff,
+            @Param("expectedVersion") Integer expectedVersion
     );
 
     int markReportReady(

@@ -100,70 +100,68 @@ public class InterviewReportService {
         InterviewSession session = loadOwnedSession(sessionId, userId);
         validateCompleted(session);
 
-        InterviewReport existingReport =
-                handleExistingReportStatus(session);
-        if (existingReport != null) {
-            return existingReport;
+        if (session.getReportStatus() == InterviewReportStatus.READY) {
+            return requireExistingReport(sessionId);
         }
-
-        InterviewSession latest = loadOwnedSession(sessionId, userId);
-        validateCompleted(latest);
-        InterviewReportGenerator generator =
-                requireGeneratorFor(latest);
-
-        if (latest.getReportStatus()
-                != InterviewReportStatus.GENERATING) {
-            claimReportGeneration(latest);
+        if (session.getVersion() == null || session.getReportStatus() == null) {
+            throw new IllegalStateException("Session缺少Report状态或version");
         }
-
+        int claimed;
+        if (session.getReportStatus() == InterviewReportStatus.GENERATING) {
+            if (!staleRecoveryProperties.isGeneratingStale(session.getUpdatedAt())) {
+                throw new ConflictException("报告正在生成中，请稍后重试");
+            }
+            claimed = interviewSessionMapper.reclaimStaleGenerating(
+                    sessionId, staleRecoveryProperties.generatingCutoff(), session.getVersion());
+        } else {
+            requireGenerator();
+            claimed = interviewSessionMapper.claimReportGeneration(
+                    sessionId, session.getVersion(), session.getReportStatus());
+        }
+        if (claimed != 1) {
+            InterviewSession latest = loadOwnedSession(sessionId, userId);
+            if (latest.getReportStatus() == InterviewReportStatus.READY) {
+                return requireExistingReport(sessionId);
+            }
+            throw new ConflictException("报告生成状态已发生变化，请重试");
+        }
+        // The successful CAS increments exactly this version. Never reload a newer token.
+        session.setVersion(Math.addExact(session.getVersion(), 1));
+        session.setReportStatus(InterviewReportStatus.GENERATING);
+        int attemptVersion = session.getVersion();
         try {
-            return generateClaimedReport(
-                    userId,
-                    sessionId,
-                    generator
-            );
+            InterviewReport existing = existingReportOrContinue(session);
+            if (existing != null) {
+                return existing;
+            }
+            return generateClaimedReport(session, requireGenerator());
         } catch (RuntimeException original) {
-            recoverReportFailure(sessionId, original);
+            recoverReportFailure(sessionId, attemptVersion, original);
             throw original;
         }
     }
 
+    private InterviewReport requireExistingReport(Long sessionId) {
+        InterviewReport report = interviewReportMapper.getBySessionId(sessionId);
+        if (report == null) {
+            throw new IllegalStateException("Session为READY但Report不存在");
+        }
+        return report;
+    }
+
     private InterviewReport generateClaimedReport(
-            Long userId,
-            Long sessionId,
+            InterviewSession generatingSession,
             InterviewReportGenerator generator
     ) {
-        InterviewSession generatingSession =
-                reloadGeneratingSession(sessionId, userId);
-        List<AnswerEvaluation> evaluations =
-                answerEvaluationMapper
-                        .listFinalEffectiveEvaluationsBySessionId(
-                                sessionId
-                        );
-        validateEvaluations(
-                generatingSession,
-                evaluations
-        );
-
-        BigDecimal overallScore =
-                calculateOverallScore(evaluations);
-        InterviewReportGenerationResult generationResult =
-                generator.generate(
-                        generatingSession,
-                        List.copyOf(evaluations),
-                        overallScore
-                );
-        InterviewReport report = buildReport(
-                sessionId,
-                overallScore,
-                generationResult
-        );
-
-        return transactionService.completeReportGeneration(
-                report,
-                generatingSession,
-                evaluations
-        );
+        Long sessionId = generatingSession.getId();
+        List<AnswerEvaluation> evaluations = answerEvaluationMapper
+                .listFinalEffectiveEvaluationsBySessionId(sessionId);
+        validateEvaluations(generatingSession, evaluations);
+        BigDecimal overallScore = calculateOverallScore(evaluations);
+        InterviewReportGenerationResult generationResult = generator.generate(
+                generatingSession, List.copyOf(evaluations), overallScore);
+        InterviewReport report = buildReport(sessionId, overallScore, generationResult);
+        return transactionService.completeReportGeneration(report, generatingSession, evaluations);
     }
 
     private InterviewSession loadOwnedSession(Long sessionId, Long userId) {
@@ -184,78 +182,6 @@ public class InterviewReportService {
         }
     }
 
-    private InterviewReport handleExistingReportStatus(
-            InterviewSession session
-    ) {
-        if (session.getReportStatus() == null) {
-            throw new IllegalStateException(
-                    "Session缺少Report状态"
-            );
-        }
-
-        return switch (session.getReportStatus()) {
-            case READY -> {
-                InterviewReport report = interviewReportMapper
-                        .getBySessionId(session.getId());
-                if (report == null) {
-                    throw new IllegalStateException(
-                            "Session为READY但Report不存在"
-                    );
-                }
-                yield report;
-            }
-            case GENERATING -> recoverGenerating(session);
-            case NOT_STARTED, FAILED -> null;
-        };
-    }
-
-    private InterviewReport recoverGenerating(InterviewSession session) {
-        if (!staleRecoveryProperties
-                .isGeneratingStale(session.getUpdatedAt())) {
-            throw new ConflictException(
-                    "报告正在生成中，请稍后重试"
-            );
-        }
-
-        int reclaimed = interviewSessionMapper.reclaimStaleGenerating(
-                session.getId(),
-                staleRecoveryProperties.generatingCutoff()
-        );
-        if (reclaimed == 1) {
-            return existingReportOrContinue(session);
-        }
-
-        InterviewSession latest = interviewSessionMapper
-                .getInterviewSessionById(session.getId());
-        if (latest == null) {
-            throw new IllegalStateException(
-                    "Report恢复时Session不存在"
-            );
-        }
-        if (!Objects.equals(latest.getUserId(), session.getUserId())) {
-            throw new IllegalStateException(
-                    "Report恢复后Session不属于当前用户"
-            );
-        }
-
-        return switch (latest.getReportStatus()) {
-            case READY -> {
-                InterviewReport report = interviewReportMapper
-                        .getBySessionId(latest.getId());
-                if (report == null) {
-                    throw new IllegalStateException(
-                            "Session为READY但Report不存在"
-                    );
-                }
-                yield report;
-            }
-            case FAILED, NOT_STARTED -> null;
-            case GENERATING -> throw new ConflictException(
-                    "报告正在生成中，请稍后重试"
-            );
-        };
-    }
-
     private InterviewReport existingReportOrContinue(
             InterviewSession session
     ) {
@@ -265,18 +191,14 @@ public class InterviewReportService {
             return null;
         }
 
-        InterviewSession generating = reloadGeneratingSession(
-                session.getId(),
-                session.getUserId()
-        );
         if (report.getOverallScore() == null) {
             throw new IllegalStateException(
                     "已有Report缺少overallScore"
             );
         }
         int affectedRows = interviewSessionMapper.markReportReady(
-                generating.getId(),
-                generating.getVersion(),
+                session.getId(),
+                session.getVersion(),
                 report.getOverallScore()
         );
         if (affectedRows != 1) {
@@ -296,70 +218,6 @@ public class InterviewReportService {
             );
         }
         return generator;
-    }
-
-    private InterviewReportGenerator requireGeneratorFor(
-            InterviewSession session
-    ) {
-        try {
-            return requireGenerator();
-        } catch (BusinessException exception) {
-            if (session.getReportStatus()
-                    == InterviewReportStatus.GENERATING) {
-                recoverReportFailure(session.getId(), exception);
-            }
-            throw exception;
-        }
-    }
-
-    private void claimReportGeneration(InterviewSession session) {
-        int affectedRows = interviewSessionMapper
-                .claimReportGeneration(
-                        session.getId(),
-                        session.getVersion(),
-                        session.getReportStatus()
-                );
-        if (affectedRows != 1) {
-            throw new ConflictException(
-                    "报告生成状态已发生变化，请重试"
-            );
-        }
-    }
-
-    private InterviewSession reloadGeneratingSession(
-            Long sessionId,
-            Long userId
-    ) {
-        InterviewSession session = interviewSessionMapper
-                .getInterviewSessionById(sessionId);
-        if (session == null) {
-            throw new IllegalStateException(
-                    "Report claim后Session不存在"
-            );
-        }
-
-        if (!Objects.equals(session.getUserId(), userId)) {
-            throw new IllegalStateException(
-                    "Report claim后Session不属于当前用户"
-            );
-        }
-        if (session.getStatus() != InterviewSessionStatus.COMPLETED) {
-            throw new IllegalStateException(
-                    "Report claim后Session状态不是COMPLETED"
-            );
-        }
-        if (session.getReportStatus()
-                != InterviewReportStatus.GENERATING) {
-            throw new IllegalStateException(
-                    "Report claim后Session状态不是GENERATING"
-            );
-        }
-        if (session.getVersion() == null) {
-            throw new IllegalStateException(
-                    "Report claim后Session缺少version"
-            );
-        }
-        return session;
     }
 
     private void validateEvaluations(
@@ -530,32 +388,10 @@ public class InterviewReportService {
         }
     }
 
-    private void recoverReportFailure(
-            Long sessionId,
-            RuntimeException original
-    ) {
+    private void recoverReportFailure(Long sessionId, int attemptVersion, RuntimeException original) {
         try {
-            InterviewSession latest = interviewSessionMapper
-                    .getInterviewSessionById(sessionId);
-            if (latest == null) {
-                throw new IllegalStateException(
-                        "Report失败恢复时Session不存在"
-                );
-            }
-
-            if (latest.getReportStatus()
-                    == InterviewReportStatus.GENERATING) {
-                int affectedRows = interviewSessionMapper
-                        .markReportFailed(
-                                latest.getId(),
-                                latest.getVersion()
-                        );
-                if (affectedRows != 1) {
-                    throw new IllegalStateException(
-                            "Report状态更新为FAILED失败"
-                    );
-                }
-            }
+            // Zero rows means this task has lost ownership; no latest-version retry is allowed.
+            interviewSessionMapper.markReportFailed(sessionId, attemptVersion);
         } catch (RuntimeException recovery) {
             original.addSuppressed(recovery);
         }
