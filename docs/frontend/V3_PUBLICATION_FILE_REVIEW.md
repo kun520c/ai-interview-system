@@ -197,11 +197,11 @@
 | `docs/frontend/v3/integration/maven-summary.json` | 最初集成阶段的历史证据：maven-summary；当前结论由B1/B2最终报告接续 | 纳入提交 |
 | `docs/frontend/v3/integration/proposed-model-error-classification.patch` | 最初集成阶段的历史证据：proposed-model-error-classification；当前结论由B1/B2最终报告接续 | 纳入提交 |
 | `docs/frontend/v3/integration/provider-summary.json` | 最初集成阶段的历史证据：provider-summary；当前结论由B1/B2最终报告接续 | 纳入提交 |
-| `docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-admin-knowledge.png` | 真实Spring Boot/独立MySQL和本地模型的代表截图：REAL_BACKEND_LOCAL_AI-admin-knowledge.png | 纳入提交 |
-| `docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-admin-question-list.png` | 真实Spring Boot/独立MySQL和本地模型的代表截图：REAL_BACKEND_LOCAL_AI-admin-question-list.png | 纳入提交 |
-| `docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-final-first-question.png` | 真实Spring Boot/独立MySQL和本地模型的代表截图：REAL_BACKEND_LOCAL_AI-final-first-question.png | 纳入提交 |
-| `docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-final-report.png` | 真实Spring Boot/独立MySQL和本地模型的代表截图：REAL_BACKEND_LOCAL_AI-final-report.png | 纳入提交 |
-| `docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-main-feedback-1.png` | 真实Spring Boot/独立MySQL和本地模型的代表截图：REAL_BACKEND_LOCAL_AI-main-feedback-1.png | 纳入提交 |
+| `docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-admin-knowledge.png` | 真实Spring Boot/独立MySQL和本地 Mock 模型/向量替身（loopback mock，非真实 LLM）的代表截图：REAL_BACKEND_LOCAL_AI-admin-knowledge.png | 纳入提交 |
+| `docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-admin-question-list.png` | 真实Spring Boot/独立MySQL和本地 Mock 模型/向量替身（loopback mock，非真实 LLM）的代表截图：REAL_BACKEND_LOCAL_AI-admin-question-list.png | 纳入提交 |
+| `docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-final-first-question.png` | 真实Spring Boot/独立MySQL和本地 Mock 模型/向量替身（loopback mock，非真实 LLM）的代表截图：REAL_BACKEND_LOCAL_AI-final-first-question.png | 纳入提交 |
+| `docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-final-report.png` | 真实Spring Boot/独立MySQL和本地 Mock 模型/向量替身（loopback mock，非真实 LLM）的代表截图：REAL_BACKEND_LOCAL_AI-final-report.png | 纳入提交 |
+| `docs/frontend/v3/integration/screenshots/REAL_BACKEND_LOCAL_AI-main-feedback-1.png` | 真实Spring Boot/独立MySQL和本地 Mock 模型/向量替身（loopback mock，非真实 LLM）的代表截图：REAL_BACKEND_LOCAL_AI-main-feedback-1.png | 纳入提交 |
 | `docs/frontend/v3/integration/service-safety-checks.json` | 最初集成阶段的历史证据：service-safety-checks；当前结论由B1/B2最终报告接续 | 纳入提交 |
 | `docs/frontend/v3/integration/workspace-preservation.json` | 最初集成阶段的历史证据：workspace-preservation；当前结论由B1/B2最终报告接续 | 纳入提交 |
 | `docs/frontend/v3/references/README.md` | 设计、验证或来源说明：README.md | 纳入提交 |

@@ -25,7 +25,7 @@
 | --- | --- |
 | 应用 | Java 21、Spring Boot 3.5.16、Spring Web、Jakarta Bean Validation |
 | 身份认证 | Spring Security、BCrypt、JJWT 0.13.0；受保护请求重新查询数据库中的用户状态与角色 |
-| 数据存储 | MySQL 8.0、MyBatis 3.0.5；13 张核心表，保存业务状态、快照、评分与检索轨迹 |
+| 数据存储 | MySQL 8.0、MyBatis（mybatis-spring-boot-starter 3.0.5）；13 张核心表，保存业务状态、快照、评分与检索轨迹 |
 | 向量检索 | Milvus Java SDK 2.6.20；COSINE TopK；MySQL 回查正文并检查数据资格 |
 | Embedding | Spring AI 1.1.8 的 OpenAI 兼容适配，连接百炼 / DashScope；默认 `qwen3.7-text-embedding`、1024 维 |
 | 评分与报告 | Spring RestClient 调用 DeepSeek；可选 Jev Judge 组合策略；Java 校验结构化输出并计算总分 |

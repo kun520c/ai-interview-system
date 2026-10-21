@@ -12,18 +12,18 @@
 
 ## 界面预览
 
-**工作台：开始或继续当前训练**
+**工作台：开始或继续当前训练（Mock 数据）**
 
 ![V3 工作台：本地 Mock 数据界面](docs/frontend/v3/after/dashboard-start-1440.png)
 
 <table>
   <tr>
     <td width="50%">
-      <strong>面试作答与五维反馈</strong><br/>
+      <strong>面试作答与五维反馈（Mock 数据）</strong><br/>
       <img alt="V3 面试评价页，本地 Mock 数据" src="docs/frontend/v3/after/session-evaluation-1440.png" />
     </td>
     <td width="50%">
-      <strong>面试报告与改进建议</strong><br/>
+      <strong>面试报告与改进建议（Mock 数据）</strong><br/>
       <img alt="V3 面试报告页，本地 Mock 数据" src="docs/frontend/v3/after/report-1440.png" />
     </td>
   </tr>
@@ -138,7 +138,7 @@ npm run dev
 | 真实 MySQL + Milvus A/B 任务交错和维护验收 | 独立运行 **10 项通过**；包括超时接管、迟到插入、定向补偿和安全对账 |
 | Vue Typecheck / ESLint / Build | 均通过 |
 | Vue Vitest | **293 项通过**，0 失败 |
-| 完整浏览器 `full` | **49 项检查通过**；真实 Spring Boot + 隔离 MySQL，模型/向量为本地替身 |
+| 完整浏览器 `full` | **49 项检查通过**；真实后端 + 本地 Mock AI（真实 Spring Boot + 隔离 MySQL，模型/向量为本地 Mock/替身） |
 
 默认 Maven 的 19 项跳过为需要显式启用的外部服务 / AI Baseline 测试；真实 MySQL/Milvus 测试是在隔离环境中**另行启用**，并非默认 Maven 全量自动执行。真实交错专项中的部分临时测试源码、日志保存在开发者本地忽略的验收目录；公开仓库包含设计、核心回归及结果报告，不将临时证据描述为云端 CI。
 
