@@ -90,7 +90,9 @@ class JevScorePrecisionCompatibilityTest {
         }
         expectResponse(response);
         stubFeedback();
+
         var result = provider.evaluate(context, prompt);
+
         assertThat(result.model()).isEqualTo("jev-1.13.0");
         assertThat(result.promptVersion()).isEqualTo(JevJudgeProvider.PROMPT_VERSION);
         var rawJudge = mapper.readTree(result.rawJson()).path("judge");
@@ -156,6 +158,7 @@ class JevScorePrecisionCompatibilityTest {
         putScore(response, "clarityScore", 3.56789, 0, 0, 0, 0.43211, 0.56789);
         expectResponse(response);
         stubFeedback();
+
         assertThat(provider.evaluate(context, prompt).suggestion().clarityScore()).isEqualTo(18);
         verifyNoInteractions(fallback);
     }
@@ -184,6 +187,7 @@ class JevScorePrecisionCompatibilityTest {
         }
         assertThat(expectation).isEqualByComparingTo("3.56");
         stubFeedback();
+
         assertThat(provider.evaluate(context, prompt).model()).isEqualTo("jev-1.13.0");
         verifyNoInteractions(fallback);
     }
@@ -265,6 +269,7 @@ class JevScorePrecisionCompatibilityTest {
         putScore(response, "clarityScore", level, probabilities);
         expectResponse(response);
         stubFeedback();
+
         assertThat(provider.evaluate(context, prompt).suggestion().clarityScore()).isEqualTo(level * 5);
         verifyNoInteractions(fallback);
     }
@@ -282,6 +287,7 @@ class JevScorePrecisionCompatibilityTest {
         expectResponse(response);
         if (accepted) {
             stubFeedback();
+
             assertThat(provider.evaluate(context, prompt).suggestion().clarityScore())
                     .isEqualTo(JevJudgeProvider.mapScore(score));
             verifyNoInteractions(fallback);
@@ -301,6 +307,7 @@ class JevScorePrecisionCompatibilityTest {
         expectResponse(response);
         if (accepted) {
             stubFeedback();
+
             assertThat(provider.evaluate(context, prompt).model()).isEqualTo("jev-1.13.0");
             verifyNoInteractions(fallback);
         } else {

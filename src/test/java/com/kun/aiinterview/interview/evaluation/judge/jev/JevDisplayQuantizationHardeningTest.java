@@ -203,6 +203,7 @@ class JevDisplayQuantizationHardeningTest {
     private void assertOutcome(boolean accepted) {
         if (accepted) {
             stubFeedback();
+
             assertThat(provider.evaluate(context, prompt).model()).isEqualTo("jev-1.13.0");
             verifyNoInteractions(fallback);
             verify(feedback, times(1)).completeJson(anyString(), anyString());

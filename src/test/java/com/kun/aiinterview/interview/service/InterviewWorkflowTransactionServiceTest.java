@@ -92,6 +92,7 @@ class InterviewWorkflowTransactionServiceTest {
         draft.setId(null);
         when(answerEvaluationMapper.getByAnswerId(ANSWER_ID)).thenReturn(null);
         when(answerEvaluationMapper.insertEvaluation(draft)).thenReturn(rows);
+
         assertThatThrownBy(() -> service.finishSession(
                         ANSWER_ID,
                         mainQuestion(),
@@ -101,6 +102,7 @@ class InterviewWorkflowTransactionServiceTest {
                         trace()
                 ))
                 .isInstanceOf(IllegalStateException.class).hasMessage("AnswerEvaluation写入失败");
+
         verify(interviewAnswerMapper, never()).markEvaluated(any(), any());
     }
 
@@ -110,6 +112,7 @@ class InterviewWorkflowTransactionServiceTest {
         draft.setId(null);
         when(answerEvaluationMapper.getByAnswerId(ANSWER_ID)).thenReturn(null);
         when(answerEvaluationMapper.insertEvaluation(draft)).thenReturn(1);
+
         assertThatThrownBy(() -> service.finishSession(
                         ANSWER_ID,
                         mainQuestion(),
@@ -119,6 +122,7 @@ class InterviewWorkflowTransactionServiceTest {
                         trace()
                 ))
                 .isInstanceOf(IllegalStateException.class).hasMessage("AnswerEvaluation主键未回填");
+
         verify(interviewAnswerMapper, never()).markEvaluated(any(), any());
     }
 
@@ -127,9 +131,11 @@ class InterviewWorkflowTransactionServiceTest {
         var draft = evaluation();
         draft.setId(null);
         when(answerEvaluationMapper.getByAnswerId(ANSWER_ID)).thenReturn(null);
+
         assertThatThrownBy(() -> service.finishSession(ANSWER_ID, mainQuestion(),
                 session(MAIN_QUESTION_ID), "attempt-test", draft, null))
                 .isInstanceOf(IllegalArgumentException.class).hasMessage("新评价缺少待提交RAG轨迹");
+
         verify(answerEvaluationMapper, never()).insertEvaluation(any());
         verify(interviewAnswerMapper, never()).markEvaluated(any(), any());
     }

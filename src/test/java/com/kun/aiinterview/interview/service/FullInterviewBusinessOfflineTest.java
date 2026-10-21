@@ -175,6 +175,7 @@ class FullInterviewBusinessOfflineTest {
         request("POST","/api/interviews/"+sessionId+"/report",null,409);
         assertThat(request("POST","/api/interviews",Map.of("difficulty","EASY"),200).path("sessionId").asLong()).isEqualTo(sessionId);
         JsonNode current=created.path("currentQuestion");
+
         for(int index=1;index<=6;index++) {
             long questionId=current.path("interviewQuestionId").asLong();
             var body=Map.of("interviewQuestionId",questionId,"answerContent","Offline candidate answer "+index,"requestId",UUID.randomUUID().toString());
@@ -203,6 +204,7 @@ class FullInterviewBusinessOfflineTest {
                 assertThat(response.path("nextQuestion").isNull()).isTrue();
             } else current=response.path("nextQuestion");
         }
+
         assertThat(request("GET","/api/interviews/current",null,200).isNull()).isTrue();
         var report=request("POST","/api/interviews/"+sessionId+"/report",null,200);
         assertThat(report.path("overallScore").decimalValue()).isEqualByComparingTo("80.00");

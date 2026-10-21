@@ -39,6 +39,7 @@ class FollowUpOutputCompletenessHardeningTest {
                 "主回答", "追问", "追问回答", List.of(103L, 104L));
         var prompt = new EvaluationPromptBuilder().build(context, new EvaluationRetrievalResult(
                 "本地查询", 5, "offline-embedding", "offline-version", List.of(), List.of()));
+
         var builder = RestClient.builder().baseUrl("http://localhost");
         var server = MockRestServiceServer.bindTo(builder).build();
         var properties = new DeepSeekProperties();
@@ -57,6 +58,7 @@ class FollowUpOutputCompletenessHardeningTest {
         var outer = mapper.createObjectNode().put("model", "deepseek-flash");
         outer.putArray("choices").addObject().put("index", 0).put("finish_reason", "stop")
                 .putObject("message").put("role", "assistant").put("content", inner.toString());
+
         server.expect(requestTo("http://localhost/chat/completions"))
                 .andExpect(jsonPath("$.messages[0].content").value(containsString("完整MAIN评分点ID列表：[101, 102, 103, 104]")))
                 .andExpect(jsonPath("$.messages[0].content").value(containsString("禁止只输出targets")))
@@ -64,7 +66,9 @@ class FollowUpOutputCompletenessHardeningTest {
                 .andExpect(jsonPath("$.thinking.type").value("disabled"))
                 .andExpect(jsonPath("$.tools").doesNotExist())
                 .andRespond(withSuccess(outer.toString(), MediaType.APPLICATION_JSON));
+
         var result = client.evaluate(prompt);
+
         assertThat(result.rawJson()).isEqualTo(inner.toString());
         assertThat(result.suggestion().scoringPointResults()).hasSize(complete ? 4 : 2);
         if (complete) {

@@ -72,7 +72,9 @@ class JevJudgeProviderTest {
                 .andExpect(jsonPath("$.state").value(prompt.userPrompt()))
                 .andRespond(withSuccess(validResponse().toString(), MediaType.APPLICATION_JSON));
         stubFeedback(validFeedback("CAS保护状态推进", "请解释并发冲突"));
+
         var result = provider.evaluate(context, prompt);
+
         assertThat(result.model()).isEqualTo("jev-1.13.0");
         assertThat(result.promptVersion()).isEqualTo("jev-judge-v3");
         var validated = validator.validate(context, result.suggestion());
@@ -99,9 +101,12 @@ class JevJudgeProviderTest {
         assertThat(request.questions().get("correctnessScore").criteria()).isEqualTo(List.of(
                 "无正确技术内容或关键结论错误", "少量正确内容但有重大错误", "基本结论正确但有明显不准确处",
                 "关键结论与机制正确，仅少量瑕疵", "技术事实与机制准确，无实质错误"));
+
         expectResponse(validResponse().toString());
         stubFeedback(validFeedback("CAS保护状态推进", "请解释并发冲突"));
+
         provider.evaluate(context, prompt);
+
         verify(deepSeek).completeJson(argThat(system -> system.contains("不能添加候选人未说的机制或场景")
                         && system.contains("不能把未出现的错误观点归给候选人")
                         && system.contains("不能再称为遗漏")
@@ -114,11 +119,14 @@ class JevJudgeProviderTest {
     void followUpAnswerUsesCombinedAnswersAndCannotAskAnotherFollowUp() {
         useMode(EvaluationMode.FOLLOW_UP_ANSWER);
         assertThat(provider.buildRequest(context, prompt).questions()).doesNotContainKey("followUp");
+
         server.expect(requestTo("http://localhost/v1/systemone"))
                 .andExpect(jsonPath("$.state").value(prompt.userPrompt()))
                 .andRespond(withSuccess(validResponse().toString(), MediaType.APPLICATION_JSON));
         stubFeedback(validFeedback("版本号比较避免重复推进", null));
+
         var result = provider.evaluate(context, prompt);
+
         assertThat(result.suggestion().followUpRecommended()).isFalse();
         assertThat(result.suggestion().suggestedFollowUp()).isNull();
         assertThat(result.suggestion().scoringPointResults().getFirst().evidence())
@@ -132,9 +140,12 @@ class JevJudgeProviderTest {
         var followUp = answer(response, "followUp");
         followUp.put("choice", "no");
         followUp.withObject("/probabilities").put("yes", 0.1).put("no", 0.9);
+
         expectResponse(response.toString());
         stubFeedback(validFeedback("CAS保护状态推进", null));
+
         var result = provider.evaluate(context, prompt);
+
         assertThat(result.suggestion().followUpRecommended()).isFalse();
         assertThat(result.suggestion().suggestedFollowUp()).isNull();
         verify(deepSeek, never()).evaluate(any());
@@ -145,6 +156,7 @@ class JevJudgeProviderTest {
         expectResponse(validResponse().toString());
         when(deepSeek.completeJson(anyString(), anyString()))
                 .thenThrow(new ExternalServiceException("generation unavailable"));
+
         assertFallback();
     }
 
@@ -154,6 +166,7 @@ class JevJudgeProviderTest {
         answer(response, "correctnessScore").put("confidence", 0);
         expectResponse(response.toString());
         stubFeedback(validFeedback("CAS保护状态推进", "请解释并发冲突"));
+
         assertThat(provider.evaluate(context, prompt).model()).startsWith("jev");
         verify(deepSeek, never()).evaluate(any());
     }
@@ -162,6 +175,7 @@ class JevJudgeProviderTest {
     void configuredLowConfidenceFallsBackBeforeGeneration() {
         properties.setMinConfidence(0.9);
         expectResponse(validResponse().toString());
+
         assertFallback();
         verify(deepSeek, never()).completeJson(anyString(), anyString());
     }
@@ -177,6 +191,7 @@ class JevJudgeProviderTest {
         probabilities.put("covered".equals(choice) ? "uncovered" : "covered", 0.1);
         probabilities.putNull(choice);
         expectResponse(response.toString());
+
         assertFallback();
         verify(deepSeek, never()).completeJson(anyString(), anyString());
     }
@@ -188,6 +203,7 @@ class JevJudgeProviderTest {
         RuntimeException failure = "null-pointer".equals(scenario)
                 ? new NullPointerException("internal defect") : new IndexOutOfBoundsException("internal defect");
         when(deepSeek.completeJson(anyString(), anyString())).thenThrow(failure);
+
         assertThatThrownBy(() -> provider.evaluate(context, prompt)).isSameAs(failure);
         verify(deepSeek, never()).evaluate(any());
         verify(deepSeek, times(1)).completeJson(anyString(), anyString());
@@ -205,6 +221,7 @@ class JevJudgeProviderTest {
                 points, context.mainAnswerContent(), null, null, List.of());
         prompt = new EvaluationPromptBuilder().build(context,
                 new EvaluationRetrievalResult("query without answer", 5, "embedding", "v1", List.of(), List.of()));
+
         expectResponse(validResponse().toString());
         var feedback = mapper.createObjectNode();
         feedback.putArray("strengths");
@@ -217,7 +234,9 @@ class JevJudgeProviderTest {
                     .put("evidence", point.scoringPointId() == 101L ? "CAS保护状态推进" : null);
         }
         stubFeedback(feedback.toString());
+
         var result = provider.evaluate(context, prompt);
+
         var suggestion = result.suggestion();
         assertThat(List.of(suggestion.correctnessScore(), suggestion.completenessScore(), suggestion.depthScore(),
                 suggestion.clarityScore(), suggestion.practiceScore())).containsExactly(17, 17, 17, 17, 17);
@@ -236,6 +255,7 @@ class JevJudgeProviderTest {
     void httpFailureFallsBackOnceToOriginalDeepSeekJudge(int status) {
         server.expect(requestTo("http://localhost/v1/systemone"))
                 .andRespond(withStatus(HttpStatusCode.valueOf(status)).body("private-data"));
+
         assertFallback();
         verify(deepSeek, never()).completeJson(anyString(), anyString());
     }
@@ -249,7 +269,9 @@ class JevJudgeProviderTest {
                 List.of(new LlmEvaluationSuggestion.ScoringPointResult(101L, true, "CAS保护状态推进"),
                         new LlmEvaluationSuggestion.ScoringPointResult(102L, false, null)), false, null);
         when(deepSeek.evaluate(prompt)).thenReturn(new DeepSeekEvaluationResult("offline-deepseek", "stop", "{}", suggestion));
+
         var result = provider.evaluate(context, prompt);
+
         assertThat(result.model()).isEqualTo("offline-deepseek");
         assertThatCode(() -> validator.validate(context, result.suggestion())).doesNotThrowAnyException();
         verify(deepSeek, times(1)).evaluate(prompt);
@@ -260,6 +282,7 @@ class JevJudgeProviderTest {
     void timeoutFallsBackOnceToOriginalDeepSeekJudge() {
         server.expect(requestTo("http://localhost/v1/systemone"))
                 .andRespond(request -> { throw new SocketTimeoutException(); });
+
         assertFallback();
     }
 
@@ -291,6 +314,7 @@ class JevJudgeProviderTest {
             default -> throw new AssertionError(scenario);
         }
         expectResponse("malformed".equals(scenario) ? body : response.toString());
+
         assertFallback();
         verify(deepSeek, never()).completeJson(anyString(), anyString());
     }
@@ -318,6 +342,7 @@ class JevJudgeProviderTest {
             default -> throw new AssertionError(scenario);
         }
         stubFeedback(List.of("malformed", "null").contains(scenario) ? body : feedback.toString());
+
         assertFallback();
     }
 
@@ -326,6 +351,7 @@ class JevJudgeProviderTest {
         expectResponse("{}");
         var failure = new ExternalServiceException("DeepSeek unavailable");
         when(deepSeek.evaluate(prompt)).thenThrow(failure);
+
         assertThatThrownBy(() -> provider.evaluate(context, prompt)).isSameAs(failure);
         verify(deepSeek, times(1)).evaluate(prompt);
     }
