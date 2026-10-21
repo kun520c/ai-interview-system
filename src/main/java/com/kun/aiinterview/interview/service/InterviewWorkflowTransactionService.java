@@ -395,9 +395,11 @@ public class InterviewWorkflowTransactionService {
                 || !attemptId.equals(current.getAttemptId())) {
             throw new ConflictException("评价任务已失效，请重试");
         }
+
         if (evaluation == null || !Objects.equals(answerId, evaluation.getAnswerId())) {
             throw new IllegalArgumentException("评价结果不属于当前Answer");
         }
+
         AnswerEvaluation existing = answerEvaluationMapper.getByAnswerId(answerId);
         if (existing != null) {
             if (!Objects.equals(existing.getId(), evaluation.getId())) {
@@ -405,9 +407,11 @@ public class InterviewWorkflowTransactionService {
             }
             return; // Legacy persisted evaluations are replayed under the current attempt.
         }
+
         if (pendingTrace == null) {
             throw new IllegalArgumentException("新评价缺少待提交RAG轨迹");
         }
+
         ragTracePersistenceService.persist(evaluation.getRetrievalBatchId(), answerId, pendingTrace);
         if (evaluation.getId() != null
                 || answerEvaluationMapper.insertEvaluation(evaluation) != 1) {
