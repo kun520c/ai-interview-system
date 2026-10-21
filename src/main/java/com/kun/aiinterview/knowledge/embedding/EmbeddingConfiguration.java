@@ -148,6 +148,7 @@ public class EmbeddingConfiguration {
                 replaced = true;
             }
         }
+
         if (!replaced) {
             converters.add(new MappingJackson2HttpMessageConverter(
                     createEmbeddingObjectMapper()

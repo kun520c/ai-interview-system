@@ -458,6 +458,7 @@ public class InterviewWorkflowTransactionService {
         );
         followUpDraft.setReferenceAnswerSnapshot(null);
         followUpDraft.setScoringPointsSnapshot(null);
+
         followUpDraft.setQuestionType(
                 InterviewQuestionType.FOLLOW_UP
         );

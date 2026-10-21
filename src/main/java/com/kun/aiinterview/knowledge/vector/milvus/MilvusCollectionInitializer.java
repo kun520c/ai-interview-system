@@ -202,6 +202,7 @@ public class MilvusCollectionInitializer implements ApplicationRunner {
                         field
                 );
             }
+
             if (fields.putIfAbsent(field.getName(), field) != null) {
                 throw schemaMismatch(
                         "unique field names",
@@ -239,6 +240,7 @@ public class MilvusCollectionInitializer implements ApplicationRunner {
                 .filter(index -> index != null
                         && VECTOR_FIELD.equals(index.getFieldName()))
                 .toList();
+
         if (vectorIndexes.size() != 1) {
             List<String> actualFields = response.getIndexDescriptions()
                     .stream()

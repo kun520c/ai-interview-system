@@ -164,6 +164,7 @@ public class InterviewReportPromptBuilder {
                     json,
                     STRING_LIST_TYPE
             );
+
             if (values == null) {
                 throw new IllegalStateException(
                         "AnswerEvaluation中的" + fieldName + "为空"

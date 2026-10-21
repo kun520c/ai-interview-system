@@ -72,6 +72,7 @@ public class JevProperties {
                     || host.chars().anyMatch(Character::isWhitespace)) {
                 return false;
             }
+
             try {
                 URI address = URI.create("http://" + host + ":" + port);
                 return address.getHost() != null && address.getUserInfo() == null

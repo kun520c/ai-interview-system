@@ -47,6 +47,7 @@ final class JevRequestBudget {
         // Only this one operation runs here; a late result can never start another call.
         var task = new FutureTask<T>(operation::get);
         Thread.ofVirtual().name("jev-budget-call").start(task);
+
         try {
             T result = task.get(nanos, TimeUnit.NANOSECONDS);
             if (available(Duration.ZERO).isZero()) {

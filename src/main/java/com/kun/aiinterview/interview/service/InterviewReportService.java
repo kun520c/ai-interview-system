@@ -381,6 +381,7 @@ public class InterviewReportService {
                     json,
                     STRING_LIST_TYPE
             );
+
             if (values == null) {
                 throw new IllegalStateException(
                         "InterviewReport中的" + fieldName + "为空"

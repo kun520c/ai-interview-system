@@ -29,6 +29,7 @@ final class JevEvaluationTrace {
             else failure = "REQUEST_BUDGET_EXHAUSTED";
             throw new JevStageException(JevStageException.Failure.REQUEST_BUDGET_EXHAUSTED);
         }
+
         long start = budget.elapsedMillis();
         String code = "NONE";
         try {

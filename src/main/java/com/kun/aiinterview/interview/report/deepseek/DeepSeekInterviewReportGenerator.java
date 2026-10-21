@@ -64,11 +64,13 @@ public class DeepSeekInterviewReportGenerator
                 evaluations,
                 overallScore
         );
+
         DeepSeekJsonCompletionResult completion =
                 deepSeekClient.completeJson(
                         prompt.systemPrompt(),
                         prompt.userPrompt()
                 );
+
         DeepSeekInterviewReportResponse response =
                 parseResponse(completion.rawJson());
 
