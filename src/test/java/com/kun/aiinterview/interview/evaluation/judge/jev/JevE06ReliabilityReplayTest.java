@@ -52,11 +52,13 @@ class JevE06ReliabilityReplayTest {
         boolean fallbackInvalid = scenario.path("fallbackInvalid").asBoolean();
         int feedbackCount = nativeInvalid ? 0 : Math.min(invalidAttempts + 1, retries + 1);
         boolean fallsBack = nativeInvalid || invalidAttempts > retries;
+
         var context = new EvaluationContext(1L, 2L, 1L, 2L, EvaluationMode.MAIN_ANSWER,
                 QuestionCategory.JAVA_BASIC, "synthetic-cas", "Explain CAS", "Compare and swap",
                 List.of(new ScoringPointSnapshot(101L, QuestionPointType.CORE, "CAS", 100)),
                 "CAS compares and swaps atomically", null, null, List.of());
         var prompt = new EvaluationPrompt("synthetic-v1", "synthetic system", context.mainAnswerContent());
+
         var nativeBuilder = RestClient.builder().baseUrl("http://jev.offline");
         var nativeServer = MockRestServiceServer.bindTo(nativeBuilder).build();
         var feedbackBuilder = RestClient.builder().baseUrl("http://deepseek.offline");
@@ -69,6 +71,7 @@ class JevE06ReliabilityReplayTest {
         var validator = new LlmEvaluationValidator();
         var provider = new JevJudgeProvider(new JevClient(nativeBuilder.build(), MAPPER), properties,
                 generation, new DeepSeekJudgeProvider(generation), MAPPER, validator);
+
         var nativeBody = nativeResponse(provider.buildRequest(context, prompt));
         var nativeCalls = new AtomicInteger();
         nativeServer.expect(requestTo("http://jev.offline/v1/systemone"))
@@ -77,6 +80,7 @@ class JevE06ReliabilityReplayTest {
                     return withSuccess(nativeInvalid ? "{}" : nativeBody.toString(), MediaType.APPLICATION_JSON)
                             .createResponse(request);
                 });
+
         String validFeedback = JevFeedbackReliabilityTest.structuralFeedback(MAPPER, nativeBody, context).toString();
         var feedbackCalls = new AtomicInteger();
         var fallbackCalls = new AtomicInteger();
@@ -89,6 +93,7 @@ class JevE06ReliabilityReplayTest {
                         return withSuccess(envelope(content), MediaType.APPLICATION_JSON).createResponse(request);
                     });
         }
+
         if (fallsBack) {
             var baseline = new LlmEvaluationSuggestion(fallbackInvalid ? 21 : 10, 11, 12, 13, 14,
                     List.of("synthetic strength"), List.of(), null,
@@ -100,7 +105,9 @@ class JevE06ReliabilityReplayTest {
                                 .createResponse(request);
                     });
         }
+
         var result = provider.evaluate(context, prompt);
+
         if (fallbackInvalid) {
             assertThatThrownBy(() -> validator.validate(context, result.suggestion()))
                     .isInstanceOf(ExternalServiceException.class);

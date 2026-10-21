@@ -89,6 +89,7 @@ class JevFeedbackReliabilityTest {
                 ? new IllegalArgumentException("internal defect") : new IllegalStateException("internal defect");
         when(internal.validate(any(), any())).thenThrow(failure);
         var provider = new JevJudgeProvider(nativeClient, properties, feedback, fallback, mapper, internal);
+
         assertThatThrownBy(() -> provider.evaluate(context, prompt)).isSameAs(failure);
         verify(nativeClient, times(1)).evaluate(any());
         verify(feedback, times(1)).completeJson(anyString(), anyString());
@@ -139,6 +140,7 @@ class JevFeedbackReliabilityTest {
         var row = capture(id);
         var context = arrange(row);
         when(feedback.completeJson(anyString(), anyString())).thenReturn(completion(row.path("feedbackContent").asText()));
+
         assertThat(provider().evaluate(context, prompt)).isSameAs(fallbackResult);
         verify(nativeClient, times(1)).evaluate(any());
         verify(feedback, times(2)).completeJson(anyString(), anyString());
@@ -151,6 +153,7 @@ class JevFeedbackReliabilityTest {
         properties.setFeedbackMaxRetries(0);
         var context = arrange(capture("E02-OFF_TOPIC"));
         when(feedback.completeJson(anyString(), anyString())).thenReturn(completion("{invalid"));
+
         assertThat(provider().evaluate(context, prompt)).isSameAs(fallbackResult);
         verify(feedback).completeJson(anyString(), anyString());
         assertThat(output.getOut()).contains("FEEDBACK_JSON_INVALID", "\"feedbackCalls\":1");
@@ -160,6 +163,7 @@ class JevFeedbackReliabilityTest {
     void nativeCallFailureHasSeparateClassificationAndNeverCallsFeedback(CapturedOutput output) throws Exception {
         var context = arrange(capture("E02-OFF_TOPIC"));
         when(nativeClient.evaluate(any())).thenThrow(new ExternalServiceException("private-api-key-body"));
+
         assertThat(provider().evaluate(context, prompt)).isSameAs(fallbackResult);
         verify(nativeClient).evaluate(any());
         verifyNoInteractions(feedback);
@@ -174,6 +178,7 @@ class JevFeedbackReliabilityTest {
         var invalid = row.path("nativeResponse").deepCopy();
         ((ObjectNode) invalid.at("/answers/correctnessScore")).put("confidence", -1);
         when(nativeClient.evaluate(any())).thenReturn(mapper.treeToValue(invalid, JevResponse.class));
+
         assertThat(provider().evaluate(context, prompt)).isSameAs(fallbackResult);
         verify(nativeClient).evaluate(any());
         verifyNoInteractions(feedback);
@@ -184,6 +189,7 @@ class JevFeedbackReliabilityTest {
     void feedbackTransportFailureIsNotRetried(CapturedOutput output) throws Exception {
         var context = arrange(capture("E02-OFF_TOPIC"));
         when(feedback.completeJson(anyString(), anyString())).thenThrow(new ExternalServiceException("private-response-body"));
+
         assertThat(provider().evaluate(context, prompt)).isSameAs(fallbackResult);
         verify(feedback).completeJson(anyString(), anyString());
         assertThat(output.getOut()).contains("FEEDBACK_CALL_FAILED", "NON_RETRYABLE").doesNotContain("private-response-body");
@@ -195,6 +201,7 @@ class JevFeedbackReliabilityTest {
         properties.setRequestTimeout(Duration.ofSeconds(2));
         properties.setFallbackTimeout(Duration.ofSeconds(1));
         when(feedback.completeJson(anyString(), anyString())).thenReturn(completion("{invalid"));
+
         assertThat(provider().evaluate(context, prompt)).isSameAs(fallbackResult);
         verify(feedback).completeJson(anyString(), anyString());
         verify(fallback).evaluate(context, prompt);
@@ -211,6 +218,7 @@ class JevFeedbackReliabilityTest {
             catch (InterruptedException expected) { cancelled.countDown(); Thread.currentThread().interrupt(); }
             throw new ExternalServiceException("cancelled");
         });
+
         assertThat(provider().evaluate(context, prompt)).isSameAs(fallbackResult);
         assertThat(cancelled.await(2, TimeUnit.SECONDS)).isTrue();
         verify(feedback).completeJson(anyString(), anyString());
@@ -230,6 +238,7 @@ class JevFeedbackReliabilityTest {
             catch (InterruptedException expected) { cancelled.countDown(); Thread.currentThread().interrupt(); }
             throw new ExternalServiceException("fallback failed");
         });
+
         assertThatThrownBy(() -> provider().evaluate(context, prompt)).isInstanceOf(JevStageException.class)
                 .hasMessageContaining("CALL_TIMEOUT");
         await().atMost(Duration.ofSeconds(2)).until(() -> cancelled.getCount() == 0);
@@ -267,6 +276,7 @@ class JevFeedbackReliabilityTest {
             default -> body.toString();
         };
         when(feedback.completeJson(anyString(), anyString())).thenReturn(completion("{invalid"), completion(json));
+
         assertThat(provider().evaluate(context, prompt)).isSameAs(fallbackResult);
         verify(nativeClient).evaluate(any());
         verify(feedback, times(2)).completeJson(anyString(), anyString());

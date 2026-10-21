@@ -382,6 +382,7 @@ class EvaluationOrchestrationServiceTest {
                 .thenReturn(existing);
         when(contextService.buildContext(ANSWER_ID))
                 .thenReturn(context);
+
         EvaluationOrchestrationResult result =
                 service.evaluate(ANSWER_ID, true, "attempt-test");
 

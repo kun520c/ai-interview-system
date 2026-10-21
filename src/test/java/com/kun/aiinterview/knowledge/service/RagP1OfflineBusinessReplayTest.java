@@ -90,6 +90,7 @@ class RagP1OfflineBusinessReplayTest {
         assertThat(new EvaluationRagQueryBuilder().build(context)).isEqualTo(embeddedQuery);
         String model = FIXTURE.path("embeddingModel").asText();
         String version = query.path("hits").get(0).path("embeddingVersion").asText();
+
         var embedding = mock(EmbeddingClient.class);
         var vectors = mock(VectorStoreClient.class);
         var chunks = mock(KnowledgeChunkMapper.class);
@@ -120,6 +121,7 @@ class RagP1OfflineBusinessReplayTest {
             row.setCategory(KnowledgeCategory.valueOf(query.path("category").asText()));
             rows.add(row);
         }
+
         var retained = hits.stream().filter(h -> !enabled || h.similarityScore() >= threshold).toList();
         List<String> retainedIds = retained.stream().map(VectorSearchHit::vectorId).toList();
         when(embedding.embed(List.of(embeddedQuery))).thenReturn(new EmbeddingBatchResult(
@@ -130,6 +132,7 @@ class RagP1OfflineBusinessReplayTest {
             when(chunks.selectRetrievableByVectorIds(retainedIds, model, version))
                     .thenReturn(rows.stream().filter(r -> retainedIds.contains(r.getVectorId())).toList());
         }
+
         var retrievalService = new KnowledgeRetrievalService(embedding, vectors, chunks, properties);
         var adapter = new EvaluationRetrievalAdapter(new EvaluationRagQueryBuilder(), retrievalService);
         var trace = new RagTracePersistenceService(batches, logs, properties, org.mockito.Mockito.mock(com.kun.aiinterview.interview.mapper.InterviewAnswerMapper.class));
@@ -159,9 +162,12 @@ class RagP1OfflineBusinessReplayTest {
         var orchestrator = new EvaluationOrchestrationService(contexts, adapter, promptBuilder, offlineJudge,
                 new LlmEvaluationValidator(), new EvaluationScoreCalculator(), new EvaluationStandard(),
                 new FollowUpPolicy(targetResolver), targetResolver, answers, JSON, trace);
+
         var result = orchestrator.evaluate(1L, false, "offline-attempt");
+
         assertThat(traceBatches).isEmpty();
         trace.persist(result.retrievalBatchId(), result.answerId(), result.pendingTrace());
+
         assertThat(result.totalScore()).isEqualTo(70);
         assertThat(result.evaluationPhase()).isEqualTo(EvaluationPhase.FINAL);
         assertThat(result.evaluation()).isNotNull();

@@ -874,6 +874,7 @@ class InterviewServiceTest {
                 ? new org.springframework.dao.DeadlockLoserDataAccessException("deadlock", null)
                 : new org.springframework.dao.CannotAcquireLockException("lock timeout");
         when(transactionService.submitAnswer(any(), any())).thenThrow(failure);
+
         assertThatThrownBy(() -> service.submitAnswer(USER_ID, SESSION_ID, request()))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("答案提交发生并发冲突，请使用原requestId重试").hasCause(failure);
