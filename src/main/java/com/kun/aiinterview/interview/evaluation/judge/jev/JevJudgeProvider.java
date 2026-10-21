@@ -102,6 +102,7 @@ public class JevJudgeProvider implements JudgeProvider {
         if (context == null || prompt == null) {
             throw new IllegalArgumentException("评价上下文和Prompt不能为空");
         }
+
         var budget = new JevRequestBudget(properties.getRequestTimeout());
         var trace = new JevEvaluationTrace();
         try {
@@ -109,6 +110,7 @@ public class JevJudgeProvider implements JudgeProvider {
             var nativeDecision = trace.invoke(JEV_NATIVE, budget,
                     min(properties.getReadTimeout(), budget.available(properties.getFallbackTimeout())), () -> {
                         JevResponse response = client.evaluate(request);
+
                         try {
                             validateAnswers(request, response);
                             return new NativeDecision(response, mapDecision(context, response));
@@ -116,17 +118,21 @@ public class JevJudgeProvider implements JudgeProvider {
                             throw new JevStageException(NATIVE_DECISION_INVALID);
                         }
                     });
+
             return generateFeedback(context, prompt, nativeDecision, budget, trace);
         } catch (JevStageException exception) {
             trace.failure = exception.failure.name();
             trace.outcome = "FAILED";
             trace.actualProvider = "none";
+
             if (exception.failure == INTERRUPTED || Thread.currentThread().isInterrupted()) {
                 throw exception; // A cancelled caller must never start a new paid request.
             }
+
             trace.fallbackStage = trace.stage.name();
             var result = trace.invoke(DEEPSEEK_FALLBACK, budget, properties.getFallbackTimeout(),
                     () -> fallback.evaluate(context, prompt));
+
             trace.actualProvider = "deepseek";
             trace.outcome = "FALLBACK_RETURNED"; // Still untrusted; orchestration performs Java validation.
             return result;
@@ -140,6 +146,7 @@ public class JevJudgeProvider implements JudgeProvider {
                                     JevRequestBudget budget, JevEvaluationTrace trace) {
         String userPrompt = prompt.userPrompt() + "\n===== judgeDecision =====\n" + toJson(nativeDecision.decision());
         JevStageException lastFailure = null;
+
         for (int attempt = 0; attempt <= properties.getFeedbackMaxRetries(); attempt++) {
             Duration available = budget.available(properties.getFallbackTimeout());
             if (available.isZero() || (attempt > 0 && available.compareTo(Duration.ofSeconds(2)) < 0)) {
@@ -149,6 +156,7 @@ public class JevJudgeProvider implements JudgeProvider {
                 trace.failure = REQUEST_BUDGET_EXHAUSTED.name();
                 throw new JevStageException(REQUEST_BUDGET_EXHAUSTED);
             }
+
             // Regenerate feedback from the original inputs and frozen decision. Never echo/repair invalid output.
             String system = FEEDBACK_SYSTEM + (lastFailure == null ? "" : "\n上次反馈被Java拒绝，错误类别："
                     + lastFailure.failure.name() + "。重新输出完整合法JSON，严格逐字引用回答；不能改动judgeDecision。");
@@ -157,17 +165,21 @@ public class JevJudgeProvider implements JudgeProvider {
                         min(properties.getFeedbackTimeout(), available), () -> {
                             var generation = generationClient.completeJson(system, userPrompt);
                             Feedback feedback = parseFeedback(generation.rawJson());
+
                             var merged = mergeFeedback(context, nativeDecision.decision(), feedback);
                             try {
                                 validator.validate(context, merged);
                             } catch (ExternalServiceException exception) {
                                 throw new JevStageException(FEEDBACK_VALIDATION_FAILED);
                             }
+
                             return new FeedbackResult(generation, merged);
                         });
+
                 trace.actualProvider = "jev+deepseek-feedback";
                 trace.outcome = "VALIDATED";
                 trace.retryStopReason = attempt == 0 ? "NOT_NEEDED" : "RECOVERED";
+
                 String raw = toJson(Map.of("provider", "jev", "judge", nativeDecision.response(),
                         "generation", feedbackResult.generation(), "suggestion", feedbackResult.suggestion(),
                         "execution", trace.snapshot(budget)));
@@ -177,6 +189,7 @@ public class JevJudgeProvider implements JudgeProvider {
                 return new Result(nativeDecision.response().model(), PROMPT_VERSION, raw, feedbackResult.suggestion());
             } catch (JevStageException exception) {
                 lastFailure = exception;
+
                 if (!exception.failure.retryable) {
                     trace.retryStopReason = "NON_RETRYABLE";
                     throw exception;
@@ -204,6 +217,7 @@ public class JevJudgeProvider implements JudgeProvider {
         Map<String, JevRequest.Question> questions = new LinkedHashMap<>();
         RUBRICS.forEach((dimension, levels) -> questions.put(dimension,
                 new JevRequest.Question("score", DATA_BOUNDARY + "只评价维度：" + dimension, levels)));
+
         for (var point : context.scoringPoints()) {
             questions.put(pointKey(point.scoringPointId()), new JevRequest.Question("choice",
                     Map.of("question", DATA_BOUNDARY + "候选人是否正确覆盖scoringPoint？",
@@ -211,12 +225,14 @@ public class JevJudgeProvider implements JudgeProvider {
                     Map.of("covered", "回答中有正确且足以支持该评分点的内容",
                             "uncovered", "回答缺失、错误或不足以支持该评分点")));
         }
+
         if (context.mode() == EvaluationMode.MAIN_ANSWER) {
             questions.put("followUp", new JevRequest.Question("choice",
                     DATA_BOUNDARY + "该MAIN回答是否值得用一次追问澄清技术理解？仅提供建议，不决定工作流。",
                     Map.of("yes", "存在可通过追问澄清的重要缺失或含糊技术理解",
                             "no", "回答已充分或追问不能有效澄清")));
         }
+
         // Reuses exactly the already selected RAG evidence. Raw Milvus hits never enter this state.
         return new JevRequest(properties.getModel(), prompt.userPrompt(), questions);
     }
@@ -232,6 +248,7 @@ public class JevJudgeProvider implements JudgeProvider {
             if (answer.confidence() < properties.getMinConfidence()) {
                 throw new ExternalServiceException("Jev回答低于配置的confidence阈值");
             }
+
             Set<String> keys;
             if ("score".equals(question.type())) {
                 keys = Set.of("0", "1", "2", "3", "4");
@@ -253,11 +270,13 @@ public class JevJudgeProvider implements JudgeProvider {
                     throw new ExternalServiceException("Jev Choice选项非法");
                 }
             }
+
             if (answer.probabilities() == null || !answer.probabilities().keySet().equals(keys)) {
                 throw new ExternalServiceException("Jev概率分布选项非法");
             }
             // Validate every value before cross-entry comparisons can unbox a selected null probability.
             answer.probabilities().values().forEach(JevJudgeProvider::requireProbability);
+
             double sum = 0;
             double expectedScore = 0;
             for (var probability : answer.probabilities().entrySet()) {
@@ -268,6 +287,7 @@ public class JevJudgeProvider implements JudgeProvider {
                     throw new ExternalServiceException("Jev Choice与概率分布不一致");
                 }
             }
+
             boolean scoreQuestion = "score".equals(question.type());
             boolean strictConsistent = Math.abs(sum - 1) <= 0.0001
                     && (!scoreQuestion || Math.abs(expectedScore - answer.score()) <= 0.001);
@@ -290,10 +310,12 @@ public class JevJudgeProvider implements JudgeProvider {
         if (!TWO_DECIMAL_COMPATIBLE_MODEL.equals(model)) {
             return false;
         }
+
         BigDecimal score = displayedCent(answer.score());
         if (score == null) {
             return false;
         }
+
         BigDecimal[] lower = new BigDecimal[5];
         BigDecimal[] upper = new BigDecimal[5];
         BigDecimal lowerSum = BigDecimal.ZERO;
@@ -308,9 +330,11 @@ public class JevJudgeProvider implements JudgeProvider {
             lowerSum = lowerSum.add(lower[index]);
             upperSum = upperSum.add(upper[index]);
         }
+
         if (lowerSum.compareTo(BigDecimal.ONE) > 0 || upperSum.compareTo(BigDecimal.ONE) < 0) {
             return false;
         }
+
         BigDecimal remaining = BigDecimal.ONE.subtract(lowerSum);
         BigDecimal minimum = extremeExpectation(lower, upper, remaining, false);
         BigDecimal maximum = extremeExpectation(lower, upper, remaining, true);
@@ -365,6 +389,7 @@ public class JevJudgeProvider implements JudgeProvider {
         if (feedback == null || feedback.pointEvidence() == null) {
             throw new JevStageException(FEEDBACK_EVIDENCE_MISSING);
         }
+
         Map<Long, String> evidence = new HashMap<>();
         Set<Long> ids = decision.scoringPointResults().stream()
                 .map(LlmEvaluationSuggestion.ScoringPointResult::scoringPointId).collect(Collectors.toSet());
@@ -377,6 +402,7 @@ public class JevJudgeProvider implements JudgeProvider {
         if (!evidence.keySet().equals(ids)) {
             throw new JevStageException(FEEDBACK_EVIDENCE_MISSING);
         }
+
         var points = new ArrayList<LlmEvaluationSuggestion.ScoringPointResult>();
         for (var point : decision.scoringPointResults()) {
             String quote = evidence.get(point.scoringPointId());
@@ -387,9 +413,11 @@ public class JevJudgeProvider implements JudgeProvider {
                     && (context.followUpAnswerContent() == null || !context.followUpAnswerContent().contains(quote)))) {
                 throw new JevStageException(FEEDBACK_EVIDENCE_MISMATCH);
             }
+
             points.add(new LlmEvaluationSuggestion.ScoringPointResult(point.scoringPointId(),
                     point.covered(), point.covered() ? quote : null));
         }
+
         return new LlmEvaluationSuggestion(decision.correctnessScore(), decision.completenessScore(),
                 decision.depthScore(), decision.clarityScore(), decision.practiceScore(),
                 feedback.strengths(), feedback.missingPoints(), feedback.correction(), List.copyOf(points),

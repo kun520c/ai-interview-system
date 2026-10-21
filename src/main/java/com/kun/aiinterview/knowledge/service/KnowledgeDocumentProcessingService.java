@@ -124,6 +124,7 @@ public class KnowledgeDocumentProcessingService {
                             documentId, vectorIds, confirmationFailure);
                 }
             }
+
             if (mayCompensate && !vectorIds.isEmpty()) {
                 compensateMilvus(
                         documentId,
@@ -346,6 +347,7 @@ public class KnowledgeDocumentProcessingService {
 
             ordered.set(inputIndex, vector);
         }
+
         for (int index = 0;index < ordered.size();index++) {
             if (ordered.get(index) == null) {
                 throw new BusinessException(

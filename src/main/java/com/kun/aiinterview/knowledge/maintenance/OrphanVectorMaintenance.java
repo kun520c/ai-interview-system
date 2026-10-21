@@ -67,6 +67,7 @@ public class OrphanVectorMaintenance {
             throw new IllegalArgumentException("Maintenance target does not match explicit confirmation");
         }
         requireNoProcessing();
+
         long scanned = 0;
         long candidates = 0;
         long deleted = 0;
@@ -78,6 +79,7 @@ public class OrphanVectorMaintenance {
                     .outputFields(List.of(VECTOR_ID_FIELD)).expr("").limit(-1)
                     .batchSize(options.batchSize()).ignoreGrowing(false)
                     .consistencyLevel(ConsistencyLevel.STRONG).build());
+
             try {
                 while (true) {
                     List<RowRecord> page = iterator.next();
@@ -87,10 +89,12 @@ public class OrphanVectorMaintenance {
                     if (page.isEmpty()) {
                         break;
                     }
+
                     requireNoProcessing();
                     List<String> ids = page.stream().map(row -> checkedId(row.get(VECTOR_ID_FIELD)))
                             .distinct().toList();
                     scanned += page.size();
+
                     Set<String> existing = existingIds(ids);
                     for (String id : ids) {
                         if (!existing.contains(id)) {
@@ -103,6 +107,7 @@ public class OrphanVectorMaintenance {
             } finally {
                 iterator.close();
             }
+
             journal.write("SCAN_COMPLETE\t" + scanned + "\t" + candidates);
             // Finish scanning before deleting, so mutation cannot disturb the iterator.
             if (options.delete()) {
@@ -117,6 +122,7 @@ public class OrphanVectorMaintenance {
                             }
                             batch.add(checkedId(line.substring("CANDIDATE\t".length())));
                         }
+
                         requireNoProcessing();
                         Set<String> nowExisting = existingIds(batch);
                         List<String> orphanIds = batch.stream().filter(id -> !nowExisting.contains(id))
@@ -127,6 +133,7 @@ public class OrphanVectorMaintenance {
                         if (orphanIds.isEmpty()) {
                             continue;
                         }
+
                         try {
                             var deletion = milvus.delete(DeleteReq.builder()
                                     .databaseName(properties.getDatabaseName())
@@ -136,6 +143,7 @@ public class OrphanVectorMaintenance {
                             if (deletion == null || deletion.getDeleteCnt() < 0) {
                                 throw new IllegalStateException("Invalid deletion response");
                             }
+
                             var remaining = milvus.query(QueryReq.builder()
                                     .databaseName(properties.getDatabaseName())
                                     .collectionName(properties.getCollectionName())
@@ -146,6 +154,7 @@ public class OrphanVectorMaintenance {
                                     || !remaining.getQueryResults().isEmpty()) {
                                 throw new IllegalStateException("Deletion not confirmed by strong read");
                             }
+
                             for (String id : orphanIds) {
                                 journal.write("DELETED_VERIFIED\t" + id);
                             }
@@ -160,8 +169,10 @@ public class OrphanVectorMaintenance {
                     }
                 }
             }
+
             journal.write("COMPLETE\t" + scanned + "\t" + candidates + "\t" + deleted);
         }
+
         Summary summary = new Summary(scanned, candidates, deleted);
         output.println(summary);
         return summary;
@@ -221,12 +232,14 @@ public class OrphanVectorMaintenance {
         if (!accepted.containsAll(flags)) {
             throw new IllegalArgumentException("Unknown CLI option");
         }
+
         Options options = new Options(flags.contains("--delete"), flags.contains("--writers-drained"),
                 flags.contains("--old-instances-stopped"), requiredEnv("ORPHAN_EXPECTED_TARGET"),
                 Integer.parseInt(System.getenv().getOrDefault("ORPHAN_BATCH_SIZE", "500")),
                 Path.of(requiredEnv("ORPHAN_JOURNAL")));
         DriverManagerDataSource datasource = new DriverManagerDataSource(requiredEnv("ORPHAN_MYSQL_URL"),
                 requiredEnv("ORPHAN_MYSQL_USERNAME"), requiredEnv("ORPHAN_MYSQL_PASSWORD"));
+
         MilvusProperties properties = new MilvusProperties();
         properties.setDatabaseName(requiredEnv("ORPHAN_MILVUS_DATABASE"));
         properties.setCollectionName(requiredEnv("ORPHAN_MILVUS_COLLECTION"));
@@ -236,6 +249,7 @@ public class OrphanVectorMaintenance {
         if (token != null && !token.isBlank()) {
             config.token(token);
         }
+
         MilvusClientV2 client = new MilvusClientV2(config.build());
         try {
             new OrphanVectorMaintenance(new JdbcTemplate(datasource), client, properties, System.out).run(options);

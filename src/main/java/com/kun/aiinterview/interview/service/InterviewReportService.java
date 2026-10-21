@@ -103,9 +103,11 @@ public class InterviewReportService {
         if (session.getReportStatus() == InterviewReportStatus.READY) {
             return requireExistingReport(sessionId);
         }
+
         if (session.getVersion() == null || session.getReportStatus() == null) {
             throw new IllegalStateException("Session缺少Report状态或version");
         }
+
         int claimed;
         if (session.getReportStatus() == InterviewReportStatus.GENERATING) {
             if (!staleRecoveryProperties.isGeneratingStale(session.getUpdatedAt())) {
@@ -118,6 +120,7 @@ public class InterviewReportService {
             claimed = interviewSessionMapper.claimReportGeneration(
                     sessionId, session.getVersion(), session.getReportStatus());
         }
+
         if (claimed != 1) {
             InterviewSession latest = loadOwnedSession(sessionId, userId);
             if (latest.getReportStatus() == InterviewReportStatus.READY) {
@@ -125,10 +128,12 @@ public class InterviewReportService {
             }
             throw new ConflictException("报告生成状态已发生变化，请重试");
         }
+
         // The successful CAS increments exactly this version. Never reload a newer token.
         session.setVersion(Math.addExact(session.getVersion(), 1));
         session.setReportStatus(InterviewReportStatus.GENERATING);
         int attemptVersion = session.getVersion();
+
         try {
             InterviewReport existing = existingReportOrContinue(session);
             if (existing != null) {
@@ -157,10 +162,12 @@ public class InterviewReportService {
         List<AnswerEvaluation> evaluations = answerEvaluationMapper
                 .listFinalEffectiveEvaluationsBySessionId(sessionId);
         validateEvaluations(generatingSession, evaluations);
+
         BigDecimal overallScore = calculateOverallScore(evaluations);
         InterviewReportGenerationResult generationResult = generator.generate(
                 generatingSession, List.copyOf(evaluations), overallScore);
         InterviewReport report = buildReport(sessionId, overallScore, generationResult);
+
         return transactionService.completeReportGeneration(report, generatingSession, evaluations);
     }
 
