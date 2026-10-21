@@ -57,6 +57,7 @@ public class UserWeaknessService {
             WeaknessKey key = entry.getKey();
             EvaluationLevel level =
                     evaluationStandard.resolveLevel(averageScore);
+
             if (level == EvaluationLevel.EXCELLENT
                     || level == EvaluationLevel.GOOD) {
                 userWeaknessMapper.resolveActiveWeakness(
