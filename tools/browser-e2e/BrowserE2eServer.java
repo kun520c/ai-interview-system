@@ -21,7 +21,8 @@ public final class BrowserE2eServer {
 
     private static Path runOutput() {
         String runId = System.getenv().getOrDefault("BROWSER_E2E_RUN_ID", "20261018-v3");
-        if (!runId.matches("[a-z0-9-]{1,64}")) throw new IllegalArgumentException("Invalid browser run ID");
+        if (!runId.matches("[a-z0-9-]{1,64}"))
+            throw new IllegalArgumentException("Invalid browser run ID");
         return Path.of("target/browser-e2e", runId);
     }
 
@@ -34,9 +35,9 @@ public final class BrowserE2eServer {
                 var snapshot = new java.util.LinkedHashMap<String, Object>();
                 for (String table : List.of("interview_session", "interview_question", "interview_answer",
                         "answer_evaluation", "rag_retrieval_batch", "rag_hit_log", "interview_report", "user_weakness")) {
-                    String key = table.equals("rag_retrieval_batch") ? "retrieval_batch_id" : "id";
-                    snapshot.put(table, jdbc.queryForList("SELECT * FROM " + table + " ORDER BY " + key));
-                }
+                        String key = table.equals("rag_retrieval_batch") ? "retrieval_batch_id" : "id";
+                        snapshot.put(table, jdbc.queryForList("SELECT * FROM " + table + " ORDER BY " + key));
+                        }
                 String file = args.length > 1 && args[1].equals("after-regression")
                         ? "database-snapshot-after-regression.json" : "database-snapshot.json";
                 Files.writeString(OUT.resolve(file), new ObjectMapper().findAndRegisterModules()
@@ -60,8 +61,9 @@ public final class BrowserE2eServer {
             // Replace only the external vector boundary. The real retrieval/hydration/trace pipeline runs.
             for (String name : List.of("milvusConfiguration", "milvusClient", "milvusConnectConfig",
                     "milvusCollectionInitializer", "milvusVectorStoreClient")) {
-                if (registry.containsBeanDefinition(name)) registry.removeBeanDefinition(name);
-            }
+                    if (registry.containsBeanDefinition(name))
+                            registry.removeBeanDefinition(name);
+                    }
             registry.registerBeanDefinition("browserE2eVectors", new RootBeanDefinition(VectorStoreClient.class,
                     () -> new LocalVectors(factory.getBean(JdbcTemplate.class))));
         }));
@@ -87,19 +89,32 @@ public final class BrowserE2eServer {
         try (var statement = connection.createStatement(); var rows = statement.executeQuery("SELECT @@datadir")) {
             if (!rows.next() || !Path.of(rows.getString(1)).toAbsolutePath().normalize()
                     .equals(OUT.resolve("mysql-data").toAbsolutePath().normalize())) {
-                throw new IllegalStateException("Refusing a MySQL instance outside this run's private data directory");
-            }
+                    throw new IllegalStateException("Refusing a MySQL instance outside this run's private data directory");
+                    }
         }
     }
 
     static final class LocalVectors implements VectorStoreClient {
         private final JdbcTemplate jdbc;
-        LocalVectors(JdbcTemplate jdbc) { this.jdbc = jdbc; }
-        public void insert(List<VectorWriteItem> items) { throw new UnsupportedOperationException("E2E retrieval only"); }
-        public void deleteByVectorIds(List<String> ids) { throw new UnsupportedOperationException("E2E retrieval only"); }
-        public void deleteByDocumentId(long id) { throw new UnsupportedOperationException("E2E retrieval only"); }
+        LocalVectors(JdbcTemplate jdbc) {
+            this.jdbc = jdbc;
+        }
+
+        public void insert(List<VectorWriteItem> items) {
+            throw new UnsupportedOperationException("E2E retrieval only");
+        }
+
+        public void deleteByVectorIds(List<String> ids) {
+            throw new UnsupportedOperationException("E2E retrieval only");
+        }
+
+        public void deleteByDocumentId(long id) {
+            throw new UnsupportedOperationException("E2E retrieval only");
+        }
+
         public List<VectorSearchHit> search(List<Float> vector, String version, int topK) {
-            if (vector.size() != 1024 || !version.equals("browser-e2e-mock-v1")) throw new IllegalArgumentException("Mock vector contract");
+            if (vector.size() != 1024 || !version.equals("browser-e2e-mock-v1"))
+                throw new IllegalArgumentException("Mock vector contract");
             return jdbc.query("SELECT vector_id,document_id,chunk_index,embedding_version FROM knowledge_chunk ORDER BY id LIMIT ?",
                     (row, index) -> new VectorSearchHit(row.getString(1), row.getLong(2), row.getInt(3), row.getString(4), .9), topK);
         }
