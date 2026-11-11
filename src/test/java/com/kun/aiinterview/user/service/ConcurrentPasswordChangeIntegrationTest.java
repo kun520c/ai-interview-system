@@ -205,11 +205,11 @@ class ConcurrentPasswordChangeIntegrationTest {
                     INNER JOIN performance_schema.data_locks requesting
                         ON requesting.ENGINE_LOCK_ID
                             = waits.REQUESTING_ENGINE_LOCK_ID
-                        AND requesting.ENGINE = waits.REQUESTING_ENGINE
+                        AND requesting.ENGINE = waits.ENGINE
                     INNER JOIN performance_schema.data_locks blocking
                         ON blocking.ENGINE_LOCK_ID
                             = waits.BLOCKING_ENGINE_LOCK_ID
-                        AND blocking.ENGINE = waits.BLOCKING_ENGINE
+                        AND blocking.ENGINE = waits.ENGINE
                     WHERE requesting.OBJECT_SCHEMA = DATABASE()
                       AND requesting.OBJECT_NAME = 'user'
                       AND requesting.LOCK_STATUS = 'WAITING'
