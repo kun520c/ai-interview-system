@@ -283,7 +283,7 @@ class AnswerEvaluationMapperTest {
     }
 
     @Test
-    void shouldReturnInitialEvaluationWhenMainHasNoFinalEvaluation() {
+    void shouldExcludeInitialEvaluationWhenMainHasNoFinalEvaluation() {
         MainAnswerFixture fixture = insertMainAnswerFixture();
         AnswerEvaluation initialEvaluation = evaluation(
                 fixture.mainAnswerId(),
@@ -302,28 +302,7 @@ class AnswerEvaluationMapperTest {
         List<AnswerEvaluation> evaluations = answerEvaluationMapper
                 .listFinalEffectiveEvaluationsBySessionId(fixture.sessionId());
 
-        assertEquals(1, evaluations.size());
-        AnswerEvaluation found = evaluations.getFirst();
-        assertAll(
-                () -> assertEquals(initialEvaluation.getId(), found.getId()),
-                () -> assertEquals(
-                        fixture.mainQuestionId(),
-                        found.getMainInterviewQuestionId()
-                ),
-                () -> assertEquals(
-                        EvaluationPhase.INITIAL,
-                        found.getEvaluationPhase()
-                ),
-                () -> assertEquals(
-                        QuestionCategory.JAVA_COLLECTION,
-                        found.getCategory()
-                ),
-                () -> assertEquals("HashMap", found.getKnowledgePoint()),
-                () -> assertEquals(
-                        "请说明 HashMap 的核心机制",
-                        found.getQuestionContent()
-                )
-        );
+        assertTrue(evaluations.isEmpty());
     }
 
     @Test
@@ -372,10 +351,10 @@ class AnswerEvaluationMapperTest {
                 "MAIN 3 回答"
         );
 
-        AnswerEvaluation main1Initial = evaluation(
+        AnswerEvaluation main1Final = evaluation(
                 mainAnswer1Id,
                 mainQuestion1Id,
-                EvaluationPhase.INITIAL,
+                EvaluationPhase.FINAL,
                 DecisionAction.NEXT_MAIN,
                 false,
                 null,
@@ -399,18 +378,18 @@ class AnswerEvaluationMapperTest {
                 null,
                 null
         );
-        AnswerEvaluation main3Initial = evaluation(
+        AnswerEvaluation main3Final = evaluation(
                 mainAnswer3Id,
                 mainQuestion3Id,
-                EvaluationPhase.INITIAL,
+                EvaluationPhase.FINAL,
                 DecisionAction.FINISH,
                 false,
                 null,
                 null
         );
-        answerEvaluationMapper.insertEvaluation(main3Initial);
+        answerEvaluationMapper.insertEvaluation(main3Final);
         answerEvaluationMapper.insertEvaluation(main2Initial);
-        answerEvaluationMapper.insertEvaluation(main1Initial);
+        answerEvaluationMapper.insertEvaluation(main1Final);
         answerEvaluationMapper.insertEvaluation(main2Final);
 
         MainAnswerFixture otherSessionFixture = insertMainAnswerFixture();
@@ -435,7 +414,7 @@ class AnswerEvaluationMapperTest {
                         evaluations.get(0).getMainInterviewQuestionId()
                 ),
                 () -> assertEquals(
-                        EvaluationPhase.INITIAL,
+                        EvaluationPhase.FINAL,
                         evaluations.get(0).getEvaluationPhase()
                 ),
                 () -> assertEquals(
@@ -455,7 +434,7 @@ class AnswerEvaluationMapperTest {
                         evaluations.get(2).getMainInterviewQuestionId()
                 ),
                 () -> assertEquals(
-                        EvaluationPhase.INITIAL,
+                        EvaluationPhase.FINAL,
                         evaluations.get(2).getEvaluationPhase()
                 ),
                 () -> assertTrue(evaluations.stream().noneMatch(

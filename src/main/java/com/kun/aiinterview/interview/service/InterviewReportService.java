@@ -8,6 +8,15 @@ import com.kun.aiinterview.common.exception.ConflictException;
 import com.kun.aiinterview.common.exception.ResourceNotFoundException;
 import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
+import com.kun.aiinterview.interview.entity.InterviewAnswer;
+import com.kun.aiinterview.interview.entity.InterviewQuestion;
+import com.kun.aiinterview.interview.enums.DecisionAction;
+import com.kun.aiinterview.interview.enums.EvaluationPhase;
+import com.kun.aiinterview.interview.enums.InterviewAnswerStatus;
+import com.kun.aiinterview.interview.enums.InterviewQuestionStatus;
+import com.kun.aiinterview.interview.enums.InterviewQuestionType;
+import com.kun.aiinterview.interview.mapper.InterviewAnswerMapper;
+import com.kun.aiinterview.interview.mapper.InterviewQuestionMapper;
 import com.kun.aiinterview.interview.entity.InterviewReport;
 import com.kun.aiinterview.interview.entity.InterviewSession;
 import com.kun.aiinterview.interview.enums.InterviewReportStatus;
@@ -23,7 +32,12 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Objects;
 
 @Service
@@ -38,6 +52,8 @@ public class InterviewReportService {
     private final InterviewReportMapper interviewReportMapper;
     private final AnswerEvaluationMapper answerEvaluationMapper;
     private final InterviewReportTransactionService transactionService;
+    private final InterviewQuestionMapper interviewQuestionMapper;
+    private final InterviewAnswerMapper interviewAnswerMapper;
     private final ObjectProvider<InterviewReportGenerator> generatorProvider;
     private final ObjectMapper objectMapper;
     private final StaleRecoveryProperties staleRecoveryProperties;
@@ -203,6 +219,8 @@ public class InterviewReportService {
                     "已有Report缺少overallScore"
             );
         }
+        // READY history is returned earlier; recovering an unready row must obey the same invariant.
+        validateEvaluations(session, answerEvaluationMapper.listFinalEffectiveEvaluationsBySessionId(session.getId()));
         int affectedRows = interviewSessionMapper.markReportReady(
                 session.getId(),
                 session.getVersion(),
@@ -243,6 +261,84 @@ public class InterviewReportService {
                     "有效Evaluation数量与计划的MAIN题数不一致"
             );
         }
+        Set<Long> mainIds = new HashSet<>();
+        for (AnswerEvaluation evaluation : evaluations) {
+            if (evaluation == null || evaluation.getEvaluationPhase() != EvaluationPhase.FINAL) {
+                throw new IllegalStateException("报告评价必须为FINAL");
+            }
+            if (evaluation.getMainInterviewQuestionId() == null
+                    || !mainIds.add(evaluation.getMainInterviewQuestionId())) {
+                throw new IllegalStateException("每道MAIN必须恰有一个FINAL评价");
+            }
+            if (evaluation.getDecisionAction() != DecisionAction.NEXT_MAIN
+                    && evaluation.getDecisionAction() != DecisionAction.FINISH) {
+                throw new IllegalStateException("FINAL评价决策非法");
+            }
+        }
+        validateEvaluationAssociations(session, evaluations, mainIds);
+    }
+
+    private void validateEvaluationAssociations(
+            InterviewSession session, List<AnswerEvaluation> evaluations, Set<Long> mainIds
+    ) {
+        List<InterviewQuestion> questions = interviewQuestionMapper.listBySessionId(session.getId());
+        List<InterviewQuestion> mains = questions.stream()
+                .filter(question -> question.getQuestionType() == InterviewQuestionType.MAIN)
+                .sorted(Comparator.comparing(InterviewQuestion::getPlanOrder))
+                .toList();
+        if (mains.size() != session.getPlannedQuestionCount()
+                || !mainIds.equals(new HashSet<>(mains.stream().map(InterviewQuestion::getId).toList()))) {
+            throw new IllegalStateException("FINAL评价未完整覆盖本场MAIN计划");
+        }
+
+        Map<Long, InterviewQuestion> followUps = new HashMap<>();
+        for (InterviewQuestion question : questions) {
+            if (!Objects.equals(question.getSessionId(), session.getId())
+                    || question.getStatus() != InterviewQuestionStatus.ANSWERED) {
+                throw new IllegalStateException("报告问题不属于本场或尚未回答");
+            }
+            if (question.getQuestionType() == InterviewQuestionType.FOLLOW_UP) {
+                if (!mainIds.contains(question.getParentQuestionId())
+                        || followUps.put(question.getParentQuestionId(), question) != null) {
+                    throw new IllegalStateException("报告追问必须属于本场MAIN且每题最多一个");
+                }
+            }
+        }
+        Map<Long, InterviewAnswer> answers = new HashMap<>();
+        for (InterviewAnswer answer : interviewAnswerMapper.listByInterviewQuestionIds(
+                questions.stream().map(InterviewQuestion::getId).toList())) {
+            answers.put(answer.getInterviewQuestionId(), answer);
+        }
+        for (int index = 0; index < mains.size(); index++) {
+            InterviewQuestion main = mains.get(index);
+            AnswerEvaluation evaluation = evaluations.get(index);
+            if (!Objects.equals(main.getPlanOrder(), index + 1)
+                    || !Objects.equals(main.getId(), evaluation.getMainInterviewQuestionId())) {
+                throw new IllegalStateException("报告MAIN计划或评价顺序非法");
+            }
+            InterviewAnswer mainAnswer = requireEvaluatedAnswer(answers.get(main.getId()));
+            InterviewQuestion followUp = followUps.get(main.getId());
+            InterviewAnswer finalAnswer = followUp == null ? mainAnswer
+                    : requireEvaluatedAnswer(answers.get(followUp.getId()));
+            if (!Objects.equals(evaluation.getAnswerId(), finalAnswer.getId())) {
+                throw new IllegalStateException("FINAL评价未关联所属MAIN的最终答案");
+            }
+            if (followUp != null) {
+                AnswerEvaluation initial = answerEvaluationMapper.getByAnswerId(mainAnswer.getId());
+                if (initial == null || initial.getEvaluationPhase() != EvaluationPhase.INITIAL
+                        || initial.getDecisionAction() != DecisionAction.FOLLOW_UP
+                        || !Objects.equals(initial.getMainInterviewQuestionId(), main.getId())) {
+                    throw new IllegalStateException("追问缺少所属MAIN的INITIAL评价");
+                }
+            }
+        }
+    }
+
+    private InterviewAnswer requireEvaluatedAnswer(InterviewAnswer answer) {
+        if (answer == null || answer.getStatus() != InterviewAnswerStatus.EVALUATED) {
+            throw new IllegalStateException("报告答案缺失或尚未完成评价");
+        }
+        return answer;
     }
 
     private BigDecimal calculateOverallScore(

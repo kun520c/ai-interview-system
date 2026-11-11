@@ -13,6 +13,8 @@ public interface AnswerEvaluationMapper {
 
     AnswerEvaluation getByAnswerId(@Param("answerId") Long answerId);
 
+    // Returns FINAL candidates in MAIN plan order; duplicates and invalid associations
+    // must remain visible so report validation can reject persisted inconsistencies.
     List<AnswerEvaluation> listFinalEffectiveEvaluationsBySessionId(
             @Param("sessionId") Long sessionId
     );

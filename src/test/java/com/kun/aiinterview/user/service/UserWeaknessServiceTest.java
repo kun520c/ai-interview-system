@@ -1,5 +1,6 @@
 package com.kun.aiinterview.user.service;
 
+import com.kun.aiinterview.interview.enums.EvaluationPhase;
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.evaluation.standard.EvaluationStandard;
 import com.kun.aiinterview.question.enums.QuestionCategory;
@@ -45,6 +46,17 @@ class UserWeaknessServiceTest {
                 userWeaknessMapper,
                 new EvaluationStandard()
         );
+    }
+
+    @Test
+    void shouldRejectInitialBeforeAnyWeaknessWrite() {
+        AnswerEvaluation invalid = evaluation(QuestionCategory.JAVA_COLLECTION, HASH_MAP, 20);
+        invalid.setEvaluationPhase(EvaluationPhase.INITIAL);
+        assertThatThrownBy(() -> service.applySessionEvaluations(USER_ID,
+                List.of(evaluation(QuestionCategory.JAVA_COLLECTION, HASH_MAP, 60), invalid)))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("薄弱点统计评价必须为FINAL");
+        verifyNoInteractions(userWeaknessMapper);
     }
 
     @Test
@@ -383,6 +395,7 @@ class UserWeaknessServiceTest {
             Integer totalScore
     ) {
         return AnswerEvaluation.builder()
+                .evaluationPhase(EvaluationPhase.FINAL)
                 .category(category)
                 .knowledgePoint(knowledgePoint)
                 .totalScore(totalScore)

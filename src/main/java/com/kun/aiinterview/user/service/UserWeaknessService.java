@@ -1,6 +1,7 @@
 package com.kun.aiinterview.user.service;
 
 import com.kun.aiinterview.interview.entity.AnswerEvaluation;
+import com.kun.aiinterview.interview.enums.EvaluationPhase;
 import com.kun.aiinterview.interview.evaluation.standard.EvaluationLevel;
 import com.kun.aiinterview.interview.evaluation.standard.EvaluationStandard;
 import com.kun.aiinterview.question.enums.QuestionCategory;
@@ -82,6 +83,9 @@ public class UserWeaknessService {
             throw new IllegalStateException(
                     "Evaluation不能为空"
             );
+        }
+        if (evaluation.getEvaluationPhase() != EvaluationPhase.FINAL) {
+            throw new IllegalStateException("薄弱点统计评价必须为FINAL");
         }
         if (evaluation.getCategory() == null) {
             throw new IllegalStateException(

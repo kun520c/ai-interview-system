@@ -8,6 +8,8 @@ import com.kun.aiinterview.interview.entity.InterviewSession;
 import com.kun.aiinterview.interview.enums.InterviewReportStatus;
 import com.kun.aiinterview.interview.enums.InterviewSessionStatus;
 import com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper;
+import com.kun.aiinterview.interview.mapper.InterviewQuestionMapper;
+import com.kun.aiinterview.interview.mapper.InterviewAnswerMapper;
 import com.kun.aiinterview.interview.mapper.InterviewReportMapper;
 import com.kun.aiinterview.interview.mapper.InterviewSessionMapper;
 import com.kun.aiinterview.interview.vo.InterviewReportResponse;
@@ -51,6 +53,12 @@ class InterviewReportApiServiceTest {
     private InterviewReportTransactionService transactionService;
 
     @Mock
+    private InterviewQuestionMapper interviewQuestionMapper;
+
+    @Mock
+    private InterviewAnswerMapper interviewAnswerMapper;
+
+    @Mock
     private ObjectProvider<InterviewReportGenerator> generatorProvider;
 
     private InterviewReportService service;
@@ -62,6 +70,8 @@ class InterviewReportApiServiceTest {
                 interviewReportMapper,
                 answerEvaluationMapper,
                 transactionService,
+                interviewQuestionMapper,
+                interviewAnswerMapper,
                 generatorProvider,
                 new ObjectMapper(),
                 new StaleRecoveryProperties()

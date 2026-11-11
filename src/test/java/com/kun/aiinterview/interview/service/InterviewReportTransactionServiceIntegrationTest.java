@@ -1,5 +1,14 @@
 package com.kun.aiinterview.interview.service;
 
+import com.kun.aiinterview.interview.entity.InterviewAnswer;
+import com.kun.aiinterview.interview.entity.InterviewQuestion;
+import com.kun.aiinterview.interview.enums.DecisionAction;
+import com.kun.aiinterview.interview.enums.EvaluationPhase;
+import com.kun.aiinterview.interview.enums.InterviewAnswerStatus;
+import com.kun.aiinterview.interview.enums.InterviewQuestionStatus;
+import com.kun.aiinterview.interview.enums.InterviewQuestionType;
+import com.kun.aiinterview.interview.mapper.InterviewQuestionMapper;
+import com.kun.aiinterview.interview.mapper.InterviewAnswerMapper;
 import org.mockito.Mockito;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
@@ -324,7 +333,7 @@ class InterviewReportTransactionServiceIntegrationTest {
         };
         Mockito.when(provider.getIfAvailable()).thenReturn(generator);
         var service = new InterviewReportService(interviewSessionMapper, interviewReportMapper, evaluationMapper,
-                transactionService, provider, new ObjectMapper(),
+                transactionService, reportQuestions(), reportAnswers(), provider, new ObjectMapper(),
                 new StaleRecoveryProperties());
         try (var executor = Executors.newFixedThreadPool(2)) {
             var old = executor.submit(() -> catchThrowable(() -> service.generateReport(userId, sessionId)));
@@ -459,8 +468,27 @@ class InterviewReportTransactionServiceIntegrationTest {
         @SuppressWarnings("unchecked")
         ObjectProvider<InterviewReportGenerator> provider = Mockito.mock(ObjectProvider.class);
         Mockito.when(provider.getIfAvailable()).thenReturn(generator);
-        return new InterviewReportService(sessions, interviewReportMapper, evaluations, transactionService,
+        return new InterviewReportService(sessions, interviewReportMapper, evaluations, transactionService, reportQuestions(), reportAnswers(),
                 provider, new ObjectMapper(), new StaleRecoveryProperties());
+    }
+
+    private InterviewQuestionMapper reportQuestions() {
+        var mapper = Mockito.mock(InterviewQuestionMapper.class);
+        Mockito.when(mapper.listBySessionId(sessionId)).thenReturn(List.of(
+                InterviewQuestion.builder()
+                        .id(300L).sessionId(sessionId).planOrder(1)
+                        .questionType(InterviewQuestionType.MAIN)
+                        .status(InterviewQuestionStatus.ANSWERED).build()));
+        return mapper;
+    }
+
+    private InterviewAnswerMapper reportAnswers() {
+        var mapper = Mockito.mock(InterviewAnswerMapper.class);
+        Mockito.when(mapper.listByInterviewQuestionIds(List.of(300L))).thenReturn(List.of(
+                InterviewAnswer.builder()
+                        .id(400L).interviewQuestionId(300L)
+                        .status(InterviewAnswerStatus.EVALUATED).build()));
+        return mapper;
     }
 
     private AnswerEvaluation evaluation(
@@ -469,6 +497,9 @@ class InterviewReportTransactionServiceIntegrationTest {
             int totalScore
     ) {
         return AnswerEvaluation.builder()
+                .id(500L).answerId(400L).mainInterviewQuestionId(300L)
+                .evaluationPhase(EvaluationPhase.FINAL)
+                .decisionAction(DecisionAction.FINISH)
                 .category(category)
                 .knowledgePoint(knowledgePoint)
                 .totalScore(totalScore)

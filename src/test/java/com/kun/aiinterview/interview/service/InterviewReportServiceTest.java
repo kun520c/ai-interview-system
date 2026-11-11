@@ -1,5 +1,13 @@
 package com.kun.aiinterview.interview.service;
 
+import com.kun.aiinterview.interview.entity.InterviewAnswer;
+import com.kun.aiinterview.interview.entity.InterviewQuestion;
+import com.kun.aiinterview.interview.enums.DecisionAction;
+import com.kun.aiinterview.interview.enums.InterviewAnswerStatus;
+import com.kun.aiinterview.interview.enums.InterviewQuestionStatus;
+import com.kun.aiinterview.interview.enums.InterviewQuestionType;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.common.exception.BusinessException;
@@ -10,8 +18,11 @@ import com.kun.aiinterview.interview.entity.AnswerEvaluation;
 import com.kun.aiinterview.interview.entity.InterviewReport;
 import com.kun.aiinterview.interview.entity.InterviewSession;
 import com.kun.aiinterview.interview.enums.InterviewReportStatus;
+import com.kun.aiinterview.interview.enums.EvaluationPhase;
 import com.kun.aiinterview.interview.enums.InterviewSessionStatus;
 import com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper;
+import com.kun.aiinterview.interview.mapper.InterviewQuestionMapper;
+import com.kun.aiinterview.interview.mapper.InterviewAnswerMapper;
 import com.kun.aiinterview.interview.mapper.InterviewReportMapper;
 import com.kun.aiinterview.interview.mapper.InterviewSessionMapper;
 import com.kun.aiinterview.interview.model.InterviewReportGenerationResult;
@@ -60,6 +71,12 @@ class InterviewReportServiceTest {
     private InterviewReportTransactionService transactionService;
 
     @Mock
+    private InterviewQuestionMapper interviewQuestionMapper;
+
+    @Mock
+    private InterviewAnswerMapper interviewAnswerMapper;
+
+    @Mock
     private ObjectProvider<InterviewReportGenerator> generatorProvider;
 
     @Mock
@@ -70,6 +87,20 @@ class InterviewReportServiceTest {
     @BeforeEach
     void setUp() {
         service = serviceWith(new ObjectMapper());
+        // Valid persisted source plan for tests focused on report state/serialization.
+        org.mockito.Mockito.lenient().when(interviewQuestionMapper.listBySessionId(SESSION_ID))
+                .thenReturn(java.util.stream.IntStream.range(0, 3).mapToObj(index ->
+                        InterviewQuestion.builder()
+                                .id(300L + index).sessionId(SESSION_ID).planOrder(index + 1)
+                                .questionType(InterviewQuestionType.MAIN)
+                                .status(InterviewQuestionStatus.ANSWERED)
+                                .build()).toList());
+        org.mockito.Mockito.lenient().when(interviewAnswerMapper.listByInterviewQuestionIds(any()))
+                .thenReturn(java.util.stream.IntStream.range(0, 3).mapToObj(index ->
+                        InterviewAnswer.builder()
+                                .id(400L + index).interviewQuestionId(300L + index)
+                                .status(InterviewAnswerStatus.EVALUATED)
+                                .build()).toList());
     }
 
     @Test
@@ -90,6 +121,8 @@ class InterviewReportServiceTest {
                 interviewReportMapper,
                 answerEvaluationMapper,
                 transactionService,
+                interviewQuestionMapper,
+                interviewAnswerMapper,
                 generatorProvider,
                 generator
         );
@@ -110,6 +143,8 @@ class InterviewReportServiceTest {
                 interviewReportMapper,
                 answerEvaluationMapper,
                 transactionService,
+                interviewQuestionMapper,
+                interviewAnswerMapper,
                 generatorProvider,
                 generator
         );
@@ -278,6 +313,8 @@ class InterviewReportServiceTest {
         ))
                 .thenReturn(1);
         when(interviewReportMapper.getBySessionId(SESSION_ID)).thenReturn(existing);
+        when(answerEvaluationMapper.listFinalEffectiveEvaluationsBySessionId(SESSION_ID))
+                .thenReturn(evaluations(70, 80, 90));
         when(interviewSessionMapper.markReportReady(
                 SESSION_ID,
                 GENERATING_VERSION + 1,
@@ -295,8 +332,7 @@ class InterviewReportServiceTest {
         verifyNoInteractions(generatorProvider, generator, transactionService);
         verify(interviewSessionMapper, never())
                 .claimReportGeneration(any(), any(), any());
-        verify(answerEvaluationMapper, never())
-                .listFinalEffectiveEvaluationsBySessionId(any());
+        verify(answerEvaluationMapper).listFinalEffectiveEvaluationsBySessionId(SESSION_ID);
     }
 
     @Test
@@ -631,6 +667,39 @@ class InterviewReportServiceTest {
         );
     }
 
+    @Test
+    void shouldRejectInitialEvenWhenEvaluationCountMatchesPlan() {
+        List<AnswerEvaluation> rows = evaluations(60, 70, 80);
+        rows.get(1).setEvaluationPhase(EvaluationPhase.INITIAL);
+        stubClaimedFlow(InterviewReportStatus.NOT_STARTED, rows);
+        org.mockito.Mockito.lenient().when(generator.generate(any(), any(), any()))
+                .thenReturn(generationResult());
+
+        assertThatThrownBy(() -> service.generateReport(USER_ID, SESSION_ID))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("报告评价必须为FINAL");
+        verifyNoInteractions(generator, transactionService);
+        verify(interviewSessionMapper).markReportFailed(SESSION_ID, GENERATING_VERSION);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"null-phase", "duplicate-main", "foreign-main", "wrong-answer"})
+    void shouldRejectInvalidFinalsEvenWhenCountMatches(String invalid) {
+        List<AnswerEvaluation> rows = evaluations(60, 70, 80);
+        switch (invalid) {
+            case "null-phase" -> rows.get(1).setEvaluationPhase(null);
+            case "duplicate-main" -> rows.get(1).setMainInterviewQuestionId(rows.getFirst().getMainInterviewQuestionId());
+            case "foreign-main" -> rows.get(1).setMainInterviewQuestionId(999L);
+            case "wrong-answer" -> rows.get(1).setAnswerId(999L);
+            default -> throw new AssertionError(invalid);
+        }
+        stubClaimedFlow(InterviewReportStatus.NOT_STARTED, rows);
+        assertThatThrownBy(() -> service.generateReport(USER_ID, SESSION_ID))
+                .isInstanceOf(IllegalStateException.class);
+        verifyNoInteractions(generator, transactionService);
+        verify(interviewSessionMapper).markReportFailed(SESSION_ID, GENERATING_VERSION);
+    }
+
     private void stubClaimedFlow(
             InterviewReportStatus initialStatus,
             List<AnswerEvaluation> evaluations
@@ -660,6 +729,8 @@ class InterviewReportServiceTest {
                 interviewReportMapper,
                 answerEvaluationMapper,
                 transactionService,
+                interviewQuestionMapper,
+                interviewAnswerMapper,
                 generatorProvider,
                 objectMapper,
                 new StaleRecoveryProperties()
@@ -689,9 +760,14 @@ class InterviewReportServiceTest {
     }
 
     private List<AnswerEvaluation> evaluations(Integer... scores) {
-        return java.util.Arrays.stream(scores)
-                .map(score -> AnswerEvaluation.builder()
-                        .totalScore(score)
+        return java.util.stream.IntStream.range(0, scores.length)
+                .mapToObj(index -> AnswerEvaluation.builder()
+                        .id(500L + index)
+                        .answerId(400L + index)
+                        .mainInterviewQuestionId(300L + index)
+                        .evaluationPhase(EvaluationPhase.FINAL)
+                        .decisionAction(DecisionAction.FINISH)
+                        .totalScore(scores[index])
                         .build())
                 .toList();
     }
