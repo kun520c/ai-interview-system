@@ -74,6 +74,11 @@ public class InterviewWorkflowService {
             );
         }
 
+        // InterviewService has validated ownership and request payload; it rebuilds the persisted response.
+        if (answer.getStatus() == InterviewAnswerStatus.EVALUATED) {
+            return null;
+        }
+
         InterviewQuestion currentQuestion =
                 interviewQuestionMapper
                         .getInterviewQuestionById(
@@ -118,6 +123,11 @@ public class InterviewWorkflowService {
                 currentQuestion.getId(),
                 session.getCurrentInterviewQuestionId()
         )) {
+            // Another request may have completed after the first Answer read but before the Session read.
+            InterviewAnswer latest = requireReloadedAnswer(answerId, "会话推进后Answer不存在");
+            if (latest.getStatus() == InterviewAnswerStatus.EVALUATED) {
+                return null;
+            }
             throw new IllegalStateException(
                     "当前Answer不属于Session正在处理的问题"
             );

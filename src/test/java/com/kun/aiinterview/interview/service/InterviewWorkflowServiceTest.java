@@ -507,37 +507,50 @@ class InterviewWorkflowServiceTest {
         verifyNoDecisionTransitions();
     }
 
-    @ParameterizedTest
-    @EnumSource(
-            value = InterviewAnswerStatus.class,
-            names = {"EVALUATED"}
-    )
-    void shouldRejectAnswerStatusThatCannotEnterEvaluation(
-            InterviewAnswerStatus status
-    ) {
-        InterviewAnswer answer = answer(status, MAIN_QUESTION_ID);
-        InterviewQuestion main = mainQuestion();
+    @Test
+    void shouldReplayInitiallyEvaluatedAnswerWithoutClaimOrSessionPointerValidation() {
+        InterviewAnswer answer = answer(InterviewAnswerStatus.EVALUATED, MAIN_QUESTION_ID);
         when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID))
                 .thenReturn(answer);
-        when(interviewQuestionMapper.getInterviewQuestionById(
-                MAIN_QUESTION_ID
-        )).thenReturn(main);
-        when(interviewSessionMapper.getInterviewSessionById(
-                SESSION_ID
-        )).thenReturn(session(MAIN_QUESTION_ID));
 
-        assertThatThrownBy(
-                () -> service.evaluateAnswer(ANSWER_ID)
-        )
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("当前Answer状态不允许进入评价");
+        assertThat(service.evaluateAnswer(ANSWER_ID)).isNull();
 
         verifyNoInteractions(
                 evaluationOrchestrationService,
-                transactionService
+                transactionService,
+                interviewQuestionMapper,
+                interviewSessionMapper
         );
-        verify(interviewQuestionMapper, never())
-                .findNextPendingMainQuestion(any(), any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = InterviewAnswerStatus.class, names = {"SUBMITTED", "FAILED", "EVALUATING"})
+    void shouldReloadCompletedAnswerWhenSessionMovedAfterInitialRead(InterviewAnswerStatus initialStatus) {
+        when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID))
+                .thenReturn(answer(initialStatus, MAIN_QUESTION_ID),
+                        answer(InterviewAnswerStatus.EVALUATED, MAIN_QUESTION_ID));
+        when(interviewQuestionMapper.getInterviewQuestionById(MAIN_QUESTION_ID)).thenReturn(mainQuestion());
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID)).thenReturn(session(NEXT_MAIN_QUESTION_ID));
+
+        assertThat(service.evaluateAnswer(ANSWER_ID)).isNull();
+
+        verifyNoInteractions(evaluationOrchestrationService, transactionService);
+        verify(interviewQuestionMapper, never()).findNextPendingMainQuestion(any(), any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void shouldRejectMissingOrMismatchedAnswerOnCompletionReload(boolean wrongIdentity) {
+        InterviewAnswer invalid = wrongIdentity ? answer(InterviewAnswerStatus.EVALUATED, MAIN_QUESTION_ID) : null;
+        if (invalid != null) invalid.setId(ANSWER_ID + 1);
+        when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID))
+                .thenReturn(answer(InterviewAnswerStatus.SUBMITTED, MAIN_QUESTION_ID), invalid);
+        when(interviewQuestionMapper.getInterviewQuestionById(MAIN_QUESTION_ID)).thenReturn(mainQuestion());
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID)).thenReturn(session(NEXT_MAIN_QUESTION_ID));
+
+        assertThatThrownBy(() -> service.evaluateAnswer(ANSWER_ID))
+                .isInstanceOf(IllegalStateException.class).hasMessage("会话推进后Answer不存在");
+        verifyNoInteractions(evaluationOrchestrationService, transactionService);
     }
 
     @Test
