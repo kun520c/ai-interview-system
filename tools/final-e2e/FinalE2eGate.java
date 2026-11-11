@@ -20,11 +20,12 @@ final class FinalE2eGate implements AutoCloseable {
     HttpServer server;
     interface Transport { RagE2eModelGate.Reply post(URI uri, String authorization, byte[] body) throws Exception; }
     FinalE2eGate(Path output, Transport transport) {
-        this(output,transport,Map.of("embedding",10,"jev",10,"deepseek",21),2);
+        this(output,transport,Map.of("embedding",10,"deepseek",11),1);
     }
     FinalE2eGate(Path output, Transport transport,Map<String,Integer> limits,int deepSeekPerAnswer) {
         this.output = output; this.transport = transport;
         this.limits=Map.copyOf(limits); this.deepSeekPerAnswer=deepSeekPerAnswer;
+        // Keep the legacy zero counter for archived report readers; admission rejects this provider.
         for (String provider : List.of("embedding", "jev", "deepseek")) counts.put(provider, 0);
     }
     synchronized void begin(String value) { operation = value; operationCounts.clear(); }
@@ -33,21 +34,21 @@ final class FinalE2eGate implements AutoCloseable {
     static String provider(String path) {
         return switch (path) {
             case "/embedding/embeddings" -> "embedding";
-            case "/jev/v1/systemone" -> "jev";
             case "/deepseek/chat/completions" -> "deepseek";
             default -> throw new SecurityException("MODEL_PATH_REJECTED");
         };
     }
     synchronized void admit(String provider, String authorization, byte[] body) throws Exception {
         FinalE2eRunner.check(body.length <= BODY_CAP, "MODEL_REQUEST_BYTE_CAP");
-        int maximum = limits.get(provider);
+        FinalE2eRunner.check(Set.of("embedding", "deepseek").contains(provider), "MODEL_PROVIDER_RETIRED_OR_UNKNOWN");
+        int maximum = limits.getOrDefault(provider, 0);
         int perOperation = provider.equals("deepseek") && operation.startsWith("answer-") ? deepSeekPerAnswer : 1;
         FinalE2eRunner.check(operation.startsWith("answer-") || operation.equals("report"), "NO_ACTIVE_BUSINESS_OPERATION");
         FinalE2eRunner.check(!operation.equals("report") || provider.equals("deepseek"), "REPORT_PROVIDER_REJECTED");
         FinalE2eRunner.check(counts.get(provider) < maximum
                 && operationCounts.getOrDefault(provider, 0) < perOperation, "MODEL_REQUEST_BUDGET_EXHAUSTED");
         String key = FinalE2eRunner.env(switch(provider) {
-            case "embedding" -> "EMBEDDING_API_KEY"; case "jev" -> "JEV_API_KEY"; default -> "DEEPSEEK_API_KEY";
+            case "embedding" -> "EMBEDDING_API_KEY"; default -> "DEEPSEEK_API_KEY";
         });
         FinalE2eRunner.check(!key.isBlank() && ("Bearer " + key).equals(authorization), "MODEL_AUTH_MISMATCH");
         JsonNode request = FinalE2eRunner.JSON.readTree(body);
@@ -55,11 +56,8 @@ final class FinalE2eGate implements AutoCloseable {
             RagE2ePolicy.modelRequest(request, true);
             FinalE2eRunner.check(request.path("input").get(0).asText().getBytes(java.nio.charset.StandardCharsets.UTF_8).length <= 8320,
                     "QUERY_BYTE_CAP");
-        } else if (provider.equals("deepseek")) {
-            RagE2ePolicy.modelRequest(request, false);
         } else {
-            FinalE2eRunner.check("jev-latest".equals(request.path("model").asText())
-                    && request.path("state").isTextual() && request.path("questions").isObject(), "JEV_REQUEST_CONTRACT");
+            RagE2ePolicy.modelRequest(request, false);
         }
         counts.merge(provider, 1, Integer::sum);
         operationCounts.merge(provider, 1, Integer::sum);
@@ -78,7 +76,6 @@ final class FinalE2eGate implements AutoCloseable {
         FinalE2eRunner.save(output.resolve("provider-index.json"), records);
         String endpoint = switch(provider) {
             case "embedding" -> RagE2ePolicy.EMBEDDING_ENDPOINT + "/embeddings";
-            case "jev" -> "https://api.typesafe.ai/v1/systemone";
             default -> "https://api.deepseek.com/chat/completions";
         };
         item.put("endpoint", endpoint);

@@ -1,3 +1,6 @@
+# Retired in J1: this one-time evidence builder requires the removed Jev classes.
+raise SystemExit("RETIRED: the 2026-10-14 Jev proxy byte-delta is historical evidence; do not rebuild it against current code.")
+
 """One-time offline forensic build. Refuses to overwrite any existing evidence."""
 import difflib
 import hashlib

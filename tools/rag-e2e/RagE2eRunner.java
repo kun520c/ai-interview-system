@@ -44,6 +44,11 @@ public final class RagE2eRunner {
     static int submitHttpStatus;
     static String stage="OFFLINE";
 
+    static void verifyJudge(Object judge) {
+        // E2E observers wrap the production port in JDK proxies.
+        check(com.kun.aiinterview.interview.evaluation.judge.DeepSeekJudgeProvider.class.isAssignableFrom(
+                org.springframework.aop.framework.AopProxyUtils.ultimateTargetClass(judge)), "DEEPSEEK_JUDGE_REQUIRED");
+    }
     static String env(String name) { String value=System.getenv(name); return value==null?"":value; }
     static void check(boolean condition,String code) { RagE2ePolicy.require(condition,code); }
     static String safeGrpcDescription(String description,List<String> secrets) {
@@ -466,7 +471,7 @@ public final class RagE2eRunner {
         fixed.put("deepseek.enabled",true); fixed.put("deepseek.base-url",gate.base(false));
         fixed.put("deepseek.api-key",env("DEEPSEEK_API_KEY")); fixed.put("deepseek.model",RagE2ePolicy.JUDGE_MODEL);
         fixed.put("deepseek.max-tokens",4096); fixed.put("deepseek.connect-timeout","3s"); fixed.put("deepseek.read-timeout","70s");
-        fixed.put("ai.judge.provider","deepseek"); fixed.put("milvus.enabled",true);
+        fixed.put("milvus.enabled",true);
         fixed.put("milvus.uri","http://127.0.0.1:19530"); fixed.put("milvus.database-name","default");
         fixed.put("milvus.collection-name",RagE2ePolicy.COLLECTION); fixed.put("milvus.dimension",1024);
         fixed.put("milvus.token",env("E2E_MILVUS_TOKEN")); fixed.put("milvus.connect-timeout","5s"); fixed.put("milvus.request-timeout","20s");
@@ -484,10 +489,11 @@ public final class RagE2eRunner {
             check(new HashSet<>(Arrays.asList(e.getActiveProfiles())).equals(Set.of("test-real","rag-p1")),"EXACT_E2E_PROFILES_REQUIRED");
             RagE2ePolicy.auditJdbc(e.getProperty("spring.datasource.url"));
             check(RagE2ePolicy.COLLECTION.equals(e.getProperty("milvus.collection-name"))
-                    && "deepseek".equals(e.getProperty("ai.judge.provider")),"RESOLVED_CONFIG_MISMATCH");
+                    && "true".equals(e.getProperty("deepseek.enabled")),"RESOLVED_CONFIG_MISMATCH");
         });
         // Existing EnvironmentIsolationInitializer remains registered and runs before infrastructure.
         var context=app.run();
+        verifyJudge(context.getBean(com.kun.aiinterview.interview.evaluation.judge.JudgeProvider.class));
         baseUrl="http://127.0.0.1:"+((ServletWebServerApplicationContext)context).getWebServer().getPort();
         report.put("resolvedConfiguration",Map.of("profiles",List.of("test-real","rag-p1"),"database",RagE2ePolicy.TARGET,
                 "collection",RagE2ePolicy.COLLECTION,"provider","deepseek","judgeModel",RagE2ePolicy.JUDGE_MODEL,

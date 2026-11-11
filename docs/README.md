@@ -8,7 +8,7 @@
 2. [后端源码与面试学习手册](study/AI模拟面试系统-后端源码与面试学习手册.md)：沿业务流程阅读源码，准备面试讲解。
 3. [前端架构](frontend/FRONTEND_ARCHITECTURE.md)：理解正式 Vue 前端的组织与边界。
 4. [RAG 版本与知识入库审计](rag/Phase2A-版本与知识入库审计.md)：沿下方 Phase 顺序了解知识源、切片和真实入库。
-5. [Jev Judge 接入学习报告](study/Jev-Judge接入学习报告.md)：理解 Jev、DeepSeek fallback 与 Java 校验的职责。
+5. [J1：移除 Jev、保留 DeepSeek 业务恢复](verification/JEV_REMOVAL_DEEPSEEK_ONLY_20261111.md)：当前调用链、验证记录与 10～15 分钟源码阅读路径。
 6. [AI Baseline](evaluation/AI_SYSTEM_BASELINE.md)：阅读历史评测结果及其限制；评测通过与离线测试通过是不同结论。
 7. [Phase 9C 前后端真实 E2E 验证](frontend/review/final/Phase9C-前后端真实E2E验证.md)：查看最终用户流程的历史验收记录。
 
@@ -45,9 +45,9 @@
 
 | 主题 | 阅读入口 | 文件性质与边界 |
 |---|---|---|
-| Jev | [接入学习报告](study/Jev-Judge接入学习报告.md)、[Java 结构与无效代码审计](evaluation/Jev-Java结构与无效代码审计.md) | 人工报告，记录接入结构与离线验证 |
-| Jev 教材 | [增量学习教材](study/Jev-Judge增量学习教材.html) | 人工教材，可沿相对链接查看当前源码 |
-| DeepSeek | [Jev 接入报告中的 fallback 说明](study/Jev-Judge接入学习报告.md)、[Jev 与 DeepSeek 评测](evaluation/JEV_EVALUATION_REPORT.md) | 前者为人工说明；后者为自动生成的历史评测报告 |
+| Jev（历史） | [接入学习报告](study/Jev-Judge接入学习报告.md)、[Java 结构与无效代码审计](evaluation/Jev-Java结构与无效代码审计.md) | 人工报告，记录接入结构与离线验证 |
+| Jev 教材（历史） | [增量学习教材](study/Jev-Judge增量学习教材.html) | 历史教材；旧类已于 J1 移除，源码请在报告对应历史提交中查阅 |
+| DeepSeek | [J1 清理与回归](verification/JEV_REMOVAL_DEEPSEEK_ONLY_20261111.md)、[历史模型评测](evaluation/JEV_EVALUATION_REPORT.md) | 当前单模型业务与故障恢复；历史评测结论不变 |
 | Baseline | [评测复现与证据说明](evaluation/README.md)、[AI 系统 Baseline](evaluation/AI_SYSTEM_BASELINE.md)、[环境检查](evaluation/ENVIRONMENT_CHECK.md) | 自动生成报告保持英文文件名；遵守隔离环境规则 |
 | RAG 评测与 Trace | [RAG 评测](evaluation/RAG_EVALUATION_REPORT.md)、[检索 Trace](evaluation/RAG_RETRIEVAL_TRACES.md) | 自动生成的指标与证据摘要 |
 | AI E2E | [AI E2E 评测](evaluation/E2E_EVALUATION_REPORT.md) | 自动生成的历史端到端评测报告 |

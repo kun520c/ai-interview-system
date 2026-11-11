@@ -1,6 +1,8 @@
 # Baseline 复现与证据
 
-先阅读 [AI_SYSTEM_BASELINE.md](AI_SYSTEM_BASELINE.md)。本目录是本地评测产物，当前docs/被.git/info/exclude忽略，未提交。
+先阅读历史 [AI_SYSTEM_BASELINE.md](AI_SYSTEM_BASELINE.md)。本目录保留原评测证据，Git 状态以实际工作区为准。
+
+J1（2026-11-11）后 `run-baseline.ps1` 仅运行 DeepSeek，不能根据旧 Jev key 自动选模型；`check-jev-access.py` 与硬编码旧报告的 `build-reports.py` 已退役，直接拒绝执行。以下历史结果不变，新评分不再执行 Jev 故障 fallback 实验。
 
 ## 文件职责
 
@@ -9,7 +11,7 @@
 - RAG_EVALUATION_REPORT.md / RAG_RETRIEVAL_TRACES.md：指标、每个query与真实Top1/3/5、FP/FN。
 - E2E_EVALUATION_REPORT.md：真实HTTP面试、失败、报告与FINAL一致性、可观测性。
 - data/：事先固定输入/语义标签/评测文档；evidence/：真实返回与SQL快照，全部是合成面试内容，不含key/JWT/password。
-- scripts/run-baseline.ps1：本机Windows凭据到子进程、双保护opt-in与Maven日志；prepare-data.py：检索前标签；build-reports.py：从证据生成指标报告；check-jev-access.py：无凭据探测，不是推理；audit-evidence.py：映射/评分算术/凭据泄露检查与SHA-256 manifest。
+- scripts/run-baseline.ps1：本机Windows凭据到子进程、双保护opt-in与Maven日志；prepare-data.py：检索前标签；build-reports.py / check-jev-access.py：已退役，仅保留入口说明；audit-evidence.py：映射/评分算术/凭据泄露检查与SHA-256 manifest。
 
 ## 复现（会真实调用并产生费用/测试数据）
 
@@ -38,7 +40,6 @@ Phase 0.5 后，真实 baseline 必须使用 evaluation profile、MySQL `ai_inte
 .\docs\evaluation\scripts\run-baseline.ps1 -Phase e2e
 .\docs\evaluation\scripts\run-baseline.ps1 -Phase focused
 .\docs\evaluation\scripts\run-baseline.ps1 -Phase regression
-& D:\python\python.exe docs/evaluation/scripts/build-reports.py
 ```
 
 这次“existing”特指inventory证据中初始单文档库；已经保留扩充语料后再跑existing只会换标签，不会自动恢复单文档库。脚本不删任何共享文档/Collection。因此复现实验必须固定/审核语料快照，并将新一轮证据另存，避免覆盖本轮报告。

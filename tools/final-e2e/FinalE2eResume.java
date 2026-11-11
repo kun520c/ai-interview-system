@@ -34,7 +34,7 @@ public final class FinalE2eResume {
         Path output=Path.of("target/final-e2e/attempts",RUN_ID);
         Files.createDirectories(output.getParent()); Files.createDirectory(output);
         Files.writeString(output.resolve("ATTEMPT_RESERVED.lock"),Instant.now().toString(),StandardOpenOption.CREATE_NEW);
-        FinalE2eRunner.output=output;FinalE2eRunner.userId=427;FinalE2eRunner.sessionId=150;FinalE2eRunner.judgeProvider="deepseek";
+        FinalE2eRunner.output=output;FinalE2eRunner.userId=427;FinalE2eRunner.sessionId=150;
         var report=FinalE2eRunner.report;
         report.put("FINAL_E2E_STATUS","BLOCKED");report.put("runId",RUN_ID);report.put("continuationOf","final-e2e-20261013-001");
         report.put("feeAuthorizationConsumed",true);

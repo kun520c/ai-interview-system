@@ -1,3 +1,6 @@
+# Archived October 2026 report generator. Preserve the historical reports as written.
+raise SystemExit("RETIRED: this generator belongs to the 2026-10-04 baseline; do not overwrite historical reports with J1 results.")
+
 """Summarize recorded real results without changing production code or tuning parameters."""
 import json
 import re

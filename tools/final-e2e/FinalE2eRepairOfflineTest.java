@@ -26,7 +26,7 @@ public class FinalE2eRepairOfflineTest {
         catch(FileAlreadyExistsException expected) {test(true);}
         var gate=new FinalE2eGate(out,(uri,auth,body)-> {throw new AssertionError("Offline request forwarded");},Map.of("embedding",9,"jev",0,"deepseek",10),1);
         gate.begin("answer-2");try {gate.admit("jev","Bearer unused","{}".getBytes());throw new AssertionError("Known region-blocked provider admitted");}
-        catch(SecurityException expected) {test(expected.getMessage().equals("MODEL_REQUEST_BUDGET_EXHAUSTED"));}
+        catch(SecurityException expected) {test(expected.getMessage().equals("MODEL_PROVIDER_RETIRED_OR_UNKNOWN"));}
         test(gate.total()==0);
         test(FinalE2eResume.budgetUpper()<3);
         FinalE2eRunner.report.put("currentOperation","GET /api/interviews/150");

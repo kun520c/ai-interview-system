@@ -51,3 +51,5 @@ pwsh -NoProfile -File "E:\learning\IDEA_PROJECTJ\ai-interview-system\tools\rag-p
 审查报告按完整标签SHA另存 `target/rag-p4-2/analysis/<标签SHA>/analysis.json`。冻结验收为覆盖题主要机制证据4/4、库外正常正确拒绝4/4、错误准入0、相对固定Rerank Top2的独立主要机制证据保留率≥90%、引文/ID/版本检查通过。SAFE_EMPTY错误/不确定不能算库外成功；分母0或审查不确定为INCONCLUSIVE；覆盖假设被挑战为BLOCKED。逐题报告缺失主要机制、误拒、误准入和引文判断错误，并对照Milvus Top2、Rerank Top2、Gate（0.50仅保留为原历史对照规则，不在本批调参）。失败保留为 `FAIL_UNDER_PRELOCKED_RULE`；通过也只称 `PASS_ON_THIS_8_CASE_HOLDOUT_ONLY`，不意味着整题充分或生产泛化已验证。
 
 当前尚未验证：原定8题真实API兼容性与组合语义、真实延迟/usage/账单、独立人工质量指标。执行准备已READY，没有未解释SHA阻断；没有Git stage/commit/push。后续真实调用需要新的独立费用授权，历史Jev/E2E授权不能复用。
+
+J1（2026-11-11）说明：`execution/build_delta.py` 是旧 Jev 代理实验的字节差异固化工具，依赖已移除的类，现已直接拒绝执行。原证据和成功/失败结论保留。其余 RAG 工具及历史保护、隔离门禁未移除。

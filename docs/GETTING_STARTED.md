@@ -54,6 +54,16 @@ EXIT;
 
 本项目的超时接管由**后续请求触发**，不是自动后台调度。已发出的 Milvus RPC 可能迟到，正式数据的孤立向量只允许在独立维护窗口依照[手动对账指南](../tools/orphan-vectors/README.md)安全处理；默认 dry-run，不应在日常启动时运行删除。详见[并发设计说明](design/timeout-task-fencing.md)及[2026-10-19 验收记录](verification/CONCURRENCY_FINAL_ACCEPTANCE_20261019.md)。
 
+### J1 升级：移除旧模型配置
+
+自 2026-11-11 起，`deepseek.enabled=true` 仅装配 `DeepSeekJudgeProvider`；禁用时基础后端仍可启动。评分、反馈、追问建议和报告使用 DeepSeek，Embedding 提供方、Spring AI、Milvus 与 RAG 责任不变。
+
+从个人 `.env`、ignored `application-local.yaml`、IDE 启动配置、Shell 启动文件及 Windows 用户/系统环境中移除 `AI_JUDGE_PROVIDER`、`ai.judge.provider`、整个 `ai.judge.jev` 和所有 `JEV_*`（密钥、地址、模型、代理、超时、预算及重试配置）。旧 selector 即使残留为 `jev` 也不会启用 Jev。不要将旧凭据复制到测试配置或提交 Git。
+
+本轮没有 Schema 迁移。历史 `llm_model`、`prompt_version`、`raw_result` 中的 Jev 是合法历史事实，不能改名为 DeepSeek或强制套用 DeepSeek DTO；已有评价和报告继续复用。
+
+DeepSeek 保留有限连接/读取超时（默认 3s/60s），每次业务调用仅进行一次应用层 HTTP 尝试。FAILED 后可用相同 requestId、问题和完整答案内容再次提交；更改 payload 返回冲突。报告 FAILED 按同 sessionId 再次请求。stale 接管由请求触发并受 attempt/version 保护。跨模型 fallback 已删除，业务恢复仍保留；未新增自动退避、总时间预算或并发上限。
+
 ## 3. 启动基础后端
 
 在仓库根目录的 PowerShell 中配置本机环境变量：
@@ -72,7 +82,6 @@ $env:JWT_SECRET = [Convert]::ToBase64String($jwtBytes)
 
 $env:MILVUS_ENABLED = 'false'
 $env:DEEPSEEK_ENABLED = 'false'
-$env:AI_JUDGE_PROVIDER = 'deepseek'
 $env:EMBEDDING_BASE_URL = 'http://localhost:18080/v1'
 $env:EMBEDDING_API_KEY = 'local-disabled-placeholder'
 
@@ -150,7 +159,6 @@ $env:MILVUS_COLLECTION_NAME = 'knowledge_chunk_vectors_local'
 $env:DEEPSEEK_ENABLED = 'true'
 $deepseekKey = Read-Host 'DeepSeek API Key' -AsSecureString
 $env:DEEPSEEK_API_KEY = [System.Net.NetworkCredential]::new('', $deepseekKey).Password
-$env:AI_JUDGE_PROVIDER = 'deepseek'
 
 .\mvnw.cmd -B -ntp spring-boot:run
 ```

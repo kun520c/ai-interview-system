@@ -21,3 +21,5 @@ original private `PHASE_5B_EPOCH_06_RUN_EVIDENCE.json` archive. That archive sta
 outside Git. Default Maven tests neither read nor require it, and this synthetic
 test suite does not independently reproduce its statistics, model quality,
 real latency, usage or charges. Historical reports and evidence remain preserved.
+
+J1（2026-11-11）：`jev-e05-numeric-captures.json`、`jev-e06-feedback-captures.json` 是历史采样 fixture，保留原始事实。对应 Jev 协议实现和专属测试已移除；这些文件不再是活跃模型输入，不需要密钥，也不用于声称当前 DeepSeek 效果已验证。

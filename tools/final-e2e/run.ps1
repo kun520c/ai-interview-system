@@ -46,7 +46,7 @@ function Invoke-FinalChild {
         }
     }
     if ($Models) {
-        foreach ($taskName in @('EMBEDDING_API_KEY','DEEPSEEK_API_KEY','JEV_API_KEY')) {
+        foreach ($taskName in @('EMBEDDING_API_KEY','DEEPSEEK_API_KEY')) {
             $taskValue=[Environment]::GetEnvironmentVariable($taskName,'Process')
             if (-not $taskValue) { $taskValue=[Environment]::GetEnvironmentVariable($taskName,'User') }
             if (-not $taskValue) { throw "Existing provider credential missing: $taskName" }
@@ -85,7 +85,7 @@ if ($Mode -eq 'ExecuteOnce') {
     $taskTests=@('AuthServiceTest','AuthControllerTest','JwtAuthenticationFilterTest','InterviewControllerTest',
         'InterviewSessionServiceTest','InterviewWorkflowServiceTest','InterviewWorkflowTransactionServiceIntegrationTest',
         'InterviewReportServiceTest','InterviewReportTransactionServiceIntegrationTest','UserWeaknessServiceTest',
-        'JevJudgeProviderTest','JevClientTest','DeepSeekEvaluationClientTest','DeepSeekInterviewReportGeneratorTest',
+        'JudgeConfigurationTest','DeepSeekJudgeProviderTest','DeepSeekEvaluationClientTest','DeepSeekInterviewReportGeneratorTest',
         'KnowledgeRetrievalServiceTest','EvaluationOrchestrationServiceTest','EnvironmentIsolationInitializerTest','FullInterviewBusinessOfflineTest')
     $taskTotal=0
     $taskSuites=@()

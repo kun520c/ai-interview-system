@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.kun.aiinterview.interview.evaluation.*;
 import com.kun.aiinterview.interview.evaluation.judge.*;
-import com.kun.aiinterview.interview.evaluation.judge.jev.*;
-import com.kun.aiinterview.interview.evaluation.llm.deepseek.DeepSeekEvaluationClient;
 import com.kun.aiinterview.interview.evaluation.prompt.EvaluationPromptBuilder;
 import com.kun.aiinterview.interview.evaluation.validation.LlmEvaluationValidator;
 import com.kun.aiinterview.interview.evaluation.score.EvaluationScoreCalculator;
@@ -27,8 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.env.Environment;
-import org.springframework.http.client.JdkClientHttpRequestFactory;
-import org.springframework.web.client.RestClient;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.context.annotation.Import;
@@ -77,7 +73,6 @@ class AiSystemBaselineEvaluationTest {
     @Autowired EvaluationScoreCalculator scores;
     @Autowired FollowUpPolicy followUpPolicy;
     @Autowired JudgeProvider judge;
-    @Autowired DeepSeekEvaluationClient deepseek;
     @Autowired KnowledgeTextChunker chunker;
     @Autowired JwtTokenService jwtTokens;
     @LocalServerPort int port;
@@ -108,8 +103,7 @@ class AiSystemBaselineEvaluationTest {
         Map<String,Object> result = new LinkedHashMap<>();
         result.put("timestamp", Instant.now().toString());
         result.put("mysqlVersion", db.queryForObject("SELECT VERSION()", String.class));
-        result.put("judgeProvider", environment.getProperty("ai.judge.provider"));
-        result.put("jevCredentialPresent", hasText(environment.getProperty("ai.judge.jev.api-key")));
+        result.put("judgeProvider", "deepseek");
         result.put("deepseekCredentialPresent", hasText(environment.getProperty("deepseek.api-key")));
         result.put("deepseekModel", environment.getProperty("deepseek.model"));
         result.put("embeddingModel", embeddingProperties.getModel());
@@ -192,7 +186,6 @@ class AiSystemBaselineEvaluationTest {
         var base = data.path("context");
         var constantRetrieval = evaluationRetrieval.retrieve(context(base,"retrieval does not use this"),5);
         List<Object> rows = new ArrayList<>();
-        boolean jevAvailable = hasText(environment.getProperty("ai.judge.jev.api-key"));
         JudgeProvider provider = judge;
         for (JsonNode c : data.path("cases")) {
             for (int repeat=1;repeat<=c.path("repeats").asInt(1);repeat++) {
@@ -200,27 +193,13 @@ class AiSystemBaselineEvaluationTest {
                 Map<String,Object> row = evaluateJudge(provider,ctx,constantRetrieval);
                 row.put("case",c);
                 row.put("repeat",repeat);
-                row.put("jevStatus",jevAvailable ? row.get("actualProvider") : "BLOCKED_MISSING_CREDENTIAL");
                 rows.add(row);
                 write("judge-cases.json",rows);
                 System.out.println("BASELINE_JUDGE_CASE=" + c.path("id").asText() + " REPEAT=" + repeat + " STATUS=" + row.get("status"));
             }
         }
-        // Network failure injection: no fabricated AI responses; fallback still calls real DeepSeek.
-        // Port 1 is deliberately unavailable. This is resilience evidence, not Jev quality evidence.
-        JevProperties failureProperties = new JevProperties();
-        failureProperties.setBaseUrl(URI.create("http://127.0.0.1:1"));
-        failureProperties.setApiKey("evaluation-local-network-fault");
-        failureProperties.setConnectTimeout(Duration.ofMillis(250));
-        failureProperties.setReadTimeout(Duration.ofMillis(250));
-        var faultClient = new JevClient(RestClient.builder().baseUrl(failureProperties.getBaseUrl().toString())
-                .requestFactory(new JdkClientHttpRequestFactory(HttpClient.newBuilder()
-                        .connectTimeout(Duration.ofMillis(250)).build())).build(),mapper);
-        var faultProvider = new JevJudgeProvider(faultClient,failureProperties,deepseek,
-                new DeepSeekJudgeProvider(deepseek),mapper,validator);
-        var networkFault = evaluateJudge(faultProvider,context(base,data.path("cases").get(0).path("input").asText()),constantRetrieval);
-        networkFault.put("injection","real connection refusal; real DeepSeek fallback; no mock responses");
-        write("judge-network-fault.json",networkFault);
+        // HTTP faults are covered offline. Real baseline only measures the DeepSeek path;
+        // explicit business retry and stale recovery remain in the recovery phase.
 
         List<Object> ablation = new ArrayList<>();
         JsonNode partial = data.path("cases").get(1);
@@ -359,7 +338,7 @@ class AiSystemBaselineEvaluationTest {
             JsonNode current=creation.body().path("data").path("currentQuestion");
             Map<String,Object> session=new LinkedHashMap<>();
             session.put("quality",quality);session.put("sessionId",sessionId);session.put("creation",creation);
-            session.put("configuredProvider",environment.getProperty("ai.judge.provider"));
+            session.put("configuredProvider","deepseek");
             List<Object> turns=new ArrayList<>();session.put("turns",turns);sessions.add(session);
             if(quality.equals("excellent")) {
                 long questionId=current.path("interviewQuestionId").asLong();

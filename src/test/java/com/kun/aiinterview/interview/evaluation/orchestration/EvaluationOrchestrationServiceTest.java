@@ -322,8 +322,9 @@ class EvaluationOrchestrationServiceTest {
     }
 
     @Test
-    void shouldReturnExistingEvaluationWithoutInvokingPipelineOrInsert() {
+    void shouldReturnHistoricalJevFinalWithoutInvokingPipelineOrInsert() {
         AnswerEvaluation existing = existingEvaluation("GOOD");
+        markHistoricalJev(existing);
         when(answerEvaluationMapper.getByAnswerId(ANSWER_ID)).thenReturn(existing);
 
         EvaluationOrchestrationResult result = service.evaluate(ANSWER_ID, true, "attempt-test");
@@ -355,7 +356,7 @@ class EvaluationOrchestrationServiceTest {
     }
 
     @Test
-    void shouldRecoverFollowUpTargetsFromExistingEvaluationWithoutDeepSeek()
+    void shouldRecoverHistoricalJevFollowUpTargetsWithoutDeepSeek()
             throws Exception {
         List<LlmEvaluationSuggestion.ScoringPointResult>
                 persistedResults = List.of(
@@ -371,6 +372,7 @@ class EvaluationOrchestrationServiceTest {
                                 persistedResults
                         )
                 );
+        markHistoricalJev(existing);
         EvaluationContext context = fixture(
                 ANSWER_ID,
                 EvaluationMode.MAIN_ANSWER,
@@ -598,24 +600,30 @@ class EvaluationOrchestrationServiceTest {
     }
 
     @Test
-    void shouldPersistSelectedJudgeMetadataRatherThanOriginalDeepSeekPromptVersion() {
+    void shouldPreserveProviderResultMetadataWithoutRewritingIt() {
         EvaluationScore score = new EvaluationScore(17, 17, 17, 17, 17, 85);
         EvaluationDecision decision = new EvaluationDecision(
                 EvaluationPhase.FINAL, DecisionAction.NEXT_MAIN, List.of());
         stubHappyPipeline(ANSWER_ID, EvaluationMode.MAIN_ANSWER, score,
                 EvaluationLevel.GOOD, decision, false);
-        String combinedRaw = "{\"provider\":\"jev\",\"judge\":{},\"generation\":{}}";
+        String combinedRaw = "{\"provider\":\"fixture\",\"opaque\":true}";
         JudgeProvider selectedJudge = (context, prompt) -> new JudgeProvider.Result(
-                "jev-1.13.0", "jev-judge-v1", combinedRaw,
+                "fixture-model", "fixture-prompt-v1", combinedRaw,
                 deepSeekEvaluationClient.evaluate(prompt).suggestion());
         service = serviceWith(objectMapper, selectedJudge);
 
         var result = service.evaluate(ANSWER_ID, true, "attempt-test");
 
         AnswerEvaluation prepared = result.evaluation();
-        assertThat(prepared.getLlmModel()).isEqualTo("jev-1.13.0");
-        assertThat(prepared.getPromptVersion()).isEqualTo("jev-judge-v1");
+        assertThat(prepared.getLlmModel()).isEqualTo("fixture-model");
+        assertThat(prepared.getPromptVersion()).isEqualTo("fixture-prompt-v1");
         assertThat(prepared.getRawResult()).isEqualTo(combinedRaw);
+    }
+
+    private void markHistoricalJev(AnswerEvaluation evaluation) {
+        evaluation.setLlmModel("jev-1.13.0");
+        evaluation.setPromptVersion("jev-judge-v1");
+        evaluation.setRawResult("{\"provider\":\"jev\",\"judge\":{},\"generation\":{}}");
     }
 
     private EvaluationOrchestrationService serviceWith(ObjectMapper mapper) {

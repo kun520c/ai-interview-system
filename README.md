@@ -54,8 +54,8 @@ flowchart TB
     RAG --> EMB["Spring AI Embedding"]
     RAG --> VDB[("Milvus<br/>向量 TopK")]
     RAG --> DB
-    S --> J["JudgeProvider<br/>DeepSeek（默认）/ Jev（可选）"]
-    J --> CHECK["Java 输出校验 + 五维计分<br/>追问策略 / 回退处理"]
+    S --> J["JudgeProvider<br/>DeepSeek"]
+    J --> CHECK["Java 输出校验 + 五维计分<br/>追问策略 / 业务恢复"]
     CHECK --> S
 ```
 
@@ -88,8 +88,8 @@ flowchart TB
 **4. 外部模型失败后的恢复**
 
 - 使用 `EVALUATING` / `GENERATING` / `PROCESSING` 超时状态回收、幂等重放和持久化结果复用处理失败；**超时接管由后续请求触发，并非后台定时任务**。
-- DeepSeek 为默认 Judge；可选 Jev 负责原生判分与建议，再由 DeepSeek 生成反馈，校验失败时按受限预算重试或回退。
-- 外部调用可能重试，不承诺恰好执行一次；异常与状态恢复必须以数据库事实为准。
+- 评分、反馈、追问建议和报告统一使用 DeepSeek；单次调用不做应用层 HTTP 自动重试，也没有跨模型 fallback。
+- FAILED 后由同一请求显式重试；stale 状态由后续请求竞争接管。重试/接管可能再次调用模型，不承诺外部调用恰好执行一次；旧 attempt/version 不能提交到新任务。
 
 [更完整的实现说明与接口清单](docs/PROJECT_TECHNICAL_DETAILS_20261015.md) · [后端源码学习手册](docs/study/AI模拟面试系统-后端源码与面试学习手册.md)
 
@@ -99,9 +99,11 @@ flowchart TB
 | --- | --- |
 | 后端 | Java 21、Spring Boot 3.5、Spring MVC、Spring Security、JWT、MyBatis |
 | 数据存储 | MySQL 8.0（事务、唯一约束、状态和快照） |
-| AI / 检索 | DeepSeek、可选 Jev、Spring AI Embedding、Milvus SDK、RAG 轨迹 |
+| AI / 检索 | DeepSeek、Spring AI Embedding、Milvus SDK、RAG 轨迹 |
 | 前端 | Vue 3、TypeScript、Vite、Pinia、Vue Router |
 | 验证 | JUnit / Spring 测试、Vitest、浏览器自动化、隔离 MySQL 与本地 AI 替身 |
+
+J1 升级无需数据库迁移；旧 Jev 评价与 raw_result 保持原样。请按[运行指南](docs/GETTING_STARTED.md#j1-升级移除旧模型配置)移除旧环境 selector 和密钥配置。
 
 Spring AI **仅用于 Embedding 适配**，向量存储由原生 Milvus SDK 封装实现。本项目不是微服务架构，也未接入消息队列或 Redis 缓存。
 

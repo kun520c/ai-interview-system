@@ -8,16 +8,20 @@ import com.kun.aiinterview.interview.evaluation.EvaluationContext;
 import com.kun.aiinterview.interview.evaluation.EvaluationMode;
 import com.kun.aiinterview.interview.evaluation.judge.DeepSeekJudgeProvider;
 import com.kun.aiinterview.interview.evaluation.judge.JudgeProvider;
-import com.kun.aiinterview.interview.evaluation.judge.jev.JevClient;
-import com.kun.aiinterview.interview.evaluation.judge.jev.JevJudgeProvider;
-import com.kun.aiinterview.interview.evaluation.judge.jev.JevProperties;
 import com.kun.aiinterview.interview.evaluation.llm.LlmEvaluationSuggestion;
 import com.kun.aiinterview.interview.evaluation.llm.deepseek.DeepSeekEvaluationClient;
 import com.kun.aiinterview.interview.evaluation.llm.deepseek.DeepSeekProperties;
 import com.kun.aiinterview.interview.evaluation.prompt.EvaluationPrompt;
 import com.kun.aiinterview.interview.evaluation.standard.EvaluationStandard;
-import com.kun.aiinterview.interview.evaluation.validation.LlmEvaluationValidator;
 import com.kun.aiinterview.interview.model.InterviewReportGenerationResult;
+import com.kun.aiinterview.interview.orchestration.EvaluationOrchestrationService;
+import com.kun.aiinterview.interview.report.deepseek.DeepSeekInterviewReportGenerator;
+import com.kun.aiinterview.interview.report.prompt.InterviewReportPromptBuilder;
+import org.springframework.test.web.client.ResponseCreator;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.util.function.Function;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingBatchResult;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingClient;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingVector;
@@ -69,7 +73,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /** Real HTTP/security/business/MyBatis/transactions, with explicitly mocked external ports only. */
-@SpringBootTest(properties = {"milvus.enabled=true", "deepseek.enabled=true", "ai.judge.provider=deepseek",
+@SpringBootTest(properties = {"milvus.enabled=true", "deepseek.enabled=true",
         "deepseek.api-key=offline-test-key", "rag.retrieval.cosine-threshold-enabled=false"})
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
@@ -79,6 +83,9 @@ class FullInterviewBusinessOfflineTest {
     @Autowired ObjectMapper json;
     @Autowired JdbcTemplate jdbc;
     @Autowired InterviewService interviewService;
+    @Autowired EvaluationOrchestrationService orchestration;
+    @Autowired DeepSeekProperties deepSeekProperties;
+    @Autowired org.mybatis.spring.SqlSessionTemplate sqlSession;
     @MockitoBean EmbeddingClient embedding;
     @MockitoBean VectorStoreClient vectors;
     @MockitoBean JudgeProvider judge;
@@ -236,23 +243,18 @@ class FullInterviewBusinessOfflineTest {
 
     static Stream<Arguments> invalidModelScores() {
         var cases = new ArrayList<Arguments>();
-        for (String provider : List.of("deepseek", "jev-fallback")) {
-            for (String field : scoreFields()) {
-                for (String value : List.of("-1", "21", "null", "missing")) {
-                    cases.add(Arguments.of(provider, field, value));
-                }
-            }
-            for (String value : List.of("1.5", "\"20\"", "\"not-a-score\"", "true", "[]")) {
-                cases.add(Arguments.of(provider, "correctnessScore", value));
+        for (String field : scoreFields()) {
+            for (String value : List.of("-1", "21", "null", "missing", "1.5", "\"20\"", "\"not-a-score\"", "true", "[]")) {
+                cases.add(Arguments.of(field, value));
             }
         }
         return cases.stream();
     }
 
     static Stream<Arguments> legalModelScores() {
-        return Stream.of("deepseek", "jev-fallback").flatMap(provider -> scoreFields().stream()
+        return scoreFields().stream()
                 .flatMap(field -> Stream.of(0, 20)
-                        .map(score -> Arguments.of(provider, field, score))));
+                        .map(score -> Arguments.of(field, score)));
     }
 
     private static List<String> scoreFields() {
@@ -261,8 +263,8 @@ class FullInterviewBusinessOfflineTest {
 
     @ParameterizedTest
     @MethodSource("invalidModelScores")
-    void invalidModelScoresReturnSanitized502AndPreserveFailedState(String provider, String field, String value) throws Exception {
-        useHttpModel(provider, node -> {
+    void invalidModelScoresReturnSanitized502AndPreserveFailedState(String field, String value) throws Exception {
+        useHttpModel(node -> {
             if (value.equals("missing")) node.remove(field);
             else try { node.set(field, json.readTree(value)); } catch (Exception error) { throw new AssertionError(error); }
         });
@@ -278,8 +280,8 @@ class FullInterviewBusinessOfflineTest {
 
     @ParameterizedTest
     @MethodSource("legalModelScores")
-    void acceptsZeroAndTwentyInEveryDimension(String provider, String field, int score) throws Exception {
-        useHttpModel(provider, node -> node.put(field, score));
+    void acceptsZeroAndTwentyInEveryDimension(String field, int score) throws Exception {
+        useHttpModel(node -> node.put(field, score));
         var created = request("POST", "/api/interviews", Map.of("difficulty", "EASY"), 200);
         var response = modelAnswerResponse(created.path("sessionId").asLong(),
                 modelAnswer(created.at("/currentQuestion/interviewQuestionId").asLong()), 200);
@@ -307,7 +309,7 @@ class FullInterviewBusinessOfflineTest {
     }
 
     @Test void failedModelRetryReusesIdentityAndCannotChangeOriginalPayload() throws Exception {
-        useHttpModel("deepseek", node -> { if (providerCalls.get() == 1) node.put("correctnessScore", 21); });
+        useHttpModel(node -> { if (providerCalls.get() == 1) node.put("correctnessScore", 21); });
         var created = request("POST", "/api/interviews", Map.of("difficulty", "EASY"), 200);
         long sessionId = created.path("sessionId").asLong();
         long questionId = created.at("/currentQuestion/interviewQuestionId").asLong();
@@ -327,6 +329,137 @@ class FullInterviewBusinessOfflineTest {
                 Integer.class, body.get("requestId"))).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM answer_evaluation e JOIN interview_answer a ON a.id=e.answer_id WHERE a.request_id=?",
                 Integer.class, body.get("requestId"))).isEqualTo(1);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"429", "500", "503", "connect", "timeout", "empty", "blank", "length", "content_filter", "illegal-json"})
+    void singleHttpFailureAllowsOnlyExplicitSamePayloadRecovery(String fault) throws Exception {
+        doAnswer(invocation -> {
+            providerCalls.incrementAndGet();
+            return withHttpResponse(faultResponse(fault), client -> new DeepSeekJudgeProvider(client)
+                    .evaluate(invocation.getArgument(0), invocation.getArgument(1)));
+        }).when(judge).evaluate(any(), any());
+        var created = request("POST", "/api/interviews", Map.of("difficulty", "EASY"), 200);
+        long sessionId = created.path("sessionId").asLong();
+        long questionId = created.at("/currentQuestion/interviewQuestionId").asLong();
+        var body = modelAnswer(questionId);
+        modelAnswerResponse(sessionId, body, 502);
+        assertFailedModelState(sessionId, questionId, body.get("requestId").toString());
+        assertThat(providerCalls.get()).isEqualTo(1);
+        request("POST", "/api/interviews/" + sessionId + "/answers", Map.of("interviewQuestionId", questionId,
+                "requestId", body.get("requestId"), "answerContent", "changed"), 409);
+        assertThat(providerCalls.get()).isEqualTo(1);
+        useHttpModel(node -> { });
+        var recovered = modelAnswerResponse(sessionId, body, 200);
+        assertThat(modelAnswerResponse(sessionId, body, 200)).isEqualTo(recovered);
+        assertThat(providerCalls.get()).isEqualTo(2);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM answer_evaluation e JOIN interview_answer a ON a.id=e.answer_id WHERE a.request_id=?",
+                Integer.class, body.get("requestId"))).isEqualTo(1);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"429", "500", "503", "connect", "timeout", "empty", "blank", "length", "content_filter", "illegal-json", "missing-fields", "wrong-type"})
+    void reportFailureDoesNotPublishOrUpdateWeaknessAndSameSessionCanRecover(String fault) throws Exception {
+        useHttpModel(node -> { });
+        var created = request("POST", "/api/interviews", Map.of("difficulty", "EASY"), 200);
+        long sessionId = created.path("sessionId").asLong();
+        var current = created.path("currentQuestion");
+        for (int i = 0; i < 5; i++) {
+            current = modelAnswerResponse(sessionId, modelAnswer(current.path("interviewQuestionId").asLong()), 200)
+                    .at("/data/nextQuestion");
+        }
+        var calls = new AtomicInteger();
+        useHttpReport(fault, calls);
+        var failure = mvc.perform(post("/api/interviews/" + sessionId + "/report")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadGateway()).andExpect(jsonPath("$.code").value(502))
+                .andExpect(jsonPath("$.message").value("外部服务暂时不可用")).andReturn();
+        assertThat(failure.getResponse().getContentAsString()).doesNotContain("PRIVATE_MODEL_OUTPUT", "private-model-id", token);
+        assertThat(calls.get()).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT report_status FROM interview_session WHERE id=?", String.class, sessionId)).isEqualTo("FAILED");
+        assertThat(jdbc.queryForObject("SELECT status FROM interview_session WHERE id=?", String.class, sessionId)).isEqualTo("COMPLETED");
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM interview_report WHERE session_id=?", Integer.class, sessionId)).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM user_weakness WHERE user_id=?", Integer.class, userId)).isZero();
+        useHttpReport("valid-report", calls);
+        var ready = request("POST", "/api/interviews/" + sessionId + "/report", null, 200);
+        assertThat(request("POST", "/api/interviews/" + sessionId + "/report", null, 200)).isEqualTo(ready);
+        assertThat(calls.get()).isEqualTo(2);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM interview_report WHERE session_id=?", Integer.class, sessionId)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT report_status FROM interview_session WHERE id=?", String.class, sessionId)).isEqualTo("READY");
+        assertThat(jdbc.queryForObject("SELECT MAX(discovered_count) FROM user_weakness WHERE user_id=?", Integer.class, userId)).isEqualTo(1);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void historicalJevFinalAndFollowUpReadAndReplayWithoutModelOrDuplicateTrace(boolean followUp) throws Exception {
+        if (!followUp) useHttpModel(node -> { });
+        var created = request("POST", "/api/interviews", Map.of("difficulty", "EASY"), 200);
+        long sessionId = created.path("sessionId").asLong();
+        var body = modelAnswer(created.at("/currentQuestion/interviewQuestionId").asLong());
+        var original = modelAnswerResponse(sessionId, body, 200);
+        long answerId = jdbc.queryForObject("SELECT id FROM interview_answer WHERE request_id=?", Long.class, body.get("requestId"));
+        // Only this test's newly created row becomes a historical fixture. The opaque envelope is not a DeepSeek DTO.
+        String historicalRaw = "{\"provider\":\"jev\",\"judge\":{\"answers\":{}},\"generation\":{\"rawJson\":\"legacy opaque payload\"}}";
+        assertThat(jdbc.update("UPDATE answer_evaluation SET llm_model='jev-1.13.0',prompt_version='jev-judge-v1',raw_result=? WHERE answer_id=?",
+                historicalRaw, answerId)).isEqualTo(1);
+        // JdbcTemplate fixture updates bypass MyBatis' transaction-local first-level cache.
+        sqlSession.clearCache();
+        var before = jdbc.queryForMap("SELECT * FROM answer_evaluation WHERE answer_id=?", answerId);
+        var tracesBefore = jdbc.queryForList("SELECT * FROM rag_retrieval_batch WHERE answer_id=?", answerId);
+        var hitsBefore = jdbc.queryForList("SELECT * FROM rag_hit_log WHERE answer_id=?", answerId);
+        var questionsBefore = jdbc.queryForList("SELECT * FROM interview_question WHERE session_id=? ORDER BY id", sessionId);
+        clearInvocations(judge, embedding, vectors, reportGenerator);
+        var detail = request("GET", "/api/interviews/" + sessionId, null, 200);
+        assertThat(detail.path("questions").get(0).path("evaluation").path("evaluationPhase").asText())
+                .isEqualTo(followUp ? "INITIAL" : "FINAL");
+        assertThat(modelAnswerResponse(sessionId, body, 200)).isEqualTo(original);
+        var replay = orchestration.evaluate(answerId, true, "history-read-only");
+        assertThat(replay.decisionAction().name()).isEqualTo(followUp ? "FOLLOW_UP" : "NEXT_MAIN");
+        assertThat(replay.evaluation().getLlmModel()).isEqualTo("jev-1.13.0");
+        assertThat(json.readTree(replay.evaluation().getRawResult())).isEqualTo(json.readTree(historicalRaw));
+        if (followUp) assertThat(replay.followUpTargetPointIds()).isNotEmpty();
+        assertThat(jdbc.queryForMap("SELECT * FROM answer_evaluation WHERE answer_id=?", answerId)).isEqualTo(before);
+        assertThat(jdbc.queryForList("SELECT * FROM rag_retrieval_batch WHERE answer_id=?", answerId)).isEqualTo(tracesBefore);
+        assertThat(jdbc.queryForList("SELECT * FROM rag_hit_log WHERE answer_id=?", answerId)).isEqualTo(hitsBefore);
+        assertThat(jdbc.queryForList("SELECT * FROM interview_question WHERE session_id=? ORDER BY id", sessionId)).isEqualTo(questionsBefore);
+        verifyNoInteractions(judge, embedding, vectors, reportGenerator);
+    }
+
+    private void useHttpReport(String fault, AtomicInteger calls) {
+        doAnswer(invocation -> {
+            calls.incrementAndGet();
+            return withHttpResponse(faultResponse(fault), client -> new DeepSeekInterviewReportGenerator(
+                    client, deepSeekProperties, new InterviewReportPromptBuilder(json), new EvaluationStandard(), json)
+                    .generate(invocation.getArgument(0), invocation.getArgument(1), invocation.getArgument(2)));
+        }).when(reportGenerator).generate(any(), any(), any());
+    }
+
+    private <T> T withHttpResponse(ResponseCreator response, Function<DeepSeekEvaluationClient, T> call) {
+        var builder = RestClient.builder().baseUrl("http://deepseek.offline");
+        var server = MockRestServiceServer.bindTo(builder).build();
+        server.expect(org.springframework.test.web.client.ExpectedCount.once(),
+                        org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo("http://deepseek.offline/chat/completions"))
+                .andRespond(response);
+        try { return call.apply(new DeepSeekEvaluationClient(builder.build(), deepSeekProperties, json)); }
+        finally { server.verify(); }
+    }
+
+    private ResponseCreator faultResponse(String fault) throws Exception {
+        if (fault.matches("[45][0-9]{2}")) return withRawStatus(Integer.parseInt(fault)).body("PRIVATE_MODEL_OUTPUT");
+        if (fault.equals("connect")) return withException(new ConnectException("PRIVATE_MODEL_OUTPUT"));
+        if (fault.equals("timeout")) return withException(new SocketTimeoutException("PRIVATE_MODEL_OUTPUT"));
+        if (fault.equals("empty")) return withSuccess("", MediaType.APPLICATION_JSON);
+        String content = switch (fault) {
+            case "blank" -> "   ";
+            case "illegal-json" -> "{PRIVATE_MODEL_OUTPUT";
+            case "wrong-type" -> "{\"summary\":[],\"strengths\":true}";
+            case "valid-report" -> json.writeValueAsString(Map.of("summary", "Recovered report", "strengths", List.of("Strength"),
+                    "weaknesses", List.of("Weakness"), "suggestions", List.of("Suggestion")));
+            default -> "{}";
+        };
+        String finish = List.of("length", "content_filter").contains(fault) ? fault : "stop";
+        return withSuccess(json.writeValueAsString(Map.of("model", "private-model-id", "choices", List.of(Map.of(
+                "index", 0, "finish_reason", finish, "message", Map.of("role", "assistant", "content", content))))), MediaType.APPLICATION_JSON);
     }
 
     private Map<String, Object> modelAnswer(long questionId) {
@@ -361,7 +494,7 @@ class FullInterviewBusinessOfflineTest {
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM user_weakness WHERE user_id=?", Integer.class, userId)).isZero();
     }
 
-    private void useHttpModel(String provider, Consumer<ObjectNode> change) {
+    private void useHttpModel(Consumer<ObjectNode> change) {
         doAnswer(invocation -> {
             providerCalls.incrementAndGet();
             EvaluationContext context = invocation.getArgument(0);
@@ -379,17 +512,10 @@ class FullInterviewBusinessOfflineTest {
                                     "index", 0, "finish_reason", "stop", "message", Map.of("role", "assistant", "content", content.toString()))))),
                             MediaType.APPLICATION_JSON));
             var client = new DeepSeekEvaluationClient(builder.build(),
-                    new DeepSeekProperties(), json);
+                    deepSeekProperties, json);
             var direct = new DeepSeekJudgeProvider(client);
             try {
-                if (provider.equals("deepseek")) return direct.evaluate(context, prompt);
-                var nativeClient = mock(JevClient.class);
-                when(nativeClient.evaluate(any())).thenThrow(new ExternalServiceException("synthetic native outage"));
-                try {
-                    return new JevJudgeProvider(nativeClient,
-                            new JevProperties(), client, direct, json,
-                            new LlmEvaluationValidator()).evaluate(context, prompt);
-                } finally { verify(nativeClient, times(1)).evaluate(any()); }
+                return direct.evaluate(context, prompt);
             } finally { server.verify(); }
         }).when(judge).evaluate(any(), any());
     }

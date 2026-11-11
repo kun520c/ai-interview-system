@@ -13,7 +13,15 @@ public class FinalE2eOfflineTest {
     public static void main(String[] args) throws Exception {
         FinalE2eRunner.output=Path.of("target/final-e2e/preparation");
         var gate=new FinalE2eGate(FinalE2eRunner.output,(uri,auth,body)-> { throw new AssertionError("Offline transport invoked"); });
+        var direct = new com.kun.aiinterview.interview.evaluation.judge.DeepSeekJudgeProvider(null);
+        tests++; RagE2eRunner.verifyJudge(direct);
+        tests++; RagE2eRunner.verifyJudge(FinalE2eAudit.fullE2eObservers().postProcessAfterInitialization(direct, "judgeProvider"));
+        tests++; RagE2eRunner.verifyJudge(RagE2eAudit.e2eObservers().postProcessAfterInitialization(direct, "judgeProvider"));
+        com.kun.aiinterview.interview.evaluation.judge.JudgeProvider unexpected = (context, prompt) -> null;
+        expectBlocked(() -> RagE2eRunner.verifyJudge(unexpected));
         expectBlocked(()->FinalE2eGate.provider("/unknown"));
+        expectBlocked(()->FinalE2eGate.provider("/jev/v1/systemone"));
+        expectBlocked(()->gate.admit("jev","Bearer retired-key","{}".getBytes()));
         expectBlocked(()->gate.admit("deepseek","Bearer missing",new byte[FinalE2eGate.BODY_CAP+1]));
         expectBlocked(()->gate.admit("embedding","Bearer missing","{}".getBytes()));
         gate.begin("report");
@@ -21,12 +29,14 @@ public class FinalE2eOfflineTest {
         gate.begin("answer-1");
         gate.counts.put("embedding",10);
         expectBlocked(()->gate.admit("embedding","Bearer missing","{}".getBytes()));
-        gate.counts.put("deepseek",21);
+        gate.counts.put("deepseek",11);
         expectBlocked(()->gate.admit("deepseek","Bearer missing","{}".getBytes()));
-        gate.counts.put("deepseek",0); gate.operationCounts.put("deepseek",2);
+        gate.counts.put("deepseek",0); gate.operationCounts.put("deepseek",1);
         expectBlocked(()->gate.admit("deepseek","Bearer missing","{}".getBytes()));
         gate.operationCounts.clear();
         expectBlocked(()->gate.admit("deepseek","Bearer missing","{}".getBytes()));
+        tests++; FinalE2eRunner.check(gate.limits.equals(Map.of("embedding",10,"deepseek",11))
+                && gate.deepSeekPerAnswer == 1, "SINGLE_MODEL_BUDGET");
         tests++; FinalE2eRunner.check(((Number)FinalE2eRunner.budget().get("conservativeBodyBasedUpperCny")).doubleValue()<5,"BUDGET");
         tests++;
         var old=Path.of("target/final-e2e/preparation/offline-reservation-probe");

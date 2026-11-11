@@ -78,7 +78,7 @@ public final class BrowserE2eServer {
                 "--milvus.enabled=true", "--milvus.collection-name=knowledge_chunk_vectors_test",
                 "--deepseek.enabled=true", "--deepseek.base-url=http://127.0.0.1:18097",
                 "--deepseek.api-key=local-mock-only", "--deepseek.model=browser-e2e-mock-chat",
-                "--deepseek.read-timeout=10s", "--ai.judge.provider=deepseek",
+                "--deepseek.read-timeout=10s",
                 "--rag.retrieval.cosine-threshold-enabled=false");
     }
 

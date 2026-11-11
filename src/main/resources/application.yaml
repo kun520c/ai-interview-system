@@ -60,24 +60,3 @@ deepseek:
   max-tokens: ${DEEPSEEK_MAX_TOKENS:4096}
   connect-timeout: ${DEEPSEEK_CONNECT_TIMEOUT:3s}
   read-timeout: ${DEEPSEEK_READ_TIMEOUT:60s}
-
-ai:
-  judge:
-    provider: ${AI_JUDGE_PROVIDER:deepseek}
-    jev:
-      base-url: ${JEV_BASE_URL:https://api.typesafe.ai}
-      api-key: ${JEV_API_KEY:}
-      model: ${JEV_MODEL:jev-latest}
-      connect-timeout: ${JEV_CONNECT_TIMEOUT:3s}
-      read-timeout: ${JEV_READ_TIMEOUT:20s}
-      # 0 disables confidence fallback until a threshold is calibrated on project data.
-      min-confidence: ${JEV_MIN_CONFIDENCE:0.0}
-      # Jev composition only; the default DeepSeek judge keeps its existing policy.
-      feedback-max-retries: ${JEV_FEEDBACK_MAX_RETRIES:1}
-      request-timeout: ${JEV_REQUEST_TIMEOUT:80s}
-      feedback-timeout: ${JEV_FEEDBACK_TIMEOUT:20s}
-      fallback-timeout: ${JEV_FALLBACK_TIMEOUT:25s}
-      proxy:
-        enabled: ${JEV_PROXY_ENABLED:false}
-        host: ${JEV_PROXY_HOST:}
-        port: ${JEV_PROXY_PORT:}

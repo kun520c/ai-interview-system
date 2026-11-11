@@ -1,5 +1,7 @@
 # 单次真实 RAG HTTP E2E 准备交付
 
+> J1（2026-11-11）当前入口说明：评分仅使用 DeepSeek，不读取旧 selector 或 Jev 密钥，不转发 Jev API。final-e2e 每答案最多一次 DeepSeek 请求；保留 Embedding/RAG、隔离目标及付费门禁。以下日期化执行经过、模型调用数、价格和成功/失败结论均为历史证据，不代表当前配置；不重写、不重跑原收费实验。
+
 ## 2026-10-12 第三次执行后的只读一致性复验
 
 第三次 `rag-e2e-attempt-003-20261012` 已执行。原 report.json 保留 FAIL / RAW_MODEL_TO_DB_MISMATCH，

@@ -15,14 +15,14 @@ $collection = if ($ordinaryTests) { 'knowledge_chunk_vectors_test' } else { 'kno
 $prefix = if ($ordinaryTests) { 'TEST' } else { 'EVALUATION' }
 $settingNames = @('DB_USERNAME','DB_PASSWORD','JWT_SECRET',
     'EMBEDDING_API_KEY','EMBEDDING_BASE_URL','EMBEDDING_MODEL',
-    'EMBEDDING_DIMENSION','EMBEDDING_PROFILE_VERSION','JEV_API_KEY','JEV_MODEL',
+    'EMBEDDING_DIMENSION','EMBEDDING_PROFILE_VERSION',
     'DEEPSEEK_API_KEY','DEEPSEEK_BASE_URL',
     "$($prefix)_DB_URL","$($prefix)_DB_USERNAME","$($prefix)_DB_PASSWORD",
     "$($prefix)_MILVUS_COLLECTION_NAME","$($prefix)_MILVUS_DATABASE_NAME")
 $changedNames = @($settingNames + @('JAVA_HOME','PATH','SPRING_PROFILES_ACTIVE',
     'SPRING_DATASOURCE_URL','SPRING_DATASOURCE_USERNAME','SPRING_DATASOURCE_PASSWORD',
     'MILVUS_COLLECTION_NAME','MILVUS_DATABASE_NAME','MILVUS_ENABLED',
-    'DEEPSEEK_ENABLED','AI_JUDGE_PROVIDER','RUN_REAL_AI_BASELINE'))
+    'DEEPSEEK_ENABLED','RUN_REAL_AI_BASELINE'))
 $changedNames += @(Get-ChildItem Env: | Where-Object Name -Like 'RUN_REAL_*' | ForEach-Object Name)
 $previous = @{}
 foreach ($name in ($changedNames | Select-Object -Unique)) {
@@ -77,11 +77,11 @@ try {
     Get-ChildItem Env: | Where-Object Name -Like 'RUN_REAL_*' | ForEach-Object {
         Remove-Item -LiteralPath ('Env:' + $_.Name) -ErrorAction SilentlyContinue
     }
-    foreach ($name in @('MILVUS_ENABLED','DEEPSEEK_ENABLED','AI_JUDGE_PROVIDER')) {
+    foreach ($name in @('MILVUS_ENABLED','DEEPSEEK_ENABLED')) {
         Remove-Item -LiteralPath ('Env:' + $name) -ErrorAction SilentlyContinue
     }
     if ($ordinaryTests) {
-        foreach ($name in @('JWT_SECRET','EMBEDDING_BASE_URL','EMBEDDING_API_KEY','JEV_API_KEY','DEEPSEEK_API_KEY')) {
+        foreach ($name in @('JWT_SECRET','EMBEDDING_BASE_URL','EMBEDDING_API_KEY','DEEPSEEK_API_KEY')) {
             Remove-Item -LiteralPath ('Env:' + $name) -ErrorAction SilentlyContinue
         }
     } elseif (-not $env:DEEPSEEK_API_KEY) {
@@ -93,12 +93,11 @@ try {
     if ($Phase -eq 'regression') {
         & .\mvnw.cmd -B -ntp test *> 'target/evaluation/regression.log'
     } elseif ($Phase -eq 'focused') {
-        & .\mvnw.cmd -B -ntp '-Dtest=JevClientTest,JevJudgeProviderTest,JevScoreMappingTest,JudgeConfigurationTest,LlmEvaluationValidatorTest' test *> 'target/evaluation/focused.log'
+        & .\mvnw.cmd -B -ntp '-Dtest=DeepSeekEvaluationClientTest,DeepSeekJudgeProviderTest,JudgeConfigurationTest,LlmEvaluationValidatorTest' test *> 'target/evaluation/focused.log'
     } else {
         $env:RUN_REAL_AI_BASELINE = 'true'
         $env:DEEPSEEK_ENABLED = 'true'
         $env:MILVUS_ENABLED = 'true'
-        $env:AI_JUDGE_PROVIDER = if ($env:JEV_API_KEY) { 'jev' } else { 'deepseek' }
         & .\mvnw.cmd -B -ntp '-Dtest=AiSystemBaselineEvaluationTest' '-Dspring.profiles.active=evaluation' "-Devaluation.phase=$Phase" "-Devaluation.dataset=$Dataset" test *> "target/evaluation/$Phase.log"
     }
     $runExitCode = $LASTEXITCODE

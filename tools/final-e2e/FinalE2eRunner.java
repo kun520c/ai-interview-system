@@ -40,7 +40,6 @@ public class FinalE2eRunner {
     static long continuationSessionId;
     static FinalE2eGate gate;
     static ConfigurableApplicationContext app;
-    static String judgeProvider = "jev";
     static void check(boolean value, String code) { RagE2ePolicy.require(value, code); }
     static String env(String name) { return Objects.toString(System.getenv(name), ""); }
     static void save(Path file, Object value) throws Exception {
@@ -63,19 +62,18 @@ public class FinalE2eRunner {
     static Map<String,Object> budget() {
         // USD converted at a conservative planning factor of 8 CNY/USD, not a live exchange quote.
         double upper = 10 * 8320 * .5 / 1_000_000
-                + (10 * FinalE2eGate.BODY_CAP * .042
-                + 21 * (FinalE2eGate.BODY_CAP * .3 + 4096 * 1.2)) / 1_000_000 * 8;
+                + 11 * (FinalE2eGate.BODY_CAP * .3 + 4096 * 1.2) / 1_000_000 * 8;
         check(upper < 5, "PLANNED_BUDGET_EXCEEDED");
         Map<String,Object> budget = new LinkedHashMap<>();
         budget.put("plannedMainQuestions", 5); budget.put("maximumFollowUps", 5);
-        budget.put("normalRequestsWithoutFollowUp", Map.of("embedding",5,"jev",5,"deepseek",6));
-        budget.put("maximumProviderRequests", Map.of("embedding",10,"jev",10,"deepseek",21));
-        budget.put("deepseekMaximumExplanation", "Each answer: feedback then at most one production fallback; report: one request.");
-        budget.put("expectedCny", "0.10-0.60 (estimate, not account billing evidence)");
+        budget.put("normalRequestsWithoutFollowUp", Map.of("embedding",5,"deepseek",6));
+        budget.put("maximumProviderRequests", Map.of("embedding",10,"deepseek",11));
+        budget.put("deepseekMaximumExplanation", "Each answer: one DeepSeek request; report: one request. No automatic retry or model fallback.");
+        budget.put("rateSnapshotDate", "2026-10-13; historical planning rates, recheck before any new paid run");
         budget.put("conservativeBodyBasedUpperCny", upper); budget.put("proposedBudgetCny", 5);
-        budget.put("priceSources", List.of("https://docs.typesafe.ai/models", "https://api-docs.deepseek.com/quick_start/pricing/",
+        budget.put("priceSources", List.of("https://api-docs.deepseek.com/quick_start/pricing/",
                 "https://help.aliyun.com/en/model-studio/qwen3-7-text-embedding"));
-        budget.put("rates", Map.of("embeddingCnyPerMillionInput",.5,"jevUsdPerMillionInput",.042,
+        budget.put("rates", Map.of("embeddingCnyPerMillionInput",.5,
                 "deepseekUsdPerMillionUncachedInputPeak",.3,"deepseekUsdPerMillionOutputPeak",1.2,"planningCnyPerUsd",8));
         budget.put("limitMeaning", "Forwarded HTTP counts and body/output caps are enforced; token estimate is not a provider account spending cap.");
         return budget;
@@ -200,9 +198,6 @@ public class FinalE2eRunner {
         settings.put("deepseek.enabled", true); settings.put("deepseek.base-url", gate.base("deepseek"));
         settings.put("deepseek.api-key", modelKey("DEEPSEEK_API_KEY")); settings.put("deepseek.model", "deepseek-flash");
         settings.put("deepseek.max-tokens",4096); settings.put("deepseek.read-timeout","150s");
-        settings.put("ai.judge.provider",judgeProvider); settings.put("ai.judge.jev.base-url", gate.base("jev"));
-        settings.put("ai.judge.jev.api-key",modelKey("JEV_API_KEY")); settings.put("ai.judge.jev.model","jev-latest");
-        settings.put("ai.judge.jev.min-confidence",0.0); settings.put("ai.judge.jev.read-timeout","150s");
         settings.put("embedding.read-timeout","150s");
         settings.put("milvus.enabled",true); settings.put("milvus.uri","http://127.0.0.1:19530");
         settings.put("milvus.database-name","default"); settings.put("milvus.collection-name",RagE2ePolicy.COLLECTION);
@@ -219,10 +214,11 @@ public class FinalE2eRunner {
             var resolved = context.getEnvironment();
             check(Set.copyOf(Arrays.asList(resolved.getActiveProfiles())).equals(Set.of("test-real")), "EXACT_PROFILES");
             RagE2ePolicy.auditJdbc(resolved.getProperty("spring.datasource.url"));
-            check(judgeProvider.equals(resolved.getProperty("ai.judge.provider"))
+            check("true".equals(resolved.getProperty("deepseek.enabled"))
                     && "false".equals(resolved.getProperty("rag.retrieval.cosine-threshold-enabled")), "PRODUCTION_PATH_MISMATCH");
         }); // The registered production EnvironmentIsolationInitializer still validates before infrastructure starts.
         var context = application.run();
+        RagE2eRunner.verifyJudge(context.getBean(com.kun.aiinterview.interview.evaluation.judge.JudgeProvider.class));
         verifyHttpMapper(context.getBean(ObjectMapper.class));
         base = "http://127.0.0.1:" + ((ServletWebServerApplicationContext)context).getWebServer().getPort();
         return context;
@@ -269,6 +265,7 @@ public class FinalE2eRunner {
         }
         save(output.resolve("report.json"),report);
     }
+    // Historical usage envelopes can still contain the retired provider. This reader never calls it.
     static Map<String,Object> usageCost() {
         double cny=0,usd=0; int missing=0;
         for(var record:gate.records) {
@@ -359,8 +356,7 @@ public class FinalE2eRunner {
         item.put("rawMilvusHits",retrieval.rawHits()); item.put("hydrationIds",observation.hydrationIds); item.put("hydratedRows",observation.hydrated);
         item.put("query",retrieval.query()); item.put("prompt",observation.prompt); item.put("evidence",retrieval.evidence());
         item.put("provider",observation.judge.model()); item.put("wireAndPersistenceVerified",true); evaluations.add(item);
-        item.put("providerOutcome",observation.judge.model().startsWith("jev") ? "JEV_SCORE_AND_DEEPSEEK_FEEDBACK"
-                : judgeProvider.equals("jev") ? "PRODUCTION_DEEPSEEK_FALLBACK" : "DEEPSEEK_JUDGE");
+        item.put("providerOutcome", "DEEPSEEK_JUDGE");
         save(output.resolve("answer-"+evaluations.size()+".evidence.json"),item);
     }
     static void verifyWire(FinalE2eAudit.Observation observation) throws Exception {
@@ -369,21 +365,9 @@ public class FinalE2eRunner {
         for(var record:records) {
             var request=JSON.readTree(Files.readAllBytes(output.resolve("providers").resolve(record.get("requestFile").toString())));
             if(record.get("provider").equals("embedding")) check(request.path("input").get(0).asText().equals(observation.retrieval.query()),"QUERY_WIRE_MISMATCH");
-            if(record.get("provider").equals("jev")) check(request.path("state").asText().equals(observation.prompt.userPrompt()),"JEV_STATE_PROMPT_MISMATCH");
             if(record.get("provider").equals("deepseek")) check(request.path("messages").path(1).path("content").asText().startsWith(observation.prompt.userPrompt()),"DEEPSEEK_PROMPT_WIRE_MISMATCH");
         }
-        if(observation.judge.model().startsWith("jev")) {
-            var raw=JSON.readTree(observation.judge.rawJson());
-            check(records.stream().anyMatch(r->"jev".equals(r.get("provider")) && Integer.valueOf(200).equals(r.get("httpStatus"))),"JEV_HTTP_SUCCESS_MISSING");
-            for(var record:records) if(record.get("provider").equals("jev")) {
-                var body=JSON.readTree(Files.readAllBytes(output.resolve("providers").resolve(record.get("responseFile").toString())));
-                // Production deliberately persists the typed JevResponse projection. Full envelope remains in provider files.
-                var projection=JSON.valueToTree(JSON.treeToValue(body,com.kun.aiinterview.interview.evaluation.judge.jev.JevResponse.class));
-                check(RagE2eConsistency.equivalent(raw.path("judge"),projection),"JEV_TYPED_RESPONSE_RAW_RESULT_MISMATCH");
-            }
-            String generation=raw.path("generation").path("rawJson").asText();
-            check(!generation.isBlank() && matchesDeepSeekContent(records,generation),"FEEDBACK_RESPONSE_RAW_RESULT_MISMATCH");
-        } else check(matchesDeepSeekContent(records,observation.judge.rawJson()),"FALLBACK_RESPONSE_RAW_RESULT_MISMATCH");
+        check(matchesDeepSeekContent(records,observation.judge.rawJson()),"DEEPSEEK_RESPONSE_RAW_RESULT_MISMATCH");
     }
     static boolean matchesDeepSeekContent(List<Map<String,Object>> records,String raw) throws Exception {
         for(var record:records) if(record.get("provider").equals("deepseek") && Integer.valueOf(200).equals(record.get("httpStatus"))) {
@@ -554,11 +538,11 @@ public class FinalE2eRunner {
         report.put("FINAL_E2E_STATUS","BLOCKED"); report.put("runId",RUN_ID); report.put("budget",budget());
         report.put("feeAuthorizationConsumed",execute);
         report.put("configuration",Map.of("profile","test-real","database",RagE2ePolicy.TARGET,"collection",RagE2ePolicy.COLLECTION,
-                "provider","jev","deepseekModel","deepseek-flash","rag","production dense TopK=5, no cosine threshold","p42Enabled",false));
+                "provider","deepseek","deepseekModel","deepseek-flash","rag","production dense TopK=5, no cosine threshold","p42Enabled",false));
         try(Connection c=connection()) {
             report.put("preflight",preflight(c));
             if(execute) {
-                for(String name:List.of("EMBEDDING_API_KEY","DEEPSEEK_API_KEY","JEV_API_KEY")) check(!env(name).isBlank(),"PROVIDER_CREDENTIAL_MISSING");
+                for(String name:List.of("EMBEDDING_API_KEY","DEEPSEEK_API_KEY")) check(!env(name).isBlank(),"PROVIDER_CREDENTIAL_MISSING");
                 Files.writeString(output.resolve("EXECUTION_CONSUMED.lock"),Instant.now().toString(),StandardOpenOption.CREATE_NEW);
                 try { execute(c); }
                 finally {
