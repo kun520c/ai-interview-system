@@ -146,16 +146,16 @@ public class InterviewWorkflowService {
             return null;
         }
 
-        InterviewQuestion nextMain =
-                interviewQuestionMapper
-                        .findNextPendingMainQuestion(
-                                session.getId(),
-                                mainQuestion.getPlanOrder()
-                        );
-
-        boolean hasNextMainQuestion = nextMain != null;
-
         try {
+            InterviewQuestion nextMain =
+                    interviewQuestionMapper
+                            .findNextPendingMainQuestion(
+                                    session.getId(),
+                                    mainQuestion.getPlanOrder()
+                            );
+
+            boolean hasNextMainQuestion = nextMain != null;
+
             EvaluationOrchestrationResult result =
                     evaluationOrchestrationService
                             .evaluate(

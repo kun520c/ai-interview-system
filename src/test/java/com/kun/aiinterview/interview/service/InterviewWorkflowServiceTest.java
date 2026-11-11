@@ -30,7 +30,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.Mock;
+import org.springframework.dao.DataAccessResourceFailureException;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -347,6 +349,87 @@ class InterviewWorkflowServiceTest {
         verifyNoDecisionTransitions();
     }
 
+    @ParameterizedTest
+    @EnumSource(value = InterviewAnswerStatus.class, names = {"SUBMITTED", "FAILED", "EVALUATING"})
+    void shouldMarkOwnedAttemptFailedWhenNextMainQueryFails(InterviewAnswerStatus status) {
+        stubMainWorkflow(status, mainQuestion(), session(MAIN_QUESTION_ID), null);
+        if (status == InterviewAnswerStatus.EVALUATING) {
+            InterviewAnswer stale = answer(status, MAIN_QUESTION_ID);
+            stale.setUpdatedAt(LocalDateTime.now().minusMinutes(20));
+            when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID)).thenReturn(stale);
+            when(transactionService.tryReclaimStaleEvaluating(eq(ANSWER_ID), any(), anyString()))
+                    .thenReturn(true);
+        }
+        SQLException cause = new SQLException("next MAIN query unavailable");
+        var failure = new DataAccessResourceFailureException("next MAIN query failed", cause);
+        when(interviewQuestionMapper.findNextPendingMainQuestion(SESSION_ID, MAIN_PLAN_ORDER))
+                .thenThrow(failure);
+
+        assertThatThrownBy(() -> service.evaluateAnswer(ANSWER_ID))
+                .isSameAs(failure).hasCause(cause);
+
+        ArgumentCaptor<String> attempt = ArgumentCaptor.forClass(String.class);
+        InOrder order = inOrder(transactionService, interviewQuestionMapper);
+        switch (status) {
+            case SUBMITTED -> order.verify(transactionService).tryClaimEvaluation(eq(ANSWER_ID), attempt.capture());
+            case FAILED -> order.verify(transactionService).tryRetryEvaluation(eq(ANSWER_ID), attempt.capture());
+            case EVALUATING -> order.verify(transactionService)
+                    .tryReclaimStaleEvaluating(eq(ANSWER_ID), any(), attempt.capture());
+            default -> throw new AssertionError("unexpected test status");
+        }
+        order.verify(interviewQuestionMapper).findNextPendingMainQuestion(SESSION_ID, MAIN_PLAN_ORDER);
+        assertThat(attempt.getValue()).matches("[0-9a-f]{32}");
+        order.verify(transactionService).markEvaluationFailed(ANSWER_ID, "EVALUATION_ERROR", attempt.getValue());
+        assertThat(failure.getSuppressed()).isEmpty();
+        verifyNoInteractions(evaluationOrchestrationService);
+        verifyNoDecisionTransitions();
+    }
+
+    @Test
+    void shouldPreserveQueryFailureWhenFailedWriteAlsoFails() {
+        stubMainWorkflow(InterviewAnswerStatus.SUBMITTED, mainQuestion(), session(MAIN_QUESTION_ID), null);
+        SQLException cause = new SQLException("next MAIN query unavailable");
+        var primary = new DataAccessResourceFailureException("next MAIN query failed", cause);
+        var secondary = new DataAccessResourceFailureException("FAILED update unavailable");
+        when(interviewQuestionMapper.findNextPendingMainQuestion(SESSION_ID, MAIN_PLAN_ORDER))
+                .thenThrow(primary);
+        doThrow(secondary).when(transactionService)
+                .markEvaluationFailed(eq(ANSWER_ID), eq("EVALUATION_ERROR"), anyString());
+
+        assertThatThrownBy(() -> service.evaluateAnswer(ANSWER_ID))
+                .isSameAs(primary).hasCause(cause)
+                .satisfies(error -> assertThat(error.getSuppressed()).containsExactly(secondary));
+        verifyNoInteractions(evaluationOrchestrationService);
+        verifyNoDecisionTransitions();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = InterviewAnswerStatus.class, names = {"SUBMITTED", "FAILED", "EVALUATING"})
+    void shouldNotMarkFailedWhenClaimItselfThrows(InterviewAnswerStatus status) {
+        InterviewAnswer answer = answer(status, MAIN_QUESTION_ID);
+        answer.setUpdatedAt(LocalDateTime.now().minusMinutes(20));
+        when(interviewAnswerMapper.getInterviewAnswerById(ANSWER_ID)).thenReturn(answer);
+        when(interviewQuestionMapper.getInterviewQuestionById(MAIN_QUESTION_ID)).thenReturn(mainQuestion());
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID)).thenReturn(session(MAIN_QUESTION_ID));
+        var failure = new DataAccessResourceFailureException("claim unavailable");
+        switch (status) {
+            case SUBMITTED -> when(transactionService.tryClaimEvaluation(eq(ANSWER_ID), anyString()))
+                    .thenThrow(failure);
+            case FAILED -> when(transactionService.tryRetryEvaluation(eq(ANSWER_ID), anyString()))
+                    .thenThrow(failure);
+            case EVALUATING -> when(transactionService.tryReclaimStaleEvaluating(eq(ANSWER_ID), any(), anyString()))
+                    .thenThrow(failure);
+            default -> throw new AssertionError("unexpected test status");
+        }
+
+        assertThatThrownBy(() -> service.evaluateAnswer(ANSWER_ID)).isSameAs(failure);
+
+        verify(transactionService, never()).markEvaluationFailed(any(), any(), any());
+        verify(interviewQuestionMapper, never()).findNextPendingMainQuestion(any(), any());
+        verifyNoInteractions(evaluationOrchestrationService);
+        verifyNoDecisionTransitions();
+    }
+
     @Test
     void shouldRetryFailedAnswerBeforeEvaluation() {
         InterviewQuestion main = mainQuestion();
@@ -412,6 +495,7 @@ class InterviewWorkflowServiceTest {
         verify(interviewQuestionMapper, never())
                 .findNextPendingMainQuestion(any(), any());
         verifyNoDecisionTransitions();
+        verify(transactionService, never()).markEvaluationFailed(any(), any(), any());
     }
 
     @Test
@@ -445,6 +529,7 @@ class InterviewWorkflowServiceTest {
         verify(interviewQuestionMapper, never())
                 .findNextPendingMainQuestion(any(), any());
         verifyNoDecisionTransitions();
+        verify(transactionService, never()).markEvaluationFailed(any(), any(), any());
     }
 
     @Test
@@ -476,6 +561,7 @@ class InterviewWorkflowServiceTest {
         verify(interviewQuestionMapper, never())
                 .findNextPendingMainQuestion(any(), any());
         verifyNoDecisionTransitions();
+        verify(transactionService, never()).markEvaluationFailed(any(), any(), any());
     }
 
     @Test
@@ -505,6 +591,7 @@ class InterviewWorkflowServiceTest {
         verify(transactionService).tryRetryEvaluation(eq(ANSWER_ID), anyString());
         verifyNoInteractions(evaluationOrchestrationService);
         verifyNoDecisionTransitions();
+        verify(transactionService, never()).markEvaluationFailed(any(), any(), any());
     }
 
     @Test
@@ -583,6 +670,7 @@ class InterviewWorkflowServiceTest {
                 .tryReclaimStaleEvaluating(any(), any(), anyString());
         verify(interviewQuestionMapper, never())
                 .findNextPendingMainQuestion(any(), any());
+        verify(transactionService, never()).markEvaluationFailed(any(), any(), any());
     }
 
     @Test
@@ -711,6 +799,7 @@ class InterviewWorkflowServiceTest {
         verify(transactionService, never()).tryRetryEvaluation(eq(ANSWER_ID), anyString());
         verify(interviewQuestionMapper, never())
                 .findNextPendingMainQuestion(any(), any());
+        verify(transactionService, never()).markEvaluationFailed(any(), any(), any());
     }
 
     @Test
