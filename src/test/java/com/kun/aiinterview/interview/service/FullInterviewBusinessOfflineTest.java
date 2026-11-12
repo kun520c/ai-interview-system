@@ -343,7 +343,7 @@ class FullInterviewBusinessOfflineTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"400", "401", "402", "429", "500", "503", "connect", "timeout", "empty", "blank", "length", "content_filter", "illegal-json", "outer-json", "malicious-finish"})
+    @ValueSource(strings = {"400", "401", "402", "403", "408", "429", "500", "502", "503", "504", "connect", "connect-timeout", "http-timeout", "timeout", "empty", "blank", "length", "content_filter", "insufficient_system_resource", "tool_calls", "illegal-json", "missing-fields", "outer-json", "malicious-finish"})
     void singleHttpFailureAllowsOnlyExplicitSamePayloadRecovery(String fault) throws Exception {
         doAnswer(invocation -> {
             providerCalls.incrementAndGet();
@@ -369,7 +369,7 @@ class FullInterviewBusinessOfflineTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"400", "401", "402", "429", "500", "503", "connect", "timeout", "empty", "blank", "length", "content_filter", "illegal-json", "missing-fields", "wrong-type", "outer-json", "malicious-finish"})
+    @ValueSource(strings = {"400", "401", "402", "403", "408", "429", "500", "502", "503", "504", "connect", "connect-timeout", "http-timeout", "timeout", "empty", "blank", "length", "content_filter", "insufficient_system_resource", "tool_calls", "illegal-json", "missing-fields", "wrong-type", "outer-json", "malicious-finish"})
     void reportFailureDoesNotPublishOrUpdateWeaknessAndSameSessionCanRecover(String fault) throws Exception {
         useHttpModel(node -> { });
         var created = request("POST", "/api/interviews", Map.of("difficulty", "EASY"), 200);
@@ -492,6 +492,8 @@ class FullInterviewBusinessOfflineTest {
     private ResponseCreator faultResponse(String fault) throws Exception {
         if (fault.matches("[45][0-9]{2}")) return withRawStatus(Integer.parseInt(fault)).body(MALICIOUS_RESPONSE);
         if (fault.equals("connect")) return withException(new ConnectException(MALICIOUS_RESPONSE));
+        if (fault.equals("connect-timeout")) return withException(new java.net.http.HttpConnectTimeoutException(MALICIOUS_RESPONSE));
+        if (fault.equals("http-timeout")) return withException(new java.net.http.HttpTimeoutException(MALICIOUS_RESPONSE));
         if (fault.equals("timeout")) return withException(new SocketTimeoutException(MALICIOUS_RESPONSE));
         if (fault.equals("outer-json")) return withSuccess("{" + LOG_SENTINEL, MediaType.APPLICATION_JSON);
         if (fault.equals("empty")) return withSuccess("", MediaType.APPLICATION_JSON);
@@ -504,7 +506,7 @@ class FullInterviewBusinessOfflineTest {
             default -> "{}";
         };
         String finish = fault.equals("malicious-finish") ? MALICIOUS_RESPONSE
-                : List.of("length", "content_filter").contains(fault) ? fault : "stop";
+                : List.of("length", "content_filter", "insufficient_system_resource", "tool_calls").contains(fault) ? fault : "stop";
         return withSuccess(json.writeValueAsString(Map.of("model", "private-model-id", "choices", List.of(Map.of(
                 "index", 0, "finish_reason", finish, "message", Map.of("role", "assistant", "content", content))))), MediaType.APPLICATION_JSON);
     }

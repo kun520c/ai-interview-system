@@ -162,9 +162,10 @@ public class DeepSeekEvaluationClient {
                             .retrieve()
                             .onStatus(status -> !status.is2xxSuccessful(), (httpRequest, httpResponse) -> {
                                 // Do not let Spring's default handler copy untrusted body/headers into a Throwable.
+                                int status = httpResponse.getStatusCode().value();
                                 throw new ExternalServiceException(
                                         "调用DeepSeek评价服务失败 [stage=chat_completion, category=HTTP_STATUS, httpStatus="
-                                                + httpResponse.getStatusCode().value() + "]"
+                                                + status + ", reason=" + safeHttpFailureReason(status) + "]"
                                 );
                             })
                             .body(
@@ -188,24 +189,47 @@ public class DeepSeekEvaluationClient {
         }
     }
 
+    private String safeHttpFailureReason(int status) {
+        // Diagnostic reasons are not retry permissions. Keep one application-level HTTP attempt.
+        return switch (status) {
+            case 400, 422 -> "INVALID_REQUEST";
+            case 401 -> "AUTHENTICATION";
+            case 402 -> "BALANCE";
+            case 403 -> "PERMISSION";
+            case 408, 504 -> "UPSTREAM_TIMEOUT";
+            case 429 -> "RATE_LIMIT";
+            case 500 -> "UPSTREAM_SERVER";
+            case 502 -> "UPSTREAM_GATEWAY";
+            case 503 -> "UPSTREAM_UNAVAILABLE";
+            default -> "UNEXPECTED_STATUS";
+        };
+    }
+
     private String safeFailureCategory(RestClientException exception) {
         // Inspect types only: even I/O messages, causes and suppressed errors can contain echoed input.
         boolean ioFailure = exception instanceof ResourceAccessException;
+        boolean timeout = false;
+        boolean connectionFailure = false;
+        boolean responseJsonFailure = false;
         Throwable current = exception;
         for (int depth = 0; current != null && depth < 10; depth++, current = current.getCause()) {
             if (current instanceof HttpConnectTimeoutException) {
                 return "CONNECT_TIMEOUT";
             }
-            if (current instanceof HttpTimeoutException || current instanceof SocketTimeoutException) {
-                return "TIMEOUT";
-            }
-            if (current instanceof ConnectException || current instanceof UnknownHostException) {
-                return "CONNECTION_ERROR";
-            }
-            if (current instanceof JsonProcessingException) {
-                return "RESPONSE_JSON";
-            }
+            timeout |= current instanceof HttpTimeoutException || current instanceof SocketTimeoutException;
+            connectionFailure |= current instanceof ConnectException || current instanceof UnknownHostException;
+            responseJsonFailure |= current instanceof JsonProcessingException;
             ioFailure |= current instanceof IOException;
+        }
+        // A parser/wrapper must not hide a more specific typed transport failure deeper in the chain.
+        if (timeout) {
+            return "TIMEOUT";
+        }
+        if (connectionFailure) {
+            return "CONNECTION_ERROR";
+        }
+        if (responseJsonFailure) {
+            return "RESPONSE_JSON";
         }
         return ioFailure ? "IO_ERROR" : "HTTP_CLIENT_ERROR";
     }
