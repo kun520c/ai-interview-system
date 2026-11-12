@@ -166,7 +166,7 @@ class DeepSeekEvaluationClientTest {
     }
 
     @Test
-    void givenHttpErrorStatus_whenEvaluate_thenWrapsRestClientException() {
+    void givenHttpErrorStatus_whenEvaluate_thenReturnsSafeStatusWithoutCause() {
         expectRequest().andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("{\"message\":\"supplier error\"}"));
@@ -174,7 +174,8 @@ class DeepSeekEvaluationClientTest {
         verifyAfter(() -> assertThatThrownBy(() -> client.evaluate(PROMPT))
                 .isInstanceOf(ExternalServiceException.class)
                 .hasMessageContaining("调用DeepSeek评价服务失败")
-                .hasCauseInstanceOf(RuntimeException.class));
+                .hasMessageContaining("category=HTTP_STATUS, httpStatus=500")
+                .hasNoCause());
     }
 
     @Test
@@ -213,7 +214,8 @@ class DeepSeekEvaluationClientTest {
         verifyAfter(() -> assertThatThrownBy(() -> client.evaluate(PROMPT))
                 .isInstanceOf(ExternalServiceException.class)
                 .hasMessageContaining("不是可解析的JSON对象")
-                .hasCauseInstanceOf(JsonProcessingException.class));
+                .hasMessageContaining("stage=evaluation_parse, category=INVALID_JSON")
+                .hasNoCause());
     }
 
     private org.springframework.test.web.client.ResponseActions expectRequest() {

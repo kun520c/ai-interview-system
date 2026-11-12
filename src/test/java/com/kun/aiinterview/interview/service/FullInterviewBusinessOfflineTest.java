@@ -1,5 +1,11 @@
 package com.kun.aiinterview.interview.service;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.PatternLayout;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.ThrowableProxy;
+import ch.qos.logback.classic.spi.ThrowableProxyUtil;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -49,6 +55,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -59,6 +66,7 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -92,6 +100,9 @@ class FullInterviewBusinessOfflineTest {
     @MockitoBean InterviewReportGenerator reportGenerator;
     @MockitoBean MilvusClientV2 milvus;
     @MockitoBean MilvusCollectionInitializer initializer;
+    private static final String LOG_SENTINEL = "B4B_TEST_SENSITIVE_BODY_20261112";
+    private static final String MALICIOUS_RESPONSE = LOG_SENTINEL
+            + "\r\nERROR FORGED_LOG_RECORD\u001b[31m\u0000 Authorization: Bearer offline-test-key PRIVATE_CANDIDATE_INPUT";
     private String token;
     private long userId;
     private final AtomicInteger providerCalls = new AtomicInteger();
@@ -332,7 +343,7 @@ class FullInterviewBusinessOfflineTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"429", "500", "503", "connect", "timeout", "empty", "blank", "length", "content_filter", "illegal-json"})
+    @ValueSource(strings = {"400", "401", "402", "429", "500", "503", "connect", "timeout", "empty", "blank", "length", "content_filter", "illegal-json", "outer-json", "malicious-finish"})
     void singleHttpFailureAllowsOnlyExplicitSamePayloadRecovery(String fault) throws Exception {
         doAnswer(invocation -> {
             providerCalls.incrementAndGet();
@@ -343,7 +354,7 @@ class FullInterviewBusinessOfflineTest {
         long sessionId = created.path("sessionId").asLong();
         long questionId = created.at("/currentQuestion/interviewQuestionId").asLong();
         var body = modelAnswer(questionId);
-        modelAnswerResponse(sessionId, body, 502);
+        withSafeProviderLog(() -> modelAnswerResponse(sessionId, body, 502), "InterviewWorkflowService");
         assertFailedModelState(sessionId, questionId, body.get("requestId").toString());
         assertThat(providerCalls.get()).isEqualTo(1);
         request("POST", "/api/interviews/" + sessionId + "/answers", Map.of("interviewQuestionId", questionId,
@@ -358,7 +369,7 @@ class FullInterviewBusinessOfflineTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"429", "500", "503", "connect", "timeout", "empty", "blank", "length", "content_filter", "illegal-json", "missing-fields", "wrong-type"})
+    @ValueSource(strings = {"400", "401", "402", "429", "500", "503", "connect", "timeout", "empty", "blank", "length", "content_filter", "illegal-json", "missing-fields", "wrong-type", "outer-json", "malicious-finish"})
     void reportFailureDoesNotPublishOrUpdateWeaknessAndSameSessionCanRecover(String fault) throws Exception {
         useHttpModel(node -> { });
         var created = request("POST", "/api/interviews", Map.of("difficulty", "EASY"), 200);
@@ -370,11 +381,11 @@ class FullInterviewBusinessOfflineTest {
         }
         var calls = new AtomicInteger();
         useHttpReport(fault, calls);
-        var failure = mvc.perform(post("/api/interviews/" + sessionId + "/report")
+        var failure = withSafeProviderLog(() -> mvc.perform(post("/api/interviews/" + sessionId + "/report")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadGateway()).andExpect(jsonPath("$.code").value(502))
-                .andExpect(jsonPath("$.message").value("外部服务暂时不可用")).andReturn();
-        assertThat(failure.getResponse().getContentAsString()).doesNotContain("PRIVATE_MODEL_OUTPUT", "private-model-id", token);
+                .andExpect(jsonPath("$.message").value("外部服务暂时不可用")).andReturn(), "InterviewReportService");
+        assertThat(failure.getResponse().getContentAsString()).doesNotContain(LOG_SENTINEL, "PRIVATE_MODEL_OUTPUT", "private-model-id", token);
         assertThat(calls.get()).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT report_status FROM interview_session WHERE id=?", String.class, sessionId)).isEqualTo("FAILED");
         assertThat(jdbc.queryForObject("SELECT status FROM interview_session WHERE id=?", String.class, sessionId)).isEqualTo("COMPLETED");
@@ -425,6 +436,39 @@ class FullInterviewBusinessOfflineTest {
         verifyNoInteractions(judge, embedding, vectors, reportGenerator);
     }
 
+    private <T> T withSafeProviderLog(Callable<T> request, String serviceClass) throws Exception {
+        Logger logger = (Logger) LoggerFactory.getLogger("com.kun.aiinterview");
+        var appender = new ListAppender<ILoggingEvent>();
+        var layout = new PatternLayout();
+        appender.setContext(logger.getLoggerContext());
+        layout.setContext(logger.getLoggerContext());
+        layout.setPattern("%level %logger - %msg%n%ex{full}");
+        appender.start();
+        layout.start();
+        logger.addAppender(appender);
+        try {
+            T result = request.call();
+            assertThat(appender.list).hasSize(1);
+            var event = appender.list.getFirst();
+            assertThat(event.getFormattedMessage()).isEqualTo("外部服务异常");
+            var throwable = ((ThrowableProxy) event.getThrowableProxy()).getThrowable();
+            assertThat(throwable).isInstanceOf(ExternalServiceException.class).hasNoCause();
+            assertThat(throwable.getSuppressed()).isEmpty();
+            String rendered = layout.doLayout(event);
+            assertThat(rendered).contains("ERROR", "ExternalServiceException", serviceClass);
+            for (String output : List.of(rendered, ThrowableProxyUtil.asString(event.getThrowableProxy()))) {
+                assertThat(output).doesNotContain(LOG_SENTINEL, "PRIVATE_MODEL_OUTPUT", "PRIVATE_CANDIDATE_INPUT",
+                        "private-model-id", "offline-test-key", "Authorization:", "Bearer ", token,
+                        "FORGED_LOG_RECORD", "\r", "\u001b", "\u0000");
+            }
+            return result;
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+            layout.stop();
+        }
+    }
+
     private void useHttpReport(String fault, AtomicInteger calls) {
         doAnswer(invocation -> {
             calls.incrementAndGet();
@@ -435,7 +479,8 @@ class FullInterviewBusinessOfflineTest {
     }
 
     private <T> T withHttpResponse(ResponseCreator response, Function<DeepSeekEvaluationClient, T> call) {
-        var builder = RestClient.builder().baseUrl("http://deepseek.offline");
+        var builder = RestClient.builder().baseUrl("http://deepseek.offline")
+                .defaultHeader("Authorization", "Bearer offline-test-key");
         var server = MockRestServiceServer.bindTo(builder).build();
         server.expect(org.springframework.test.web.client.ExpectedCount.once(),
                         org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo("http://deepseek.offline/chat/completions"))
@@ -445,19 +490,21 @@ class FullInterviewBusinessOfflineTest {
     }
 
     private ResponseCreator faultResponse(String fault) throws Exception {
-        if (fault.matches("[45][0-9]{2}")) return withRawStatus(Integer.parseInt(fault)).body("PRIVATE_MODEL_OUTPUT");
-        if (fault.equals("connect")) return withException(new ConnectException("PRIVATE_MODEL_OUTPUT"));
-        if (fault.equals("timeout")) return withException(new SocketTimeoutException("PRIVATE_MODEL_OUTPUT"));
+        if (fault.matches("[45][0-9]{2}")) return withRawStatus(Integer.parseInt(fault)).body(MALICIOUS_RESPONSE);
+        if (fault.equals("connect")) return withException(new ConnectException(MALICIOUS_RESPONSE));
+        if (fault.equals("timeout")) return withException(new SocketTimeoutException(MALICIOUS_RESPONSE));
+        if (fault.equals("outer-json")) return withSuccess("{" + LOG_SENTINEL, MediaType.APPLICATION_JSON);
         if (fault.equals("empty")) return withSuccess("", MediaType.APPLICATION_JSON);
         String content = switch (fault) {
             case "blank" -> "   ";
-            case "illegal-json" -> "{PRIVATE_MODEL_OUTPUT";
-            case "wrong-type" -> "{\"summary\":[],\"strengths\":true}";
+            case "illegal-json" -> "{" + LOG_SENTINEL;
+            case "wrong-type" -> "{\"summary\":[],\"strengths\":\"" + LOG_SENTINEL + "\"}";
             case "valid-report" -> json.writeValueAsString(Map.of("summary", "Recovered report", "strengths", List.of("Strength"),
                     "weaknesses", List.of("Weakness"), "suggestions", List.of("Suggestion")));
             default -> "{}";
         };
-        String finish = List.of("length", "content_filter").contains(fault) ? fault : "stop";
+        String finish = fault.equals("malicious-finish") ? MALICIOUS_RESPONSE
+                : List.of("length", "content_filter").contains(fault) ? fault : "stop";
         return withSuccess(json.writeValueAsString(Map.of("model", "private-model-id", "choices", List.of(Map.of(
                 "index", 0, "finish_reason", finish, "message", Map.of("role", "assistant", "content", content))))), MediaType.APPLICATION_JSON);
     }
@@ -476,7 +523,7 @@ class FullInterviewBusinessOfflineTest {
         var response = json.readTree(raw);
         if (expected >= 500) {
             assertThat(response.path("message").asText()).isEqualTo(expected == 502 ? "外部服务暂时不可用" : "系统异常，请稍后重试");
-            assertThat(raw).doesNotContain("PRIVATE_MODEL_OUTPUT", "PRIVATE_CANDIDATE_INPUT", "private-model-id",
+            assertThat(raw).doesNotContain(LOG_SENTINEL, "PRIVATE_MODEL_OUTPUT", "PRIVATE_CANDIDATE_INPUT", "private-model-id",
                     "Authorization", token, "rawJson", "systemPrompt", "userPrompt");
         }
         return response;
@@ -504,7 +551,8 @@ class FullInterviewBusinessOfflineTest {
             var suggestion = new LlmEvaluationSuggestion(10, 10, 10, 10, 10, List.of("PRIVATE_MODEL_OUTPUT"), List.of(), null, points, false, null);
             ObjectNode content = json.valueToTree(suggestion);
             change.accept(content);
-            var builder = RestClient.builder().baseUrl("http://deepseek.offline");
+            var builder = RestClient.builder().baseUrl("http://deepseek.offline")
+                .defaultHeader("Authorization", "Bearer offline-test-key");
             var server = MockRestServiceServer.bindTo(builder).build();
             server.expect(org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo("http://deepseek.offline/chat/completions"))
                     .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess(

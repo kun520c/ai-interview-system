@@ -16,7 +16,14 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.ResourceAccessException;
 
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+import java.net.http.HttpConnectTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.util.List;
 
 @Component
@@ -153,6 +160,13 @@ public class DeepSeekEvaluationClient {
                             )
                             .body(request)
                             .retrieve()
+                            .onStatus(status -> !status.is2xxSuccessful(), (httpRequest, httpResponse) -> {
+                                // Do not let Spring's default handler copy untrusted body/headers into a Throwable.
+                                throw new ExternalServiceException(
+                                        "调用DeepSeek评价服务失败 [stage=chat_completion, category=HTTP_STATUS, httpStatus="
+                                                + httpResponse.getStatusCode().value() + "]"
+                                );
+                            })
                             .body(
                                     DeepSeekChatResponse.class
                             );
@@ -168,10 +182,32 @@ public class DeepSeekEvaluationClient {
         } catch (RestClientException exception) {
 
             throw new ExternalServiceException(
-                    "调用DeepSeek评价服务失败",
-                    exception
+                    "调用DeepSeek评价服务失败 [stage=chat_completion, category="
+                            + safeFailureCategory(exception) + "]"
             );
         }
+    }
+
+    private String safeFailureCategory(RestClientException exception) {
+        // Inspect types only: even I/O messages, causes and suppressed errors can contain echoed input.
+        boolean ioFailure = exception instanceof ResourceAccessException;
+        Throwable current = exception;
+        for (int depth = 0; current != null && depth < 10; depth++, current = current.getCause()) {
+            if (current instanceof HttpConnectTimeoutException) {
+                return "CONNECT_TIMEOUT";
+            }
+            if (current instanceof HttpTimeoutException || current instanceof SocketTimeoutException) {
+                return "TIMEOUT";
+            }
+            if (current instanceof ConnectException || current instanceof UnknownHostException) {
+                return "CONNECTION_ERROR";
+            }
+            if (current instanceof JsonProcessingException) {
+                return "RESPONSE_JSON";
+            }
+            ioFailure |= current instanceof IOException;
+        }
+        return ioFailure ? "IO_ERROR" : "HTTP_CLIENT_ERROR";
     }
 
     private DeepSeekChoice validateResponse(
@@ -228,7 +264,7 @@ public class DeepSeekEvaluationClient {
 
             throw new ExternalServiceException(
                     "DeepSeek响应未正常结束，finishReason="
-                            + choice.finishReason()
+                            + safeFinishReason(choice.finishReason())
             );
         }
 
@@ -259,6 +295,16 @@ public class DeepSeekEvaluationClient {
         return choice;
     }
 
+    private String safeFinishReason(String finishReason) {
+        if (finishReason == null) {
+            return "MISSING";
+        }
+        return switch (finishReason) {
+            case "length", "content_filter", "insufficient_system_resource", "tool_calls" -> finishReason;
+            default -> "UNKNOWN";
+        };
+    }
+
     private LlmEvaluationSuggestion parseSuggestion(
             String rawJson
     ) {
@@ -282,8 +328,7 @@ public class DeepSeekEvaluationClient {
         } catch (JsonProcessingException exception) {
 
             throw new ExternalServiceException(
-                    "DeepSeek评价结果不是可解析的JSON对象",
-                    exception
+                    "DeepSeek评价结果不是可解析的JSON对象 [stage=evaluation_parse, category=INVALID_JSON]"
             );
         }
     }

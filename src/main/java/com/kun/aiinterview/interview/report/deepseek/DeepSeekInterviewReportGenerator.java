@@ -113,8 +113,8 @@ public class DeepSeekInterviewReportGenerator
             return response;
         } catch (JsonProcessingException exception) {
             throw new ExternalServiceException(
-                    "DeepSeek Report结果不是可解析的JSON对象",
-                    exception
+                    // Jackson messages may quote model output; keep the stage, never the original cause.
+                    "DeepSeek Report结果不是可解析的JSON对象 [stage=report_parse, category=INVALID_JSON]"
             );
         }
     }
