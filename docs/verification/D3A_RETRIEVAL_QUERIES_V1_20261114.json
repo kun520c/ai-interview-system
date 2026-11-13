@@ -1,0 +1,980 @@
+{
+  "version": "D3-A-RETRIEVAL-v1",
+  "status": "QUERY_TEXT_FROZEN_PRE_INGESTION",
+  "date": "2026-11-14",
+  "purpose": "独立检索验收。文件仅供评测负责人和标注员使用。reviewTopicIds 是意图定位提示，Chunk 真值需另行双人冻结。",
+  "queries": [
+    {
+      "id": "Q01",
+      "type": "同义",
+      "domains": [
+        "JAVA_BASIC"
+      ],
+      "query": "老的报表组件和新的短信组件毫无继承关系，却都要被调度器当作可执行任务。公共协议和共享实例状态怎么安排？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J01"
+      ],
+      "intentForAssessors": "区分能力契约与基类状态，解释组合与继承选择"
+    },
+    {
+      "id": "Q02",
+      "type": "同义",
+      "domains": [
+        "JAVA_COLLECTION"
+      ],
+      "query": "做一个按到达顺序展示的去重名单，还要用客户编号找到档案。两个容器分别要满足什么合同？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J10"
+      ],
+      "intentForAssessors": "区分 Set 的去重、顺序保证与 Map 的键值语义"
+    },
+    {
+      "id": "Q03",
+      "type": "同义",
+      "domains": [
+        "JVM"
+      ],
+      "query": "同名插件类能在两个插件里各跑一份，为什么回传给宿主后有时连强转都过不了？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J17"
+      ],
+      "intentForAssessors": "定义加载器加类名决定类型身份，并说明共享接口的加载位置"
+    },
+    {
+      "id": "Q04",
+      "type": "同义",
+      "domains": [
+        "JAVA_CONCURRENCY"
+      ],
+      "query": "后台线程要安全地读到一份新发布的配置，更新线程还有个访问次数要加一。这两个要求能共用同一种保证吗？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J20"
+      ],
+      "intentForAssessors": "区分发布可见性和复合自增原子性"
+    },
+    {
+      "id": "Q05",
+      "type": "同义",
+      "domains": [
+        "SPRING"
+      ],
+      "query": "费用模块启动时说有多个 PricePolicy。平常读地区默认价，跨境结算得指定区域策略。怎样让两个消费者的声明都一眼能读懂？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "S01"
+      ],
+      "intentForAssessors": "容器按类型形成候选，解释单值默认与限定选择"
+    },
+    {
+      "id": "Q06",
+      "type": "同义",
+      "domains": [
+        "MYSQL"
+      ],
+      "query": "账单列表先按商户筛，再按时间范围查并排序。联合键该怎样组织，如何判断已经利用了索引顺序？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D04",
+        "D05"
+      ],
+      "intentForAssessors": "解释等值前缀、范围及执行计划验证条件"
+    },
+    {
+      "id": "Q07",
+      "type": "同义",
+      "domains": [
+        "REDIS"
+      ],
+      "query": "容量没满就有键到期，压测占满后无期限的键也可能消失。怎样在观测上区分这两种删除？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D10"
+      ],
+      "intentForAssessors": "区分 TTL 与内存压力并给出统计证据"
+    },
+    {
+      "id": "Q08",
+      "type": "同义",
+      "domains": [
+        "NETWORK"
+      ],
+      "query": "应用发出连接结束后，对端还能送来最后一点数据吗？哪一侧为什么会在结束后再等一阵？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D15"
+      ],
+      "intentForAssessors": "解释 TCP 半关闭和 TIME-WAIT 边界"
+    },
+    {
+      "id": "Q09",
+      "type": "同义",
+      "domains": [
+        "PROJECT_SCENARIO"
+      ],
+      "query": "面试页面提交一次后刷新了。服务器已经存下答案但回复没到，恢复时要凭什么认出原提交？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "S09"
+      ],
+      "intentForAssessors": "说明归属、请求键与相同载荷校验"
+    },
+    {
+      "id": "Q10",
+      "type": "同义",
+      "domains": [
+        "JAVA_BASIC"
+      ],
+      "query": "日志里既有业务处理的失败又有关文件的失败。怎样保证原始失败可见且资源按声明关系释放？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J02"
+      ],
+      "intentForAssessors": "说明关闭顺序与 suppressed 的成立条件"
+    },
+    {
+      "id": "Q11",
+      "type": "同义",
+      "domains": [
+        "SPRING"
+      ],
+      "query": "按请求拿来的对象有临时状态，怎么让长寿命服务每次处理都能拿到当前请求那份？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "S02"
+      ],
+      "intentForAssessors": "说明短生命周期依赖经 scoped proxy 或 provider 动态获取"
+    },
+    {
+      "id": "Q12",
+      "type": "同义",
+      "domains": [
+        "MYSQL"
+      ],
+      "query": "表里的备注可空，两个还没填备注的记录都能存下。哪些约束才能表达备注必填而且全表不能撞值？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D02"
+      ],
+      "intentForAssessors": "说明 MySQL 8.0 UNIQUE 的 NULL 行为及 NOT NULL"
+    },
+    {
+      "id": "Q13",
+      "type": "口语",
+      "domains": [
+        "JAVA_BASIC"
+      ],
+      "query": "两个解码器从不同连接取到相同协议字段。做重复消息检测时，为啥直接拿字段对象做引用比较会漏掉？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J03"
+      ],
+      "intentForAssessors": "对象身份、内容相等和动态创建字符串的边界"
+    },
+    {
+      "id": "Q14",
+      "type": "口语",
+      "domains": [
+        "JAVA_COLLECTION"
+      ],
+      "query": "推送网关遍历可变订阅列表时，某个回调会顺手把订阅从原列表注销，随后这轮通知就崩了。怎么排查并把注销安排在安全的位置？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J13"
+      ],
+      "intentForAssessors": "结构修改与 fail-fast 条件，迭代器移除、延后删除或独立遍历副本"
+    },
+    {
+      "id": "Q15",
+      "type": "口语",
+      "domains": [
+        "JVM"
+      ],
+      "query": "服务一阵一阵把 CPU 打满了，先抓啥能知道是哪条线程忙？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J18"
+      ],
+      "intentForAssessors": "线程 CPU 采样与线程栈或 JFR 对照，区分瞬时和趋势"
+    },
+    {
+      "id": "Q16",
+      "type": "口语",
+      "domains": [
+        "JAVA_CONCURRENCY"
+      ],
+      "query": "让工作线程停下我发了中断，它醒来以后标记怎么没了？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J21"
+      ],
+      "intentForAssessors": "等待 API 抛 InterruptedException 时的状态变化和传播"
+    },
+    {
+      "id": "Q17",
+      "type": "口语",
+      "domains": [
+        "SPRING"
+      ],
+      "query": "计价服务用缓存注解包住远程汇率查询，调试却发现定时入口在同一个对象里调用时每次都远程访问。该追哪层？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "S04",
+        "S06"
+      ],
+      "intentForAssessors": "检查 this 调用和缓存代理边界，解释可以经另一受管 Bean 或其他等效方案"
+    },
+    {
+      "id": "Q18",
+      "type": "口语",
+      "domains": [
+        "MYSQL"
+      ],
+      "query": "数据库说死锁了，只把失败的那句 SQL 再发一次能接着干吗？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D07"
+      ],
+      "intentForAssessors": "说明死锁牺牲事务被回滚和完整事务重试条件"
+    },
+    {
+      "id": "Q19",
+      "type": "口语",
+      "domains": [
+        "REDIS"
+      ],
+      "query": "关机重启，昨晚有些缓存没回来。要看快照还是追加日志才能解释丢了多少？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D11"
+      ],
+      "intentForAssessors": "说明 RDB、AOF 与同步策略的恢复窗口和检查依据"
+    },
+    {
+      "id": "Q20",
+      "type": "口语",
+      "domains": [
+        "NETWORK"
+      ],
+      "query": "域名刚换地址，我这边还是老 IP，排查从哪儿开始？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D17"
+      ],
+      "intentForAssessors": "区分各层缓存与 TTL，递归解析和权威结果"
+    },
+    {
+      "id": "Q21",
+      "type": "口语",
+      "domains": [
+        "PROJECT_SCENARIO"
+      ],
+      "query": "报告页面一直转圈，前一次后台可能已经干完一半，谁能接着做？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "S10"
+      ],
+      "intentForAssessors": "说明陈旧领取、已有报告复用与迟到结果隔离"
+    },
+    {
+      "id": "Q22",
+      "type": "口语",
+      "domains": [
+        "JAVA_BASIC"
+      ],
+      "query": "流水线明明加了打印，怎么有时一行没打出来？我用它做审计行不行？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J08"
+      ],
+      "intentForAssessors": "终止操作、允许跳过中间步骤、避免依赖副作用"
+    },
+    {
+      "id": "Q23",
+      "type": "口语",
+      "domains": [
+        "REDIS"
+      ],
+      "query": "发一堆命令嫌慢，合在一起发会把它们自动变成一个整体吗？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D14"
+      ],
+      "intentForAssessors": "区分 Pipeline 的网络批处理、事务隔离和脚本"
+    },
+    {
+      "id": "Q24",
+      "type": "口语",
+      "domains": [
+        "MYSQL"
+      ],
+      "query": "这条查询明明有索引，为什么还是扫一大片？估的行数和实际差很多。",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D05"
+      ],
+      "intentForAssessors": "用计划和实测区分访问路径、估计偏差与代价选择"
+    },
+    {
+      "id": "Q25",
+      "type": "跨主题",
+      "domains": [
+        "JAVA_BASIC",
+        "JAVA_COLLECTION"
+      ],
+      "query": "第三方给我一个可变列表，我只想把只读快照存起来，元素里有可变地址对象。怎样解释哪些变化还会透进来？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J13",
+        "J10"
+      ],
+      "intentForAssessors": "区分活视图、浅拷贝和元素深层可变性",
+      "requiredIntents": [
+        {
+          "id": "Q25-I1",
+          "description": "视图或结构快照的行为"
+        },
+        {
+          "id": "Q25-I2",
+          "description": "可变元素引用的共享边界"
+        }
+      ],
+      "fullAnswerRequires": [
+        "Q25-I1",
+        "Q25-I2"
+      ]
+    },
+    {
+      "id": "Q26",
+      "type": "跨主题",
+      "domains": [
+        "JAVA_CONCURRENCY",
+        "SPRING"
+      ],
+      "query": "线程池给两个请求复用同一条线程，上一次的租户号出现在下一次日志里。业务 Bean 还是容器单例。要在哪里查和清理？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J22",
+        "S02"
+      ],
+      "intentForAssessors": "说明单例状态边界、池线程复用及 finally 清理",
+      "requiredIntents": [
+        {
+          "id": "Q26-I1",
+          "description": "单例不持有请求可变状态"
+        },
+        {
+          "id": "Q26-I2",
+          "description": "池线程复用的残留与清理"
+        }
+      ],
+      "fullAnswerRequires": [
+        "Q26-I1",
+        "Q26-I2"
+      ]
+    },
+    {
+      "id": "Q27",
+      "type": "跨主题",
+      "domains": [
+        "JVM",
+        "JAVA_BASIC"
+      ],
+      "query": "模块化插件在宿主能加载到类，却拿不到一个私有构造器的访问权限。加载成功之后还有哪道边界？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J17",
+        "J07"
+      ],
+      "intentForAssessors": "区分加载器身份和 JPMS 深反射访问条件",
+      "requiredIntents": [
+        {
+          "id": "Q27-I1",
+          "description": "加载器和类型身份"
+        },
+        {
+          "id": "Q27-I2",
+          "description": "模块的深反射访问权限"
+        }
+      ],
+      "fullAnswerRequires": [
+        "Q27-I1",
+        "Q27-I2"
+      ]
+    },
+    {
+      "id": "Q28",
+      "type": "跨主题",
+      "domains": [
+        "JAVA_CONCURRENCY",
+        "NETWORK"
+      ],
+      "query": "聚合服务给两个下游设了 300 毫秒预算，一个等待结果已经报超时。原来的网络请求会停吗，何时允许再次发送？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J23",
+        "D16"
+      ],
+      "intentForAssessors": "分别说明 future 超时、I/O 取消和业务重试条件",
+      "requiredIntents": [
+        {
+          "id": "Q28-I1",
+          "description": "Future 超时与底层 I/O 取消"
+        },
+        {
+          "id": "Q28-I2",
+          "description": "网络重试条件与业务幂等"
+        }
+      ],
+      "fullAnswerRequires": [
+        "Q28-I1",
+        "Q28-I2"
+      ]
+    },
+    {
+      "id": "Q29",
+      "type": "跨主题",
+      "domains": [
+        "SPRING",
+        "MYSQL"
+      ],
+      "query": "扣减成功提交后短信系统故障。进程若在通知前掉电，重启后靠什么确认库存和通知分别做到了哪一步？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "S08",
+        "D08"
+      ],
+      "intentForAssessors": "解释事务内持久任务、外部幂等及本地业务写的原子性",
+      "requiredIntents": [
+        {
+          "id": "Q29-I1",
+          "description": "库存更新和待办的本地事务"
+        },
+        {
+          "id": "Q29-I2",
+          "description": "崩溃后从待办恢复"
+        },
+        {
+          "id": "Q29-I3",
+          "description": "通知端幂等"
+        }
+      ],
+      "fullAnswerRequires": [
+        "Q29-I1",
+        "Q29-I2",
+        "Q29-I3"
+      ]
+    },
+    {
+      "id": "Q30",
+      "type": "跨主题",
+      "domains": [
+        "MYSQL",
+        "REDIS"
+      ],
+      "query": "写主库成功后删缓存，有一个并发读却把旧值填了回去。用数据库版本号能怎样限制旧值再次出现？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D13",
+        "D06"
+      ],
+      "intentForAssessors": "说明并发交错、版本校验前提与一致性上限",
+      "requiredIntents": [
+        {
+          "id": "Q30-I1",
+          "description": "快照和失效并发交错"
+        },
+        {
+          "id": "Q30-I2",
+          "description": "旧版本回填的约束"
+        },
+        {
+          "id": "Q30-I3",
+          "description": "一致性保证的上限"
+        }
+      ],
+      "fullAnswerRequires": [
+        "Q30-I1",
+        "Q30-I2",
+        "Q30-I3"
+      ]
+    },
+    {
+      "id": "Q31",
+      "type": "跨主题",
+      "domains": [
+        "REDIS",
+        "MYSQL"
+      ],
+      "query": "旧工作线程持有的租约已过期，恢复后还想写订单库。存储端能怎样拒绝它？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D12",
+        "D08"
+      ],
+      "intentForAssessors": "说明租约 token 与 fencing token 区别及资源端校验",
+      "requiredIntents": [
+        {
+          "id": "Q31-I1",
+          "description": "租约所有者标识"
+        },
+        {
+          "id": "Q31-I2",
+          "description": "下游识别迟到写的单调条件"
+        }
+      ],
+      "fullAnswerRequires": [
+        "Q31-I1",
+        "Q31-I2"
+      ]
+    },
+    {
+      "id": "Q32",
+      "type": "跨主题",
+      "domains": [
+        "NETWORK",
+        "REDIS"
+      ],
+      "query": "代理连接断开时，客户端没拿到一个 Redis 批处理的结果。重发整批有哪些风险？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D14",
+        "D15"
+      ],
+      "intentForAssessors": "分别说明传输断开无法推知执行结果、批内重复与命令幂等性",
+      "requiredIntents": [
+        {
+          "id": "Q32-I1",
+          "description": "连接中断的执行结果不确定"
+        },
+        {
+          "id": "Q32-I2",
+          "description": "按命令语义区分重发副作用"
+        }
+      ],
+      "fullAnswerRequires": [
+        "Q32-I1",
+        "Q32-I2"
+      ]
+    },
+    {
+      "id": "Q33",
+      "type": "跨主题",
+      "domains": [
+        "PROJECT_SCENARIO",
+        "SPRING"
+      ],
+      "query": "假设未来为面试报告加上消息通知，报告已入库后通知失败。用户重新打开报告时，报告、弱项和通知各自该如何恢复？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "S10",
+        "S08"
+      ],
+      "intentForAssessors": "区分项目既有报告及弱项持久化重放，和假设通知的独立重试与幂等",
+      "requiredIntents": [
+        {
+          "id": "Q33-I1",
+          "description": "报告及弱项使用已有业务记录"
+        },
+        {
+          "id": "Q33-I2",
+          "description": "假设通知的独立恢复和去重"
+        }
+      ],
+      "fullAnswerRequires": [
+        "Q33-I1",
+        "Q33-I2"
+      ]
+    },
+    {
+      "id": "Q34",
+      "type": "跨主题",
+      "domains": [
+        "JAVA_COLLECTION",
+        "JAVA_CONCURRENCY"
+      ],
+      "query": "启动时发布一张只读路由表，运行中另有一张并发统计表按键增加计数。各自的安全发布和更新要靠什么？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J13",
+        "J15",
+        "J20"
+      ],
+      "intentForAssessors": "分别核对只读快照安全发布和并发复合原子更新",
+      "requiredIntents": [
+        {
+          "id": "Q34-I1",
+          "description": "只读快照的发布与可见性"
+        },
+        {
+          "id": "Q34-I2",
+          "description": "并发 Map 的原子复合更新"
+        }
+      ],
+      "fullAnswerRequires": [
+        "Q34-I1",
+        "Q34-I2"
+      ]
+    },
+    {
+      "id": "Q35",
+      "type": "跨主题",
+      "domains": [
+        "MYSQL",
+        "NETWORK"
+      ],
+      "query": "客户端在提交订单时网络断开。数据库事务可能已提交，API 怎样把第二次发送解释成同一个订单请求？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D16",
+        "D08"
+      ],
+      "intentForAssessors": "解释失败结果未知、请求键唯一性和重复时读取已提交结果",
+      "requiredIntents": [
+        {
+          "id": "Q35-I1",
+          "description": "网络超时不说明数据库提交结果"
+        },
+        {
+          "id": "Q35-I2",
+          "description": "同键同意图和持久化唯一性"
+        },
+        {
+          "id": "Q35-I3",
+          "description": "已提交结果重放"
+        }
+      ],
+      "fullAnswerRequires": [
+        "Q35-I1",
+        "Q35-I2",
+        "Q35-I3"
+      ]
+    },
+    {
+      "id": "Q36",
+      "type": "跨主题",
+      "domains": [
+        "JVM",
+        "JAVA_CONCURRENCY"
+      ],
+      "query": "服务看起来没有对象泄漏，但大量阻塞任务一进线程池，原生内存和线程数都涨了。怎样分辨栈占用和 Java 堆？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J16",
+        "J18",
+        "J22"
+      ],
+      "intentForAssessors": "区分线程栈、堆与可观察指标，结合队列及工作线程配置",
+      "requiredIntents": [
+        {
+          "id": "Q36-I1",
+          "description": "线程栈和堆/原生内存观测"
+        },
+        {
+          "id": "Q36-I2",
+          "description": "线程池容量与任务阻塞的关联"
+        }
+      ],
+      "fullAnswerRequires": [
+        "Q36-I1",
+        "Q36-I2"
+      ]
+    },
+    {
+      "id": "Q37",
+      "type": "辨析",
+      "domains": [
+        "JAVA_BASIC"
+      ],
+      "query": "代码审查里有人想对 List<? extends Number> 做 ArrayList<Integer> 检查，再用检查结果保证所有数据是 Integer。静态转换和运行时能分别给出什么保证？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J06",
+        "J05"
+      ],
+      "intentForAssessors": "核对静态类型可转换性与擦除，参数化目标检查不能逐元素验证"
+    },
+    {
+      "id": "Q38",
+      "type": "辨析",
+      "domains": [
+        "JAVA_COLLECTION"
+      ],
+      "query": "读取并发 Map 的迭代结果和读取写时复制 List 的迭代结果，看到随后写入的元素是各自保证的吗？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J15"
+      ],
+      "intentForAssessors": "区分弱一致与快照迭代以及快照时点"
+    },
+    {
+      "id": "Q39",
+      "type": "辨析",
+      "domains": [
+        "JVM"
+      ],
+      "query": "诊断工具报告 Metaspace 撑大，有人说规范里的方法区就是 HotSpot 的 Metaspace。这个说法怎样限定？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J16"
+      ],
+      "intentForAssessors": "区分 JVM 逻辑区域和 HotSpot 实现及其内存边界"
+    },
+    {
+      "id": "Q40",
+      "type": "辨析",
+      "domains": [
+        "JAVA_CONCURRENCY"
+      ],
+      "query": "我给两个并发任务都加了超时。有一个只从 get 返回了异常，另一个的 future 真完成了异常，这会影响后续链式处理吗？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J23"
+      ],
+      "intentForAssessors": "区分限时等待与改变 future 完成状态"
+    },
+    {
+      "id": "Q41",
+      "type": "辨析",
+      "domains": [
+        "SPRING"
+      ],
+      "query": "内层失败了，外层还要落审核记录。一个做法回到保存点，另一个另开连接，提交结果和锁有什么不同？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "S07"
+      ],
+      "intentForAssessors": "区分 JDBC savepoint 与独立物理事务"
+    },
+    {
+      "id": "Q42",
+      "type": "辨析",
+      "domains": [
+        "MYSQL"
+      ],
+      "query": "同一个 RR 事务刚读到旧余额，紧接着加 FOR UPDATE 查到了新余额。这是不是同一个读取机制发生了不一致？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D06"
+      ],
+      "intentForAssessors": "区分一致性读与锁定读及自己修改可见性"
+    },
+    {
+      "id": "Q43",
+      "type": "辨析",
+      "domains": [
+        "REDIS"
+      ],
+      "query": "脚本途中报错和 MULTI 后有一条命令执行报错，会像关系库那样撤回前面成功的修改吗？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D14"
+      ],
+      "intentForAssessors": "区分原子执行和通用回滚，含错误阶段"
+    },
+    {
+      "id": "Q44",
+      "type": "辨析",
+      "domains": [
+        "NETWORK"
+      ],
+      "query": "TLS 已经加密了，为什么应用还要检查证书里的域名？恢复会话的早期数据能不能保证不重放？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D18"
+      ],
+      "intentForAssessors": "分别说明端点身份与加密、0-RTT 重放边界"
+    },
+    {
+      "id": "Q45",
+      "type": "辨析",
+      "domains": [
+        "PROJECT_SCENARIO"
+      ],
+      "query": "同一轮主答有一条高分，追问回来后另一条分数低。生成报告该按最新写入排序还是按哪种评价资格挑？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "S10"
+      ],
+      "intentForAssessors": "说明每个主问题唯一 FINAL 和 INITIAL 排除条件"
+    },
+    {
+      "id": "Q46",
+      "type": "辨析",
+      "domains": [
+        "JAVA_COLLECTION"
+      ],
+      "query": "一份旧压测报告把无碰撞的 ConcurrentHashMap 读慢归因于 Segment 锁，把一个小容量 HashMap 扩容归因于立即树化。要看哪些版本证据？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "J12",
+        "J14"
+      ],
+      "intentForAssessors": "区分 OpenJDK 8u 的桶并发机制、树化容量和实际压测归因"
+    },
+    {
+      "id": "Q47",
+      "type": "辨析",
+      "domains": [
+        "MYSQL"
+      ],
+      "query": "执行计划有 Using index condition，是不是已经不用读取主键记录了？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "D04",
+        "D05"
+      ],
+      "intentForAssessors": "明确 ICP 与覆盖索引的不同及回表前提"
+    },
+    {
+      "id": "Q48",
+      "type": "辨析",
+      "domains": [
+        "SPRING"
+      ],
+      "query": "预订接口近期给查询参数 nights 加了范围约束，入住人 DTO 已经用了嵌套校验。全局异常处理器原来只接一种验证异常，现在该关注哪两个入口？",
+      "expectedEvidence": "DIRECT_EXPECTED",
+      "reviewTopicIds": [
+        "S05"
+      ],
+      "intentForAssessors": "区分 MVC 参数级 DTO 校验与方法级约束，并考虑错误响应兼容"
+    },
+    {
+      "id": "Q49",
+      "type": "无充分依据",
+      "domains": [
+        "JAVA_BASIC"
+      ],
+      "query": "公司哪一次 JDK 部署把某批用户 ID 字符串改成了共享对象？给当天发布单。",
+      "expectedEvidence": "NO_DIRECT",
+      "reviewTopicIds": [],
+      "intentForAssessors": "外部或组织私有发布记录缺失，字符串常识仅为邻近背景"
+    },
+    {
+      "id": "Q50",
+      "type": "无充分依据",
+      "domains": [
+        "JAVA_COLLECTION"
+      ],
+      "query": "指定 GraalVM Native Image 运行本例，实际启用了哪项逃逸优化，给出编译日志的阶段及该次对象分配计数。",
+      "expectedEvidence": "NO_DIRECT",
+      "reviewTopicIds": [],
+      "intentForAssessors": "语料涵盖 JVM 或 HotSpot 通用行为，缺该 Native Image 构建、优化日志与计数"
+    },
+    {
+      "id": "Q51",
+      "type": "无充分依据",
+      "domains": [
+        "JVM"
+      ],
+      "query": "上周六晚上实际是哪条业务对象链占了本系统 80% 堆？",
+      "expectedEvidence": "NO_DIRECT",
+      "reviewTopicIds": [],
+      "intentForAssessors": "缺相应 heap dump 和时间段，诊断方法仅为背景"
+    },
+    {
+      "id": "Q52",
+      "type": "无充分依据",
+      "domains": [
+        "JAVA_CONCURRENCY"
+      ],
+      "query": "请给出生产搜索接口当前执行器的最大线程数和等候队列配置的准确值，包含实例覆盖结果。",
+      "expectedEvidence": "NO_DIRECT",
+      "reviewTopicIds": [],
+      "intentForAssessors": "缺实例有效配置与运行观察，线程池机制只能说明怎样核对"
+    },
+    {
+      "id": "Q53",
+      "type": "无充分依据",
+      "domains": [
+        "SPRING"
+      ],
+      "query": "项目线上哪个 Bean 在昨天 10 点比平时慢了多少毫秒？",
+      "expectedEvidence": "NO_DIRECT",
+      "reviewTopicIds": [],
+      "intentForAssessors": "缺指定实例、时间段和运行追踪"
+    },
+    {
+      "id": "Q54",
+      "type": "无充分依据",
+      "domains": [
+        "MYSQL"
+      ],
+      "query": "看不到表、分布和负载，给我上线后这条 SQL 必须达到的 p99 和确定的耗时。",
+      "expectedEvidence": "NO_DIRECT",
+      "reviewTopicIds": [],
+      "intentForAssessors": "需 SQL、Schema、数据分布、负载及测量，通用索引建议不构成结论"
+    },
+    {
+      "id": "Q55",
+      "type": "无充分依据",
+      "domains": [
+        "REDIS"
+      ],
+      "query": "确认我生产缓存昨天发生了几个被动过期事件，并给出每个 key。",
+      "expectedEvidence": "NO_DIRECT",
+      "reviewTopicIds": [],
+      "intentForAssessors": "缺实例观测与键级历史，INFO 的聚合计数无法复原该清单"
+    },
+    {
+      "id": "Q56",
+      "type": "无充分依据",
+      "domains": [
+        "NETWORK"
+      ],
+      "query": "给我这个域名今天每一个运营商递归服务器实际返回的具体地址。",
+      "expectedEvidence": "NO_DIRECT",
+      "reviewTopicIds": [],
+      "intentForAssessors": "缺域名和在线采样，DNS 标准不提供实际响应"
+    },
+    {
+      "id": "Q57",
+      "type": "无充分依据",
+      "domains": [
+        "PROJECT_SCENARIO"
+      ],
+      "query": "告诉我某位指定候选人昨日那场面试的最终分数和报告内容。",
+      "expectedEvidence": "NO_DIRECT",
+      "reviewTopicIds": [],
+      "intentForAssessors": "需授权业务记录和身份，机制资料不包含个人数据"
+    },
+    {
+      "id": "Q58",
+      "type": "无充分依据",
+      "domains": [
+        "NETWORK"
+      ],
+      "query": "请给出服务器过去七天每个 CDN 节点的私钥轮换时间和对应运维变更号。",
+      "expectedEvidence": "NO_DIRECT",
+      "reviewTopicIds": [],
+      "intentForAssessors": "缺运维日志及节点清单，TLS 握手只能支持当次认证相关事实"
+    },
+    {
+      "id": "Q59",
+      "type": "无充分依据",
+      "domains": [
+        "REDIS",
+        "MYSQL"
+      ],
+      "query": "我的缓存刚刚出现脏读，没给日志和时间线，请确认是哪个请求用旧值覆盖了哪个键。",
+      "expectedEvidence": "NO_DIRECT",
+      "reviewTopicIds": [],
+      "intentForAssessors": "只可解释一般竞态，实际请求和键需可关联的观测"
+    },
+    {
+      "id": "Q60",
+      "type": "无充分依据",
+      "domains": [
+        "SPRING",
+        "MYSQL"
+      ],
+      "query": "请列出我在 CockroachDB 上次升级后某次 SERIALIZABLE 重试的原始锁事件及精确起止时间。",
+      "expectedEvidence": "NO_DIRECT",
+      "reviewTopicIds": [],
+      "intentForAssessors": "现语料主线为 MySQL 与 Spring，缺 CockroachDB 对应版本的事件、实例和事务追踪"
+    }
+  ]
+}

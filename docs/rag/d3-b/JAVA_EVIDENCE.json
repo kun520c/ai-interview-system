@@ -1,0 +1,2110 @@
+{
+  "scope": "J01 保留 E01 原文，J02–J23 为新版本。关系来源是 D3-A 建设目录和评分点矩阵中的实际单元格。",
+  "evidenceLevel": "作者 AI 逐点审查与官方资料核对。正文定位和充分性仍需独立复核；人工抽查待进行。",
+  "documents": [
+    {
+      "documentId": "J01",
+      "path": "docs/rag/source-documents/e01_java21_interface_vs_abstract_class.md",
+      "title": "Java 接口、抽象基类与组合",
+      "versionScope": "Java SE 21，JLS 8/9。",
+      "pointMappings": [
+        {
+          "pointId": "E01.01",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "CORE",
+          "section": "1. Core model",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E01.02",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "2. Main mechanism",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E01.03",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "2. Main mechanism",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E01.04",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "PRINCIPLE",
+          "section": "3. Important boundary",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A398",
+          "version": "JLS SE 21",
+          "locator": "§8.1.1.1、§8.1.4–8.1.5、§8.8",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.1.1.1",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "类最多一个直接父类、可实现多个接口；抽象类可保有状态、构造和实现"
+        },
+        {
+          "sourceId": "A377",
+          "version": "JLS SE 21",
+          "locator": "§9.3–9.4 Fields and Methods",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html#jls-9.3",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "接口字段、可实现的方法种类及多个父接口"
+        }
+      ]
+    },
+    {
+      "documentId": "J02",
+      "path": "docs/rag/d3-b/corpus/j02.md",
+      "title": "异常传播、资源所有权与抑制异常",
+      "versionScope": "Java SE 21 语言语义和 AutoCloseable。",
+      "pointMappings": [
+        {
+          "pointId": "E06.01",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "CORE",
+          "section": "受检异常与失败边界",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E06.02",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "受检异常与失败边界",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E06.03",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "成功取得资源与关闭顺序",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E06.04",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "PRINCIPLE",
+          "section": "受检异常与失败边界",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M08.01",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "CORE",
+          "section": "成功取得资源与关闭顺序",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M08.02",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "主异常、抑制异常与 finally",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M08.03",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "主异常、抑制异常与 finally",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M08.04",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "PRINCIPLE",
+          "section": "主异常、抑制异常与 finally",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M08.05",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "PRINCIPLE",
+          "section": "主异常、抑制异常与 finally",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A399",
+          "version": "JLS SE 21",
+          "locator": "§11.1.1、§11.2.3、§11.3",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-11.html#jls-11.1.1",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "受检异常的捕获或声明要求及非受检异常传播"
+        },
+        {
+          "sourceId": "A400",
+          "version": "JLS SE 21",
+          "locator": "§14.20.2–14.20.3.2",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-14.html#jls-14.20.2",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "普通 finally 的异常退出、资源关闭顺序和主异常优先"
+        },
+        {
+          "sourceId": "A038",
+          "version": "Java SE 21 API",
+          "locator": "close()",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/AutoCloseable.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "try-with-resources 调用 AutoCloseable.close 的资源约定"
+        },
+        {
+          "sourceId": "A401",
+          "version": "Java SE 21 API",
+          "locator": "getSuppressed() / getCause()",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "cause 与 suppressed 的独立作用"
+        }
+      ]
+    },
+    {
+      "documentId": "J03",
+      "path": "docs/rag/d3-b/corpus/j03.md",
+      "title": "String 的身份、不可变性与文本构建",
+      "versionScope": "Java SE 21，避免把某个编译器拼接策略视为语言契约。",
+      "pointMappings": [
+        {
+          "pointId": "E07.01",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "CORE",
+          "section": "引用身份和内容",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E07.02",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "不可变值和变量重绑定",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E07.03",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "局部可变缓冲",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E07.04",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "PRINCIPLE",
+          "section": "局部可变缓冲",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A402",
+          "version": "JLS SE 21",
+          "locator": "§15.21.3 Reference Equality Operators、§15.18.1 String Concatenation",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-15.html#jls-15.21.3",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "引用相等和字符串拼接语义"
+        },
+        {
+          "sourceId": "A403",
+          "version": "JLS SE 21",
+          "locator": "§3.10.5 String Literals",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-3.html#jls-3.10.5",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "字符串字面量及字符串常量表达式的驻留"
+        },
+        {
+          "sourceId": "A404",
+          "version": "Java SE 21 API",
+          "locator": "Class description / equals / replace",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "String 不可变、equals 内容比较及 replace 返回值"
+        },
+        {
+          "sourceId": "A405",
+          "version": "Java SE 21 API",
+          "locator": "Class description / append / toString",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/StringBuilder.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "StringBuilder 无同步保证、append 和 toString"
+        }
+      ]
+    },
+    {
+      "documentId": "J04",
+      "path": "docs/rag/d3-b/corpus/j04.md",
+      "title": "对象相等、哈希契约和稳定键",
+      "versionScope": "Java SE 21 API，定位示例固定 OpenJDK jdk-21+35。",
+      "pointMappings": [
+        {
+          "pointId": "M01.01",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "CORE",
+          "section": "逻辑相等和哈希约束",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M01.02",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "逻辑相等和哈希约束",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M01.03",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "PRINCIPLE",
+          "section": "哈希容器中的定位与候选比较",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M01.04",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "哈希容器中的定位与候选比较",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A082",
+          "version": "Java SE 21 API",
+          "locator": "equals(Object) / hashCode()",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Object 默认相等及 equals/hashCode 的一致性约束"
+        },
+        {
+          "sourceId": "A084",
+          "version": "OpenJDK jdk-21+35",
+          "locator": "hash / getNode / putVal",
+          "url": "https://raw.githubusercontent.com/openjdk/jdk/jdk-21%2B35/src/java.base/share/classes/java/util/HashMap.java",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "源文件 GPL-2.0-only，带 Classpath Exception；本项目只描述行为",
+          "supports": "固定 OpenJDK 版本的 HashMap 散列、候选桶定位和相等匹配"
+        },
+        {
+          "sourceId": "A052",
+          "version": "Java SE 21 API",
+          "locator": "Class description",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashSet.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "HashSet 基于 HashMap 实现且不保证遍历顺序"
+        }
+      ]
+    },
+    {
+      "documentId": "J05",
+      "path": "docs/rag/d3-b/corpus/j05.md",
+      "title": "泛型不变性和通配符的读写边界",
+      "versionScope": "JLS SE 21 与标准集合签名。",
+      "pointMappings": [
+        {
+          "pointId": "M09.01",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "CORE",
+          "section": "不变性保护写入",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M09.02",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "生产者和消费者的静态类型",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M09.03",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "生产者和消费者的静态类型",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M09.04",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "生产者和消费者的静态类型",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M09.05",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "PRINCIPLE",
+          "section": "生产者和消费者的静态类型",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A406",
+          "version": "JLS SE 21",
+          "locator": "§4.5.1–4.5.2、§4.10.2",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.5.1",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "参数化类型与通配符的包含关系"
+        },
+        {
+          "sourceId": "A126",
+          "version": "JLS SE 21",
+          "locator": "§5.1.10 Capture Conversion",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-5.html#jls-5.1.10",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "extends、super 通配符捕获后的上下界"
+        },
+        {
+          "sourceId": "A407",
+          "version": "Java SE 21 API",
+          "locator": "copy(List<? super T>, List<? extends T>)",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Collections.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Collections.copy 参数方向和覆盖既有位置的 size 要求"
+        }
+      ]
+    },
+    {
+      "documentId": "J06",
+      "path": "docs/rag/d3-b/corpus/j06.md",
+      "title": "擦除、桥接和运行时泛型元数据",
+      "versionScope": "JLS/JVMS SE 21，兼述 Java 16 的 instanceof 变化。",
+      "pointMappings": [
+        {
+          "pointId": "H01.01",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "CORE",
+          "section": "擦除与对象身份",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H01.02",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "PRINCIPLE",
+          "section": "擦除与对象身份",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H01.03",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "INTERNAL",
+          "section": "擦除后的调用与声明元数据",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H01.04",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "限制与检查",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H01.05",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "ADVANCED",
+          "section": "擦除后的调用与声明元数据",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A408",
+          "version": "JLS SE 21",
+          "locator": "§4.6–4.7",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.6",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "擦除、最左上界与可实化类型规则"
+        },
+        {
+          "sourceId": "A409",
+          "version": "JLS SE 21",
+          "locator": "§8.4.8.3",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.4.8.3",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "擦除后覆盖限制及保持覆盖分派的桥接规则"
+        },
+        {
+          "sourceId": "A212",
+          "version": "JLS SE 21",
+          "locator": "§15.9、§15.10.1、§15.20.2",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-15.html#jls-15.9",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "实例创建、不可实化数组限制及 instanceof 的适用条件"
+        },
+        {
+          "sourceId": "A391",
+          "version": "JVMS SE 21",
+          "locator": "§4.6、§4.7.9",
+          "url": "https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html#jvms-4.6",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "ACC_BRIDGE 与 Signature 属性"
+        },
+        {
+          "sourceId": "J21-REFLECT-FIELD",
+          "version": "Java SE 21 API",
+          "locator": "Field.getGenericType() / getType()",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/reflect/Field.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "字段的声明类型与擦除后类型"
+        },
+        {
+          "sourceId": "J21-REFLECT-METHOD",
+          "version": "Java SE 21 API",
+          "locator": "Method.isBridge()",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/reflect/Method.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "反射识别编译器生成的桥接方法"
+        }
+      ]
+    },
+    {
+      "documentId": "J07",
+      "path": "docs/rag/d3-b/corpus/j07.md",
+      "title": "反射成员发现与 JPMS 访问控制",
+      "versionScope": "Java 21 两个具名模块，普通实例成员。",
+      "pointMappings": [
+        {
+          "pointId": "H10.01",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "CORE",
+          "section": "成员元数据与执行权限",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H10.02",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "PRINCIPLE",
+          "section": "导出和开放的边界",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H10.03",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "导出和开放的边界",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H10.04",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "导出和开放的边界",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H10.05",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "ADVANCED",
+          "section": "限制反射的输入",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A256",
+          "version": "JLS SE 21",
+          "locator": "§7.7.2 Exported and Opened Packages",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-7.html#jls-7.7.2",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "模块导出包与反射开放包的权限差异"
+        },
+        {
+          "sourceId": "A253",
+          "version": "Java SE 21 API",
+          "locator": "getDeclaredField(String)",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Class.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "查找当前类声明字段的规则"
+        },
+        {
+          "sourceId": "A254",
+          "version": "Java SE 21 API",
+          "locator": "get(Object)",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/reflect/Field.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Field.get 的默认访问检查及其异常"
+        },
+        {
+          "sourceId": "A410",
+          "version": "Java SE 21 API",
+          "locator": "setAccessible(boolean) / trySetAccessible()",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/reflect/AccessibleObject.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "canAccess、trySetAccessible 与 setAccessible 的跨模块行为"
+        },
+        {
+          "sourceId": "A411",
+          "version": "Oracle JDK 21 java",
+          "locator": "--add-opens",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "启动器可用 --add-opens 定向开放包"
+        },
+        {
+          "sourceId": "A412",
+          "version": "Oracle Secure Coding Guidelines for Java SE",
+          "locator": "§4 Accessibility and Extensibility、§5 Input Validation",
+          "url": "https://www.oracle.com/java/technologies/javase/seccodeguide.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "限制反射目标及验证不可信输入的安全建议"
+        }
+      ]
+    },
+    {
+      "documentId": "J08",
+      "path": "docs/rag/d3-b/corpus/j08.md",
+      "title": "Stream 管线、顺序和并行归约",
+      "versionScope": "Java SE 21 Stream API。",
+      "pointMappings": [
+        {
+          "pointId": "H11.01",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "CORE",
+          "section": "延迟执行与副作用",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H11.02",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "CORE",
+          "section": "并行写入与顺序",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H11.03",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "PRINCIPLE",
+          "section": "延迟执行与副作用",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H11.04",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "KEY",
+          "section": "并行写入与顺序",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H11.05",
+          "questionCategory": "JAVA_BASIC",
+          "pointType": "ADVANCED",
+          "section": "并行决策的成本",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A413",
+          "version": "Java SE 21 API",
+          "locator": "count / peek / forEach / forEachOrdered / toList",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "count 可省略遍历，forEach 与有序收集的执行合同"
+        },
+        {
+          "sourceId": "A414",
+          "version": "Java SE 21 API",
+          "locator": "Pipelines / Side-effects / Non-interference / Ordering / Parallelism",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "中间/终止操作、非干扰、无状态及并行副作用"
+        }
+      ]
+    },
+    {
+      "documentId": "J09",
+      "path": "docs/rag/d3-b/corpus/j09.md",
+      "title": "列表存储结构和访问成本",
+      "versionScope": "Java SE 21 ArrayList/LinkedList API。",
+      "pointMappings": [
+        {
+          "pointId": "E02.01",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "CORE",
+          "section": "定位和追加",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E02.02",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "定位和追加",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E02.03",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "中段修改的两部分成本",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E02.04",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "PRINCIPLE",
+          "section": "选择与验证",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A378",
+          "version": "Java SE 21 API",
+          "locator": "Class description / get / add / remove",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "ArrayList 增长数组、随机访问及追加成本"
+        },
+        {
+          "sourceId": "A379",
+          "version": "Java SE 21 API",
+          "locator": "Class description / get / listIterator",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/LinkedList.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "LinkedList 双向节点、从较近端定位与顺序迭代"
+        }
+      ]
+    },
+    {
+      "documentId": "J10",
+      "path": "docs/rag/d3-b/corpus/j10.md",
+      "title": "有序记录、去重与键值映射",
+      "versionScope": "Java SE 21 List/Set/Map 及其典型实现。",
+      "pointMappings": [
+        {
+          "pointId": "E08.01",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "CORE",
+          "section": "分离序列、成员和索引",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E08.02",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "分离序列、成员和索引",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E08.03",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "分离序列、成员和索引",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E08.04",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "PRINCIPLE",
+          "section": "首次出现和最近访问是不同顺序",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A415",
+          "version": "Java SE 21 API",
+          "locator": "Class description",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "List 是有位置次序的序列，可允许重复"
+        },
+        {
+          "sourceId": "A416",
+          "version": "Java SE 21 API",
+          "locator": "Class description",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Set 成员唯一性按相等关系判断"
+        },
+        {
+          "sourceId": "A417",
+          "version": "Java SE 21 API",
+          "locator": "Class description / put / merge",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Map 的键唯一性、put 和 merge 更新合同"
+        },
+        {
+          "sourceId": "A418",
+          "version": "Java SE 21 API",
+          "locator": "Class description / insertion order",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/LinkedHashSet.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "LinkedHashSet 保持遍历顺序与显式定位操作"
+        },
+        {
+          "sourceId": "A419",
+          "version": "Java SE 21 API",
+          "locator": "Class description / order",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/LinkedHashMap.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "LinkedHashMap 插入顺序和访问顺序"
+        },
+        {
+          "sourceId": "A420",
+          "version": "Java SE 21 API",
+          "locator": "Class description / iteration",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashSet.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "HashSet 不保证遍历顺序"
+        }
+      ]
+    },
+    {
+      "documentId": "J11",
+      "path": "docs/rag/d3-b/corpus/j11.md",
+      "title": "双端队列的方向、容量和并发",
+      "versionScope": "Java SE 21 Deque、ArrayDeque 及并发实现。",
+      "pointMappings": [
+        {
+          "pointId": "E09.01",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "CORE",
+          "section": "双端操作的方向",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E09.02",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "双端操作的方向",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E09.03",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "可增长缓冲和硬容量",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "E09.04",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "PRINCIPLE",
+          "section": "共享访问",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A421",
+          "version": "Java SE 21 API",
+          "locator": "Stack and Queue method equivalences",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Deque.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Deque 的同端栈、异端队列及异常/特殊值方法"
+        },
+        {
+          "sourceId": "A059",
+          "version": "Java SE 21 API",
+          "locator": "Class description / ArrayDeque(int)",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayDeque.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "ArrayDeque 初始容量、可增长且非线程安全"
+        },
+        {
+          "sourceId": "A422",
+          "version": "Java SE 21 API",
+          "locator": "Class description / LinkedBlockingDeque(int)",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/LinkedBlockingDeque.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "LinkedBlockingDeque 的容量、阻塞与拒绝行为"
+        },
+        {
+          "sourceId": "A062",
+          "version": "Java SE 21 API",
+          "locator": "Class description",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ConcurrentLinkedDeque.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "ConcurrentLinkedDeque 的无界并发语义"
+        }
+      ]
+    },
+    {
+      "documentId": "J12",
+      "path": "docs/rag/d3-b/corpus/j12.md",
+      "title": "OpenJDK 8u HashMap 的桶、树化与扩容",
+      "versionScope": "固定 OpenJDK jdk8u402-b06，公开契约附 Java SE 8 API。",
+      "pointMappings": [
+        {
+          "pointId": "M02.01",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "CORE",
+          "section": "桶定位与更新",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M02.02",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "PRINCIPLE",
+          "section": "桶定位与更新",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M02.03",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "桶定位与更新",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M02.04",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "INTERNAL",
+          "section": "树化与表容量",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M02.05",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "全表扩容与工程边界",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A423",
+          "version": "OpenJDK jdk8u402-b06",
+          "locator": "putVal / resize / treeifyBin / TreeNode.balanceInsertion",
+          "url": "https://raw.githubusercontent.com/openjdk/jdk8u/jdk8u402-b06/jdk/src/share/classes/java/util/HashMap.java",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "源文件 GPL-2.0-only，带 Classpath Exception；本项目只描述行为",
+          "supports": "8u putVal 桶匹配、treeifyBin 容量条件与 resize 分桶"
+        },
+        {
+          "sourceId": "A093",
+          "version": "Java SE 8 API",
+          "locator": "Class description / load factor",
+          "url": "https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "HashMap 默认负载因子及容量约束"
+        }
+      ]
+    },
+    {
+      "documentId": "J13",
+      "path": "docs/rag/d3-b/corpus/j13.md",
+      "title": "迭代修改、只读视图与结构快照",
+      "versionScope": "Java SE 21 集合 API。",
+      "pointMappings": [
+        {
+          "pointId": "M10.01",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "CORE",
+          "section": "遍历期间的修改",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M10.02",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "删除与并发协调",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M10.03",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "遍历期间的修改",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M10.04",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "PRINCIPLE",
+          "section": "遍历期间的修改",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M10.05",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "PRINCIPLE",
+          "section": "删除与并发协调",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M11.01",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "CORE",
+          "section": "只读容器和元素生命周期",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M11.02",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "只读容器和元素生命周期",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M11.03",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "只读容器和元素生命周期",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M11.04",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "PRINCIPLE",
+          "section": "只读容器和元素生命周期",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M11.05",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "PRINCIPLE",
+          "section": "只读容器和元素生命周期",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A424",
+          "version": "JLS SE 21",
+          "locator": "§14.14.2 Enhanced for",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-14.html#jls-14.14.2",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Iterable 增强 for 的迭代器语义"
+        },
+        {
+          "sourceId": "A131",
+          "version": "Java SE 21 API",
+          "locator": "remove()",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Iterator.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Iterator.remove 的时序与可选支持"
+        },
+        {
+          "sourceId": "A132",
+          "version": "Java SE 21 API",
+          "locator": "removeIf(Predicate)",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Collection.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Collection.removeIf 的过滤合同"
+        },
+        {
+          "sourceId": "A009",
+          "version": "Java SE 21 API",
+          "locator": "Class description",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "ArrayList 结构修改和尽力 fail-fast"
+        },
+        {
+          "sourceId": "A425",
+          "version": "Java SE 21 API",
+          "locator": "unmodifiableList / synchronizedList",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Collections.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Collections.unmodifiableList 与同步列表遍历要求"
+        },
+        {
+          "sourceId": "A140",
+          "version": "Java SE 21 API",
+          "locator": "copyOf(Collection) / Unmodifiable Lists",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "List.copyOf 隔离源集合的结构变化并拒绝 null"
+        }
+      ]
+    },
+    {
+      "documentId": "J14",
+      "path": "docs/rag/d3-b/corpus/j14.md",
+      "title": "OpenJDK 8u ConcurrentHashMap 的桶协调",
+      "versionScope": "固定 OpenJDK jdk8u402-b06。",
+      "pointMappings": [
+        {
+          "pointId": "H02.01",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "CORE",
+          "section": "表、空桶和非空桶写入",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H02.02",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "INTERNAL",
+          "section": "表、空桶和非空桶写入",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H02.03",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "INTERNAL",
+          "section": "表、空桶和非空桶写入",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H02.04",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "PRINCIPLE",
+          "section": "普通读取路径",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H02.05",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "ADVANCED",
+          "section": "扩容期间的协作",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A393",
+          "version": "OpenJDK jdk8u402-b06",
+          "locator": "Overview / Node / putVal / get / helpTransfer / transfer",
+          "url": "https://raw.githubusercontent.com/openjdk/jdk8u/jdk8u402-b06/jdk/src/share/classes/java/util/concurrent/ConcurrentHashMap.java",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "源文件 GPL-2.0-only，带 Classpath Exception；本项目只描述行为",
+          "supports": "固定 8u 版本的槽 CAS、桶头监视器、读取可见性和协作扩容"
+        }
+      ]
+    },
+    {
+      "documentId": "J15",
+      "path": "docs/rag/d3-b/corpus/j15.md",
+      "title": "并发集合的原子更新和迭代一致性",
+      "versionScope": "Java SE 21 公开 API。",
+      "pointMappings": [
+        {
+          "pointId": "H12.01",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "CORE",
+          "section": "单键原子更新与回调",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H12.02",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "CORE",
+          "section": "单键原子更新与回调",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H12.03",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "单键原子更新与回调",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H12.04",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "PRINCIPLE",
+          "section": "单键原子更新与回调",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H12.05",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "ADVANCED",
+          "section": "单键原子更新与回调",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H13.01",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "CORE",
+          "section": "写时复制的观察时点",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H13.02",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "KEY",
+          "section": "写时复制的观察时点",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H13.03",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "PRINCIPLE",
+          "section": "写时复制的观察时点",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H13.04",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "CORE",
+          "section": "弱一致观察与精确快照",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H13.05",
+          "questionCategory": "JAVA_COLLECTION",
+          "pointType": "ADVANCED",
+          "section": "弱一致观察与精确快照",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A426",
+          "version": "Java SE 21 API",
+          "locator": "Class description / computeIfAbsent / compute / merge / entrySet",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "ConcurrentHashMap 原子单键更新、回调约束和弱一致遍历"
+        },
+        {
+          "sourceId": "A427",
+          "version": "Java SE 21 API",
+          "locator": "Class description / iterator",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CopyOnWriteArrayList.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "CopyOnWriteArrayList 写时复制与成员数组快照"
+        },
+        {
+          "sourceId": "A428",
+          "version": "Java SE 21 API",
+          "locator": "sum()",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/atomic/LongAdder.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "LongAdder.sum 无原子快照保证"
+        },
+        {
+          "sourceId": "A105",
+          "version": "Java SE 21 API",
+          "locator": "Memory Synchronization",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/locks/Lock.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Lock 成功获取/释放的内存同步约束"
+        }
+      ]
+    },
+    {
+      "documentId": "J16",
+      "path": "docs/rag/d3-b/corpus/j16.md",
+      "title": "JVM 运行时区域、栈帧与类元数据",
+      "versionScope": "JVMS SE 21 与 HotSpot JDK 21。",
+      "pointMappings": [
+        {
+          "pointId": "M03.01",
+          "questionCategory": "JVM",
+          "pointType": "CORE",
+          "section": "线程私有执行状态与共享区域",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M03.02",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "线程私有执行状态与共享区域",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M03.03",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "调用栈帧中的值",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M03.04",
+          "questionCategory": "JVM",
+          "pointType": "PRINCIPLE",
+          "section": "调用栈帧中的值",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M03.05",
+          "questionCategory": "JVM",
+          "pointType": "ADVANCED",
+          "section": "规范布局与实现布局",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A429",
+          "version": "JVMS SE 21",
+          "locator": "§2.5.1–2.5.6 Run-Time Data Areas、§2.6 Frames",
+          "url": "https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-2.html#jvms-2.5.1",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "JVM 运行时区域共享性、线程状态与栈帧内容"
+        },
+        {
+          "sourceId": "A099",
+          "version": "Oracle JDK 21 HotSpot",
+          "locator": "Class Metadata",
+          "url": "https://docs.oracle.com/en/java/javase/21/gctuning/other-considerations.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "HotSpot 类元数据的本地内存分配"
+        },
+        {
+          "sourceId": "J21-VM-EA",
+          "version": "Oracle JDK 21 HotSpot",
+          "locator": "Escape Analysis",
+          "url": "https://docs.oracle.com/en/java/javase/21/vm/java-hotspot-virtual-machine-performance-enhancements.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "逃逸分析可消除符合条件的分配"
+        }
+      ]
+    },
+    {
+      "documentId": "J17",
+      "path": "docs/rag/d3-b/corpus/j17.md",
+      "title": "类加载、初始化、类型身份和 SPI",
+      "versionScope": "JLS/JVMS SE 21，具名普通类和接口，JDK API。",
+      "pointMappings": [
+        {
+          "pointId": "M12.01",
+          "questionCategory": "JVM",
+          "pointType": "CORE",
+          "section": "加载、连接和初始化",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M12.02",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "加载、连接和初始化",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M12.03",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "加载、连接和初始化",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M12.04",
+          "questionCategory": "JVM",
+          "pointType": "PRINCIPLE",
+          "section": "加载、连接和初始化",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M12.05",
+          "questionCategory": "JVM",
+          "pointType": "PRINCIPLE",
+          "section": "加载、连接和初始化",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H14.01",
+          "questionCategory": "JVM",
+          "pointType": "CORE",
+          "section": "定义加载器与插件冲突",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H14.02",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "定义加载器与插件冲突",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H14.03",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "定义加载器与插件冲突",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H14.04",
+          "questionCategory": "JVM",
+          "pointType": "PRINCIPLE",
+          "section": "定义加载器与插件冲突",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H14.05",
+          "questionCategory": "JVM",
+          "pointType": "ADVANCED",
+          "section": "SPI 提供者可见性",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A430",
+          "version": "JLS SE 21",
+          "locator": "§12.2–12.4",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-12.html#jls-12.2",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "加载、连接与触发类初始化的主动使用条件"
+        },
+        {
+          "sourceId": "A431",
+          "version": "JLS SE 21",
+          "locator": "§4.12.4 Constant Variables",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.12.4",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "常量变量的类型和初始化表达式要求"
+        },
+        {
+          "sourceId": "A432",
+          "version": "JVMS SE 21",
+          "locator": "§5.3 Creation and Loading、§5.4 Linking",
+          "url": "https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-5.html#jvms-5.3",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "定义加载器身份、发起加载和链接"
+        },
+        {
+          "sourceId": "A289",
+          "version": "Java SE 21 API",
+          "locator": "loadClass(String,boolean)",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ClassLoader.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "ClassLoader.loadClass 默认委派顺序"
+        },
+        {
+          "sourceId": "A433",
+          "version": "Java SE 21 API",
+          "locator": "load(Class) / load(Class, ClassLoader)",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ServiceLoader.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "ServiceLoader 的模块部署、查找加载器与提供者要求"
+        },
+        {
+          "sourceId": "A436",
+          "version": "Oracle JDK 21 java",
+          "locator": "Unified Logging",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "统一类加载日志用于诊断重复 API"
+        }
+      ]
+    },
+    {
+      "documentId": "J18",
+      "path": "docs/rag/d3-b/corpus/j18.md",
+      "title": "对象可达性、内存泄漏与 JVM 取证",
+      "versionScope": "Java SE 21 引用契约与 Oracle JDK 21 HotSpot 工具。",
+      "pointMappings": [
+        {
+          "pointId": "M13.01",
+          "questionCategory": "JVM",
+          "pointType": "CORE",
+          "section": "生命周期和保留链",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M13.02",
+          "questionCategory": "JVM",
+          "pointType": "PRINCIPLE",
+          "section": "生命周期和保留链",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M13.03",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "生命周期和保留链",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M13.04",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "高分配、异常峰值和资源耗尽",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M13.05",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "生命周期和保留链",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H15.01",
+          "questionCategory": "JVM",
+          "pointType": "CORE",
+          "section": "将时间线与修复验证关联",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H15.02",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "高分配、异常峰值和资源耗尽",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H15.03",
+          "questionCategory": "JVM",
+          "pointType": "PRINCIPLE",
+          "section": "高分配、异常峰值和资源耗尽",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H15.04",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "将时间线与修复验证关联",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H15.05",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "将时间线与修复验证关联",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A153",
+          "version": "Java SE 21 API",
+          "locator": "Reachability",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ref/package-summary.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "不同引用强度与可达性的判定"
+        },
+        {
+          "sourceId": "A434",
+          "version": "Oracle JDK 21 Troubleshooting Guide",
+          "locator": "Understand OutOfMemoryError / Detect a Memory Leak / Diagnosing Java Memory Leaks",
+          "url": "https://docs.oracle.com/en/java/javase/21/troubleshoot/troubleshooting-memory-leaks.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "OOM 类别、存活量增长和内存泄漏取证"
+        },
+        {
+          "sourceId": "A435",
+          "version": "Oracle JDK 21 jcmd",
+          "locator": "GC.heap_dump / JFR.start / Thread.print / VM.native_memory",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "堆转储、线程栈、JFR、原生内存诊断及开销"
+        },
+        {
+          "sourceId": "A436",
+          "version": "Oracle JDK 21 java",
+          "locator": "Unified Logging",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "统一日志用于观察真实类加载或收集阶段"
+        },
+        {
+          "sourceId": "J21-VM-NMT",
+          "version": "Oracle JDK 21 HotSpot",
+          "locator": "Enabling NMT / Accessing NMT Data using jcmd",
+          "url": "https://docs.oracle.com/en/java/javase/21/vm/native-memory-tracking.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "NMT 启动条件和第三方本地分配的覆盖边界"
+        }
+      ]
+    },
+    {
+      "documentId": "J19",
+      "path": "docs/rag/d3-b/corpus/j19.md",
+      "title": "HotSpot 21 G1 的 Region、并发标记与 Mixed",
+      "versionScope": "Oracle JDK 21 HotSpot G1 实现文档。",
+      "pointMappings": [
+        {
+          "pointId": "H03.01",
+          "questionCategory": "JVM",
+          "pointType": "CORE",
+          "section": "Region 与年轻代搬迁",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H03.02",
+          "questionCategory": "JVM",
+          "pointType": "PRINCIPLE",
+          "section": "标记与老年代候选",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H03.03",
+          "questionCategory": "JVM",
+          "pointType": "KEY",
+          "section": "Region 与年轻代搬迁",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H03.04",
+          "questionCategory": "JVM",
+          "pointType": "INTERNAL",
+          "section": "标记与老年代候选",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H03.05",
+          "questionCategory": "JVM",
+          "pointType": "ADVANCED",
+          "section": "Mixed 和诊断",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A437",
+          "version": "Oracle JDK 21 HotSpot",
+          "locator": "Heap Layout / Garbage Collection Cycle / Collection Set / Marking / Space-Reclamation Phase",
+          "url": "https://docs.oracle.com/en/java/javase/21/gctuning/garbage-first-g1-garbage-collector1.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "G1 Region、年轻代搬迁、并发标记、Mixed 及暂停目标"
+        },
+        {
+          "sourceId": "A436",
+          "version": "Oracle JDK 21 java",
+          "locator": "Unified Logging",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "统一日志用于观察真实类加载或收集阶段"
+        }
+      ]
+    },
+    {
+      "documentId": "J20",
+      "path": "docs/rag/d3-b/corpus/j20.md",
+      "title": "JMM 可见性、原子更新和互斥锁",
+      "versionScope": "JLS SE 21 与 Java SE 21 并发 API。",
+      "pointMappings": [
+        {
+          "pointId": "M04.01",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "CORE",
+          "section": "volatile 发布和读改写",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M04.02",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "PRINCIPLE",
+          "section": "volatile 发布和读改写",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M04.03",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "volatile 发布和读改写",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M04.04",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "volatile 发布和读改写",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M14.01",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "CORE",
+          "section": "限时获取和释放责任",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M14.02",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "限时获取和释放责任",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M14.03",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "限时获取和释放责任",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M14.04",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "PRINCIPLE",
+          "section": "监视器和可重入锁",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M14.05",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "监视器和可重入锁",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A438",
+          "version": "JLS SE 21",
+          "locator": "§17.1 Synchronization、§17.4.4–17.4.5",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-17.html#jls-17.1",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "监视器可重入与 volatile/监视器 happens-before"
+        },
+        {
+          "sourceId": "A385",
+          "version": "JLS SE 21",
+          "locator": "§15.14.2 Postfix Increment",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-15.html#jls-15.14.2",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "后置自增读值、加法及写回"
+        },
+        {
+          "sourceId": "A439",
+          "version": "JLS SE 21",
+          "locator": "§14.19 Synchronized",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-14.html#jls-14.19",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "同步块正常或异常退出释放监视器"
+        },
+        {
+          "sourceId": "A440",
+          "version": "Java SE 21 API",
+          "locator": "incrementAndGet",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/atomic/AtomicInteger.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "AtomicInteger.incrementAndGet 的原子自增"
+        },
+        {
+          "sourceId": "A105",
+          "version": "Java SE 21 API",
+          "locator": "Memory Synchronization",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/locks/Lock.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Lock 成功获取/释放的内存同步约束"
+        },
+        {
+          "sourceId": "A441",
+          "version": "Java SE 21 API",
+          "locator": "tryLock / unlock",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "ReentrantLock 的限时、可中断获取与释放路径"
+        }
+      ]
+    },
+    {
+      "documentId": "J21",
+      "path": "docs/rag/d3-b/corpus/j21.md",
+      "title": "线程等待、通知与协作式中断",
+      "versionScope": "Java SE 21 监视器与线程 API。",
+      "pointMappings": [
+        {
+          "pointId": "M15.01",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "CORE",
+          "section": "sleep 与目标监视器",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M15.02",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "PRINCIPLE",
+          "section": "sleep 与目标监视器",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M15.03",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "谓词循环和通知",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M15.04",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "谓词循环和通知",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "M15.05",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "PRINCIPLE",
+          "section": "中断处理",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A442",
+          "version": "JLS SE 21",
+          "locator": "§17.2.1–17.2.3 Wait/Notification/Interruptions、§17.3 Sleep",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-17.html#jls-17.2.1",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "等待集合、释放/重获监视器、通知和中断"
+        },
+        {
+          "sourceId": "A443",
+          "version": "Java SE 21 API",
+          "locator": "wait(long,int) / notifyAll()",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Object.wait 谓词循环、虚假唤醒和通知"
+        },
+        {
+          "sourceId": "A444",
+          "version": "Java SE 21 API",
+          "locator": "sleep / interrupt / interrupted",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Thread.sleep 不释放监视器以及中断状态规则"
+        }
+      ]
+    },
+    {
+      "documentId": "J22",
+      "path": "docs/rag/d3-b/corpus/j22.md",
+      "title": "线程池容量、拒绝与任务上下文",
+      "versionScope": "Java SE 21 ThreadPoolExecutor 与复用平台线程。",
+      "pointMappings": [
+        {
+          "pointId": "H04.01",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "CORE",
+          "section": "提交顺序和队列容量",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H04.02",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "PRINCIPLE",
+          "section": "提交顺序和队列容量",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H04.03",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "提交顺序和队列容量",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H04.04",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "任务受理和反馈",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H04.05",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "ADVANCED",
+          "section": "任务受理和反馈",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H16.01",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "CORE",
+          "section": "复用线程的上下文所有权",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H16.02",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "复用线程的上下文所有权",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H16.03",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "PRINCIPLE",
+          "section": "复用线程的上下文所有权",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H16.04",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "复用线程的上下文所有权",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H16.05",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "ADVANCED",
+          "section": "复用线程的上下文所有权",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A445",
+          "version": "Java SE 21 API",
+          "locator": "Queuing / Rejected tasks / Hooks / getActiveCount / getQueue",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "线程池的工作线程、排队、拒绝与监测合同"
+        },
+        {
+          "sourceId": "A446",
+          "version": "Java SE 21 API",
+          "locator": "Class description / set / remove",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ThreadLocal.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "ThreadLocal 按线程保存及 remove 清理"
+        },
+        {
+          "sourceId": "A447",
+          "version": "Java SE 21 API",
+          "locator": "Class description / childValue",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/InheritableThreadLocal.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "InheritableThreadLocal 在线程创建时提供继承初值"
+        },
+        {
+          "sourceId": "A314",
+          "version": "Java SE 21 API",
+          "locator": "Inheritance when creating threads",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "Thread 创建时控制是否继承初始上下文"
+        }
+      ]
+    },
+    {
+      "documentId": "J23",
+      "path": "docs/rag/d3-b/corpus/j23.md",
+      "title": "CompletableFuture 的依赖、时限和取消",
+      "versionScope": "Java SE 21 CompletableFuture、Executor 与 HTTP Client API。",
+      "pointMappings": [
+        {
+          "pointId": "H17.01",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "CORE",
+          "section": "依赖组合和失败边界",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H17.02",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "依赖组合和失败边界",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H17.03",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "依赖组合和失败边界",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H17.04",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "PRINCIPLE",
+          "section": "选择执行器",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        },
+        {
+          "pointId": "H17.05",
+          "questionCategory": "JAVA_CONCURRENCY",
+          "pointType": "KEY",
+          "section": "总时限与底层工作",
+          "contentAssessment": "作者 AI 初评，正文提供直接机制依据"
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "A448",
+          "version": "Java SE 21 API",
+          "locator": "thenCompose / thenCombine / allOf / orTimeout / cancel",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "CompletionStage 组合、异步默认执行器与阶段超时/取消"
+        },
+        {
+          "sourceId": "A324",
+          "version": "Java SE 21 HttpClient API",
+          "locator": "timeout(Duration)",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.net.http/java/net/http/HttpRequest.Builder.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "HttpRequest.Builder.timeout 的响应等待边界"
+        },
+        {
+          "sourceId": "A449",
+          "version": "Java SE 21 HttpClient API",
+          "locator": "sendAsync / default cancellation",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.net.http/java/net/http/HttpClient.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "HttpClient.sendAsync 的默认取消语义"
+        },
+        {
+          "sourceId": "A322",
+          "version": "Java SE 21 API",
+          "locator": "newVirtualThreadPerTaskExecutor()",
+          "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/Executors.html",
+          "retrievedDate": "2026-11-14",
+          "use": "技术事实核对，正文为项目原创释义和场景，未复制源文本或实现代码",
+          "licenseOrRestriction": "Oracle 公开参考资料，保留原权利；仅用链接、API 标识与原创释义",
+          "supports": "每任务虚拟线程执行器合同"
+        }
+      ]
+    }
+  ]
+}

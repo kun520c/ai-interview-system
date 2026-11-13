@@ -1,0 +1,1411 @@
+{
+  "kind": "D3-B MySQL 与 Redis 正文级证据映射",
+  "date": "2026-11-14",
+  "limits": "逐项对照冻结评分点。标题定位为正文可支持的范围，切片支持需按生产输出另行检查。正文是项目原创释义和示例，审查为 AI 技术复核。",
+  "documents": {
+    "D01": {
+      "path": "docs/rag/d3-b/corpus/d01.md",
+      "version": "MySQL 8.0，InnoDB，开发验证对齐项目 8.0.45",
+      "pointHeadings": {
+        "E04.01": [
+          "事务失败时应用需要做什么",
+          "可观察的工程例"
+        ],
+        "E04.02": [
+          "从业务不变量确定边界",
+          "可观察的工程例"
+        ],
+        "E04.03": [
+          "隔离与持久各回答一个问题"
+        ],
+        "E04.04": [
+          "隔离与持久各回答一个问题"
+        ],
+        "E04.05": [
+          "从业务不变量确定边界",
+          "事务失败时应用需要做什么",
+          "可观察的工程例"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "从业务不变量确定边界",
+          "sourceIds": [
+            "A024",
+            "A021"
+          ],
+          "supportedClaim": "声明约束和应用工作单元共同维护余额守恒。"
+        },
+        {
+          "heading": "事务失败时应用需要做什么",
+          "sourceIds": [
+            "A021",
+            "A022",
+            "A023"
+          ],
+          "supportedClaim": "独立自动提交与一次显式提交的边界；个别语句错误不终止整事务。"
+        },
+        {
+          "heading": "隔离与持久各回答一个问题",
+          "sourceIds": [
+            "A021",
+            "A025",
+            "A026"
+          ],
+          "supportedClaim": "并发读规则和提交后 redo／刷盘耐久性。"
+        },
+        {
+          "heading": "可观察的工程例",
+          "sourceIds": [
+            "A021",
+            "A022"
+          ],
+          "supportedClaim": "独立连接对照部分提交、完整回滚及业务余额。"
+        }
+      ]
+    },
+    "D02": {
+      "path": "docs/rag/d3-b/corpus/d02.md",
+      "version": "MySQL 8.0 / InnoDB，普通 SQL 谓词",
+      "pointHeadings": {
+        "E12.01": [
+          "主键与选填字段"
+        ],
+        "E12.02": [
+          "主键与选填字段"
+        ],
+        "E12.03": [
+          "NULL、空字符串与条件判断"
+        ],
+        "E12.04": [
+          "NULL、空字符串与条件判断"
+        ],
+        "E13.01": [
+          "先匹配、再扩展、最后过滤"
+        ],
+        "E13.02": [
+          "先匹配、再扩展、最后过滤",
+          "检查一个常见修补为什么仍丢行"
+        ],
+        "E13.03": [
+          "先匹配、再扩展、最后过滤",
+          "检查一个常见修补为什么仍丢行"
+        ],
+        "E13.04": [
+          "先匹配、再扩展、最后过滤",
+          "检查一个常见修补为什么仍丢行"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "主键与选填字段",
+          "sourceIds": [
+            "A024"
+          ],
+          "supportedClaim": "主键非空且唯一；完整可空 UNIQUE 的空值和排序规则边界。"
+        },
+        {
+          "heading": "NULL、空字符串与条件判断",
+          "sourceIds": [
+            "A071",
+            "A072"
+          ],
+          "supportedClaim": "普通比较的 UNKNOWN、IS NULL、<=> 与空字符串。"
+        },
+        {
+          "heading": "先匹配、再扩展、最后过滤",
+          "sourceIds": [
+            "A073",
+            "A074",
+            "A071"
+          ],
+          "supportedClaim": "外连接匹配和 NULL 扩展，区分 ON 与 null-rejecting WHERE。"
+        },
+        {
+          "heading": "检查一个常见修补为什么仍丢行",
+          "sourceIds": [
+            "A073",
+            "A074"
+          ],
+          "supportedClaim": "仅有不合格右行时 WHERE 补 OR IS NULL 仍会丢行。"
+        }
+      ]
+    },
+    "D03": {
+      "path": "docs/rag/d3-b/corpus/d03.md",
+      "version": "MySQL 8.0 / InnoDB 普通 B-tree",
+      "pointHeadings": {
+        "M06.01": [
+          "页组织与访问路径"
+        ],
+        "M06.02": [
+          "页组织与访问路径"
+        ],
+        "M06.03": [
+          "聚簇与二级索引"
+        ],
+        "M06.04": [
+          "聚簇与二级索引",
+          "覆盖按某次查询判断"
+        ],
+        "M06.05": [
+          "覆盖按某次查询判断",
+          "观察而非猜测磁盘访问"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "页组织与访问路径",
+          "sourceIds": [
+            "A110",
+            "A111",
+            "A386"
+          ],
+          "supportedClaim": "页、记录和高扇出，有序扫描与哈希的适用边界。"
+        },
+        {
+          "heading": "聚簇与二级索引",
+          "sourceIds": [
+            "A070",
+            "A387"
+          ],
+          "supportedClaim": "聚簇键选择、叶记录行数据、二级键中的主键及回表。"
+        },
+        {
+          "heading": "覆盖按某次查询判断",
+          "sourceIds": [
+            "A070",
+            "A112",
+            "A113"
+          ],
+          "supportedClaim": "按投影判断覆盖，近期更新和删除标记的 MVCC 例外。"
+        },
+        {
+          "heading": "观察而非猜测磁盘访问",
+          "sourceIds": [
+            "A112",
+            "A113"
+          ],
+          "supportedClaim": "以计划诊断覆盖，保留真实 I/O 不确定性。"
+        }
+      ]
+    },
+    "D04": {
+      "path": "docs/rag/d3-b/corpus/d04.md",
+      "version": "MySQL 8.0 / InnoDB 普通多列 B-tree",
+      "pointHeadings": {
+        "M18.01": [
+          "键按字典序排列"
+        ],
+        "M18.02": [
+          "键按字典序排列"
+        ],
+        "M18.03": [
+          "区分排序、过滤与覆盖",
+          "计划与验证"
+        ],
+        "M18.04": [
+          "区分排序、过滤与覆盖",
+          "计划与验证"
+        ],
+        "M18.05": [
+          "区分排序、过滤与覆盖",
+          "计划与验证"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "键按字典序排列",
+          "sourceIds": [
+            "A192",
+            "A193"
+          ],
+          "supportedClaim": "固定等值前缀和随后范围；缺中间键时的区间分裂与 Skip Scan 条件。"
+        },
+        {
+          "heading": "区分排序、过滤与覆盖",
+          "sourceIds": [
+            "A194",
+            "A112",
+            "A196"
+          ],
+          "supportedClaim": "全局排序、后续过滤、ICP、覆盖及回表分别判断。"
+        },
+        {
+          "heading": "计划与验证",
+          "sourceIds": [
+            "A195",
+            "A196",
+            "A194"
+          ],
+          "supportedClaim": "用 key、Extra 和实际扫描核对排序、覆盖、下推。"
+        }
+      ]
+    },
+    "D05": {
+      "path": "docs/rag/d3-b/corpus/d05.md",
+      "version": "MySQL 8.0，EXPLAIN ANALYZE 自 8.0.18",
+      "pointHeadings": {
+        "M18.05": [
+          "检查哪些工作发生在取行之前"
+        ],
+        "M19.01": [
+          "读传统计划"
+        ],
+        "M19.02": [
+          "读传统计划"
+        ],
+        "M19.03": [
+          "比较估计和真正执行"
+        ],
+        "M19.04": [
+          "用参数分布定位原因"
+        ],
+        "M19.05": [
+          "比较估计和真正执行",
+          "用参数分布定位原因"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "读传统计划",
+          "sourceIds": [
+            "A195"
+          ],
+          "supportedClaim": "候选与已选索引、ALL、rows × filtered 和连接分母。"
+        },
+        {
+          "heading": "检查哪些工作发生在取行之前",
+          "sourceIds": [
+            "A195",
+            "A196"
+          ],
+          "supportedClaim": "剩余过滤可下推，Extra 三个相关信号各有含义。"
+        },
+        {
+          "heading": "比较估计和真正执行",
+          "sourceIds": [
+            "A197"
+          ],
+          "supportedClaim": "EXPLAIN 与真正执行的 EXPLAIN ANALYZE，迭代器时间、行与循环。"
+        },
+        {
+          "heading": "用参数分布定位原因",
+          "sourceIds": [
+            "A198",
+            "A197",
+            "A195"
+          ],
+          "supportedClaim": "真实参数、选择性和统计误差诊断，按可比执行证据验证。"
+        }
+      ]
+    },
+    "D06": {
+      "path": "docs/rag/d3-b/corpus/d06.md",
+      "version": "MySQL 8.0 / InnoDB，RR 与 RC，显式事务",
+      "pointHeadings": {
+        "H06.01": [
+          "一致性读如何选到历史版本"
+        ],
+        "H06.02": [
+          "一致性读如何选到历史版本"
+        ],
+        "H06.03": [
+          "一致性读如何选到历史版本"
+        ],
+        "H06.04": [
+          "两个连接看见哪些值"
+        ],
+        "H06.05": [
+          "锁定读、自身写入和更新谓词"
+        ],
+        "H20.01": [
+          "两个连接看见哪些值"
+        ],
+        "H20.02": [
+          "两个连接看见哪些值"
+        ],
+        "H20.03": [
+          "锁定读、自身写入和更新谓词"
+        ],
+        "H20.04": [
+          "锁定读、自身写入和更新谓词"
+        ],
+        "H20.05": [
+          "锁定读、自身写入和更新谓词"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "一致性读如何选到历史版本",
+          "sourceIds": [
+            "A113",
+            "A026"
+          ],
+          "supportedClaim": "记录事务身份、undo 重建、Read View 与非锁定读。"
+        },
+        {
+          "heading": "两个连接看见哪些值",
+          "sourceIds": [
+            "A022",
+            "A025",
+            "A026"
+          ],
+          "supportedClaim": "普通 BEGIN 的首读快照、RR 和 RC 双连接读结果。"
+        },
+        {
+          "heading": "锁定读、自身写入和更新谓词",
+          "sourceIds": [
+            "A025",
+            "A026",
+            "A242",
+            "A247"
+          ],
+          "supportedClaim": "锁定读的最新可用版本、冲突等待、自身写入和条件更新。"
+        }
+      ]
+    },
+    "D07": {
+      "path": "docs/rag/d3-b/corpus/d07.md",
+      "version": "MySQL 8.0 / InnoDB，分别记录死锁检测与 rollback_on_timeout",
+      "pointHeadings": {
+        "H09.04": [
+          "重新开始事务的边界"
+        ],
+        "H21.01": [
+          "等待成环与单向等待",
+          "重新开始事务的边界"
+        ],
+        "H21.02": [
+          "等待成环与单向等待",
+          "重新开始事务的边界"
+        ],
+        "H21.03": [
+          "重新开始事务的边界"
+        ],
+        "H21.04": [
+          "降低等待与找到当时证据"
+        ],
+        "H21.05": [
+          "降低等待与找到当时证据"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "等待成环与单向等待",
+          "sourceIds": [
+            "A333",
+            "A023"
+          ],
+          "supportedClaim": "死锁牺牲者整事务回滚，默认锁等待超时的单语句回滚。"
+        },
+        {
+          "heading": "重新开始事务的边界",
+          "sourceIds": [
+            "A023",
+            "A251",
+            "A252",
+            "A250"
+          ],
+          "supportedClaim": "明确前次事务结束再有限重试；未知提交用稳定业务键。"
+        },
+        {
+          "heading": "降低等待与找到当时证据",
+          "sourceIds": [
+            "A251",
+            "A334"
+          ],
+          "supportedClaim": "固定加锁顺序和范围；最近死锁与当前等待的时间区别。"
+        }
+      ]
+    },
+    "D08": {
+      "path": "docs/rag/d3-b/corpus/d08.md",
+      "version": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+      "pointHeadings": {
+        "H09.01": [
+          "把库存条件放进权威写入",
+          "可以怎样观察"
+        ],
+        "H09.02": [
+          "让并发重放得到已提交结果",
+          "可以怎样观察"
+        ],
+        "H09.03": [
+          "让并发重放得到已提交结果",
+          "可以怎样观察"
+        ],
+        "H09.04": [
+          "超时后的恢复"
+        ],
+        "H20.05": [
+          "把库存条件放进权威写入"
+        ],
+        "H21.03": [
+          "超时后的恢复"
+        ],
+        "H25.01": [
+          "超时后的恢复"
+        ],
+        "H25.03": [
+          "让并发重放得到已提交结果",
+          "超时后的恢复"
+        ],
+        "H25.04": [
+          "让并发重放得到已提交结果",
+          "超时后的恢复",
+          "可以怎样观察"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "把库存条件放进权威写入",
+          "sourceIds": [
+            "A247",
+            "A242"
+          ],
+          "supportedClaim": "正数、唯一定位、条件更新行数、锁定读取和版本比较。"
+        },
+        {
+          "heading": "让并发重放得到已提交结果",
+          "sourceIds": [
+            "A024",
+            "A022",
+            "A250"
+          ],
+          "supportedClaim": "作用域非空唯一键、原子结果、同键载荷校验和已提交重放。"
+        },
+        {
+          "heading": "超时后的恢复",
+          "sourceIds": [
+            "A078",
+            "A023",
+            "A250",
+            "A252"
+          ],
+          "supportedClaim": "超时已发送结果未知、查主库或同键重试、先结束前次事务。"
+        },
+        {
+          "heading": "可以怎样观察",
+          "sourceIds": [
+            "A247",
+            "A024",
+            "A022",
+            "A250"
+          ],
+          "supportedClaim": "用并发扣减、响应丢失和同键异载荷分别验证。"
+        }
+      ]
+    },
+    "D09": {
+      "path": "docs/rag/d3-b/corpus/d09.md",
+      "version": "Redis OSS 7.2，经典类型及基础命令",
+      "pointHeadings": {
+        "M07.01": [
+          "整值、计数和字段",
+          "双端序列和去重集合",
+          "排序集合与范围访问"
+        ],
+        "M07.02": [
+          "整值、计数和字段"
+        ],
+        "M07.03": [
+          "双端序列和去重集合",
+          "可观察的选型对照"
+        ],
+        "M07.04": [
+          "双端序列和去重集合",
+          "可观察的选型对照"
+        ],
+        "M07.05": [
+          "排序集合与范围访问",
+          "可观察的选型对照"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "整值、计数和字段",
+          "sourceIds": [
+            "A114",
+            "A115",
+            "A116",
+            "D3B-D09-HEXPIRE"
+          ],
+          "supportedClaim": "String 整值及整数计数、Hash 字段访问及 7.2 TTL 边界。"
+        },
+        {
+          "heading": "双端序列和去重集合",
+          "sourceIds": [
+            "A114",
+            "A118",
+            "A119",
+            "A120"
+          ],
+          "supportedClaim": "两端出入、简单 FIFO、去重和集合运算。"
+        },
+        {
+          "heading": "排序集合与范围访问",
+          "sourceIds": [
+            "A114",
+            "A121"
+          ],
+          "supportedClaim": "成员唯一、分数范围、同分字节序和重复更新。"
+        },
+        {
+          "heading": "可观察的选型对照",
+          "sourceIds": [
+            "A118",
+            "A119",
+            "A120",
+            "A121"
+          ],
+          "supportedClaim": "相同标识写入三类结构后的可观察差异。"
+        }
+      ]
+    },
+    "D10": {
+      "path": "docs/rag/d3-b/corpus/d10.md",
+      "version": "Redis OSS 7.2，单实例，key 级 TTL / maxmemory",
+      "pointHeadings": {
+        "M20.01": [
+          "到期时间与内存压力分别起作用",
+          "两个可区分的实验"
+        ],
+        "M20.02": [
+          "到期时间与内存压力分别起作用",
+          "两个可区分的实验"
+        ],
+        "M20.03": [
+          "策略与候选空间",
+          "两个可区分的实验"
+        ],
+        "M20.04": [
+          "策略与候选空间"
+        ],
+        "M20.05": [
+          "在实例层区分可能原因",
+          "两个可区分的实验"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "到期时间与内存压力分别起作用",
+          "sourceIds": [
+            "A199",
+            "A200"
+          ],
+          "supportedClaim": "被动和主动过期、物理释放时间、TTL 之前的内存淘汰。"
+        },
+        {
+          "heading": "策略与候选空间",
+          "sourceIds": [
+            "A200",
+            "A201"
+          ],
+          "supportedClaim": "两类 LRU 候选、抽样策略、拒绝增加内存的写入。"
+        },
+        {
+          "heading": "在实例层区分可能原因",
+          "sourceIds": [
+            "A200",
+            "A202",
+            "A203"
+          ],
+          "supportedClaim": "内存和统计差值只能定位实例趋势；权威源回填。"
+        },
+        {
+          "heading": "两个可区分的实验",
+          "sourceIds": [
+            "A199",
+            "A200",
+            "A202"
+          ],
+          "supportedClaim": "隔离过期和内存压力的实验，避免用单键 miss 归因。"
+        }
+      ]
+    },
+    "D11": {
+      "path": "docs/rag/d3-b/corpus/d11.md",
+      "version": "Redis OSS 7.2，多段 AOF 自 7.0",
+      "pointHeadings": {
+        "M21.01": [
+          "从恢复点看 RDB",
+          "把丢失容忍和恢复时长测出来"
+        ],
+        "M21.02": [
+          "从日志结构看 AOF",
+          "把丢失容忍和恢复时长测出来"
+        ],
+        "M21.03": [
+          "从日志结构看 AOF"
+        ],
+        "M21.04": [
+          "从恢复点看 RDB",
+          "把丢失容忍和恢复时长测出来"
+        ],
+        "M21.05": [
+          "用独立故障域覆盖本机失效"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "从恢复点看 RDB",
+          "sourceIds": [
+            "A204",
+            "A201"
+          ],
+          "supportedClaim": "时间点快照、加载后的丢失窗口和快照资源成本。"
+        },
+        {
+          "heading": "从日志结构看 AOF",
+          "sourceIds": [
+            "A204",
+            "A201"
+          ],
+          "supportedClaim": "多段 AOF、重写、fsync 及常见而非绝对丢失量。"
+        },
+        {
+          "heading": "把丢失容忍和恢复时长测出来",
+          "sourceIds": [
+            "A204",
+            "A205"
+          ],
+          "supportedClaim": "按 RPO、RTO、数据可再生性和恢复演练选方案。"
+        },
+        {
+          "heading": "用独立故障域覆盖本机失效",
+          "sourceIds": [
+            "A205",
+            "A204"
+          ],
+          "supportedClaim": "独立故障域、多恢复点、完整文件集和业务校验。"
+        }
+      ]
+    },
+    "D12": {
+      "path": "docs/rag/d3-b/corpus/d12.md",
+      "version": "Redis OSS 7.2，单实例经典方案，SET NX/PX 与 Lua",
+      "pointHeadings": {
+        "H07.01": [
+          "一次获取同时设置租期"
+        ],
+        "H07.02": [
+          "一次获取同时设置租期",
+          "原子核验所有权后释放"
+        ],
+        "H07.03": [
+          "原子核验所有权后释放"
+        ],
+        "H07.04": [
+          "原子核验所有权后释放",
+          "过期后旧执行者可能迟到",
+          "故障与热点回源"
+        ],
+        "H07.05": [
+          "过期后旧执行者可能迟到",
+          "故障与热点回源"
+        ],
+        "H22.04": [
+          "故障与热点回源"
+        ],
+        "H23.03": [
+          "原子核验所有权后释放"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "一次获取同时设置租期",
+          "sourceIds": [
+            "A243",
+            "A244"
+          ],
+          "supportedClaim": "单次 NX/PX、独立所有者 token、客户端结果未知。"
+        },
+        {
+          "heading": "原子核验所有权后释放",
+          "sourceIds": [
+            "A244",
+            "A245",
+            "A246"
+          ],
+          "supportedClaim": "原子 compare-and-delete、受控续租、短脚本执行边界。"
+        },
+        {
+          "heading": "过期后旧执行者可能迟到",
+          "sourceIds": [
+            "A244",
+            "A247"
+          ],
+          "supportedClaim": "租约超期后执行者仍可能继续，接收方校验 fencing 编号或业务约束。"
+        },
+        {
+          "heading": "故障与热点回源",
+          "sourceIds": [
+            "A244",
+            "A247",
+            "A335"
+          ],
+          "supportedClaim": "异步提升窗口、热点回源资格的重查和有限等待。"
+        }
+      ]
+    },
+    "D13": {
+      "path": "docs/rag/d3-b/corpus/d13.md",
+      "version": "Redis OSS 7.2 基础命令和 MySQL 权威数据源，明确应用假设",
+      "pointHeadings": {
+        "H22.01": [
+          "读 miss 与写后失效"
+        ],
+        "H22.02": [
+          "用时间轴看陈旧回填",
+          "版本条件与窗口"
+        ],
+        "H22.03": [
+          "用时间轴看陈旧回填",
+          "版本条件与窗口"
+        ],
+        "H22.04": [
+          "热点 miss 与并发预算"
+        ],
+        "H22.05": [
+          "热点 miss 与并发预算"
+        ],
+        "M20.05": [
+          "读 miss 与写后失效"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "读 miss 与写后失效",
+          "sourceIds": [
+            "A203",
+            "A022",
+            "A200",
+            "A202"
+          ],
+          "supportedClaim": "权威源、miss 回填、提交后失效与实例趋势。"
+        },
+        {
+          "heading": "用时间轴看陈旧回填",
+          "sourceIds": [
+            "A203",
+            "A336",
+            "A022"
+          ],
+          "supportedClaim": "旧读取在删除后回填，有限陈旧和绕缓存的选择。"
+        },
+        {
+          "heading": "版本条件与窗口",
+          "sourceIds": [
+            "A243",
+            "A246",
+            "A336",
+            "A022"
+          ],
+          "supportedClaim": "原子缓存版本标记及提交／发布窗口、丢失和淘汰。"
+        },
+        {
+          "heading": "热点 miss 与并发预算",
+          "sourceIds": [
+            "A335",
+            "A336",
+            "A252"
+          ],
+          "supportedClaim": "同键合并、重查、等待上限、多实例作用域和数据库预算。"
+        }
+      ]
+    },
+    "D14": {
+      "path": "docs/rag/d3-b/corpus/d14.md",
+      "version": "Redis OSS 7.2 单实例，排除跨槽",
+      "pointHeadings": {
+        "H23.01": [
+          "独立操作采用批量往返",
+          "如何选取和验证"
+        ],
+        "H23.02": [
+          "WATCH 乐观流程与 EXEC 的两类错误",
+          "如何选取和验证"
+        ],
+        "H23.03": [
+          "短脚本在一个执行边界内完成检查",
+          "如何选取和验证"
+        ],
+        "H23.04": [
+          "WATCH 乐观流程与 EXEC 的两类错误",
+          "如何选取和验证"
+        ],
+        "H23.05": [
+          "短脚本在一个执行边界内完成检查",
+          "如何选取和验证"
+        ]
+      },
+      "sections": [
+        {
+          "heading": "独立操作采用批量往返",
+          "sourceIds": [
+            "A337"
+          ],
+          "supportedClaim": "Pipeline 减少往返、不提供组隔离，逐项响应与批量内存。"
+        },
+        {
+          "heading": "WATCH 乐观流程与 EXEC 的两类错误",
+          "sourceIds": [
+            "A338"
+          ],
+          "supportedClaim": "WATCH 同连接时序及队列与执行错误的区别。"
+        },
+        {
+          "heading": "短脚本在一个执行边界内完成检查",
+          "sourceIds": [
+            "A246",
+            "A339",
+            "A340",
+            "A341"
+          ],
+          "supportedClaim": "短脚本执行隔离、类型校验、运行期已生效写入保留。"
+        },
+        {
+          "heading": "如何选取和验证",
+          "sourceIds": [
+            "A337",
+            "A338",
+            "A246",
+            "A339",
+            "A340"
+          ],
+          "supportedClaim": "冲突与两种先写后报错的对照实验。"
+        }
+      ]
+    }
+  },
+  "sources": {
+    "A021": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/mysql-acid.html",
+      "section": "§17.2 InnoDB and the ACID Model",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A022": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/commit.html",
+      "section": "§15.3.1 START TRANSACTION, COMMIT, and ROLLBACK Statements",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A023": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-error-handling.html",
+      "section": "§17.21.5 InnoDB Error Handling：死锁与锁等待超时回滚范围",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A024": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/create-table.html",
+      "section": "§15.1.20 CREATE TABLE：PRIMARY KEY / UNIQUE",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A025": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-isolation-levels.html",
+      "section": "§17.7.2.1 Transaction Isolation Levels",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A026": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html",
+      "section": "§17.7.2.3 Consistent Nonlocking Reads：快照、自身写入与锁定读示例",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A070": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-index-types.html",
+      "section": "§17.6.2.1 Clustered and Secondary Indexes",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A071": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/working-with-null.html",
+      "section": "§5.3.4.6 Working with NULL Values",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A072": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/comparison-operators.html",
+      "section": "§14.4.2 Comparison Functions and Operators：NULL-safe equal",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A073": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/join.html",
+      "section": "§15.2.13.2 JOIN Clause：连接条件、ON 与 WHERE、NULL 扩展",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A074": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/outer-join-simplification.html",
+      "section": "§10.2.1.10 Outer Join Simplification：null-rejected conditions",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A078": {
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2",
+      "section": "§9.2.1 Safe Methods、§9.2.2 Idempotent Methods",
+      "version": "IETF RFC 9110",
+      "accessed": "2026-11-14",
+      "kind": "规范",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "保留原发布方权利。仅引用章节与技术事实或工程经验，无原文复制。"
+    },
+    "A110": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-physical-structure.html",
+      "section": "§17.6.2.2 The Physical Structure of an InnoDB Index",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A111": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/index-btree-hash.html",
+      "section": "§10.3.9 Comparison of B-Tree and Hash Indexes",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A112": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/mysql-indexes.html",
+      "section": "§10.3.1 How MySQL Uses Indexes：covering index",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A113": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-multi-versioning.html",
+      "section": "§17.3 InnoDB Multi-Versioning：行事务 ID、rollback pointer、undo",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A114": {
+      "url": "https://redis.io/docs/latest/develop/data-types/",
+      "section": "Redis data types：Strings、Hashes、Lists、Sets、Sorted sets",
+      "version": "Redis OSS 7.2 经典类型语义",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A115": {
+      "url": "https://redis.io/docs/latest/develop/data-types/strings/",
+      "section": "Redis Strings：单值与整数运算",
+      "version": "Redis OSS 7.2 经典类型语义",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A116": {
+      "url": "https://redis.io/docs/latest/develop/data-types/hashes/",
+      "section": "Redis hashes：field-value 记录与字段读写",
+      "version": "Redis OSS 7.2 经典类型语义",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A118": {
+      "url": "https://redis.io/docs/latest/commands/lpush/",
+      "section": "LPUSH：头部插入",
+      "version": "Redis OSS ≥ 1.0.0 单元素语义",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A119": {
+      "url": "https://redis.io/docs/latest/commands/rpop/",
+      "section": "RPOP：尾部移除并返回",
+      "version": "Redis OSS ≥ 1.0.0 单元素语义",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A120": {
+      "url": "https://redis.io/docs/latest/develop/data-types/sets/",
+      "section": "Redis sets：唯一成员、集合运算",
+      "version": "Redis OSS 7.2 经典类型语义",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A121": {
+      "url": "https://redis.io/docs/latest/develop/data-types/sorted-sets/",
+      "section": "Redis sorted sets：唯一成员、score 与同分次序",
+      "version": "Redis OSS 7.2 经典类型语义",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A192": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/multiple-column-indexes.html",
+      "section": "§10.3.6 Multiple-Column Indexes：leftmost prefix",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A193": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/range-optimization.html",
+      "section": "§10.2.1.2 Range Optimization：多列范围与 Skip Scan",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A194": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/order-by-optimization.html",
+      "section": "§10.2.1.16 ORDER BY Optimization：可用索引及不连续键部分",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A195": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/explain-output.html",
+      "section": "§10.8.2 EXPLAIN Output Format：列含义、Join Types、Extra",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A196": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/index-condition-pushdown-optimization.html",
+      "section": "§10.2.1.6 Index Condition Pushdown Optimization",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A197": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/explain.html",
+      "section": "§15.8.2 EXPLAIN Statement：8.0.18 起的 EXPLAIN ANALYZE",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A198": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/analyze-table.html",
+      "section": "§15.7.3.1 ANALYZE TABLE Statement：Key Distribution Analysis",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A199": {
+      "url": "https://redis.io/docs/latest/commands/expire/",
+      "section": "EXPIRE：How Redis expires keys",
+      "version": "Redis OSS 7.2 key TTL",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A200": {
+      "url": "https://redis.io/docs/latest/develop/reference/eviction/",
+      "section": "Key eviction：Eviction policies、Approximated LRU algorithm、Using the INFO command",
+      "version": "Redis OSS 7.2 适用策略",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A201": {
+      "url": "https://raw.githubusercontent.com/redis/redis/7.2.12/redis.conf",
+      "section": "redis.conf：MEMORY MANAGEMENT、SNAPSHOTTING、APPEND ONLY MODE",
+      "version": "Redis OSS 7.2.12（固定标签）",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 7.2.12 源码 BSD-3-Clause，参见对应标签 COPYING。仅核对实现和配置，无源码复制。"
+    },
+    "A202": {
+      "url": "https://redis.io/docs/latest/commands/info/",
+      "section": "INFO：Memory、Stats（expired_keys、evicted_keys 等）",
+      "version": "Redis OSS 7.2 INFO 字段",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A203": {
+      "url": "https://redis.io/docs/latest/develop/use-cases/cache-aside/",
+      "section": "Redis cache-aside：Why the problem is hard、Cache-aside flow",
+      "version": "Redis OSS 7.2 基础命令可实现",
+      "accessed": "2026-11-14",
+      "kind": "工程建议",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A204": {
+      "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/",
+      "section": "Redis persistence：RDB、AOF、Log rewriting、fsync、Backing up Redis data",
+      "version": "Redis OSS 7.2（7.0 起多段 AOF）",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。",
+      "notes": "当前在线手册同时包含更新版本，正文仅使用 7.2 持久化机制。"
+    },
+    "A205": {
+      "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/",
+      "section": "Redis persistence：Backing up Redis data 与 Disaster recovery",
+      "version": "Redis OSS 7.2 持久化恢复实践",
+      "accessed": "2026-11-14",
+      "kind": "工程建议",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。",
+      "notes": "当前在线手册同时包含更新版本，正文仅使用 7.2 持久化机制。"
+    },
+    "A242": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html",
+      "section": "§17.7.2.4 Locking Reads：当前版本、排他锁、等待与计数示例",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A243": {
+      "url": "https://redis.io/docs/latest/commands/set/",
+      "section": "SET：Options / History（NX 与 EX/PX）",
+      "version": "Redis OSS 2.6.12 起 NX/PX；7.2 规划基线",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A244": {
+      "url": "https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/",
+      "section": "Distributed Locks：Safety and Liveness Guarantees、Single Instance、fencing 与故障边界",
+      "version": "Redis OSS ≥ 2.6.12 经典单实例方案，7.2 规划基线",
+      "accessed": "2026-11-14",
+      "kind": "工程建议",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。",
+      "notes": "当前在线手册展示较新的 DELEX；本文 Redis 7.2 示例使用 Lua 原子条件删除。"
+    },
+    "A245": {
+      "url": "https://redis.io/docs/latest/commands/eval/",
+      "section": "EVAL：Lua 执行与版本历史",
+      "version": "Redis OSS ≥ 2.6.0；7.2 规划基线",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A246": {
+      "url": "https://redis.io/docs/latest/develop/programmability/eval-intro/",
+      "section": "Scripting with Lua：Executing Lua in Redis、Interacting with Redis from a script",
+      "version": "Redis OSS 7.2 单实例",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A247": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/update.html",
+      "section": "§15.2.17 UPDATE Statement：条件与实际改变行数",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A250": {
+      "url": "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/",
+      "section": "Reducing client complexity、Retries and semantic equivalence、Late arriving requests、Same client request ID, different intent",
+      "version": "AWS Builders’ Library（公开工程实践）",
+      "accessed": "2026-11-14",
+      "kind": "工程建议",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "保留原发布方权利。仅引用章节与技术事实或工程经验，无原文复制。"
+    },
+    "A251": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html",
+      "section": "§17.7.5.3 How to Minimize and Handle Deadlocks：事务重试、加锁顺序、最近死锁",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "工程建议",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A252": {
+      "url": "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/",
+      "section": "Timeouts、Retries and backoff、Jitter",
+      "version": "AWS Builders’ Library（2019 工程实践）",
+      "accessed": "2026-11-14",
+      "kind": "工程建议",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "保留原发布方权利。仅引用章节与技术事实或工程经验，无原文复制。"
+    },
+    "A333": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlock-detection.html",
+      "section": "§17.7.5.2 Deadlock Detection：死锁牺牲者与检测开关",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A334": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/performance-schema-data-lock-waits-table.html",
+      "section": "§29.12.13.2 Performance Schema data_lock_waits：当前请求与持有关系",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A335": {
+      "url": "https://redis.io/docs/latest/develop/use-cases/cache-aside/java-jedis/",
+      "section": "Redis cache-aside with Jedis：single-flight、失效、等待与数据源回退",
+      "version": "Redis OSS 7.2 基础命令可实现",
+      "accessed": "2026-11-14",
+      "kind": "工程建议",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。",
+      "notes": "只采用 read-through 之外的 cache-aside 流程和按键合并思路，未移植 SDK 示例。"
+    },
+    "A336": {
+      "url": "https://www.usenix.org/system/files/conference/nsdi13/nsdi13-final170.pdf#page=4",
+      "section": "§3.2.1 Leases：陈旧回填和热点并发回源",
+      "version": "NSDI 2013（Facebook Memcache 工程实践）",
+      "accessed": "2026-11-14",
+      "kind": "工程建议",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "保留原发布方权利。仅引用章节与技术事实或工程经验，无原文复制。",
+      "notes": "论文描述 Memcache leases，本文只借用陈旧回填与热点问题的故障模型，未将该实现归属 Redis。"
+    },
+    "A337": {
+      "url": "https://redis.io/docs/latest/develop/using-commands/pipelining/",
+      "section": "Redis pipelining：RTT、批量响应、Pipelining vs Scripting",
+      "version": "Redis OSS 7.2 单实例",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A338": {
+      "url": "https://redis.io/docs/latest/develop/using-commands/transactions/",
+      "section": "Transactions：MULTI/EXEC、Errors inside a transaction、WATCH check-and-set",
+      "version": "Redis OSS 7.2 单实例",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A339": {
+      "url": "https://redis.io/docs/latest/develop/programmability/lua-api/",
+      "section": "Redis Lua API reference：redis.call、redis.pcall、脚本效果传播",
+      "version": "Redis OSS 7.2 单实例",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A340": {
+      "url": "https://raw.githubusercontent.com/redis/redis/7.2.12/src/script_lua.c",
+      "section": "src/script_lua.c：luaCallFunction 错误回复和清理路径，已执行子命令没有回滚路径",
+      "version": "Redis OSS 7.2.12（固定标签）",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 7.2.12 源码 BSD-3-Clause，参见对应标签 COPYING。仅核对实现和配置，无源码复制。"
+    },
+    "A341": {
+      "url": "https://redis.io/docs/latest/commands/script-kill/",
+      "section": "SCRIPT KILL：有写入效果时不可直接终止脚本",
+      "version": "Redis OSS 7.2",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Redis 官方文档。仅引用章节和版本行为，无原文或教程代码复制。"
+    },
+    "A386": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-fulltext-index.html",
+      "section": "§17.6.2.4 InnoDB Full-Text Indexes：Inverted index design",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "A387": {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html",
+      "section": "§17.10 InnoDB Row Formats：off-page columns",
+      "version": "MySQL 8.0 Reference Manual",
+      "accessed": "2026-11-14",
+      "kind": "实现",
+      "usage": "项目原创释义或独立工程示例的事实核对",
+      "reuseLimit": "Oracle MySQL 手册使用条件见 Preface and Legal Notices。仅引用章节和事实，无原文复制。"
+    },
+    "D3B-D09-HEXPIRE": {
+      "url": "https://redis.io/docs/latest/commands/hexpire/",
+      "section": "Available since",
+      "version": "Redis 7.4.0 起提供，正文基线 7.2",
+      "accessed": "2026-11-14",
+      "kind": "版本边界",
+      "usage": "核对 Hash 字段级过期命令不在 Redis 7.2",
+      "reuseLimit": "仅引用版本事实，不复制原文。"
+    }
+  }
+}

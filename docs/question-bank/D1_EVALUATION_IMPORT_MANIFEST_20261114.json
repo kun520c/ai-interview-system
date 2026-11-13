@@ -1,0 +1,1123 @@
+{
+  "status": "PASS",
+  "date": "2026-11-14",
+  "bankVersion": "D1-v2-20261114",
+  "bankSha256": "d4c1d9f20664308231ab383f5dce67154f3c5d874fc041b44f7499ce8647177e",
+  "codeHead": "0c6f92afe331954f7cea37d33db688fe781cbf2c",
+  "mysqlTarget": "127.0.0.1:3308/ai_interview_evaluation",
+  "serverUuid": "85dd1e00-cf98-11f1-8677-9eb9380f25e7",
+  "questionCount": 63,
+  "pointCount": 298,
+  "newQuestions": 42,
+  "newPointsNet": 201,
+  "h01": {
+    "questionId": 33,
+    "oldPointIds": [
+      147,
+      148,
+      149,
+      150,
+      151
+    ],
+    "newPointIds": [
+      392,
+      393,
+      394,
+      395,
+      396
+    ],
+    "pointCountUnchanged": 5,
+    "changedBusinessFields": [
+      "referenceAnswer",
+      "scoringPoints[3].content"
+    ]
+  },
+  "difficultyCounts": {
+    "EASY": 15,
+    "MEDIUM": 21,
+    "HARD": 27
+  },
+  "categoryCounts": {
+    "JAVA_BASIC": 9,
+    "JAVA_COLLECTION": 9,
+    "SPRING": 9,
+    "MYSQL": 9,
+    "NETWORK": 6,
+    "JVM": 6,
+    "JAVA_CONCURRENCY": 6,
+    "REDIS": 6,
+    "PROJECT_SCENARIO": 3
+  },
+  "protection": {
+    "originalTwoDumpsIdentical": true,
+    "originalDumpSha256": {
+      "ai_interview": "c5c9c60712087833620b9bd77b049e2303a5059671226e1eda8bb503a713208a",
+      "ai_interview_test": "0b9b6466be3fe8a9e3d174c5be3274759f7388073e50f2ead790114dbd12b241"
+    },
+    "evaluationOther11TablesIdentical": true,
+    "old20QuestionsAnd92PointsIdentical": true,
+    "historicalSessionsAndSnapshots": 0,
+    "milvus4CollectionInventorySha256": "ac27c00aafb21ac1191e73b1b2f4c5f1d6cf7f810de6ccb64b18af500bd14a07",
+    "e01HistoricalContentAnd2048FloatsMatch": true
+  },
+  "externalCalls": {
+    "deepseek": 0,
+    "embedding": 0
+  },
+  "databaseIdMapping": [
+    {
+      "bankId": "E01",
+      "revision": 1,
+      "knowledgePoint": "interface_vs_abstract_class",
+      "questionId": 21,
+      "status": "ENABLED",
+      "pointIds": [
+        94,
+        95,
+        96,
+        97
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "5b9b8d8a6c94a76442f62b5059a85b90a76508965c39804951c7ddfe3c992d48"
+    },
+    {
+      "bankId": "E02",
+      "revision": 1,
+      "knowledgePoint": "arraylist_vs_linkedlist",
+      "questionId": 22,
+      "status": "ENABLED",
+      "pointIds": [
+        98,
+        99,
+        100,
+        101
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "dcff3726324b233e578f06ea917ca92a232bd228e8d0a85f2e166d175c166461"
+    },
+    {
+      "bankId": "E03",
+      "revision": 1,
+      "knowledgePoint": "ioc_di",
+      "questionId": 23,
+      "status": "ENABLED",
+      "pointIds": [
+        102,
+        103,
+        104,
+        105
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "989a14007b773ccc8d27da830c5c73c36c1af84f6327451935c440551320e5e2"
+    },
+    {
+      "bankId": "E04",
+      "revision": 1,
+      "knowledgePoint": "transaction_acid",
+      "questionId": 24,
+      "status": "ENABLED",
+      "pointIds": [
+        106,
+        107,
+        108,
+        109,
+        110
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "583228e52f0055cc7ae9014f486c6d44f36085ee888f2e1a72cc0b56ce175480"
+    },
+    {
+      "bankId": "E05",
+      "revision": 1,
+      "knowledgePoint": "tcp_vs_udp",
+      "questionId": 25,
+      "status": "ENABLED",
+      "pointIds": [
+        111,
+        112,
+        113,
+        114
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "d3cd9fffc5572a3969c5782e73331aeaeeb969522f1df55a75c34e69c59ca647"
+    },
+    {
+      "bankId": "E06",
+      "revision": 1,
+      "knowledgePoint": "exceptions_resource_basics",
+      "questionId": 83,
+      "status": "ENABLED",
+      "pointIds": [
+        397,
+        398,
+        399,
+        400
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "44744599270cb1eeba4cf249501ee86718f24dff5206f879a7bb2beeb0738bc6"
+    },
+    {
+      "bankId": "E07",
+      "revision": 1,
+      "knowledgePoint": "strings_immutability",
+      "questionId": 84,
+      "status": "ENABLED",
+      "pointIds": [
+        401,
+        402,
+        403,
+        404
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "3973cb70651437e9e57663c62d003ac2efbc4a4d9869e737e05809376481bac7"
+    },
+    {
+      "bankId": "E08",
+      "revision": 1,
+      "knowledgePoint": "collection_semantics",
+      "questionId": 85,
+      "status": "ENABLED",
+      "pointIds": [
+        405,
+        406,
+        407,
+        408
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "27b5f1e3b9dba943e0174e0fb88044080ce3c7556431ff3675a20d722dcd8d23"
+    },
+    {
+      "bankId": "E09",
+      "revision": 1,
+      "knowledgePoint": "deque_stack_queue",
+      "questionId": 86,
+      "status": "ENABLED",
+      "pointIds": [
+        409,
+        410,
+        411,
+        412
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "bfa2869e6a447d10592ddd5fecc3dbd042f0a8a6726c569ce87ccbd56a9103c8"
+    },
+    {
+      "bankId": "E10",
+      "revision": 1,
+      "knowledgePoint": "bean_scope_basics",
+      "questionId": 87,
+      "status": "ENABLED",
+      "pointIds": [
+        413,
+        414,
+        415,
+        416
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "b7bddf14398532d9f553b47bf45be4f8ebaca7233140385ca82a76dcbdbb9bda"
+    },
+    {
+      "bankId": "E11",
+      "revision": 1,
+      "knowledgePoint": "bean_lifecycle_basics",
+      "questionId": 88,
+      "status": "ENABLED",
+      "pointIds": [
+        417,
+        418,
+        419,
+        420
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "f5edee01a1b97c66c3956a8792b0141d1453aff11dac4c27fdc6d3bd76547ea2"
+    },
+    {
+      "bankId": "E12",
+      "revision": 1,
+      "knowledgePoint": "mysql_constraints_null",
+      "questionId": 89,
+      "status": "ENABLED",
+      "pointIds": [
+        421,
+        422,
+        423,
+        424
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "715e317de012b502f362b643bfea757eb55509c3fe8921f9a9a2cd5f576abcd9"
+    },
+    {
+      "bankId": "E13",
+      "revision": 1,
+      "knowledgePoint": "mysql_join_basics",
+      "questionId": 90,
+      "status": "ENABLED",
+      "pointIds": [
+        425,
+        426,
+        427,
+        428
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "41e07a723cfcf03265acbba1b85637b9e17771a5d9952a3678adde9c5d2d638a"
+    },
+    {
+      "bankId": "E14",
+      "revision": 1,
+      "knowledgePoint": "http_methods_status",
+      "questionId": 91,
+      "status": "ENABLED",
+      "pointIds": [
+        429,
+        430,
+        431,
+        432,
+        433
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "8d5e46649da76f594f8575104e24ffdf3b1af458674b3a9a31327dfdcc7c73bc"
+    },
+    {
+      "bankId": "E15",
+      "revision": 1,
+      "knowledgePoint": "dns_resolution_basics",
+      "questionId": 92,
+      "status": "ENABLED",
+      "pointIds": [
+        434,
+        435,
+        436,
+        437
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "965342135d06ff07767ad4e540a5e4ba2ccca3035d86b47ed7862f8b1e9c7fdf"
+    },
+    {
+      "bankId": "M01",
+      "revision": 1,
+      "knowledgePoint": "equals_hashcode_contract",
+      "questionId": 26,
+      "status": "ENABLED",
+      "pointIds": [
+        115,
+        116,
+        117,
+        118
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "63d1b35b15987bb2670fa6ad36ae8545e7b93a5dab956ad00a114c33878bf300"
+    },
+    {
+      "bankId": "M02",
+      "revision": 1,
+      "knowledgePoint": "hashmap_put_resize",
+      "questionId": 27,
+      "status": "ENABLED",
+      "pointIds": [
+        119,
+        120,
+        121,
+        122,
+        123
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "1d7a9ed5561d1dde0aeb4d06596dbb4610f83431959ef6232415d25214fa5dea"
+    },
+    {
+      "bankId": "M03",
+      "revision": 1,
+      "knowledgePoint": "runtime_data_areas",
+      "questionId": 28,
+      "status": "ENABLED",
+      "pointIds": [
+        124,
+        125,
+        126,
+        127,
+        128
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "7e5e741063cfde85d53255ececf17ad2231868f0aa995b401b3028a251d1be64"
+    },
+    {
+      "bankId": "M04",
+      "revision": 1,
+      "knowledgePoint": "volatile_jmm",
+      "questionId": 29,
+      "status": "ENABLED",
+      "pointIds": [
+        129,
+        130,
+        131,
+        132
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "2a7d69292c0451932e5c5b6b6d3425c1f71d0d1962493433dd296a60d57b9cde"
+    },
+    {
+      "bankId": "M05",
+      "revision": 1,
+      "knowledgePoint": "spring_aop_proxy",
+      "questionId": 30,
+      "status": "ENABLED",
+      "pointIds": [
+        133,
+        134,
+        135,
+        136
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "4947e37387a87809880a87dc828ad88c3e5bdc0aa608f57fa5d170c86bb28783"
+    },
+    {
+      "bankId": "M06",
+      "revision": 1,
+      "knowledgePoint": "innodb_index_structure",
+      "questionId": 31,
+      "status": "ENABLED",
+      "pointIds": [
+        137,
+        138,
+        139,
+        140,
+        141
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "5175fa3fb70e77e68c9a489df5691fd070ec04e1ea262f1888f736d568993d8d"
+    },
+    {
+      "bankId": "M07",
+      "revision": 1,
+      "knowledgePoint": "redis_data_structures",
+      "questionId": 32,
+      "status": "ENABLED",
+      "pointIds": [
+        142,
+        143,
+        144,
+        145,
+        146
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "8373cfec744102b8e044168db815ed3cb3a4c98199f8051297a3050f4c00c407"
+    },
+    {
+      "bankId": "M08",
+      "revision": 1,
+      "knowledgePoint": "resource_exception_suppression",
+      "questionId": 93,
+      "status": "ENABLED",
+      "pointIds": [
+        438,
+        439,
+        440,
+        441,
+        442
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "f5f72ae3c41eb754d0b6c7fee2d3e31db37b8985affb6c6bcb12e6cf0d38fe25"
+    },
+    {
+      "bankId": "M09",
+      "revision": 1,
+      "knowledgePoint": "generic_variance_pecs",
+      "questionId": 94,
+      "status": "ENABLED",
+      "pointIds": [
+        443,
+        444,
+        445,
+        446,
+        447
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "d8d1b13e663dda37e94ebb304cfe68af162d8cbdc403438f06a83792552bc2cf"
+    },
+    {
+      "bankId": "M10",
+      "revision": 1,
+      "knowledgePoint": "iterator_modification",
+      "questionId": 95,
+      "status": "ENABLED",
+      "pointIds": [
+        448,
+        449,
+        450,
+        451,
+        452
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "5dbe0193f396129d3895475a1da8a4c77ab42766ac029c93913691d2e0b09bb3"
+    },
+    {
+      "bankId": "M11",
+      "revision": 1,
+      "knowledgePoint": "collection_copy_views",
+      "questionId": 96,
+      "status": "ENABLED",
+      "pointIds": [
+        453,
+        454,
+        455,
+        456,
+        457
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "a35fa3f575b8c3a98153d2bcc9fca124a5ef7bd491f5436c4458e0c6c9339262"
+    },
+    {
+      "bankId": "M12",
+      "revision": 1,
+      "knowledgePoint": "class_loading_initialization",
+      "questionId": 97,
+      "status": "ENABLED",
+      "pointIds": [
+        458,
+        459,
+        460,
+        461,
+        462
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "9469e93004eaa84ea421e35cffd313371d697424020cecf251de8a1ef1ad785e"
+    },
+    {
+      "bankId": "M13",
+      "revision": 1,
+      "knowledgePoint": "gc_reachability_leaks",
+      "questionId": 98,
+      "status": "ENABLED",
+      "pointIds": [
+        463,
+        464,
+        465,
+        466,
+        467
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "7beab535fd9d859110bb84c2d99e661086f766eb9e3bfc173b6c21d6272783ad"
+    },
+    {
+      "bankId": "M14",
+      "revision": 1,
+      "knowledgePoint": "monitor_reentrant_lock",
+      "questionId": 99,
+      "status": "ENABLED",
+      "pointIds": [
+        468,
+        469,
+        470,
+        471,
+        472
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "6a790222b806441bc390ccd542a7ab873cfc314a963fdacba825237c365250da"
+    },
+    {
+      "bankId": "M15",
+      "revision": 1,
+      "knowledgePoint": "thread_interruption_wait",
+      "questionId": 100,
+      "status": "ENABLED",
+      "pointIds": [
+        473,
+        474,
+        475,
+        476,
+        477
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "72ee9dcecfae5113316bb85438a5e9b7ea6198d638917a87944b12c406655381"
+    },
+    {
+      "bankId": "M16",
+      "revision": 1,
+      "knowledgePoint": "dependency_injection_resolution",
+      "questionId": 101,
+      "status": "ENABLED",
+      "pointIds": [
+        478,
+        479,
+        480,
+        481,
+        482
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "bd40bdec6d5ed373da7fd5fe51c64472a185a85426ac4330df6d4325ac5c8b56"
+    },
+    {
+      "bankId": "M17",
+      "revision": 1,
+      "knowledgePoint": "mvc_validation_errors",
+      "questionId": 102,
+      "status": "ENABLED",
+      "pointIds": [
+        483,
+        484,
+        485,
+        486,
+        487
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "f9637a4bd0acd11f2ccb834b0d1dc7a527977c03608ea3753748181f1617e7ec"
+    },
+    {
+      "bankId": "M18",
+      "revision": 1,
+      "knowledgePoint": "composite_index_access",
+      "questionId": 103,
+      "status": "ENABLED",
+      "pointIds": [
+        488,
+        489,
+        490,
+        491,
+        492
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "b715386b131abcf4d46d206709af52a5138fde45dcaed19b891ecd7b524b1b8c"
+    },
+    {
+      "bankId": "M19",
+      "revision": 1,
+      "knowledgePoint": "explain_query_plan",
+      "questionId": 104,
+      "status": "ENABLED",
+      "pointIds": [
+        493,
+        494,
+        495,
+        496,
+        497
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "d978ecd69ee274c5c6efb680ce4cdfe393f7e881a293cf0ede5d17cef1d5afcc"
+    },
+    {
+      "bankId": "M20",
+      "revision": 1,
+      "knowledgePoint": "redis_expiry_eviction",
+      "questionId": 105,
+      "status": "ENABLED",
+      "pointIds": [
+        498,
+        499,
+        500,
+        501,
+        502
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "e2e4bd90f04888974c3a820486cd5df3daa1028fc4fdb601aa01605ec529f3db"
+    },
+    {
+      "bankId": "M21",
+      "revision": 1,
+      "knowledgePoint": "redis_persistence_tradeoffs",
+      "questionId": 106,
+      "status": "ENABLED",
+      "pointIds": [
+        503,
+        504,
+        505,
+        506,
+        507
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "6f36f9946e43231034c3c29a57125bd09af93e7117bf7fa18cf0ba5bb475d247"
+    },
+    {
+      "bankId": "H01",
+      "revision": 2,
+      "knowledgePoint": "generic_type_erasure",
+      "questionId": 33,
+      "status": "ENABLED",
+      "pointIds": [
+        392,
+        393,
+        394,
+        395,
+        396
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "dc9a0820bee4d426845de8d17d9d017406b2d8639727094566aae23cfdaf9df9"
+    },
+    {
+      "bankId": "H02",
+      "revision": 1,
+      "knowledgePoint": "concurrent_hashmap",
+      "questionId": 34,
+      "status": "ENABLED",
+      "pointIds": [
+        152,
+        153,
+        154,
+        155,
+        156
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "5e76f0581bce49f057dda63bb74a6fbf3851ec23d650f80dff9f226933ebc94e"
+    },
+    {
+      "bankId": "H03",
+      "revision": 1,
+      "knowledgePoint": "g1_gc",
+      "questionId": 35,
+      "status": "ENABLED",
+      "pointIds": [
+        157,
+        158,
+        159,
+        160,
+        161
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "8fdbb3f074bfdf3bd82acfcbff785e19fc088388724e4922af2d9a71947ae240"
+    },
+    {
+      "bankId": "H04",
+      "revision": 1,
+      "knowledgePoint": "thread_pool_design",
+      "questionId": 36,
+      "status": "ENABLED",
+      "pointIds": [
+        162,
+        163,
+        164,
+        165,
+        166
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "5508186057959f14e787c2dcdeb2a5f4a10da06b6d4f7108204bc25582eb82db"
+    },
+    {
+      "bankId": "H05",
+      "revision": 1,
+      "knowledgePoint": "transaction_boundary",
+      "questionId": 37,
+      "status": "ENABLED",
+      "pointIds": [
+        167,
+        168,
+        169,
+        170,
+        171
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "579447ffb226b03965e682bbe9c92792ed2dc175cea815aa4363890e8b7d6aa1"
+    },
+    {
+      "bankId": "H06",
+      "revision": 1,
+      "knowledgePoint": "mvcc_read_view",
+      "questionId": 38,
+      "status": "ENABLED",
+      "pointIds": [
+        172,
+        173,
+        174,
+        175,
+        176
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "927c8a4ccc5a018fae447627a0f8c3b409d46024ff5944d0fc295c0cc695d526"
+    },
+    {
+      "bankId": "H07",
+      "revision": 1,
+      "knowledgePoint": "distributed_lock",
+      "questionId": 39,
+      "status": "ENABLED",
+      "pointIds": [
+        177,
+        178,
+        179,
+        180,
+        181
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "01d8461cea6cc8f6fa2477708bc569f92dd8baba01df391f8104d7e085d9929c"
+    },
+    {
+      "bankId": "H08",
+      "revision": 1,
+      "knowledgePoint": "tcp_connection_lifecycle",
+      "questionId": 40,
+      "status": "ENABLED",
+      "pointIds": [
+        182,
+        183,
+        184,
+        185,
+        186
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "03107d44fe65be0ccf1c36b756c3ecf08d795ba552be6ec1e5c85ebd543c9708"
+    },
+    {
+      "bankId": "H09",
+      "revision": 1,
+      "knowledgePoint": "concurrent_inventory_idempotency",
+      "questionId": 41,
+      "status": "ENABLED",
+      "pointIds": [
+        187,
+        188,
+        189,
+        190
+      ],
+      "pointCount": 4,
+      "enabledWeightSum": 100,
+      "requestSha256": "4bdd96a47009598937a3c3781d6a8946e99dc6c33ebf2ebf7238ebc7b6be7541"
+    },
+    {
+      "bankId": "H10",
+      "revision": 1,
+      "knowledgePoint": "reflection_module_access",
+      "questionId": 107,
+      "status": "ENABLED",
+      "pointIds": [
+        508,
+        509,
+        510,
+        511,
+        512
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "2b1b29f8e3612df9fb5e13fcee86999073732e23a44e7e4a17c814589ae44080"
+    },
+    {
+      "bankId": "H11",
+      "revision": 1,
+      "knowledgePoint": "stream_laziness_parallel",
+      "questionId": 108,
+      "status": "ENABLED",
+      "pointIds": [
+        513,
+        514,
+        515,
+        516,
+        517
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "2618eea0f2855a0792d48a873e4a3563512afff85155ecfda10494d7a033252a"
+    },
+    {
+      "bankId": "H12",
+      "revision": 1,
+      "knowledgePoint": "concurrent_map_atomicity",
+      "questionId": 109,
+      "status": "ENABLED",
+      "pointIds": [
+        518,
+        519,
+        520,
+        521,
+        522
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "4ee598f99be0a03fb3e7ac22ddf912b4c4b539e8dd44679a32d74bf538d16ca1"
+    },
+    {
+      "bankId": "H13",
+      "revision": 1,
+      "knowledgePoint": "concurrent_iteration_tradeoffs",
+      "questionId": 110,
+      "status": "ENABLED",
+      "pointIds": [
+        523,
+        524,
+        525,
+        526,
+        527
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "c5426d627b19d770003be4e297051ee045b492a3b899b4bbd0949b8dce83f24e"
+    },
+    {
+      "bankId": "H14",
+      "revision": 1,
+      "knowledgePoint": "classloader_type_identity",
+      "questionId": 111,
+      "status": "ENABLED",
+      "pointIds": [
+        528,
+        529,
+        530,
+        531,
+        532
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "e45bc89264da6ce27a6ca12ac1eaa8319769dff2f743de9b1088a07073e9ba1e"
+    },
+    {
+      "bankId": "H15",
+      "revision": 1,
+      "knowledgePoint": "jvm_diagnostics_workflow",
+      "questionId": 112,
+      "status": "ENABLED",
+      "pointIds": [
+        533,
+        534,
+        535,
+        536,
+        537
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "49e38dede83c2c3e2a31861bf96e33c9fb41fcb0a4eb96e061ade44b22a6dc76"
+    },
+    {
+      "bankId": "H16",
+      "revision": 1,
+      "knowledgePoint": "threadlocal_pool_cleanup",
+      "questionId": 113,
+      "status": "ENABLED",
+      "pointIds": [
+        538,
+        539,
+        540,
+        541,
+        542
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "9a9186547cc296ac982ad31f7251a93ba88b53f0eec8c2ce93b869504cefd104"
+    },
+    {
+      "bankId": "H17",
+      "revision": 1,
+      "knowledgePoint": "future_timeout_composition",
+      "questionId": 114,
+      "status": "ENABLED",
+      "pointIds": [
+        543,
+        544,
+        545,
+        546,
+        547
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "fbd6a5ff4955d9ce24d179a29f2cfdf5e963338979af69a9f87ade3168e1f65a"
+    },
+    {
+      "bankId": "H18",
+      "revision": 1,
+      "knowledgePoint": "spring_transaction_propagation",
+      "questionId": 115,
+      "status": "ENABLED",
+      "pointIds": [
+        548,
+        549,
+        550,
+        551,
+        552
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "079bfffd4322d301a98d9c2e1ab1dd12add55d25413d3d56efd0c6fab86ad8aa"
+    },
+    {
+      "bankId": "H19",
+      "revision": 1,
+      "knowledgePoint": "transaction_external_side_effect",
+      "questionId": 116,
+      "status": "ENABLED",
+      "pointIds": [
+        553,
+        554,
+        555,
+        556,
+        557
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "251ceafc003f511631e9871cdb0baff2d2dfcfb644a1da686a7876603e323c12"
+    },
+    {
+      "bankId": "H20",
+      "revision": 1,
+      "knowledgePoint": "isolation_snapshot_locking",
+      "questionId": 117,
+      "status": "ENABLED",
+      "pointIds": [
+        558,
+        559,
+        560,
+        561,
+        562
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "3252523a499dbbeaf95dbc918094b4e1dd3914c7b29b310a7973925f14e57de7"
+    },
+    {
+      "bankId": "H21",
+      "revision": 1,
+      "knowledgePoint": "deadlock_timeout_recovery",
+      "questionId": 118,
+      "status": "ENABLED",
+      "pointIds": [
+        563,
+        564,
+        565,
+        566,
+        567
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "3d953f5778d1cc21d4cba1a6dfa4fd2b196cebdc2ab24ec8289b19ae6d342816"
+    },
+    {
+      "bankId": "H22",
+      "revision": 1,
+      "knowledgePoint": "cache_aside_hotkey",
+      "questionId": 119,
+      "status": "ENABLED",
+      "pointIds": [
+        568,
+        569,
+        570,
+        571,
+        572
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "11afe1def693ee56cb0c000cf5d39c25a3026b9b812ba30d0192e5dae77c2134"
+    },
+    {
+      "bankId": "H23",
+      "revision": 1,
+      "knowledgePoint": "redis_batch_atomicity",
+      "questionId": 120,
+      "status": "ENABLED",
+      "pointIds": [
+        573,
+        574,
+        575,
+        576,
+        577
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "a4747e57806026c5b8ab9cdc0292e69089b48cc067e0c46a3a5a5c04592f3e7a"
+    },
+    {
+      "bankId": "H24",
+      "revision": 1,
+      "knowledgePoint": "tls_authentication_basics",
+      "questionId": 121,
+      "status": "ENABLED",
+      "pointIds": [
+        578,
+        579,
+        580,
+        581,
+        582
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "caf0c0779af659ac01dc215d459db14a9a7b4468952a590a79998bcf0aee2ac5"
+    },
+    {
+      "bankId": "H25",
+      "revision": 1,
+      "knowledgePoint": "http_timeout_idempotency",
+      "questionId": 122,
+      "status": "ENABLED",
+      "pointIds": [
+        583,
+        584,
+        585,
+        586,
+        587
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "f3dd4482039bff2c1ca5e6d1f9ff5e866ebb0b385710df5309c3be845d17b393"
+    },
+    {
+      "bankId": "H26",
+      "revision": 1,
+      "knowledgePoint": "interview_idempotency_ownership",
+      "questionId": 123,
+      "status": "ENABLED",
+      "pointIds": [
+        588,
+        589,
+        590,
+        591,
+        592
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "dbd3688916f8bdaf04016fc14e9cba80f19b80084e19b66382b81e089e562dc9"
+    },
+    {
+      "bankId": "H27",
+      "revision": 1,
+      "knowledgePoint": "report_recovery_final_consistency",
+      "questionId": 124,
+      "status": "ENABLED",
+      "pointIds": [
+        593,
+        594,
+        595,
+        596,
+        597
+      ],
+      "pointCount": 5,
+      "enabledWeightSum": 100,
+      "requestSha256": "50fad15c3e640b4a1ab3092ea2ef9a463eae68fb09a69b3672cda91be61c8889"
+    }
+  ]
+}
