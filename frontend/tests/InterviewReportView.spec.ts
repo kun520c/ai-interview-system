@@ -1,7 +1,11 @@
-import { flushPromises } from '@vue/test-utils'
+import { enableAutoUnmount, flushPromises } from '@vue/test-utils'
+import { AxiosError } from 'axios'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ApiError, ErrorKind } from '@/api/apiError'
+import { httpClient } from '@/api/httpClient'
+import { resetUnauthorizedGate, setUnauthorizedHandler } from '@/api/unauthorized'
+import { bindUnauthorizedNavigation } from '@/app/router/unauthorizedNavigation'
 import { resetSessionScopeForTests } from '@/app/session/sessionScope'
 import { fetchInterviewHistory } from '@/features/history/api/historyApi'
 import {
@@ -11,6 +15,7 @@ import {
   generateInterviewReport,
 } from '@/features/interview/api/interviewApi'
 import { REPORT_POLL_INTERVAL_MS } from '@/features/interview/composables/useInterviewReport'
+import { REPORT_COPY } from '@/features/interview/copy/reportCopy'
 import { authenticate, mountApp } from './helpers/mountApp'
 import { deferred } from './helpers/deferred'
 import {
@@ -27,6 +32,8 @@ import {
 } from './helpers/interviewFixtures'
 import { InterviewReportStatus, InterviewSessionStatus } from '@/types/enums'
 import type { InterviewDetailResponse, InterviewReportResponse } from '@/types/interview'
+
+enableAutoUnmount(afterEach)
 
 vi.mock('@/features/auth/api/authApi', () => ({
   login: vi.fn(),
@@ -62,6 +69,10 @@ function generateButton(wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']
   return wrapper.findAll('button').find((button) => button.text().includes('生成报告') || button.text().includes('重新生成'))
 }
 
+function recoveryButton(wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) {
+  return wrapper.findAll('button').find((button) => button.text() === '检查并尝试恢复报告')
+}
+
 describe('InterviewReportView', () => {
   beforeEach(() => {
     resetSessionScopeForTests()
@@ -79,6 +90,8 @@ describe('InterviewReportView', () => {
 
   afterEach(() => {
     vi.useRealTimers()
+    setUnauthorizedHandler(null)
+    resetUnauthorizedGate()
   })
 
   it('loads Detail first, then Report, for a completed session', async () => {
@@ -160,6 +173,319 @@ describe('InterviewReportView', () => {
     await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS * 3)
     await flushPromises()
     expect(fetchInterviewReport).toHaveBeenCalledTimes(2)
+  })
+
+  it('keeps long-running GENERATING polling read-only and offers explicit recovery', async () => {
+    vi.useFakeTimers()
+    vi.mocked(fetchInterviewReport).mockResolvedValue(statusReport(InterviewReportStatus.GENERATING, 41))
+    const { wrapper } = await mountReport()
+    try {
+      // Advancing page time cannot establish database staleness or reclaim a backend task.
+      await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS * 220)
+      await flushPromises()
+      expect(fetchInterviewReport).toHaveBeenCalledTimes(221)
+      expect(generateInterviewReport).not.toHaveBeenCalled()
+      expect(wrapper.text()).toContain('报告正在生成')
+      expect(wrapper.text()).not.toContain('上次报告生成未完成')
+      expect(wrapper.text()).not.toContain('本场说明')
+      expect(generateButton(wrapper)).toBeUndefined()
+      expect(recoveryButton(wrapper)).toBeDefined()
+      expect(wrapper.text()).toContain(REPORT_COPY.recoveryHint)
+    } finally {
+      wrapper.unmount()
+    }
+  })
+
+  it('submits one manual recovery at a time and adopts the server READY result', async () => {
+    vi.useFakeTimers()
+    const pendingPost = deferred<InterviewReportResponse>()
+    vi.mocked(fetchInterviewReport).mockResolvedValue(statusReport(InterviewReportStatus.GENERATING, 41))
+    vi.mocked(generateInterviewReport).mockReturnValue(pendingPost.promise)
+    const { wrapper } = await mountReport()
+    const button = recoveryButton(wrapper)!
+    // Both events arrive before Vue renders the disabled state.
+    await Promise.all([button.trigger('click'), button.trigger('click')])
+    expect(generateInterviewReport).toHaveBeenCalledExactlyOnceWith(41)
+    expect(button.attributes('disabled')).toBeDefined()
+    expect(button.attributes('aria-busy')).toBe('true')
+    await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS * 3)
+    expect(fetchInterviewReport).toHaveBeenCalledTimes(1)
+    await button.trigger('click')
+    expect(generateInterviewReport).toHaveBeenCalledTimes(1)
+    pendingPost.resolve(reportResponse())
+    await flushPromises()
+    expect(wrapper.text()).toContain('本场说明')
+    expect(recoveryButton(wrapper)).toBeUndefined()
+    await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS * 3)
+    expect(fetchInterviewReport).toHaveBeenCalledTimes(1)
+    expect(generateInterviewReport).toHaveBeenCalledTimes(1)
+  })
+
+  it.each(['报告正在生成中，请稍后重试', '报告生成状态已发生变化，请重试'])(
+    'rechecks a recovery 409 (%s), stays GENERATING and only resumes GET polling',
+    async (message) => {
+      vi.useFakeTimers()
+      vi.mocked(fetchInterviewReport).mockResolvedValue(statusReport(InterviewReportStatus.GENERATING, 41))
+      vi.mocked(generateInterviewReport).mockRejectedValue(
+        new ApiError({ httpStatus: 409, code: 409, message, kind: ErrorKind.CONFLICT }),
+      )
+      const { wrapper } = await mountReport()
+      await recoveryButton(wrapper)!.trigger('click')
+      await flushPromises()
+      expect(fetchInterviewReport).toHaveBeenCalledTimes(2)
+      expect(wrapper.text()).toContain(REPORT_COPY.stillGenerating)
+      expect(wrapper.text()).toContain('报告正在生成')
+      expect(wrapper.text()).not.toContain(REPORT_COPY.loadError)
+      expect(recoveryButton(wrapper)!.attributes('disabled')).toBeUndefined()
+      await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS * 3)
+      expect(fetchInterviewReport).toHaveBeenCalledTimes(5)
+      expect(generateInterviewReport).toHaveBeenCalledTimes(1)
+    },
+  )
+
+  it.each([
+    new ApiError({ httpStatus: 409, code: 409, message: '报告正在生成中，请稍后重试', kind: ErrorKind.CONFLICT }),
+    new ApiError({ httpStatus: 0, code: 0, message: '请求超时', kind: ErrorKind.NETWORK }),
+  ])('queries after recovery failure $httpStatus and reuses a report completed by another request', async (failure) => {
+    vi.useFakeTimers()
+    const pendingGet = deferred<InterviewReportResponse>()
+    vi.mocked(fetchInterviewReport)
+      .mockResolvedValueOnce(statusReport(InterviewReportStatus.GENERATING, 41))
+      .mockReturnValueOnce(pendingGet.promise)
+    vi.mocked(generateInterviewReport).mockRejectedValue(failure)
+    const { wrapper } = await mountReport()
+    await recoveryButton(wrapper)!.trigger('click')
+    await flushPromises()
+    expect(fetchInterviewReport).toHaveBeenCalledTimes(2)
+    expect(fetchInterviewReport).toHaveBeenLastCalledWith(41)
+    expect(recoveryButton(wrapper)!.attributes('disabled')).toBeDefined()
+    expect(vi.mocked(generateInterviewReport).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(fetchInterviewReport).mock.invocationCallOrder[1]!,
+    )
+    pendingGet.resolve(reportResponse({ summary: 'ALREADY_COMPLETED_REPORT' }))
+    await flushPromises()
+    expect(wrapper.text()).toContain('ALREADY_COMPLETED_REPORT')
+    expect(wrapper.text()).not.toContain(REPORT_COPY.stillGenerating)
+    await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS * 3)
+    expect(fetchInterviewReport).toHaveBeenCalledTimes(2)
+    expect(generateInterviewReport).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([
+    new ApiError({ httpStatus: 409, code: 409, message: '报告正在生成中，请稍后重试', kind: ErrorKind.CONFLICT }),
+    new ApiError({ httpStatus: 0, code: 0, message: '请求超时', kind: ErrorKind.NETWORK }),
+    new ApiError({ httpStatus: 400, code: 400, message: '报告生成服务当前不可用', kind: ErrorKind.VALIDATION }),
+  ])('keeps recovery controlled when POST $httpStatus and the confirmation GET both fail', async (failure) => {
+    vi.useFakeTimers()
+    vi.mocked(fetchInterviewReport).mockResolvedValueOnce(statusReport(InterviewReportStatus.GENERATING, 41))
+    const { wrapper } = await mountReport()
+    vi.mocked(generateInterviewReport).mockRejectedValue(failure)
+    vi.mocked(fetchInterviewReport).mockRejectedValue(
+      new ApiError({ httpStatus: 0, code: 0, message: '网络异常', kind: ErrorKind.NETWORK }),
+    )
+    await recoveryButton(wrapper)!.trigger('click')
+    await flushPromises()
+    expect(wrapper.text()).toContain(REPORT_COPY.recoveryUnknownTitle)
+    expect(wrapper.text()).toContain(REPORT_COPY.refreshStatus)
+    expect(recoveryButton(wrapper)).toBeUndefined()
+    expect(generateButton(wrapper)).toBeUndefined()
+    await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS * 3)
+    expect(fetchInterviewReport).toHaveBeenCalledTimes(2)
+    expect(generateInterviewReport).toHaveBeenCalledTimes(1)
+    vi.mocked(fetchInterviewReport).mockResolvedValueOnce(statusReport(InterviewReportStatus.GENERATING, 41))
+    await wrapper.findAll('button').find((button) => button.text() === REPORT_COPY.refreshStatus)!.trigger('click')
+    await flushPromises()
+    expect(recoveryButton(wrapper)).toBeDefined()
+    expect(generateInterviewReport).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([
+    { status: InterviewReportStatus.GENERATING, expected: REPORT_COPY.generatingTitle },
+    { status: InterviewReportStatus.FAILED, expected: REPORT_COPY.failedTitle },
+    { status: InterviewReportStatus.READY, expected: '本场说明' },
+  ])('uses actual $status after recovery service-unavailable instead of inventing a fallback', async ({ status, expected }) => {
+    vi.useFakeTimers()
+    vi.mocked(fetchInterviewReport).mockResolvedValueOnce(statusReport(InterviewReportStatus.GENERATING, 41))
+    const { wrapper } = await mountReport()
+    vi.mocked(generateInterviewReport).mockRejectedValue(
+      new ApiError({ httpStatus: 400, code: 400, message: '报告生成服务当前不可用', kind: ErrorKind.VALIDATION }),
+    )
+    vi.mocked(fetchInterviewReport).mockResolvedValue(
+      status === InterviewReportStatus.READY ? reportResponse() : statusReport(status, 41),
+    )
+    await recoveryButton(wrapper)!.trigger('click')
+    await flushPromises()
+    expect(wrapper.text()).toContain(expected)
+    expect(wrapper.text()).not.toContain(REPORT_COPY.notStartedTitle)
+    if (status === InterviewReportStatus.READY) {
+      expect(wrapper.text()).not.toContain(REPORT_COPY.serviceUnavailable)
+    } else {
+      expect(wrapper.text()).toContain(REPORT_COPY.serviceUnavailable)
+    }
+    await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS)
+    expect(fetchInterviewReport).toHaveBeenCalledTimes(status === InterviewReportStatus.GENERATING ? 3 : 2)
+    expect(generateInterviewReport).toHaveBeenCalledTimes(1)
+  })
+
+  it('adopts FAILED after a recovery 502 and only retries on explicit user action', async () => {
+    vi.mocked(fetchInterviewReport).mockResolvedValueOnce(statusReport(InterviewReportStatus.GENERATING, 41))
+    const { wrapper } = await mountReport()
+    vi.mocked(generateInterviewReport).mockRejectedValueOnce(
+      new ApiError({ httpStatus: 502, code: 502, message: '外部服务暂时不可用', kind: ErrorKind.EXTERNAL_SERVICE }),
+    ).mockResolvedValueOnce(reportResponse())
+    vi.mocked(fetchInterviewReport).mockResolvedValueOnce(statusReport(InterviewReportStatus.FAILED, 41))
+    await recoveryButton(wrapper)!.trigger('click')
+    await flushPromises()
+    expect(wrapper.text()).toContain(REPORT_COPY.failedTitle)
+    expect(generateInterviewReport).toHaveBeenCalledTimes(1)
+    await generateButton(wrapper)!.trigger('click')
+    await flushPromises()
+    expect(wrapper.text()).toContain('本场说明')
+    expect(generateInterviewReport).toHaveBeenCalledTimes(2)
+  })
+
+  it.each(['resolve', 'reject'] as const)('ignores a pre-recovery poll that later %ss after READY', async (outcome) => {
+    vi.useFakeTimers()
+    const pendingPoll = deferred<InterviewReportResponse>()
+    vi.mocked(fetchInterviewReport)
+      .mockResolvedValueOnce(statusReport(InterviewReportStatus.GENERATING, 41))
+      .mockReturnValueOnce(pendingPoll.promise)
+    vi.mocked(generateInterviewReport).mockResolvedValue(reportResponse())
+    const { wrapper } = await mountReport()
+    await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS)
+    expect(fetchInterviewReport).toHaveBeenCalledTimes(2)
+    await recoveryButton(wrapper)!.trigger('click')
+    await flushPromises()
+    expect(wrapper.text()).toContain('本场说明')
+    if (outcome === 'resolve') {
+      pendingPoll.resolve(statusReport(InterviewReportStatus.GENERATING, 41))
+    } else {
+      pendingPoll.reject(new ApiError({ httpStatus: 404, code: 404, message: '不存在', kind: ErrorKind.NOT_FOUND }))
+    }
+    await flushPromises()
+    expect(wrapper.text()).toContain('本场说明')
+    expect(wrapper.text()).not.toContain(REPORT_COPY.generatingTitle)
+    await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS * 3)
+    expect(fetchInterviewReport).toHaveBeenCalledTimes(2)
+  })
+
+  it.each(['post', 'confirmation'] as const)('ignores old recovery %s results after a route change', async (phase) => {
+    const pending = deferred<InterviewReportResponse>()
+    vi.mocked(fetchInterviewDetail).mockImplementation(async (sessionId) => completedDetail({ sessionId }))
+    vi.mocked(fetchInterviewReport).mockResolvedValueOnce(statusReport(InterviewReportStatus.GENERATING, 41))
+    const { wrapper, router } = await mountReport()
+    if (phase === 'post') {
+      vi.mocked(generateInterviewReport).mockReturnValue(pending.promise)
+    } else {
+      vi.mocked(generateInterviewReport).mockRejectedValue(
+        new ApiError({ httpStatus: 0, code: 0, message: '超时', kind: ErrorKind.NETWORK }),
+      )
+      vi.mocked(fetchInterviewReport).mockReturnValueOnce(pending.promise)
+    }
+    await recoveryButton(wrapper)!.trigger('click')
+    await flushPromises()
+    vi.mocked(fetchInterviewReport).mockResolvedValue(reportResponse({ sessionId: 42, summary: 'SESSION_42_REPORT' }))
+    await router.push('/interviews/42/report')
+    await flushPromises()
+    expect(wrapper.text()).toContain('SESSION_42_REPORT')
+    pending.resolve(statusReport(InterviewReportStatus.GENERATING, 41))
+    await flushPromises()
+    expect(wrapper.text()).toContain('SESSION_42_REPORT')
+    expect(recoveryButton(wrapper)).toBeUndefined()
+    expect(generateInterviewReport).toHaveBeenCalledExactlyOnceWith(41)
+  })
+
+  it.each(['resolve', 'reject'] as const)('does not restart polling or confirmation GET after unmounted recovery %ss', async (outcome) => {
+    vi.useFakeTimers()
+    const pending = deferred<InterviewReportResponse>()
+    vi.mocked(fetchInterviewReport).mockResolvedValue(statusReport(InterviewReportStatus.GENERATING, 41))
+    vi.mocked(generateInterviewReport).mockReturnValue(pending.promise)
+    const { wrapper } = await mountReport()
+    await recoveryButton(wrapper)!.trigger('click')
+    wrapper.unmount()
+    if (outcome === 'resolve') {
+      pending.resolve(statusReport(InterviewReportStatus.GENERATING, 41))
+    } else {
+      pending.reject(new ApiError({ httpStatus: 0, code: 0, message: '超时', kind: ErrorKind.NETWORK }))
+    }
+    await flushPromises()
+    await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS * 3)
+    expect(fetchInterviewReport).toHaveBeenCalledTimes(1)
+    expect(generateInterviewReport).toHaveBeenCalledTimes(1)
+  })
+
+  it.each(['post', 'confirmation'] as const)('shows the existing missing-record page for recovery %s 404', async (phase) => {
+    vi.useFakeTimers()
+    const missing = new ApiError({ httpStatus: 404, code: 404, message: '面试会话不存在', kind: ErrorKind.NOT_FOUND })
+    vi.mocked(fetchInterviewReport).mockResolvedValueOnce(statusReport(InterviewReportStatus.GENERATING, 41))
+    const { wrapper } = await mountReport()
+    vi.mocked(generateInterviewReport).mockRejectedValue(phase === 'post' ? missing :
+      new ApiError({ httpStatus: 0, code: 0, message: '超时', kind: ErrorKind.NETWORK }))
+    vi.mocked(fetchInterviewReport).mockRejectedValue(missing)
+    await recoveryButton(wrapper)!.trigger('click')
+    await flushPromises()
+    expect(wrapper.text()).toContain(REPORT_COPY.missingRecord)
+    await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS * 3)
+    expect(fetchInterviewReport).toHaveBeenCalledTimes(phase === 'post' ? 1 : 2)
+    expect(generateInterviewReport).toHaveBeenCalledTimes(1)
+  })
+
+  it('retries FAILED normally and adopts READY without automatic submission', async () => {
+    vi.mocked(fetchInterviewReport).mockResolvedValue(statusReport(InterviewReportStatus.FAILED, 41))
+    vi.mocked(generateInterviewReport).mockResolvedValue(reportResponse())
+    const { wrapper } = await mountReport()
+    expect(generateInterviewReport).not.toHaveBeenCalled()
+    expect(recoveryButton(wrapper)).toBeUndefined()
+    await generateButton(wrapper)!.trigger('click')
+    await flushPromises()
+    expect(generateInterviewReport).toHaveBeenCalledExactlyOnceWith(41)
+    expect(wrapper.text()).toContain('本场说明')
+  })
+
+  it.each(['post', 'confirmation'] as const)('keeps recovery %s 401 on the global authentication path', async (phase) => {
+    const actualApi = await vi.importActual<typeof import('@/features/interview/api/interviewApi')>(
+      '@/features/interview/api/interviewApi',
+    )
+    const previousAdapter = httpClient.defaults.adapter
+    httpClient.defaults.adapter = async (config) => {
+      throw new AxiosError('Unauthorized', 'ERR_BAD_REQUEST', config, undefined, {
+        status: 401,
+        statusText: 'Unauthorized',
+        data: { code: 401, message: '未认证', data: null },
+        headers: {},
+        config,
+      })
+    }
+    try {
+      vi.mocked(fetchInterviewReport).mockResolvedValueOnce(statusReport(InterviewReportStatus.GENERATING, 41))
+      const { wrapper, router, auth } = await mountReport()
+      bindUnauthorizedNavigation(router)
+      // Vue receives the same propagated ApiError as the existing generate action.
+      const vueErrors = vi.fn()
+      wrapper.vm.$.appContext.config.errorHandler = vueErrors
+      if (phase === 'post') {
+        vi.mocked(generateInterviewReport).mockImplementation(actualApi.generateInterviewReport)
+      } else {
+        vi.mocked(generateInterviewReport).mockRejectedValue(
+          new ApiError({ httpStatus: 0, code: 0, message: '超时', kind: ErrorKind.NETWORK }),
+        )
+        vi.mocked(fetchInterviewReport).mockImplementation(actualApi.fetchInterviewReport)
+      }
+      await recoveryButton(wrapper)!.trigger('click')
+      await flushPromises()
+      await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('login'))
+      expect(router.currentRoute.value.query.redirect).toBe('/interviews/41/report')
+      expect(auth.accessToken).toBeNull()
+      expect(wrapper.text()).not.toContain(REPORT_COPY.recoveryUnknownTitle)
+      expect(generateInterviewReport).toHaveBeenCalledExactlyOnceWith(41)
+      expect(fetchInterviewReport).toHaveBeenCalledTimes(phase === 'post' ? 1 : 2)
+      for (const [error] of vueErrors.mock.calls) {
+        expect(error).toBeInstanceOf(ApiError)
+        expect(error.kind).toBe(ErrorKind.UNAUTHENTICATED)
+      }
+    } finally {
+      httpClient.defaults.adapter = previousAdapter
+    }
   })
 
   it('stops polling on FAILED', async () => {

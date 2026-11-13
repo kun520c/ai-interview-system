@@ -14,7 +14,7 @@ import { REPORT_COPY } from '@/features/interview/copy/reportCopy'
 import { ReportPageState } from '@/features/interview/types/reportPageState'
 import { formatInterviewDate } from '@/utils/formatInterviewDate'
 import { formatScore } from '@/utils/formatScore'
-import { EvaluationLevel } from '@/types/enums'
+import { EvaluationLevel, InterviewReportStatus } from '@/types/enums'
 
 const {
   pageState,
@@ -24,9 +24,11 @@ const {
   statusMessage,
   readyAbnormal,
   canGenerate,
+  canRecoverGenerating,
   generateBusy,
   bootstrap,
   generate,
+  recoverGenerating,
   refreshReport,
 } = useInterviewReport()
 
@@ -176,6 +178,17 @@ const generating = computed(() => {
       >
         <h2>{{ generateBusy ? REPORT_COPY.generatingBusy : REPORT_COPY.generatingTitle }}</h2>
         <p class="u-muted">{{ REPORT_COPY.generatingHint }}</p>
+        <template v-if="report?.reportStatus === InterviewReportStatus.GENERATING">
+          <p class="u-muted">{{ REPORT_COPY.recoveryHint }}</p>
+          <BaseButton
+            variant="ghost"
+            :disabled="!canRecoverGenerating"
+            :loading="generateBusy"
+            @click="recoverGenerating()"
+          >
+            {{ REPORT_COPY.recoverGenerating }}
+          </BaseButton>
+        </template>
       </section>
 
       <template v-else-if="pageState === ReportPageState.READY && report">

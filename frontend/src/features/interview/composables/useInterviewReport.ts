@@ -8,9 +8,7 @@ import {
   generateInterviewReport,
 } from '@/features/interview/api/interviewApi'
 import {
-  REPORT_CONFLICT_GENERATING,
   REPORT_CONFLICT_NOT_COMPLETED,
-  REPORT_CONFLICT_STATE_CHANGED,
   REPORT_COPY,
   REPORT_SERVICE_UNAVAILABLE,
 } from '@/features/interview/copy/reportCopy'
@@ -29,6 +27,11 @@ import type {
 } from '@/types/interview'
 
 export const REPORT_POLL_INTERVAL_MS = 3000
+
+type ReportSubmissionStatus =
+  | typeof ReportPageState.NOT_STARTED
+  | typeof ReportPageState.FAILED
+  | typeof ReportPageState.GENERATING
 
 function sortTimeline(
   questions: InterviewDetailQuestionResponse[],
@@ -67,8 +70,6 @@ export function useInterviewReport() {
   let pollTimer: ReturnType<typeof setInterval> | null = null
   let refreshEpoch: number | null = null
   let refreshSessionId: number | null = null
-  let recoverableStatus: typeof ReportPageState.NOT_STARTED | typeof ReportPageState.FAILED | null =
-    null
 
   const sessionId = computed(() => parsePositiveSessionId(route.params.sessionId))
 
@@ -86,7 +87,10 @@ export function useInterviewReport() {
     )
   })
 
-  const generateBusy = computed(() => pageState.value === ReportPageState.GENERATING_POST)
+  const canRecoverGenerating = computed(
+    () => pageState.value === ReportPageState.GENERATING && !posting.value,
+  )
+  const generateBusy = computed(() => posting.value)
 
   function isCurrentScope(operationEpoch: number, operationSessionId: number | null): boolean {
     return (
@@ -148,7 +152,7 @@ export function useInterviewReport() {
   async function refreshReport(): Promise<void> {
     const operationEpoch = epoch
     const operationSessionId = sessionId.value
-    if (operationSessionId === null) {
+    if (operationSessionId === null || posting.value) {
       return
     }
     if (refreshEpoch === operationEpoch && refreshSessionId === operationSessionId) {
@@ -243,13 +247,14 @@ export function useInterviewReport() {
     }
     detail.value = response
     pageState.value = ReportPageState.LOADING_REPORT
-    await refreshReport()
+    await recoverAfterMutationFailure(operationEpoch, operationSessionId)
   }
 
   async function handleGenerateFailure(
     caught: unknown,
     operationEpoch: number,
     operationSessionId: number,
+    recoverableStatus: ReportSubmissionStatus,
   ): Promise<void> {
     if (!isCurrentScope(operationEpoch, operationSessionId)) {
       return
@@ -263,11 +268,20 @@ export function useInterviewReport() {
       return
     }
     if (isApiError(caught) && caught.message === REPORT_SERVICE_UNAVAILABLE) {
+      if (recoverableStatus === ReportPageState.GENERATING) {
+        // A stale claim may already have changed the durable state before the service check.
+        await recoverAfterMutationFailure(operationEpoch, operationSessionId)
+        if (
+          isCurrentScope(operationEpoch, operationSessionId) &&
+          (pageState.value === ReportPageState.GENERATING || pageState.value === ReportPageState.FAILED)
+        ) {
+          statusMessage.value = REPORT_COPY.serviceUnavailable
+        }
+        return
+      }
       stopPolling()
       statusMessage.value = REPORT_COPY.serviceUnavailable
-      if (recoverableStatus) {
-        pageState.value = recoverableStatus
-      }
+      pageState.value = recoverableStatus
       return
     }
     if (isApiError(caught) && caught.kind === ErrorKind.CONFLICT) {
@@ -275,21 +289,12 @@ export function useInterviewReport() {
         await realignFromDetail(operationEpoch, operationSessionId)
         return
       }
-      await refreshReport()
+      await recoverAfterMutationFailure(operationEpoch, operationSessionId)
       if (!isCurrentScope(operationEpoch, operationSessionId)) {
         return
       }
-      if (
-        caught.message === REPORT_CONFLICT_GENERATING &&
-        report.value?.reportStatus === InterviewReportStatus.GENERATING
-      ) {
-        startPolling()
-      }
-      if (
-        caught.message === REPORT_CONFLICT_STATE_CHANGED ||
-        caught.message === REPORT_CONFLICT_GENERATING
-      ) {
-        return
+      if (pageState.value === ReportPageState.GENERATING) {
+        statusMessage.value = REPORT_COPY.stillGenerating
       }
       return
     }
@@ -308,19 +313,27 @@ export function useInterviewReport() {
   }
 
   async function generate(): Promise<void> {
-    const operationEpoch = epoch
+    if (pageState.value === ReportPageState.NOT_STARTED || pageState.value === ReportPageState.FAILED) {
+      await submitReport(pageState.value)
+    }
+  }
+
+  async function recoverGenerating(): Promise<void> {
+    await submitReport(ReportPageState.GENERATING)
+  }
+
+  async function submitReport(recoverableStatus: ReportSubmissionStatus): Promise<void> {
     const operationSessionId = sessionId.value
     if (
       operationSessionId === null ||
       posting.value ||
-      (pageState.value !== ReportPageState.NOT_STARTED && pageState.value !== ReportPageState.FAILED)
+      pageState.value !== recoverableStatus
     ) {
       return
     }
-    recoverableStatus =
-      pageState.value === ReportPageState.FAILED
-        ? ReportPageState.FAILED
-        : ReportPageState.NOT_STARTED
+    // Invalidate any pre-submit GET, including one that returns after POST has reached READY.
+    const operationEpoch = ++epoch
+    stopPolling()
     posting.value = true
     pageState.value = ReportPageState.GENERATING_POST
     statusMessage.value = null
@@ -335,7 +348,7 @@ export function useInterviewReport() {
       if (!isCurrentScope(operationEpoch, operationSessionId)) {
         return
       }
-      await handleGenerateFailure(caught, operationEpoch, operationSessionId)
+      await handleGenerateFailure(caught, operationEpoch, operationSessionId, recoverableStatus)
     } finally {
       if (isCurrentScope(operationEpoch, operationSessionId)) {
         posting.value = false
@@ -447,10 +460,12 @@ export function useInterviewReport() {
     statusMessage,
     readyAbnormal,
     canGenerate,
+    canRecoverGenerating,
     generateBusy,
     sessionId,
     bootstrap,
     generate,
+    recoverGenerating,
     refreshReport,
     recoverAfterMutationFailure,
     startPolling,

@@ -14,6 +14,10 @@ export const REPORT_COPY = {
   generatingTitle: '报告正在生成',
   generatingHint: '可能需要一些时间，可以留在页面等待。',
   generatingBusy: '正在生成报告',
+  recoverGenerating: '检查并尝试恢复报告',
+  recoveryHint:
+    '如果等待较久，可以请服务器检查并尝试恢复。正常生成中的任务会拒绝重复执行；只有服务器判定任务已过期时才可能允许恢复。页面等待时长不能判断是否过期，点击也不保证重新生成或立即完成。',
+  stillGenerating: '服务器确认报告仍在生成，本次未重复执行。请继续等待，页面会自动查询最新状态。',
   outcome: '结果',
   meaning: '本场说明',
   strength: '优势',
