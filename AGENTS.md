@@ -389,6 +389,12 @@ At the end of each development stage, report:
 
 ## 14. Current Development Stage
 
+### Engineering record maintenance
+
+- After each engineering optimization batch, update [IMPROVEMENT_LEDGER.md](docs/engineering/IMPROVEMENT_LEDGER.md) and [SOURCE_LEARNING_BACKLOG.md](docs/engineering/SOURCE_LEARNING_BACKLOG.md) using their templates; retain the original acceptance reports.
+- Record evidence, changed files/methods, call chains, tradeoffs, exact test counts/types, commit SHA, and separately verified local/remote/uncommitted status. Mark missing evidence and candidate scope explicitly; do not infer performance gains or real-service success.
+- Keep implementation status separate from developer mastery. New learning items remain unconfirmed until developer-provided explanation, reproduction, or independent modification evidence is recorded. Updating these documents does not authorize implementation, commit, or push.
+
 Current stage:
 
 ```text
