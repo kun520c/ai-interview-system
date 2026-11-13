@@ -186,6 +186,63 @@ class KnowledgeAttemptFencingIntegrationTest {
         verify(vectors, never()).deleteByDocumentId(documentId);
     }
 
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"UNAVAILABLE", "DEADLINE_EXCEEDED", "NULL_RESPONSE"})
+    void ambiguousSdkInsertUsesExactCompensationAndExplicitBusinessRetry(String failureMode) {
+        var sdk = mock(io.milvus.v2.client.MilvusClientV2.class);
+        var properties = new com.kun.aiinterview.knowledge.vector.milvus.MilvusProperties();
+        properties.setCollectionName("synthetic_vectors");
+        properties.setDimension(1);
+        var adapter = new com.kun.aiinterview.knowledge.vector.milvus.MilvusVectorStoreClient(sdk, properties);
+        var inserts = new AtomicInteger();
+        var deletes = new AtomicInteger();
+        stored.add("unrelated-vector");
+        when(sdk.insert(any(io.milvus.v2.service.vector.request.InsertReq.class))).thenAnswer(invocation -> {
+            io.milvus.v2.service.vector.request.InsertReq request = invocation.getArgument(0);
+            request.getData().forEach(row -> stored.add(row.get("vector_id").getAsString()));
+            if (inserts.incrementAndGet() == 1) {
+                if (failureMode.equals("NULL_RESPONSE")) return null;
+                throw new io.milvus.v2.exception.MilvusClientException(io.milvus.v2.exception.ErrorCode.RPC_ERROR,
+                        io.milvus.shaded.io.grpc.Status.Code.valueOf(failureMode).toStatus().asRuntimeException());
+            }
+            return io.milvus.v2.service.vector.response.InsertResp.builder().InsertCnt(request.getData().size()).build();
+        });
+        when(sdk.delete(any(io.milvus.v2.service.vector.request.DeleteReq.class))).thenAnswer(invocation -> {
+            io.milvus.v2.service.vector.request.DeleteReq request = invocation.getArgument(0);
+            assertThat(request.getFilter()).isEqualTo("vector_id in {vectorIds}");
+            @SuppressWarnings("unchecked")
+            List<String> ids = (List<String>) request.getFilterTemplateValues().get("vectorIds");
+            long deleted = ids.stream().filter(stored::remove).count();
+            deletes.incrementAndGet();
+            return io.milvus.v2.service.vector.response.DeleteResp.builder().deleteCnt(deleted).build();
+        });
+        var processing = new KnowledgeDocumentProcessingService(documents, new KnowledgeTextChunker(),
+                texts -> embedding(), adapter, transactions, new StaleRecoveryProperties());
+        long start = System.nanoTime();
+        assertThatThrownBy(() -> processing.processDocument(documentId))
+                .isInstanceOf(com.kun.aiinterview.common.exception.ExternalServiceException.class);
+        String failedAttempt = documents.selectById(documentId).getProcessingAttemptId();
+        assertThat(documents.selectById(documentId).getProcessingStatus()).isEqualTo(KnowledgeProcessingStatus.FAILED);
+        assertThat(chunkIds()).isEmpty();
+        assertThat(stored).containsExactly("unrelated-vector");
+        assertThat(inserts).hasValue(1);
+        assertThat(deletes).hasValue(1);
+        adapter.deleteByVectorIds(List.of(failedAttempt + "-1"));
+        assertThat(deletes).hasValue(2); // Repeating compensation succeeds with deleteCnt=0.
+        processing.processDocument(documentId);
+        String newAttempt = documents.selectById(documentId).getProcessingAttemptId();
+        assertThat(newAttempt).isNotEqualTo(failedAttempt);
+        assertThat(documents.selectById(documentId).getProcessingStatus()).isEqualTo(KnowledgeProcessingStatus.READY);
+        assertThat(chunkIds()).containsExactly(newAttempt + "-1");
+        assertThat(stored).containsExactlyInAnyOrder("unrelated-vector", newAttempt + "-1");
+        assertThat(chunks.selectRetrievableByVectorIds(List.copyOf(stored), "fake", "fake-v1"))
+                .extracting(row -> row.getVectorId()).containsExactly(newAttempt + "-1");
+        assertThat(inserts).hasValue(2);
+        assertThat(deletes).hasValue(2);
+        System.out.printf("B4D MySQL scenario=%s sdkInsertCalls=%d sdkDeleteCalls=%d elapsedMs=%d%n",
+                failureMode, inserts.get(), deletes.get(), (System.nanoTime() - start) / 1_000_000);
+    }
+
     @Test
     void stalePersistCannotDeleteReplacementChunks() {
         assertThat(documents.claimProcessing(documentId, "A")).isEqualTo(1);

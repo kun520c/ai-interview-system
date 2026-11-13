@@ -174,6 +174,17 @@ class MilvusPropertiesTest {
     }
 
     @Test
+    void shouldRejectPositiveDurationsThatWouldDisableDeadlineOrOverflowMillis() {
+        for (Duration duration : new Duration[]{Duration.ofNanos(1), Duration.ofSeconds(Long.MAX_VALUE)}) {
+            MilvusProperties properties = validProperties();
+            properties.setConnectTimeout(duration);
+            properties.setRequestTimeout(duration);
+            assertViolationOn(properties, "connectTimeoutPositive");
+            assertViolationOn(properties, "requestTimeoutPositive");
+        }
+    }
+
+    @Test
     void shouldNotExposeTokenThroughToString() {
         MilvusProperties properties = validProperties();
 

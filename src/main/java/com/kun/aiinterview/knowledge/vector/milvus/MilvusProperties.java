@@ -42,17 +42,20 @@ public class MilvusProperties {
     @NotNull(message = "Milvus 请求超时时间不能为空")
     private Duration requestTimeout;
 
-    @AssertTrue(message = "Milvus连接超时时间必须大于0")
+    @AssertTrue(message = "Milvus连接超时时间必须至少为1ms且可转换为毫秒")
     public boolean isConnectTimeoutPositive() {
-        return connectTimeout == null
-                ||(!connectTimeout.isZero())
-                && !connectTimeout.isNegative();
+        return isValidSdkTimeout(connectTimeout);
     }
 
-    @AssertTrue(message = "Milvus请求超时时间必须大于0")
+    @AssertTrue(message = "Milvus请求超时时间必须至少为1ms且可转换为毫秒")
     public boolean isRequestTimeoutPositive() {
-        return requestTimeout == null
-                ||(!requestTimeout.isZero())
-                && !requestTimeout.isNegative();
+        return isValidSdkTimeout(requestTimeout);
+    }
+
+    private static boolean isValidSdkTimeout(Duration timeout) {
+        // NotNull handles missing values. A positive sub-millisecond value becomes 0,
+        // which disables the SDK RPC deadline; reject it before converting to millis.
+        return timeout == null || (timeout.compareTo(Duration.ofMillis(1)) >= 0
+                && timeout.compareTo(Duration.ofMillis(Long.MAX_VALUE)) <= 0);
     }
 }

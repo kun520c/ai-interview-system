@@ -53,6 +53,15 @@ class MilvusCollectionInitializerTest {
     }
 
     @Test
+    void shouldRejectUnknownExistenceInsteadOfCreatingCollection() {
+        when(milvusClient.hasCollection(any(HasCollectionReq.class))).thenReturn(null);
+        assertThatThrownBy(() -> initializer.run(mock(ApplicationArguments.class)))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("hasCollection");
+        verify(milvusClient, never()).createCollection(any(CreateCollectionReq.class));
+    }
+
+    @Test
     void shouldValidateCompatibleExistingCollectionWithoutCreatingIt() {
         stubExistingCollection(
                 compatibleCollectionResponse(),

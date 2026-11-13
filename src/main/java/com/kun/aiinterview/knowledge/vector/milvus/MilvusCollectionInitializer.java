@@ -52,10 +52,10 @@ public class MilvusCollectionInitializer implements ApplicationRunner {
                 .collectionName(properties.getCollectionName())
                 .build();
 
-        boolean collectionExists =
-                Boolean.TRUE.equals(
-                        milvusClient.hasCollection(request)
-                );
+        Boolean collectionExists = milvusClient.hasCollection(request);
+        if (collectionExists == null) {
+            throw new IllegalStateException("Milvus hasCollection response must not be null");
+        }
 
         if (collectionExists) {
             validateExistingCollection();

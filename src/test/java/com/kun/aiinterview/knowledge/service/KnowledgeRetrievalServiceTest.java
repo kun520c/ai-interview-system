@@ -59,6 +59,28 @@ class KnowledgeRetrievalServiceTest {
         );
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void failedSdkSearchNeverBecomesSuccessfulEmptyRetrieval(boolean nullResponse) {
+        var sdk = org.mockito.Mockito.mock(io.milvus.v2.client.MilvusClientV2.class);
+        var properties = new com.kun.aiinterview.knowledge.vector.milvus.MilvusProperties();
+        properties.setDimension(QUERY_VECTOR.size());
+        properties.setCollectionName("synthetic_vectors");
+        var adapter = new com.kun.aiinterview.knowledge.vector.milvus.MilvusVectorStoreClient(sdk, properties);
+        var retrieval = new KnowledgeRetrievalService(embeddingClient, adapter, knowledgeChunkMapper, new RetrievalProperties());
+        when(embeddingClient.embed(List.of(QUERY))).thenReturn(validEmbeddingResult());
+        when(sdk.search(org.mockito.ArgumentMatchers.any(io.milvus.v2.service.vector.request.SearchReq.class)))
+                .thenAnswer(invocation -> {
+                    if (nullResponse) return null;
+                    throw new io.milvus.v2.exception.MilvusClientException(io.milvus.v2.exception.ErrorCode.RPC_ERROR,
+                            io.milvus.shaded.io.grpc.Status.DEADLINE_EXCEEDED.asRuntimeException());
+                });
+        assertThatThrownBy(() -> retrieval.retrieve(QUERY, TOP_K))
+                .isInstanceOf(com.kun.aiinterview.common.exception.ExternalServiceException.class);
+        verify(sdk).search(org.mockito.ArgumentMatchers.any(io.milvus.v2.service.vector.request.SearchReq.class));
+        verifyNoInteractions(knowledgeChunkMapper);
+    }
+
     @Test
     void givenValidQueryAndThreeHits_whenRetrieving_thenReturnsCompleteRankedEvidence() {
         List<VectorSearchHit> hits = List.of(

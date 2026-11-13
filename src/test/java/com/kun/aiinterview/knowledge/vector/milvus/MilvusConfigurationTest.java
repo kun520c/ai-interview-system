@@ -2,6 +2,8 @@ package com.kun.aiinterview.knowledge.vector.milvus;
 
 import io.milvus.v2.client.ConnectConfig;
 import io.milvus.v2.client.MilvusClientV2;
+import io.milvus.v2.client.RetryConfig;
+import org.mockito.ArgumentCaptor;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -85,6 +87,9 @@ class MilvusConfigurationTest {
                                 .isSameAs(connectConfig);
                     });
 
+            ArgumentCaptor<RetryConfig> retry = ArgumentCaptor.forClass(RetryConfig.class);
+            verify(construction.constructed().getFirst()).retryConfig(retry.capture());
+            assertThat(retry.getValue().getMaxRetryTimes()).isEqualTo(1);
             verify(construction.constructed().getFirst()).close();
         }
     }
