@@ -97,4 +97,28 @@ describe('RegisterView', () => {
     expect(registerAccount).not.toHaveBeenCalled()
     expect(wrapper.text()).toContain('两次输入的密码不一致')
   })
+  it('rejects oversized UTF-8 input intact and submits the exact 72-byte boundary', async () => {
+    vi.mocked(registerAccount).mockResolvedValue(null)
+    const { wrapper } = await mountApp('/register')
+    await wrapper.get('#register-account').setValue('alice')
+    await wrapper.get('#register-username').setValue('测试用户')
+    await wrapper.get('#register-email').setValue('alice@example.com')
+    for (const value of ['界'.repeat(24) + 'x', 'x'.repeat(73)]) {
+      await wrapper.get('#register-password').setValue(value)
+      await wrapper.get('#register-confirm-password').setValue(value)
+      expect(wrapper.get('#register-password').attributes('maxlength')).toBeUndefined()
+      expect((wrapper.get('#register-password').element as HTMLInputElement).value === value).toBe(true)
+      await wrapper.get('form').trigger('submit')
+      await flushPromises()
+      expect(registerAccount).not.toHaveBeenCalled()
+      expect(wrapper.text()).toContain('72字节')
+    }
+    const boundary = '🚀'.repeat(18)
+    await wrapper.get('#register-password').setValue(boundary)
+    await wrapper.get('#register-confirm-password').setValue(boundary)
+    await wrapper.get('form').trigger('submit')
+    await vi.waitFor(() => expect(registerAccount).toHaveBeenCalledTimes(1))
+    expect(registerAccount.mock.calls[0]?.[0].password === boundary).toBe(true)
+  })
+
 })

@@ -10,7 +10,7 @@ import {
   armPasswordChangedNotice,
   passwordChangedNoticeState,
 } from '@/features/auth/navigation/passwordChangedNotice'
-import { AUTH_LIMITS, validateConfirmPassword, validateCurrentPasswordForChange, validatePassword } from '@/features/auth/validation/authFormRules'
+import { validateConfirmPassword, validateCurrentPasswordForChange, validatePassword } from '@/features/auth/validation/authFormRules'
 import { PROFILE_COPY } from '@/features/profile/copy/profileCopy'
 import { isUncertainMutationFailure } from '@/features/interview/utils/uncertainMutation'
 import { IdentityStatus } from '@/types/auth'
@@ -158,7 +158,6 @@ export function useProfile() {
     fieldErrors,
     mutationUncertain,
     canSubmit,
-    passwordMax: AUTH_LIMITS.passwordMax,
     passwordChangedNotice: PASSWORD_CHANGED_LOGIN_NOTICE,
     retryIdentity,
     submitPassword,

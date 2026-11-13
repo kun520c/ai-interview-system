@@ -4,6 +4,7 @@ import com.kun.aiinterview.auth.dto.LoginRequest;
 import com.kun.aiinterview.auth.dto.RegisterRequest;
 import com.kun.aiinterview.auth.vo.LoginResponse;
 import com.kun.aiinterview.common.exception.BusinessException;
+import com.kun.aiinterview.common.validation.PasswordPolicy;
 import com.kun.aiinterview.security.jwt.JwtTokenService;
 import com.kun.aiinterview.user.entity.User;
 import com.kun.aiinterview.user.enums.UserRole;
@@ -32,6 +33,7 @@ public class AuthService {
 
     @Transactional
     public void register(@Valid RegisterRequest registerRequest) {
+        PasswordPolicy.validate(registerRequest.getPassword());
         if (userMapper.getUserByAccount(registerRequest.getAccount()) != null) {
             log.info("Registration rejected: duplicate account");
             throw new BusinessException(DUPLICATE_ACCOUNT_OR_EMAIL);
@@ -64,6 +66,7 @@ public class AuthService {
     }
 
     public LoginResponse login(@Valid LoginRequest loginRequest) {
+        PasswordPolicy.validate(loginRequest.getPassword());
         User user = userMapper.getUserByAccount(loginRequest.getAccount());
         if (user == null) {
             throw new BusinessException("账号或密码错误");

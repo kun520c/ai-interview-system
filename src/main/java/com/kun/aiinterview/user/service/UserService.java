@@ -1,6 +1,7 @@
 package com.kun.aiinterview.user.service;
 
 import com.kun.aiinterview.common.exception.BusinessException;
+import com.kun.aiinterview.common.validation.PasswordPolicy;
 import com.kun.aiinterview.user.dto.ChangePasswordRequest;
 import com.kun.aiinterview.user.entity.User;
 import com.kun.aiinterview.user.enums.UserStatus;
@@ -44,6 +45,8 @@ public class UserService {
 
     @Transactional
     public void changePassword(Long userId, ChangePasswordRequest changePasswordRequest) {
+        PasswordPolicy.validateCurrent(changePasswordRequest.getCurrentPassword());
+        PasswordPolicy.validate(changePasswordRequest.getNewPassword());
         User user = userMapper.getUserByIdForUpdate(userId);
         if (user == null) {
             throw new BusinessException("用户不存在");

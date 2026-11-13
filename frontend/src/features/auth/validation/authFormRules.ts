@@ -2,14 +2,20 @@ export const AUTH_LIMITS = {
   accountMax: 50,
   usernameMax: 50,
   passwordMin: 8,
-  passwordMax: 72,
+  passwordMaxBytes: 72,
   emailMax: 100,
 } as const
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const utf8Encoder = new TextEncoder()
 
 function trimmed(value: string): string {
   return value.trim()
+}
+
+function isBlankPassword(value: string): boolean {
+  // Match Hibernate Validator 8 @NotBlank: Java trim removes only code units <= U+0020.
+  return [...value].every((character) => character.charCodeAt(0) <= 0x20)
 }
 
 export function validateAccount(value: string): string | null {
@@ -35,21 +41,24 @@ export function validateUsername(value: string): string | null {
 }
 
 export function validatePassword(value: string): string | null {
-  if (!value) {
+  if (isBlankPassword(value)) {
     return '请输入密码'
   }
-  if (value.length < AUTH_LIMITS.passwordMin || value.length > AUTH_LIMITS.passwordMax) {
-    return `密码长度为${AUTH_LIMITS.passwordMin}到${AUTH_LIMITS.passwordMax}个字符`
+  if (value.length < AUTH_LIMITS.passwordMin) {
+    return `密码长度不能少于${AUTH_LIMITS.passwordMin}位`
+  }
+  if (utf8Encoder.encode(value).byteLength > AUTH_LIMITS.passwordMaxBytes) {
+    return `密码UTF-8编码不能超过${AUTH_LIMITS.passwordMaxBytes}字节`
   }
   return null
 }
 
 export function validateCurrentPasswordForChange(value: string): string | null {
-  if (!value) {
+  if (isBlankPassword(value)) {
     return '请输入当前密码'
   }
-  if (value.length > AUTH_LIMITS.passwordMax) {
-    return `当前密码不能超过${AUTH_LIMITS.passwordMax}个字符`
+  if (utf8Encoder.encode(value).byteLength > AUTH_LIMITS.passwordMaxBytes) {
+    return `当前密码UTF-8编码不能超过${AUTH_LIMITS.passwordMaxBytes}字节`
   }
   return null
 }

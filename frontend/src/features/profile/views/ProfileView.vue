@@ -23,7 +23,6 @@ const {
   fieldErrors,
   mutationUncertain,
   canSubmit,
-  passwordMax,
   retryIdentity,
   submitPassword,
   goToLogin,
@@ -93,7 +92,6 @@ const {
             v-model="currentPassword"
             name="currentPassword"
             autocomplete="current-password"
-            :maxlength="passwordMax"
             :disabled="submitting"
             :invalid="invalid"
             :described-by="describedBy"
@@ -111,7 +109,6 @@ const {
             v-model="newPassword"
             name="newPassword"
             autocomplete="new-password"
-            :maxlength="passwordMax"
             :disabled="submitting"
             :invalid="invalid"
             :described-by="describedBy"
@@ -129,7 +126,6 @@ const {
             v-model="confirmNewPassword"
             name="confirmNewPassword"
             autocomplete="new-password"
-            :maxlength="passwordMax"
             :disabled="submitting"
             :invalid="invalid"
             :described-by="describedBy"

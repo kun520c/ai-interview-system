@@ -271,7 +271,7 @@ public class AuthControllerTest {
     void shouldRejectLoginWhenPasswordIsTooShort() throws Exception{
         assertLoginFails(
                 new LoginRequest(loginUserAccount, shortPassword),
-                "密码长度应为8到72位"
+                "密码长度不能少于8位"
         );
     }
 
@@ -279,7 +279,7 @@ public class AuthControllerTest {
     void shouldRejectLoginWhenPasswordIsTooLong() throws Exception{
         assertLoginFails(
                 new LoginRequest(loginUserAccount, longPassword),
-                "密码长度应为8到72位"
+                "密码UTF-8编码不能超过72字节"
         );
     }
 

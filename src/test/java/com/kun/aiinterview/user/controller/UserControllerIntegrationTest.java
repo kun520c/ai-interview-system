@@ -152,7 +152,7 @@ class UserControllerIntegrationTest {
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message").value("新密码长度应为8到72位"));
+                .andExpect(jsonPath("$.message").value("新密码长度不能少于8位"));
     }
 
     @Test

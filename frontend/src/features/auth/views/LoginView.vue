@@ -148,7 +148,6 @@ async function onSubmit(): Promise<void> {
           v-model="password"
           name="password"
           autocomplete="current-password"
-          :maxlength="AUTH_LIMITS.passwordMax"
           :disabled="submitting"
           :invalid="invalid"
           :described-by="describedBy"

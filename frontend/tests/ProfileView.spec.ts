@@ -307,4 +307,34 @@ describe('ProfileView', () => {
     expect(auth.accessToken).toBe('token')
     expect(wrapper.text()).not.toContain('密码修改结果暂时无法确认')
   })
+  it('checks both password byte limits without clipping and preserves a valid request', async () => {
+    vi.mocked(changePassword).mockResolvedValue(null)
+    const { wrapper } = await mountApp('/profile', authenticate)
+    const boundary = '界'.repeat(24)
+    const over = boundary + 'x'
+    await wrapper.get('#profile-current-password').setValue(boundary)
+    await wrapper.get('#profile-new-password').setValue(over)
+    await wrapper.get('#profile-confirm-password').setValue(over)
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+    expect(changePassword).not.toHaveBeenCalled()
+    expect(wrapper.text()).toContain('72字节')
+    await wrapper.get('#profile-current-password').setValue(over)
+    await wrapper.get('#profile-new-password').setValue(boundary)
+    await wrapper.get('#profile-confirm-password').setValue(boundary)
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+    expect(changePassword).not.toHaveBeenCalled()
+    expect(wrapper.text()).toContain('当前密码UTF-8编码不能超过72字节')
+    for (const id of ['current', 'new', 'confirm']) {
+      expect(wrapper.get(`#profile-${id}-password`).attributes('maxlength')).toBeUndefined()
+    }
+    const shortCurrent = 'short'
+    await wrapper.get('#profile-current-password').setValue(shortCurrent)
+    await wrapper.get('form').trigger('submit')
+    await vi.waitFor(() => expect(changePassword).toHaveBeenCalledTimes(1))
+    expect(changePassword.mock.calls[0]?.[0].currentPassword === shortCurrent).toBe(true)
+    expect(changePassword.mock.calls[0]?.[0].newPassword === boundary).toBe(true)
+  })
+
 })
