@@ -1,0 +1,3026 @@
+{
+  "version": "D3-D-PUBLIC-A-20261114",
+  "assessorId": "AI-A-author_system",
+  "assessment": "全库 Chunk 配对，按文档机制与版本核对精确原文；省略项为逐主题排除的 IRRELEVANT。标注员参与编写 Spring 与网络正文，使用可见公开查询和语料，评估时未见检索 rank、score 或另一份标签。属于 AI 临时判断。",
+  "assessedOn": "2026-11-14",
+  "querySha256": "b5515261f5b2a9f4aa0c93e02d62948d2c28b2c0e41367a51273099cdcbc05fd",
+  "manifestSha256": "3a59d6009e82bba7aa91b175ca7a777fd2cbbb121be4c413ead08a8c1664bc0a",
+  "chunks": {
+    "J01/1": "db9396ccf3b0d6d5b527c58c23bf032a776eeb7089e048796b8f231534f08951",
+    "J01/2": "2e276739b01c8d87c25b2f013b34e55d5f73757f3f7053af4147fc367919680e",
+    "J02/1": "89f79da849d7c75bef16bdd9e7f48081d9e29dd2dfe7ee7bfbb70cd8c38a9eed",
+    "J03/1": "62d3d71b4c0cfb55f8b4cb1d8af5f6ada28904bc61ee6476ec59840d6b1c253f",
+    "J04/1": "3a546dcabcba0760fb29b0ef4fe101b84f352539b5436a4f2a276ab41fc0c869",
+    "J05/1": "332205c1e6dc32f017197a638f635fac534a878d4462fc50d8521ac4fe8a3c14",
+    "J06/1": "ef98a035b06de2d2d738bb76d89a5d06ac8dd81b28a63d621da393d82fdfaf3d",
+    "J07/1": "4224d43d7af433758a852c3316e61505d065ddfade96276650560738814cb68a",
+    "J08/1": "d5191eb1ae2b7f4d484e0e0e7fcf2d26ac921bcc4d3d47e922ae8a983f056482",
+    "J09/1": "fc577704a03526da3ac91931cbd199f9869cc4cc1577f98b2425189d48b13d3c",
+    "J10/1": "6bd4952ab0a11b3bba35eb5c159c4c84d886aeed3afd47c283ee00afa66870f3",
+    "J11/1": "9c6da9ac2fd354d55f7fa47d38752ac5f2ff9b92de613273537a128a5e83afea",
+    "J12/1": "92403c150808390825114fdd3edab6d9d2924cbadbc9b991825f8e2fdfde87a0",
+    "J13/1": "924e2da62c4f32efa3e5818904d4e4b8ed636366915aac72c8d8b125e8f18751",
+    "J14/1": "cc39d4a6fdbfd7dd23c1b4a1b1612128131690358622eb6308dd4a405fc896b0",
+    "J15/1": "77be1a5853338fe5145f19c54faafb8d5b128e5045949e0c6479750a3677db43",
+    "J16/1": "7040b4c038cccc13cafab021bcbc4de30f16aa48534b2504cdc7a59f6460a3b1",
+    "J17/1": "4c5c3577f06be1c339c9785588d73311ab51c5c94bddfe1c95b69ac82cd5dd45",
+    "J18/1": "3ca3ff7d09ace3a0168404fb9b4978ee6c39a4a7d8fcde9ff2dff91793aeead7",
+    "J19/1": "0419873bfe44b78127dd51484980eb6551e8d1e9de1eb44649dc86826ccce3c0",
+    "J20/1": "6fa2de891a6f21f7ea526f94bfacb0ebc4c6d08bfdb8ddc8bf3b676275f7f03a",
+    "J21/1": "63bcba7c73387c5a835aaa1b63ca838dd97293a3f64f197ae8ba2a58727be839",
+    "J22/1": "49264d49f8b9cc5a0afe77d7ae2952c16cc0efd6d58c42f360c79dce5b6a672a",
+    "J23/1": "0d1b2e53f75b078ebcb83936f8b16e1edb01eb42ca48652d10f44ea38674ae82",
+    "S01/1": "c223cbd05d90f8035aac79bd6217a278fc444c04d2fdbc6e33946b18f8047a17",
+    "S02/1": "caae19f6bb04e277dd51acfc373a958a2574d4887fac65c6d060c9b5ce04ec19",
+    "S03/1": "2d2661b4fd38f643e69e0abd42aea6423589d634f46c030bbc6f39d1fe968498",
+    "S04/1": "ac7c8e3429dc913f3fab199c0bf3542f69ebe20e4964eec921ae778df854ea7b",
+    "S05/1": "158a5f7f8ae4c4200401bf93733db71ada5d6609e9786357fd6488033cac92ca",
+    "S06/1": "e46ba16bb702efcfed4b13397cc2c1a68fd24c8dfb826626d08937cbef7dc5b8",
+    "S07/1": "c687c7f6a83611d48ea6de97d852c2a38f4633abcef8e69720f9e884ef1e4701",
+    "S08/1": "347117e113f8a6da5972871623071a0139349facff35a628b3c323aea3bac87d",
+    "S09/1": "849ad5b2f1fe69a56a79f84566d248cdfd6bd91738b37c51bc114f3b941616de",
+    "S10/1": "ee56a46280ba78e344b03021733dd220c684c48e924b63bd7546872c3fcc26ea",
+    "D01/1": "6b43a83f71a3430965300ffb2e7ea697d6b98227f212c15215b4f894a181b4e9",
+    "D02/1": "6a84d74680d1741f4b817a913e61a68b0e4c94d0583d9797d1c921fa4697e61b",
+    "D03/1": "8970c32e917141cf24b69f3a3e9d8807a4498d75f5ad2a058519e6018a3d8a3d",
+    "D04/1": "059e5b36183b7fc3e124ffbbb658edc964c085986d85968e9b425bda44816c13",
+    "D05/1": "738610f71b2501d9b095de5bbf838cb00bb51124f14621470ea42c057908ce76",
+    "D06/1": "91f249afbf4503c0cd144f5d33ee85128c248263912c6b6d58e16bd9b277ca11",
+    "D07/1": "c6558b9278be48fa67fcfa66239eabfb5bbccfc10ee88e0a8ca83862ead4fced",
+    "D08/1": "0222aec0efb49de1ed46f23399fc44f090676f62ec4fc746da6b212128c2647b",
+    "D09/1": "28458de8a0b90cc5955215f6fd36a61818090cc9e617c854bf636366c499e0a8",
+    "D10/1": "d421d02e2997643c187689a535fe49ed47aed548ccacad0f48f2d1a2240608b7",
+    "D11/1": "67ff1cd5025b10e3ffb1d0f17a925473cbc4e14c5da0754c99c530c7982ba8e3",
+    "D12/1": "d717a032d91ff277259c986e34553640dc871501f90cdd743d46e4fc04384dea",
+    "D13/1": "b40831f11094e6f4d74c70f0eaa4d26cb0e89c0e0373dd45042f811729140559",
+    "D14/1": "35c60b89c9ae99501bdedf4739d43193c92ce05d38824ef85ccde0f9f5fcea65",
+    "D15/1": "f37581aaf0ea305b43e3d1e348c78f1dede6ae27a2d4c0ba82163f9993e9bc78",
+    "D16/1": "e5ec23628028e6efa9c47978e451fbb8f79d39f16744d13c8cd1c6ee33fa7f8f",
+    "D17/1": "90b1d2d11ce20fb88d3b705de630a7c8812762cef9fadd9a04a7922b64c718a4",
+    "D18/1": "edfcf35a56f403c217cfbdfa5cbbfb9ed3260cf7876f352a5ecb1bfc28be0504"
+  },
+  "defaultLabel": "IRRELEVANT",
+  "pairs": 3120,
+  "counts": {
+    "DIRECT": 82,
+    "RELATED_ONLY": 138,
+    "UNCERTAIN": 0,
+    "IRRELEVANT": 2900
+  },
+  "queries": [
+    {
+      "queryId": "Q01",
+      "direct": [
+        {
+          "chunkKey": "J01/1",
+          "supportedIntentIds": [
+            "Q01-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 431,
+              "spanEndUtf16": 499,
+              "quote": "接口主要描述某种行为契约或能力，让调用者面向共同约定使用不同实现；抽象类适合表达具有共同基础特征的类层次，把共享状态与公共实现放进基类。"
+            },
+            {
+              "spanStartUtf16": 1085,
+              "spanEndUtf16": 1137,
+              "quote": "也可由抽象基类实现接口，让契约与共享实现各负其责；该建议依据语言能力推导，不是要求所有项目增加两层抽象。"
+            }
+          ],
+          "versionCondition": "Java SE 21，JLS 8/9。",
+          "reason": "接口表达共同能力，基类负责共享状态，给出了组合二者的选择。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J01/2",
+          "supportedIntentIds": [
+            "Q01-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 111,
+              "spanEndUtf16": 145,
+              "quote": "选择应先说明调用者依赖什么、哪些状态需要复用，再判断继承或实现关系。"
+            }
+          ],
+          "versionCondition": "Java SE 21，JLS 8/9。",
+          "reason": "根据共同调用合同与可复用状态分别决定接口和继承。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S01/1",
+          "reason": "容器注入实现只覆盖装配，未说明接口与抽象类的状态合同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q02",
+      "direct": [
+        {
+          "chunkKey": "J10/1",
+          "supportedIntentIds": [
+            "Q02-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 132,
+              "spanEndUtf16": 165,
+              "quote": "Set 则维护唯一成员，先从事件提取稳定 ID，按成员相等性去重。"
+            },
+            {
+              "spanStartUtf16": 165,
+              "spanEndUtf16": 207,
+              "quote": "Map 维护每个键至多一个值，按 ID 查找最新结果可在处理时 put 以更新原值。"
+            },
+            {
+              "spanStartUtf16": 271,
+              "spanEndUtf16": 318,
+              "quote": "默认 add 的 LinkedHashSet 保持插入顺序，重复 add 不改变已有元素位置。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 List、Set、Map 的集合合同与常见哈希实现",
+          "reason": "Set 成员唯一、LinkedHashSet 默认插入顺序及 Map 按 ID 查找各有明确说明。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J04/1",
+          "supportedIntentIds": [
+            "Q02-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 590,
+              "spanEndUtf16": 615,
+              "quote": "用稳定 ID 或不可变值对象做键，把显示名作为值。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 Object 与常用哈希集合契约",
+          "reason": "稳定 ID 或不可变键支持 Map 查找及成员去重这一部分合同。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J13/1",
+          "reason": "容器或 Redis 的集合机制相邻，缺该题 Java 有序去重与键值访问合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D09/1",
+          "reason": "容器或 Redis 的集合机制相邻，缺该题 Java 有序去重与键值访问合同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q03",
+      "direct": [
+        {
+          "chunkKey": "J17/1",
+          "supportedIntentIds": [
+            "Q03-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 459,
+              "spanEndUtf16": 488,
+              "quote": "普通类或接口的运行时身份由二进制名称和定义加载器共同确定。"
+            },
+            {
+              "spanStartUtf16": 673,
+              "spanEndUtf16": 708,
+              "quote": "常见隔离方式是把公共接口交给共同父加载器，插件侧只持有实现和私有依赖。"
+            }
+          ],
+          "versionCondition": "适用 JLS/JVMS SE 21 的普通类和接口，以及 Java SE 21 类加载 API",
+          "reason": "定义加载器参与身份，公共 API 可放到共同父加载器。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J06/1",
+          "reason": "类身份或访问边界相邻，未给两加载器各自定义同名插件接口的强转条件。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J07/1",
+          "reason": "类身份或访问边界相邻，未给两加载器各自定义同名插件接口的强转条件。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q04",
+      "direct": [
+        {
+          "chunkKey": "J20/1",
+          "supportedIntentIds": [
+            "Q04-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 145,
+              "spanEndUtf16": 199,
+              "quote": "发布者可先填充数据再写 volatile ready，读取线程观察 ready 后可看到对应发布之前的操作。"
+            },
+            {
+              "spanStartUtf16": 221,
+              "spanEndUtf16": 285,
+              "quote": "volatile int count 的 count++ 包括读取、加一和写回；两个线程都可读到 4，分别写 5，导致丢失更新。"
+            },
+            {
+              "spanStartUtf16": 285,
+              "spanEndUtf16": 347,
+              "quote": "单变量计数可用 AtomicInteger.incrementAndGet，多个字段共同满足不变量时用同一锁覆盖整个临界区。"
+            }
+          ],
+          "versionCondition": "适用 JLS SE 21 的 Java 内存模型和 Java SE 21 锁、原子变量 API",
+          "reason": "volatile 的发布规则和原子自增的读改写竞争分别给出。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J15/1",
+          "supportedIntentIds": [
+            "Q04-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 104,
+              "spanEndUtf16": 138,
+              "quote": "两个线程同时 get 到计数 4，各自 put(5)，只会增加一次。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 ConcurrentHashMap、CopyOnWriteArrayList 与 LongAdder API",
+          "reason": "同键计数 read-modify-write 可丢更新，原子 API 可解决计数子问题。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J14/1",
+          "reason": "并发容器内部可见性或请求字段共享接近，但无这个发布与自增机制的说明。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S02/1",
+          "reason": "并发容器内部可见性或请求字段共享接近，但无这个发布与自增机制的说明。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q05",
+      "direct": [
+        {
+          "chunkKey": "S01/1",
+          "supportedIntentIds": [
+            "Q05-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 399,
+              "spanEndUtf16": 469,
+              "quote": "单值参数 `NotificationSender sender` 按类型得到两个候选，在没有限定符、首选者、有效参数名等消歧规则时创建失败。"
+            },
+            {
+              "spanStartUtf16": 469,
+              "spanEndUtf16": 508,
+              "quote": "将邮件实现标为 `@Primary` 可使它成为同一候选集合内的默认单值实现。"
+            },
+            {
+              "spanStartUtf16": 508,
+              "spanEndUtf16": 585,
+              "quote": "给短信实现和专用消费者的参数使用相同的 `@Qualifier(\"sms\")` 可先缩小候选集合，邮件的 `@Primary` 不会把被排除的实现带回来。"
+            }
+          ],
+          "versionCondition": "适用 Spring Framework 6.2.19，项目由 Spring Boot 3.5.16 管理版本",
+          "reason": "给出按类型形成候选、默认 Primary 以及显式 Qualifier。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S02/1",
+          "reason": "作用域和生命周期属于容器背景，不能解释单值候选消歧。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S03/1",
+          "reason": "作用域和生命周期属于容器背景，不能解释单值候选消歧。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q06",
+      "direct": [
+        {
+          "chunkKey": "D04/1",
+          "supportedIntentIds": [
+            "Q06-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 126,
+              "spanEndUtf16": 210,
+              "quote": "条件 `device_id=7 AND severity='WARN' AND created_at>=?` 固定两列等值前缀，可在该前缀内从时间下界开始扫描连续区间。"
+            },
+            {
+              "spanStartUtf16": 364,
+              "spanEndUtf16": 406,
+              "quote": "固定设备和级别时可利用索引提供 `ORDER BY created_at` 的顺序。"
+            },
+            {
+              "spanStartUtf16": 701,
+              "spanEndUtf16": 758,
+              "quote": "用 EXPLAIN 查看 `key`、`key_len` 和 `Extra`，必要时补 JSON/TREE 计划。"
+            }
+          ],
+          "versionCondition": "以 MySQL 8.0 InnoDB 的设备事件表为例，二级索引 `(device_id, severity, created_at)` 先按设备排序，同设备下按级别排序，同级别内再按时间排序",
+          "reason": "固定等值前缀时的时间范围与扫描顺序，另有执行计划确认方法。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D05/1",
+          "supportedIntentIds": [
+            "Q06-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 578,
+              "spanEndUtf16": 624,
+              "quote": "`Using filesort` 提示还要执行排序，输出本身无法确定排序有多少发生在磁盘上。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0，EXPLAIN ANALYZE 自 8.0.18",
+          "reason": "用 Extra 的 filesort 诊断实际是否需要附加排序。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D03/1",
+          "reason": "B-tree 有序范围扫描是背景，未给联合前缀或额外排序定位。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q07",
+      "direct": [
+        {
+          "chunkKey": "D10/1",
+          "supportedIntentIds": [
+            "Q07-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 142,
+              "spanEndUtf16": 180,
+              "quote": "内存淘汰由 `maxmemory` 与策略触发，作用是让实例按配置腾出内存。"
+            },
+            {
+              "spanStartUtf16": 592,
+              "spanEndUtf16": 650,
+              "quote": "`expired_keys` 的增量说明实例有过期活动，`evicted_keys` 的增量说明实例发生了内存淘汰。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2，单实例，key 级 TTL / maxmemory",
+          "reason": "区分 maxmemory 淘汰和 TTL 过期，实例统计只做归因线索。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D13/1",
+          "supportedIntentIds": [
+            "Q07-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 208,
+              "spanEndUtf16": 246,
+              "quote": "缓存提前淘汰也属于正常 miss；排查时比较过期和淘汰统计以及主动删除日志。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2 基础命令和 MySQL 权威数据源，明确应用假设",
+          "reason": "缓存排查需对照过期、淘汰统计和主动删除记录，支持观测子项。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D11/1",
+          "reason": "持久化或租约使用 TTL 的场景缺少内存淘汰机制。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D12/1",
+          "reason": "持久化或租约使用 TTL 的场景缺少内存淘汰机制。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q08",
+      "direct": [
+        {
+          "chunkKey": "D15/1",
+          "supportedIntentIds": [
+            "Q08-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 636,
+              "spanEndUtf16": 659,
+              "quote": "A 结束自己的发送方向但仍可接收 B 的数据。"
+            },
+            {
+              "spanStartUtf16": 710,
+              "spanEndUtf16": 774,
+              "quote": "普通主动关闭端进入 `TIME-WAIT`，协议以 2MSL 表达等待要求，用于在对端重发 FIN 时再次确认并让旧连接段过期。"
+            }
+          ],
+          "versionCondition": "以 IETF RFC 9293、RFC 768、RFC 5681、RFC 8085 为基线",
+          "reason": "半关闭仍可收数据，主动关闭通常等待 2MSL 并能确认重传 FIN。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D16/1",
+          "reason": "HTTP 或 TLS 与连接相邻，未给 TCP FIN 与 TIME-WAIT。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D18/1",
+          "reason": "HTTP 或 TLS 与连接相邻，未给 TCP FIN 与 TIME-WAIT。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q09",
+      "direct": [
+        {
+          "chunkKey": "S09/1",
+          "supportedIntentIds": [
+            "Q09-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 157,
+              "spanEndUtf16": 195,
+              "quote": "服务先校验会话归属和题目属于该会话，再按 `requestId` 查旧答案。"
+            },
+            {
+              "spanStartUtf16": 225,
+              "spanEndUtf16": 260,
+              "quote": "重放要求旧记录的题目 ID 相同且答案正文 Java 字符串精确相等。"
+            },
+            {
+              "spanStartUtf16": 558,
+              "spanEndUtf16": 574,
+              "quote": "客户端应复用原请求键与同一正文。"
+            }
+          ],
+          "versionCondition": "依据项目 `0c6f92afe331954f7cea37d33db688fe781cbf2c` 的 HTTP 与 Mapper 实现",
+          "reason": "认证与题目归属校验后按键查询，并比较同题与精确正文，完成态可重建响应。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [
+            "Q09-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 713,
+              "spanEndUtf16": 757,
+              "quote": "已发送后等待响应超时，或 COMMIT 发出后断连，客户端无法仅凭异常断定是否扣减成功。"
+            },
+            {
+              "spanStartUtf16": 757,
+              "spanEndUtf16": 793,
+              "quote": "可按同一作用域的键查询持久结果，或提交同键同载荷请求让唯一约束重新裁定。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "明确响应超时结果未知，可查询同作用域持久结果或同键同载荷重放。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D16/1",
+          "supportedIntentIds": [
+            "Q09-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 579,
+              "spanEndUtf16": 630,
+              "quote": "创建 POST 需要双方约定同一业务操作复用稳定幂等键与相同载荷，或改用等价的唯一资源标识和写入合同。"
+            },
+            {
+              "spanStartUtf16": 679,
+              "spanEndUtf16": 693,
+              "quote": "并在重复请求时读取已有结果。"
+            }
+          ],
+          "versionCondition": "以 IETF RFC 9110 为准",
+          "reason": "给出创建操作同键同载荷的合同与已有结果重放，可支持该题恢复设计的一部分。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S10/1",
+          "reason": "报告复用、提交后通知或数据库重试只相邻，缺答案身份和载荷重放合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S08/1",
+          "reason": "报告复用、提交后通知或数据库重试只相邻，缺答案身份和载荷重放合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D07/1",
+          "reason": "报告复用、提交后通知或数据库重试只相邻，缺答案身份和载荷重放合同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q10",
+      "direct": [
+        {
+          "chunkKey": "J02/1",
+          "supportedIntentIds": [
+            "Q10-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 462,
+              "spanEndUtf16": 507,
+              "quote": "按相反顺序尝试关闭成功取得且非 null 的资源，正常完成、return 或抛出时均适用。"
+            },
+            {
+              "spanStartUtf16": 761,
+              "spanEndUtf16": 809,
+              "quote": "通常可按 B、A 顺序从 readFailure.getSuppressed() 读取清理失败。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 的异常检查、控制流与 AutoCloseable 契约",
+          "reason": "已获得资源逆序尝试关闭，业务异常保留为主异常，关闭失败放进 suppressed。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S03/1",
+          "reason": "直接创建资源的关闭责任相关，未说明多个关闭失败与 suppressed。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q11",
+      "direct": [
+        {
+          "chunkKey": "S02/1",
+          "supportedIntentIds": [
+            "Q11-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 489,
+              "spanEndUtf16": 511,
+              "quote": "在调用时解析当前请求目标，也可显式按需查找。"
+            }
+          ],
+          "versionCondition": "适用 Spring Framework 6.2.19、Servlet MVC 的 Web-aware ApplicationContext",
+          "reason": "作用域代理在调用时取当前请求目标，可通过按需查找替代。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S01/1",
+          "reason": "容器、代理或任务上下文相关，缺少 Web 请求实例动态选择规则。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S03/1",
+          "reason": "容器、代理或任务上下文相关，缺少 Web 请求实例动态选择规则。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S04/1",
+          "reason": "容器、代理或任务上下文相关，缺少 Web 请求实例动态选择规则。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J22/1",
+          "reason": "容器、代理或任务上下文相关，缺少 Web 请求实例动态选择规则。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q12",
+      "direct": [
+        {
+          "chunkKey": "D02/1",
+          "supportedIntentIds": [
+            "Q12-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 89,
+              "spanEndUtf16": 112,
+              "quote": "主键的每一列都必须非空，整个键值组合必须唯一。"
+            },
+            {
+              "spanStartUtf16": 212,
+              "spanEndUtf16": 225,
+              "quote": "多个 NULL 可以共存。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，普通 SQL 谓词",
+          "reason": "UNIQUE 允许多个 NULL；主键示例明确非空与唯一是不同约束要求。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D03/1",
+          "reason": "索引组织或幂等键假设非空，未明确可空 UNIQUE 的多个 NULL 行为。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "reason": "索引组织或幂等键假设非空，未明确可空 UNIQUE 的多个 NULL 行为。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "正文可合成 NOT NULL 加全列 UNIQUE 的答案，未给备注列组合的具体 DDL。"
+    },
+    {
+      "queryId": "Q13",
+      "direct": [
+        {
+          "chunkKey": "J03/1",
+          "supportedIntentIds": [
+            "Q13-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 118,
+              "spanEndUtf16": 155,
+              "quote": "String.equals 判断另一对象是否也是内容相同的 String。"
+            },
+            {
+              "spanStartUtf16": 233,
+              "spanEndUtf16": 256,
+              "quote": "运行时拼接得到相同字符并不能据此推断引用身份。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 的 String、StringBuilder 和引用比较语义",
+          "reason": "== 与 equals 分别比较引用和内容，字面量与动态创建的身份条件区分。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J04/1",
+          "reason": "对象相等契约不直接说明 String 比较协议字段时的覆盖实现和动态身份。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J10/1",
+          "reason": "去重应用相关，缺 String 内容和引用身份的具体规则。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q14",
+      "direct": [
+        {
+          "chunkKey": "J13/1",
+          "supportedIntentIds": [
+            "Q14-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 96,
+              "spanEndUtf16": 176,
+              "quote": "循环里调用 ArrayList.remove 直接改变容器结构，绕开当前迭代器，后续遍历可能抛 ConcurrentModificationException。"
+            },
+            {
+              "spanStartUtf16": 284,
+              "spanEndUtf16": 349,
+              "quote": "可在单线程里对同一个迭代器先 next 再 remove，以保持迭代器状态与列表一致；Iterator.remove 是可选操作。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21；结构修改的具体例子以 ArrayList 为准",
+          "reason": "循环期间直接结构修改触发条件与安全迭代器移除。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J15/1",
+          "supportedIntentIds": [
+            "Q14-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 495,
+              "spanEndUtf16": 530,
+              "quote": "迭代器固定创建时的成员数组，因此正在广播的一轮仍可能通知刚注销的成员。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 ConcurrentHashMap、CopyOnWriteArrayList 与 LongAdder API",
+          "reason": "高读低写的监听器列表可用快照迭代，本轮的注销可按该观察合同处理。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J09/1",
+          "supportedIntentIds": [
+            "Q14-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 362,
+              "spanEndUtf16": 398,
+              "quote": "例如已用 ListIterator 顺序检查数据时，可以就地删除当前项。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 的 ArrayList 与 LinkedList，复杂度基于标准实现的访问路径",
+          "reason": "说明有效 ListIterator 下可以在顺序扫描中就地删除当前元素。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J08/1",
+          "reason": "Stream 非干扰与迭代相邻，未给可变订阅列表的注销策略。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q15",
+      "direct": [
+        {
+          "chunkKey": "J18/1",
+          "supportedIntentIds": [
+            "Q15-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 525,
+              "spanEndUtf16": 576,
+              "quote": "在同一时间窗记录进程和线程 CPU，用多次栈采样、JFR 或 GC 日志把应用热点和 GC 活动对齐。"
+            },
+            {
+              "spanStartUtf16": 576,
+              "spanEndUtf16": 627,
+              "quote": "单次样本可能漏过短暂或间歇问题，先复用已有日志再选择 jcmd Thread.print 或 JFR。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 引用可达性与 JDK 21 HotSpot 的诊断命令",
+          "reason": "对齐线程 CPU、多个栈样本及 JFR，明确单次可能漏检。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J19/1",
+          "reason": "GC、池与栈资源有排查背景，未给线程 CPU 热点采样的操作。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J22/1",
+          "reason": "GC、池与栈资源有排查背景，未给线程 CPU 热点采样的操作。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J16/1",
+          "reason": "GC、池与栈资源有排查背景，未给线程 CPU 热点采样的操作。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q16",
+      "direct": [
+        {
+          "chunkKey": "J21/1",
+          "supportedIntentIds": [
+            "Q16-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 600,
+              "spanEndUtf16": 608,
+              "quote": "并清除中断状态。"
+            },
+            {
+              "spanStartUtf16": 647,
+              "spanEndUtf16": 690,
+              "quote": "可 Thread.currentThread().interrupt() 后尽快退出。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 的监视器、等待集合和 Thread 中断契约",
+          "reason": "wait 或 sleep 收到中断可抛异常并清除标志，给出传播或恢复。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J20/1",
+          "supportedIntentIds": [
+            "Q16-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 647,
+              "spanEndUtf16": 697,
+              "quote": "InterruptedException 传播给上层，或者在无法传播且尚需保留信号时恢复标志并结束。"
+            }
+          ],
+          "versionCondition": "适用 JLS SE 21 的 Java 内存模型和 Java SE 21 锁、原子变量 API",
+          "reason": "tryLock 的 InterruptedException 可传播或恢复标志，支持如何保留中断信号。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J22/1",
+          "reason": "任务上下文或 Future 取消与中断相邻，未提供等待 API 中断标志语义。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J23/1",
+          "reason": "任务上下文或 Future 取消与中断相邻，未提供等待 API 中断标志语义。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q17",
+      "direct": [
+        {
+          "chunkKey": "S04/1",
+          "supportedIntentIds": [
+            "Q17-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 515,
+              "spanEndUtf16": 542,
+              "quote": "未再次进入代理，内层方法的事务或审计声明不会单独生效。"
+            },
+            {
+              "spanStartUtf16": 621,
+              "spanEndUtf16": 678,
+              "quote": "例如把单笔审计写入移到另一个受管 Service，让导入编排组件通过注入的 Bean 调用，并在对外方法定义事务。"
+            }
+          ],
+          "versionCondition": "适用 Spring Framework 6.2.19 的代理模式",
+          "reason": "明确同类调用未再次进入代理，外部组件可经代理访问抽离后的方法。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S06/1",
+          "supportedIntentIds": [
+            "Q17-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 161,
+              "spanEndUtf16": 202,
+              "quote": "目标对象内部以 `this` 调用事务方法会绕过代理，内层事务声明得不到单独处理。"
+            },
+            {
+              "spanStartUtf16": 237,
+              "spanEndUtf16": 298,
+              "quote": "分离事务 Service 后，由调用方通过代理进入，也可以使用 `TransactionTemplate` 显式划定范围。"
+            }
+          ],
+          "versionCondition": "适用 Spring Framework 6.2.19 命令式事务、一个 JDBC 数据源和 MySQL 8.0 InnoDB",
+          "reason": "事务例说明同类调用绕过代理及独立 Service 解法，适用于题设缓存代理路径的同类边界。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S01/1",
+          "reason": "容器管理或生命周期背景未给缓存代理的调用路径。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S02/1",
+          "reason": "容器管理或生命周期背景未给缓存代理的调用路径。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S03/1",
+          "reason": "容器管理或生命周期背景未给缓存代理的调用路径。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q18",
+      "direct": [
+        {
+          "chunkKey": "D07/1",
+          "supportedIntentIds": [
+            "Q18-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 103,
+              "spanEndUtf16": 138,
+              "quote": "引擎选择一个事务作为牺牲者并回滚其整个事务，客户端常见错误 1213。"
+            },
+            {
+              "spanStartUtf16": 378,
+              "spanEndUtf16": 412,
+              "quote": "再新开事务执行完整的工作单元，回滚范围要核对引擎语义与框架异常规则。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，分别记录死锁检测与 rollback_on_timeout",
+          "reason": "开启检测时回滚整个死锁牺牲事务，重试应新开事务重做工作单元。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [
+            "Q18-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 815,
+              "spanEndUtf16": 867,
+              "quote": "对死锁、锁等待超时等已分类的瞬态失败，先确认本次事务完整结束，再按有限次数、总时限和退避计划开启新事务。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "死锁等瞬态错误后先确认上次事务结束，再用有界新事务。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D01/1",
+          "reason": "事务及锁的相关背景未给死锁牺牲事务和重做范围。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D06/1",
+          "reason": "事务及锁的相关背景未给死锁牺牲事务和重做范围。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S06/1",
+          "reason": "事务及锁的相关背景未给死锁牺牲事务和重做范围。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S07/1",
+          "reason": "事务及锁的相关背景未给死锁牺牲事务和重做范围。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q19",
+      "direct": [
+        {
+          "chunkKey": "D11/1",
+          "supportedIntentIds": [
+            "Q19-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 148,
+              "spanEndUtf16": 167,
+              "quote": "重启加载该快照后，期间的修改可能丢失。"
+            },
+            {
+              "spanStartUtf16": 263,
+              "spanEndUtf16": 292,
+              "quote": "AOF 保存写入效果，重启时恢复基础状态并按顺序应用增量。"
+            },
+            {
+              "spanStartUtf16": 475,
+              "spanEndUtf16": 514,
+              "quote": "常见丢失窗口约为一秒量级，遇到 I/O 卡顿和不同故障模型时无法作为严格上界。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2，多段 AOF 自 7.0",
+          "reason": "RDB 恢复点、AOF base/增量、everysec 和故障范围都有说明。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D10/1",
+          "reason": "缓存 miss 或其他存储的持久化背景，不能解释 Redis RDB/AOF。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D13/1",
+          "reason": "缓存 miss 或其他存储的持久化背景，不能解释 Redis RDB/AOF。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D01/1",
+          "reason": "缓存 miss 或其他存储的持久化背景，不能解释 Redis RDB/AOF。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q20",
+      "direct": [
+        {
+          "chunkKey": "D17/1",
+          "supportedIntentIds": [
+            "Q20-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 444,
+              "spanEndUtf16": 457,
+              "quote": "剩余 TTL 随时间递减。"
+            },
+            {
+              "spanStartUtf16": 694,
+              "spanEndUtf16": 706,
+              "quote": "再根据需要对照权威答案。"
+            }
+          ],
+          "versionCondition": "以 RFC 1034、RFC 9499 和 RFC 3596 为基线",
+          "reason": "从递归器的 TTL、权威响应及转发/本地缓存路径解释旧地址。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D15/1",
+          "reason": "传输连接及 TLS 可用于后续分层，缺 DNS 缓存内容。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D18/1",
+          "reason": "传输连接及 TLS 可用于后续分层，缺 DNS 缓存内容。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q21",
+      "direct": [
+        {
+          "chunkKey": "S10/1",
+          "supportedIntentIds": [
+            "Q21-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 390,
+              "spanEndUtf16": 415,
+              "quote": "过期时由生成请求通过状态、时间和版本条件更新接管。"
+            },
+            {
+              "spanStartUtf16": 520,
+              "spanEndUtf16": 539,
+              "quote": "A 用 7 提交或标失败时应影响零行。"
+            },
+            {
+              "spanStartUtf16": 642,
+              "spanEndUtf16": 732,
+              "quote": "生成请求取得资格后若在非 READY 会话找到已有持久化报告，先核验该报告有分数及当前 FINAL 合法，再用本次版本对齐 `READY`，直接复用报告且不重复生成摘要或更新弱项。"
+            }
+          ],
+          "versionCondition": "依据项目 `0c6f92afe331954f7cea37d33db688fe781cbf2c` 的报告服务与 Mapper",
+          "reason": "过期生成可抢占，复用已有报告并用本次版本拦迟到写。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S09/1",
+          "reason": "答案评价抢占或通知恢复类比不能代替报告生成与已有报告规则。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S08/1",
+          "reason": "答案评价抢占或通知恢复类比不能代替报告生成与已有报告规则。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q22",
+      "direct": [
+        {
+          "chunkKey": "J08/1",
+          "supportedIntentIds": [
+            "Q22-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 142,
+              "spanEndUtf16": 163,
+              "quote": "实现可以在不改变结果时省略遍历或中间阶段。"
+            },
+            {
+              "spanStartUtf16": 226,
+              "spanEndUtf16": 239,
+              "quote": "audit 并无必达保证。"
+            },
+            {
+              "spanStartUtf16": 513,
+              "spanEndUtf16": 526,
+              "quote": "然后由明确的步骤提交审计。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 Stream API",
+          "reason": "Stream 可省略不影响结果的阶段，peek 不是必达审计；给出明确审计动作。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J13/1",
+          "reason": "可变容器遍历背景未说明 Stream 管线可省略副作用。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q23",
+      "direct": [
+        {
+          "chunkKey": "D14/1",
+          "supportedIntentIds": [
+            "Q23-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 123,
+              "spanEndUtf16": 185,
+              "quote": "Pipeline 本身没有命令组隔离保证，其他客户端的命令可交错执行，因此不能用一组 GET、判断、SET 来保护共享配额。"
+            },
+            {
+              "spanStartUtf16": 614,
+              "spanEndUtf16": 664,
+              "quote": "执行期间其他客户端命令不能插入脚本步骤，但 Redis 服务端需要运行它，避免无界循环和大集合处理。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2 单实例，排除跨槽",
+          "reason": "Pipeline 只降低往返，事务与脚本另外定义执行隔离。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D12/1",
+          "reason": "Lua 的锁例或多键命令背景不直接回答 Pipeline 合批语义。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D09/1",
+          "reason": "Lua 的锁例或多键命令背景不直接回答 Pipeline 合批语义。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q24",
+      "direct": [
+        {
+          "chunkKey": "D05/1",
+          "supportedIntentIds": [
+            "Q24-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 181,
+              "spanEndUtf16": 189,
+              "quote": "全扫描可能合理。"
+            },
+            {
+              "spanStartUtf16": 658,
+              "spanEndUtf16": 712,
+              "quote": "`EXPLAIN ANALYZE SELECT ...` 会执行查询并按迭代器给出实际时间、行数和循环次数。"
+            },
+            {
+              "spanStartUtf16": 923,
+              "spanEndUtf16": 981,
+              "quote": "先用实际参数查看估计与测量偏差，再查统计是否漂移、谓词是否包住索引列而改变可用访问路径，或复合索引顺序是否适配查询。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0，EXPLAIN ANALYZE 自 8.0.18",
+          "reason": "解释估计与实测差、扫描选择与按真实分布核对。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D04/1",
+          "supportedIntentIds": [
+            "Q24-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 245,
+              "spanEndUtf16": 272,
+              "quote": "普通范围访问不能靠一段连续区间跳过每个级别里的旧记录。"
+            },
+            {
+              "spanStartUtf16": 892,
+              "spanEndUtf16": 913,
+              "quote": "比较时以真实选择性、实际读取与延迟为依据。"
+            }
+          ],
+          "versionCondition": "以 MySQL 8.0 InnoDB 的设备事件表为例，二级索引 `(device_id, severity, created_at)` 先按设备排序，同设备下按级别排序，同级别内再按时间排序",
+          "reason": "缺中间列只可普通范围定位到前缀，结合索引计划可解释候选较多。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D03/1",
+          "supportedIntentIds": [
+            "Q24-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 887,
+              "spanEndUtf16": 911,
+              "quote": "选择性很低时，优化器可能选择成本更低的其他路径。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB 普通 B-tree",
+          "reason": "低选择性时优化器可能选其他低成本路径，直接支持为什么有索引仍可能大量读取。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q25",
+      "direct": [
+        {
+          "chunkKey": "J13/1",
+          "supportedIntentIds": [
+            "Q25-I1",
+            "Q25-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 538,
+              "spanEndUtf16": 577,
+              "quote": "读操作仍转发到 backing list；若生产者后续增删或排序，视图也变化。"
+            },
+            {
+              "spanStartUtf16": 607,
+              "spanEndUtf16": 631,
+              "quote": "源后续修改不反映到结果，且拒绝 null 元素。"
+            },
+            {
+              "spanStartUtf16": 666,
+              "spanEndUtf16": 701,
+              "quote": "两种复制路径均可保留同一可变 DTO 引用，DTO 字段变化仍可观察。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21；结构修改的具体例子以 ArrayList 为准",
+          "reason": "活视图随源结构变，结构快照固定但复制的可变元素引用仍共享。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J15/1",
+          "supportedIntentIds": [
+            "Q25-I1",
+            "Q25-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 495,
+              "spanEndUtf16": 530,
+              "quote": "迭代器固定创建时的成员数组，因此正在广播的一轮仍可能通知刚注销的成员。"
+            },
+            {
+              "spanStartUtf16": 530,
+              "spanEndUtf16": 553,
+              "quote": "数组复制的是引用，监听器对象内部状态可以改变。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 ConcurrentHashMap、CopyOnWriteArrayList 与 LongAdder API",
+          "reason": "写时复制示例区分成员数组固定及引用中的对象变化，可作独立的相邻实现证据。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J10/1",
+          "reason": "集合合同或不可修改结果只覆盖邻近概念，缺来源变化和共享可变元素的完整边界。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J08/1",
+          "reason": "集合合同或不可修改结果只覆盖邻近概念，缺来源变化和共享可变元素的完整边界。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q26",
+      "direct": [
+        {
+          "chunkKey": "S02/1",
+          "supportedIntentIds": [
+            "Q26-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 667,
+              "spanEndUtf16": 696,
+              "quote": "请求 B 将字段改为 73，A 恢复后可能用 73 查询。"
+            },
+            {
+              "spanStartUtf16": 759,
+              "spanEndUtf16": 791,
+              "quote": "把 `userId` 作为 Service 参数保存到局部变量。"
+            }
+          ],
+          "versionCondition": "适用 Spring Framework 6.2.19、Servlet MVC 的 Web-aware ApplicationContext",
+          "reason": "单例实例字段会被两个请求覆盖，建议方法参数或请求作用域。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J22/1",
+          "supportedIntentIds": [
+            "Q26-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 572,
+              "spanEndUtf16": 631,
+              "quote": "复用同一线程的请求 B 若在设置自身值前读取，会看到 A 的上下文；残留引用还可能让 A 的对象随工作线程继续被持有。"
+            },
+            {
+              "spanStartUtf16": 651,
+              "spanEndUtf16": 679,
+              "quote": "在 finally remove，嵌套场景则恢复先前值。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 ThreadPoolExecutor 和复用的平台线程",
+          "reason": "工作线程复用携带 ThreadLocal 值，需要任务边界安装和 finally 清理。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J20/1",
+          "reason": "可见性与生命周期相关，未说明单例请求数据串用或线程池清理。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S03/1",
+          "reason": "可见性与生命周期相关，未说明单例请求数据串用或线程池清理。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q27",
+      "direct": [
+        {
+          "chunkKey": "J17/1",
+          "supportedIntentIds": [
+            "Q27-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 459,
+              "spanEndUtf16": 488,
+              "quote": "普通类或接口的运行时身份由二进制名称和定义加载器共同确定。"
+            }
+          ],
+          "versionCondition": "适用 JLS/JVMS SE 21 的普通类和接口，以及 Java SE 21 类加载 API",
+          "reason": "普通类型身份由二进制名称和定义加载器共同确定。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J07/1",
+          "supportedIntentIds": [
+            "Q27-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 261,
+              "spanEndUtf16": 325,
+              "quote": "对已有实例可用 field.canAccess(config) 判断当前调用者能否访问；成员查找成功不能证明该结果为 true。"
+            },
+            {
+              "spanStartUtf16": 340,
+              "spanEndUtf16": 424,
+              "quote": "exports config.internal 使其他读取该模块的模块能使用包的 public API；跨具名模块读取普通 private 字段还需要该包向调用者开放。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 的具名模块，以下以跨模块读取普通 private 实例字段为例",
+          "reason": "普通跨具名模块深反射要求适当 opens，查到成员不能推出可访问。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J06/1",
+          "reason": "泛型运行时元数据或代理可见性与 JPMS 深反射无相同的许可机制。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S04/1",
+          "reason": "泛型运行时元数据或代理可见性与 JPMS 深反射无相同的许可机制。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q28",
+      "direct": [
+        {
+          "chunkKey": "J23/1",
+          "supportedIntentIds": [
+            "Q28-I1",
+            "Q28-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 618,
+              "spanEndUtf16": 694,
+              "quote": "未承诺停止底层操作；普通 CompletableFuture.cancel 的 mayInterruptIfRunning 对该类型没有中断执行的效果。"
+            },
+            {
+              "spanStartUtf16": 694,
+              "spanEndUtf16": 818,
+              "quote": "Java 21 默认 HttpClient 的可取消 future 可尝试取消交换，请求也可用 HttpRequest.Builder.timeout 设置等待响应的请求超时，流式正文的后续消费要按具体 BodyHandler 和调用流程另设约束。"
+            },
+            {
+              "spanStartUtf16": 835,
+              "spanEndUtf16": 849,
+              "quote": "需按请求合同判断是否能重试。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 CompletableFuture、Executor 与 HttpClient",
+          "reason": "超时完成不保证 I/O 停止，HttpClient 可尝试取消；远端仍可能执行，按合同重试。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D16/1",
+          "supportedIntentIds": [
+            "Q28-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 485,
+              "spanEndUtf16": 517,
+              "quote": "若已发送请求却未收到响应，无法仅凭客户端超时推断数据库是否提交。"
+            },
+            {
+              "spanStartUtf16": 579,
+              "spanEndUtf16": 630,
+              "quote": "创建 POST 需要双方约定同一业务操作复用稳定幂等键与相同载荷，或改用等价的唯一资源标识和写入合同。"
+            },
+            {
+              "spanStartUtf16": 735,
+              "spanEndUtf16": 785,
+              "quote": "使用整体期限、有限次数、退避和抖动，有适用的 `Retry-After` 时同时遵守它与本次总预算。"
+            }
+          ],
+          "versionCondition": "以 IETF RFC 9110 为准",
+          "reason": "是否发送及幂等操作合同决定能否重试，并需总期限。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [
+            "Q28-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 739,
+              "spanEndUtf16": 757,
+              "quote": "客户端无法仅凭异常断定是否扣减成功。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "已发请求或 COMMIT 断连需按持久化结果和同键合同安全重试。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D15/1",
+          "reason": "运输连接、待办或线程池背景，未覆盖聚合调用的取消和有限重试合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S08/1",
+          "reason": "运输连接、待办或线程池背景，未覆盖聚合调用的取消和有限重试合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J22/1",
+          "reason": "运输连接、待办或线程池背景，未覆盖聚合调用的取消和有限重试合同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q29",
+      "direct": [
+        {
+          "chunkKey": "S08/1",
+          "supportedIntentIds": [
+            "Q29-I1",
+            "Q29-I2",
+            "Q29-I3"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 276,
+              "spanEndUtf16": 324,
+              "quote": "可在同一事务写订单和一条待发送记录，后者保存稳定操作键、必要载荷、状态、尝试次数和下次尝试时间。"
+            },
+            {
+              "spanStartUtf16": 463,
+              "spanEndUtf16": 486,
+              "quote": "崩溃时通过待办状态和可恢复的执行资格继续处理。"
+            },
+            {
+              "spanStartUtf16": 586,
+              "spanEndUtf16": 631,
+              "quote": "接收方可用唯一键将去重记录和业务效果一起提交，发送方按总期限和有限退避恢复，超限进入对账。"
+            }
+          ],
+          "versionCondition": "适用 Spring Framework 6.2.19 命令式事务事件与单库 InnoDB 的通用设计",
+          "reason": "业务与可恢复待办同库提交，后续独立发送确认，接收方可原子去重。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D08/1",
+          "reason": "解释库存和受理结果原子提交，并建议独立协议，但未给通知待办与库存同库原子写。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D01/1",
+          "reason": "事务或 HTTP 重试相邻，缺库存与待办原子写或通知接收专用边界。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D07/1",
+          "reason": "事务或 HTTP 重试相邻，缺库存与待办原子写或通知接收专用边界。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S06/1",
+          "reason": "事务或 HTTP 重试相邻，缺库存与待办原子写或通知接收专用边界。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D16/1",
+          "reason": "事务或 HTTP 重试相邻，缺库存与待办原子写或通知接收专用边界。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q30",
+      "direct": [
+        {
+          "chunkKey": "D13/1",
+          "supportedIntentIds": [
+            "Q30-I1",
+            "Q30-I2",
+            "Q30-I3"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 323,
+              "spanEndUtf16": 339,
+              "quote": "将 41 写回了已经清空的缓存。"
+            },
+            {
+              "spanStartUtf16": 508,
+              "spanEndUtf16": 536,
+              "quote": "缓存侧原子比较回填版本与标记及现有值，拒绝已过时的回填。"
+            },
+            {
+              "spanStartUtf16": 572,
+              "spanEndUtf16": 619,
+              "quote": "从数据库提交到 Redis 发布新版本标记之间仍有窗口，发布丢失也要由可靠失效和恢复方案处理。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2 基础命令和 MySQL 权威数据源，明确应用假设",
+          "reason": "读旧值与删缓存时序、按版本原子拒绝和提交到发布窗口。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D06/1",
+          "supportedIntentIds": [
+            "Q30-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 391,
+              "spanEndUtf16": 433,
+              "quote": "REPEATABLE READ 仍读 14，READ COMMITTED 读 11。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，RR 与 RC，显式事务",
+          "reason": "事务快照在其他事务提交后仍可能给旧值，为回填交错提供读取前提。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D10/1",
+          "reason": "淘汰、租约或库存版本约束并未定义缓存回填与失效的协同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D12/1",
+          "reason": "淘汰、租约或库存版本约束并未定义缓存回填与失效的协同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "reason": "淘汰、租约或库存版本约束并未定义缓存回填与失效的协同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q31",
+      "direct": [
+        {
+          "chunkKey": "D12/1",
+          "supportedIntentIds": [
+            "Q31-I1",
+            "Q31-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 420,
+              "spanEndUtf16": 434,
+              "quote": "相等才 DEL，否则返回零。"
+            },
+            {
+              "spanStartUtf16": 650,
+              "spanEndUtf16": 700,
+              "quote": "接收方原子记录已接纳的最高编号并拒绝更旧的写入；只有 Redis 中增加编号而资源端不校验并无保护。"
+            }
+          ],
+          "versionCondition": "以 Redis OSS 7.2 单实例为基线，为每次获取生成独立、难碰撞的随机 token，执行 `SET lock:asset:27 token NX PX 3000`",
+          "reason": "所有者 token 用于释放，接收端检查授权序号拦截旧执行者。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S10/1",
+          "supportedIntentIds": [
+            "Q31-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 433,
+              "spanEndUtf16": 459,
+              "quote": "成功抢占递增会话版本，并把递增后的版本交给本次尝试。"
+            },
+            {
+              "spanStartUtf16": 520,
+              "spanEndUtf16": 539,
+              "quote": "A 用 7 提交或标失败时应影响零行。"
+            }
+          ],
+          "versionCondition": "依据项目 `0c6f92afe331954f7cea37d33db688fe781cbf2c` 的报告服务与 Mapper",
+          "reason": "递增版本写入条件拒绝旧任务，可作为单调接管的项目实例。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S09/1",
+          "reason": "资源端可按当前 attemptId 排斥旧写，但这个标识不单调，未给本查询要求的下游编号判定。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "reason": "版本比较机制相邻，未定义租约所有权与接收端迟到写合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D13/1",
+          "reason": "版本比较机制相邻，未定义租约所有权与接收端迟到写合同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q32",
+      "direct": [
+        {
+          "chunkKey": "S08/1",
+          "supportedIntentIds": [
+            "Q32-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 533,
+              "spanEndUtf16": 586,
+              "quote": "响应超时可能是远端已执行而本地尚未确认，应按稳定操作键查询远端结果，或在接收方承诺幂等时用同键同意图重放。"
+            }
+          ],
+          "versionCondition": "适用 Spring Framework 6.2.19 命令式事务事件与单库 InnoDB 的通用设计",
+          "reason": "远端已执行但客户端没收到响应的故障窗口可直接解释执行不确定。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D14/1",
+          "supportedIntentIds": [
+            "Q32-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 108,
+              "spanEndUtf16": 123,
+              "quote": "独立读取不同计数器是适用场景。"
+            },
+            {
+              "spanStartUtf16": 123,
+              "spanEndUtf16": 185,
+              "quote": "Pipeline 本身没有命令组隔离保证，其他客户端的命令可交错执行，因此不能用一组 GET、判断、SET 来保护共享配额。"
+            },
+            {
+              "spanStartUtf16": 490,
+              "spanEndUtf16": 500,
+              "quote": "之前成功的写入保留。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2 单实例，排除跨槽",
+          "reason": "Pipeline 无组隔离；对比读命令与成功后保留的写操作可说明整批盲重试风险。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D15/1",
+          "reason": "TCP、HTTP、数据库或 Redis 单命令背景接近，缺面向断线批次的独立执行判断。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D16/1",
+          "reason": "TCP、HTTP、数据库或 Redis 单命令背景接近，缺面向断线批次的独立执行判断。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "reason": "TCP、HTTP、数据库或 Redis 单命令背景接近，缺面向断线批次的独立执行判断。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D09/1",
+          "reason": "TCP、HTTP、数据库或 Redis 单命令背景接近，缺面向断线批次的独立执行判断。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "没有一段正文完整覆盖 Redis 代理断线后的批次处理；同一命令是否安全重放要按具体写操作判断。"
+    },
+    {
+      "queryId": "Q33",
+      "direct": [
+        {
+          "chunkKey": "S10/1",
+          "supportedIntentIds": [
+            "Q33-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 415,
+              "spanEndUtf16": 433,
+              "quote": "普通报告查询只返回状态或已准备报告。"
+            },
+            {
+              "spanStartUtf16": 712,
+              "spanEndUtf16": 732,
+              "quote": "直接复用报告且不重复生成摘要或更新弱项。"
+            }
+          ],
+          "versionCondition": "依据项目 `0c6f92afe331954f7cea37d33db688fe781cbf2c` 的报告服务与 Mapper",
+          "reason": "持久报告重放且不重复更新弱项，GET 与生成恢复路径清楚。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S08/1",
+          "supportedIntentIds": [
+            "Q33-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 226,
+              "spanEndUtf16": 241,
+              "quote": "重启后数据库的成功记录仍存在。"
+            },
+            {
+              "spanStartUtf16": 586,
+              "spanEndUtf16": 631,
+              "quote": "接收方可用唯一键将去重记录和业务效果一起提交，发送方按总期限和有限退避恢复，超限进入对账。"
+            }
+          ],
+          "versionCondition": "适用 Spring Framework 6.2.19 命令式事务事件与单库 InnoDB 的通用设计",
+          "reason": "假设外部通知可通过持久待办独立恢复、按稳定键去重。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S09/1",
+          "reason": "应用或订单重放背景，没有报告弱项与独立通知的拆分。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "reason": "应用或订单重放背景，没有报告弱项与独立通知的拆分。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D16/1",
+          "reason": "应用或订单重放背景，没有报告弱项与独立通知的拆分。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q34",
+      "direct": [
+        {
+          "chunkKey": "J20/1",
+          "supportedIntentIds": [
+            "Q34-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 145,
+              "spanEndUtf16": 199,
+              "quote": "发布者可先填充数据再写 volatile ready，读取线程观察 ready 后可看到对应发布之前的操作。"
+            }
+          ],
+          "versionCondition": "适用 JLS SE 21 的 Java 内存模型和 Java SE 21 锁、原子变量 API",
+          "reason": "先填充后 volatile 发布的 happens-before 可保障快照可见性。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J15/1",
+          "supportedIntentIds": [
+            "Q34-I1",
+            "Q34-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 138,
+              "spanEndUtf16": 217,
+              "quote": "ConcurrentHashMap.merge(key, 1, Integer::sum) 或 compute 可把同一键的查找、计算、写入作为原子方法操作。"
+            },
+            {
+              "spanStartUtf16": 770,
+              "spanEndUtf16": 802,
+              "quote": "或发布预先构造的不可变整体状态；是否还需复制值取决于值的可变性。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 ConcurrentHashMap、CopyOnWriteArrayList 与 LongAdder API",
+          "reason": "不可变整体发布与 ConcurrentHashMap 单键原子更新在同篇分别明确。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J14/1",
+          "supportedIntentIds": [
+            "Q34-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 482,
+              "spanEndUtf16": 505,
+              "quote": "例如 get 后按旧值 put 仍可能丢更新。"
+            }
+          ],
+          "versionCondition": "实现范围固定 OpenJDK jdk8u402-b06",
+          "reason": "普通 get+put 仍可能丢失更新，可直接否定以并发容器替代原子复合操作。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J13/1",
+          "reason": "提供构建只读快照的机制，未给其安全发布与可见性条件。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J04/1",
+          "reason": "稳定键或串行 merge 与并发快照发布和原子更新合同不同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J10/1",
+          "reason": "稳定键或串行 merge 与并发快照发布和原子更新合同不同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q35",
+      "direct": [
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [
+            "Q35-I1",
+            "Q35-I2",
+            "Q35-I3"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 549,
+              "spanEndUtf16": 594,
+              "quote": "并发副本遇到重复键时不继续扣减，应结束本次事务，再按既定隔离语义查主库中已提交的受理记录。"
+            },
+            {
+              "spanStartUtf16": 573,
+              "spanEndUtf16": 594,
+              "quote": "再按既定隔离语义查主库中已提交的受理记录。"
+            },
+            {
+              "spanStartUtf16": 739,
+              "spanEndUtf16": 757,
+              "quote": "客户端无法仅凭异常断定是否扣减成功。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "超时结果未知、唯一约束与载荷匹配、重读已提交结果均有。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D16/1",
+          "supportedIntentIds": [
+            "Q35-I1",
+            "Q35-I2",
+            "Q35-I3"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 498,
+              "spanEndUtf16": 517,
+              "quote": "无法仅凭客户端超时推断数据库是否提交。"
+            },
+            {
+              "spanStartUtf16": 647,
+              "spanEndUtf16": 693,
+              "quote": "服务端可以用数据库唯一约束将幂等键、载荷语义和业务效果一并提交，并在重复请求时读取已有结果。"
+            },
+            {
+              "spanStartUtf16": 679,
+              "spanEndUtf16": 693,
+              "quote": "并在重复请求时读取已有结果。"
+            }
+          ],
+          "versionCondition": "以 IETF RFC 9110 为准",
+          "reason": "HTTP 已发无回应未知、稳定键加原子保存、重复时读取结果。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S09/1",
+          "supportedIntentIds": [
+            "Q35-I2",
+            "Q35-I3"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 289,
+              "spanEndUtf16": 364,
+              "quote": "`request_id` 的全表唯一约束保护同一请求键的重复插入，`interview_question_id` 唯一约束保护每道场内题仅有一个答案。"
+            },
+            {
+              "spanStartUtf16": 523,
+              "spanEndUtf16": 547,
+              "quote": "可以用持久化数据重建业务响应，无需它仍是当前题。"
+            }
+          ],
+          "versionCondition": "依据项目 `0c6f92afe331954f7cea37d33db688fe781cbf2c` 的 HTTP 与 Mapper 实现",
+          "reason": "应用级双唯一键与重放同正文规则可作等价接口合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D07/1",
+          "supportedIntentIds": [
+            "Q35-I1",
+            "Q35-I2",
+            "Q35-I3"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 438,
+              "spanEndUtf16": 466,
+              "quote": "在 COMMIT 发出后断连，客户端可能只知道结果未知。"
+            },
+            {
+              "spanStartUtf16": 487,
+              "spanEndUtf16": 513,
+              "quote": "从主库确认已有结果或进入同键安全重试，避免再次扣款。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，分别记录死锁检测与 rollback_on_timeout",
+          "reason": "COMMIT 后断连未知，基于持久约束及稳定业务号查已提交结果。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S08/1",
+          "reason": "跨系统待办、报告或事务原理相邻，未给订单 API 的同键重放。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S10/1",
+          "reason": "跨系统待办、报告或事务原理相邻，未给订单 API 的同键重放。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D01/1",
+          "reason": "跨系统待办、报告或事务原理相邻，未给订单 API 的同键重放。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q36",
+      "direct": [
+        {
+          "chunkKey": "J16/1",
+          "supportedIntentIds": [
+            "Q36-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 90,
+              "spanEndUtf16": 142,
+              "quote": "每个 JVM 线程有自己的 pc 和 JVM Stack；如果实现使用本地方法栈，通常在线程创建时分配。"
+            },
+            {
+              "spanStartUtf16": 192,
+              "spanEndUtf16": 208,
+              "quote": "堆和方法区由 JVM 线程共享。"
+            }
+          ],
+          "versionCondition": "适用 JVMS SE 21 的抽象运行时模型，类元数据实例以 JDK 21 HotSpot 为例",
+          "reason": "线程栈是线程私有资源，堆是线程共享的对象区，两者耗尽症状不同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J18/1",
+          "supportedIntentIds": [
+            "Q36-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 358,
+              "spanEndUtf16": 455,
+              "quote": "先读 OutOfMemoryError 明细：Java heap space 可看堆对象和存活量；Metaspace 关注类加载器与元数据；本地资源分配失败按对应消息查线程数量或原生内存等证据。"
+            },
+            {
+              "spanStartUtf16": 455,
+              "spanEndUtf16": 507,
+              "quote": "HotSpot NMT 需要事先启用，适合比较 JVM 跟踪的本地内存类别，不能覆盖任意第三方本地分配。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 引用可达性与 JDK 21 HotSpot 的诊断命令",
+          "reason": "OOM 路径区分堆与本地资源，NMT 提供可比原生内存类别证据。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J22/1",
+          "supportedIntentIds": [
+            "Q36-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 259,
+              "spanEndUtf16": 308,
+              "quote": "设计应结合 CPU 或阻塞比例、连接池及下游允许并发，并以允许排队时间和对象内存共同约束队列容量。"
+            },
+            {
+              "spanStartUtf16": 468,
+              "spanEndUtf16": 512,
+              "quote": "观察活跃线程估算、队列深度、拒绝率、排队和执行时延，分别用代表性的突发与慢下游验证参数。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 ThreadPoolExecutor 和复用的平台线程",
+          "reason": "阻塞比例、队列与最大线程数共同影响池内占用，观察实际活跃线程和排队。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J19/1",
+          "reason": "G1 事件或执行器配置建议有背景，未给线程栈增长与线程池的验证方法。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J23/1",
+          "reason": "G1 事件或执行器配置建议有背景，未给线程栈增长与线程池的验证方法。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q37",
+      "direct": [
+        {
+          "chunkKey": "J06/1",
+          "supportedIntentIds": [
+            "Q37-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 891,
+              "spanEndUtf16": 991,
+              "quote": "从静态类型 List<Integer> 对 ArrayList<Integer> 做 instanceof 在可检查转换条件下合法，这只验证对象能否作为对应运行时类使用；它没有逐个检查元素的动态类型。"
+            },
+            {
+              "spanStartUtf16": 957,
+              "spanEndUtf16": 991,
+              "quote": "这只验证对象能否作为对应运行时类使用；它没有逐个检查元素的动态类型。"
+            }
+          ],
+          "versionCondition": "适用 JLS 与 JVMS Java SE 21",
+          "reason": "静态可检查条件与运行时不逐项验证，擦除的约束有直接说明。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J05/1",
+          "supportedIntentIds": [
+            "Q37-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 67,
+              "spanEndUtf16": 123,
+              "quote": "Integer 是 Number 的子类型，但 List<Integer> 不能赋给 List<Number>。"
+            },
+            {
+              "spanStartUtf16": 268,
+              "spanEndUtf16": 337,
+              "quote": "List<? extends Number> 表示实际类型为某个未知的 Number 子类型的列表，从中读出的值可按 Number 使用。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 的参数化子类型、通配符捕获与集合 API",
+          "reason": "通配捕获意味着元素类型只知是未知 Number 子类，泛型不变性是编译期前提。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J07/1",
+          "reason": "反射和加载器涉及运行时类，不能回答参数化 instanceof 的编译规则。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J17/1",
+          "reason": "反射和加载器涉及运行时类，不能回答参数化 instanceof 的编译规则。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "正文给出相邻合法的 List<Integer> 情形，未给 List<? extends Number> 到 ArrayList<Integer> 的具体编译失败；仍可直接支持运行时不验证实参和逐元素的子意图。"
+    },
+    {
+      "queryId": "Q38",
+      "direct": [
+        {
+          "chunkKey": "J15/1",
+          "supportedIntentIds": [
+            "Q38-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 495,
+              "spanEndUtf16": 530,
+              "quote": "迭代器固定创建时的成员数组，因此正在广播的一轮仍可能通知刚注销的成员。"
+            },
+            {
+              "spanStartUtf16": 694,
+              "spanEndUtf16": 715,
+              "quote": "可能看见部分后来更新，不提供全表一致时点。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 ConcurrentHashMap、CopyOnWriteArrayList 与 LongAdder API",
+          "reason": "弱一致遍历可能见后续更新，无统一时点；写时复制迭代固定创建时数组。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J13/1",
+          "reason": "快照与 ConcurrentHashMap 内部结构是背景，未比较两种迭代器观察合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J14/1",
+          "reason": "快照与 ConcurrentHashMap 内部结构是背景，未比较两种迭代器观察合同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q39",
+      "direct": [
+        {
+          "chunkKey": "J16/1",
+          "supportedIntentIds": [
+            "Q39-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 527,
+              "spanEndUtf16": 537,
+              "quote": "不要求特定内存组织。"
+            },
+            {
+              "spanStartUtf16": 574,
+              "spanEndUtf16": 592,
+              "quote": "不能逐项等同于方法区的所有逻辑内容。"
+            }
+          ],
+          "versionCondition": "适用 JVMS SE 21 的抽象运行时模型，类元数据实例以 JDK 21 HotSpot 为例",
+          "reason": "方法区是规范共享职责，Metaspace 是 HotSpot 类元数据分配的一部分。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J17/1",
+          "reason": "类加载或 Metaspace 故障背景没有完整规范与实现区分。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J18/1",
+          "reason": "类加载或 Metaspace 故障背景没有完整规范与实现区分。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q40",
+      "direct": [
+        {
+          "chunkKey": "J23/1",
+          "supportedIntentIds": [
+            "Q40-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 259,
+              "spanEndUtf16": 285,
+              "quote": "某成员失败时组合异常完成，实际结果仍需从各成员读取。"
+            },
+            {
+              "spanStartUtf16": 580,
+              "spanEndUtf16": 694,
+              "quote": "orTimeout 使该 CompletableFuture 超时异常完成，未承诺停止底层操作；普通 CompletableFuture.cancel 的 mayInterruptIfRunning 对该类型没有中断执行的效果。"
+            }
+          ],
+          "versionCondition": "适用 Java SE 21 CompletableFuture、Executor 与 HttpClient",
+          "reason": "orTimeout 使 future 异常完成，并以组合阶段解释传播。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J21/1",
+          "reason": "等待或任务状态相邻，未说明 CompletableFuture 完成状态。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J22/1",
+          "reason": "等待或任务状态相邻，未说明 CompletableFuture 完成状态。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "正文未明说 get(timeout) 只终止本次等待且未改变完成状态，覆盖异常完成与后续组合的一侧。"
+    },
+    {
+      "queryId": "Q41",
+      "direct": [
+        {
+          "chunkKey": "S07/1",
+          "supportedIntentIds": [
+            "Q41-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 277,
+              "spanEndUtf16": 307,
+              "quote": "`NESTED` 在已有事务下可以用同一物理事务内的保存点。"
+            },
+            {
+              "spanStartUtf16": 468,
+              "spanEndUtf16": 519,
+              "quote": "`REQUIRES_NEW` 挂起外层事务的资源绑定，为内层建立独立物理事务，内层可以独立提交或回滚。"
+            },
+            {
+              "spanStartUtf16": 602,
+              "spanEndUtf16": 614,
+              "quote": "而外层又在等待内层返回。"
+            }
+          ],
+          "versionCondition": "适用 Spring Framework 6.2.19 代理事务和支持 JDBC 保存点的命令式单数据源事务管理器",
+          "reason": "同物理事务保存点及独立事务的外层持锁风险均明确。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S06/1",
+          "reason": "默认回滚、提交后确认或锁等待相邻，缺传播方式对照。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S08/1",
+          "reason": "默认回滚、提交后确认或锁等待相邻，缺传播方式对照。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D07/1",
+          "reason": "默认回滚、提交后确认或锁等待相邻，缺传播方式对照。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q42",
+      "direct": [
+        {
+          "chunkKey": "D06/1",
+          "supportedIntentIds": [
+            "Q42-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 391,
+              "spanEndUtf16": 433,
+              "quote": "REPEATABLE READ 仍读 14，READ COMMITTED 读 11。"
+            },
+            {
+              "spanStartUtf16": 639,
+              "spanEndUtf16": 692,
+              "quote": "A 两种隔离级别执行同一行的 `SELECT ... FOR UPDATE` 均读到 11 并取得排他锁。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，RR 与 RC，显式事务",
+          "reason": "同一 RR 事务快照读历史值、锁定读可读提交后的新值并锁定。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D01/1",
+          "reason": "有隔离或锁定读背景，但未给同事务旧快照和当前锁定读对照。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "reason": "有隔离或锁定读背景，但未给同事务旧快照和当前锁定读对照。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S07/1",
+          "reason": "有隔离或锁定读背景，但未给同事务旧快照和当前锁定读对照。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q43",
+      "direct": [
+        {
+          "chunkKey": "D14/1",
+          "supportedIntentIds": [
+            "Q43-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 490,
+              "spanEndUtf16": 500,
+              "quote": "之前成功的写入保留。"
+            },
+            {
+              "spanStartUtf16": 755,
+              "spanEndUtf16": 766,
+              "quote": "先前 SET 仍生效。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2 单实例，排除跨槽",
+          "reason": "执行错误不撤销成功的事务命令；Lua 在已写后异常时同样保留效果。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D12/1",
+          "reason": "Lua 原子释放与关系库的回滚粒度作背景，未直接讲 Redis 两类运行时错误。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D01/1",
+          "reason": "Lua 原子释放与关系库的回滚粒度作背景，未直接讲 Redis 两类运行时错误。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D07/1",
+          "reason": "Lua 原子释放与关系库的回滚粒度作背景，未直接讲 Redis 两类运行时错误。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q44",
+      "direct": [
+        {
+          "chunkKey": "D18/1",
+          "supportedIntentIds": [
+            "Q44-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 86,
+              "spanEndUtf16": 106,
+              "quote": "客户端需要分别验证证书链信任和服务身份。"
+            },
+            {
+              "spanStartUtf16": 202,
+              "spanEndUtf16": 238,
+              "quote": "如果不匹配 `api.example.com`，不应被后者的客户端接受。"
+            }
+          ],
+          "versionCondition": "以 RFC 8446 的完整服务器证书握手为例，使用临时 (EC)DHE，排除 PSK、恢复、0-RTT 与双向认证",
+          "reason": "区分受信链与证书主机名，说明加密和对端身份验证在握手中的不同职责。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D17/1",
+          "reason": "DNS 主机名和 HTTP 重试相邻，未覆盖 TLS 身份与 early data 重放机制。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D16/1",
+          "reason": "DNS 主机名和 HTTP 重试相邻，未覆盖 TLS 身份与 early data 重放机制。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "D18 明确排除 0-RTT，证据仅支持服务器身份子意图，未支持 early data 重放结论。"
+    },
+    {
+      "queryId": "Q45",
+      "direct": [
+        {
+          "chunkKey": "S10/1",
+          "supportedIntentIds": [
+            "Q45-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 89,
+              "spanEndUtf16": 123,
+              "quote": "报告聚合要求本场每道计划 MAIN 恰有一条关联正确的 FINAL。"
+            },
+            {
+              "spanStartUtf16": 254,
+              "spanEndUtf16": 271,
+              "quote": "汇总分和弱项使用有效 FINAL。"
+            }
+          ],
+          "versionCondition": "依据项目 `0c6f92afe331954f7cea37d33db688fe781cbf2c` 的报告服务与 Mapper",
+          "reason": "每个 MAIN 唯一关联正确 FINAL，追问时只汇总追答 FINAL。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S09/1",
+          "reason": "答案提交和重放相关，缺报告 FINAL 聚合资格。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q46",
+      "direct": [
+        {
+          "chunkKey": "J14/1",
+          "supportedIntentIds": [
+            "Q46-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 144,
+              "spanEndUtf16": 170,
+              "quote": "Segment 类型及字段主要服务于历史序列化兼容。"
+            },
+            {
+              "spanStartUtf16": 400,
+              "spanEndUtf16": 432,
+              "quote": "普通链表读取不走写入者的 synchronized(f) 路径。"
+            }
+          ],
+          "versionCondition": "实现范围固定 OpenJDK jdk8u402-b06",
+          "reason": "固定 8u 源码，Segment 只用于兼容，普通 get 不用桶头监视器。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J12/1",
+          "supportedIntentIds": [
+            "Q46-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 411,
+              "spanEndUtf16": 475,
+              "quote": "若 table 长度小于 MIN_TREEIFY_CAPACITY 64，则该路径优先 resize，增加桶数可能分散现有碰撞。"
+            }
+          ],
+          "versionCondition": "实现细节固定为 OpenJDK jdk8u402-b06 的常规 putVal 路径",
+          "reason": "固定 8u putVal，表长不足 64 时先扩容而非树化。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J04/1",
+          "reason": "Java 21 的合同或桶例非该 OpenJDK 8u 诊断对象。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J15/1",
+          "reason": "Java 21 的合同或桶例非该 OpenJDK 8u 诊断对象。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q47",
+      "direct": [
+        {
+          "chunkKey": "D04/1",
+          "supportedIntentIds": [
+            "Q47-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 558,
+              "spanEndUtf16": 569,
+              "quote": "减少之后的完整行访问。"
+            },
+            {
+              "spanStartUtf16": 587,
+              "spanEndUtf16": 607,
+              "quote": "覆盖要求该索引能提供谓词、投影等所需列。"
+            }
+          ],
+          "versionCondition": "以 MySQL 8.0 InnoDB 的设备事件表为例，二级索引 `(device_id, severity, created_at)` 先按设备排序，同设备下按级别排序，同级别内再按时间排序",
+          "reason": "ICP 可先用索引元组过滤，覆盖要求所需数据均在索引，回表仍可能发生。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D05/1",
+          "supportedIntentIds": [
+            "Q47-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 505,
+              "spanEndUtf16": 516,
+              "quote": "再为幸存项读取完整行。"
+            },
+            {
+              "spanStartUtf16": 548,
+              "spanEndUtf16": 577,
+              "quote": "`Using index` 通常表示能从索引提供所需数据。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0，EXPLAIN ANALYZE 自 8.0.18",
+          "reason": "Using index condition 与 Using index 的不同解释及后续完整行访问。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D03/1",
+          "supportedIntentIds": [
+            "Q47-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 426,
+              "spanEndUtf16": 466,
+              "quote": "查询需要额外字段时，可先定位二级索引，再按该主键取聚簇记录，这次访问常称为回表。"
+            },
+            {
+              "spanStartUtf16": 694,
+              "spanEndUtf16": 718,
+              "quote": "该索引不再提供全部所需列，走此路径一般需要回表。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB 普通 B-tree",
+          "reason": "聚簇与二级索引区分及额外列需要回表，直接支持不能推断无回表的前提。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q48",
+      "direct": [
+        {
+          "chunkKey": "S05/1",
+          "supportedIntentIds": [
+            "Q48-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 371,
+              "spanEndUtf16": 420,
+              "quote": "参数级 DTO 校验失败产生 `MethodArgumentNotValidException`。"
+            },
+            {
+              "spanStartUtf16": 533,
+              "spanEndUtf16": 602,
+              "quote": "方法校验覆盖同一方法内 `@Valid` 级联的嵌套约束，失败可抛 `HandlerMethodValidationException`。"
+            }
+          ],
+          "versionCondition": "适用 Spring Framework MVC 6.2.19，示例使用 Jakarta Bean Validation 3.0，控制器无类级 `@Validated`",
+          "reason": "普通 DTO 校验与 MVC 方法级校验有两种异常，直接约束可触发后者。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S01/1",
+          "reason": "容器和 AOP 背景未给 MVC 内建校验入口合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S04/1",
+          "reason": "容器和 AOP 背景未给 MVC 内建校验入口合同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q49",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "J03/1",
+          "reason": "可说明字符串驻留常识，但无该机构的发布单与部署历史。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q50",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "J16/1",
+          "reason": "仅有 JVM/HotSpot 优化或观测方法，无该 GraalVM 构建日志与计数。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J18/1",
+          "reason": "仅有 JVM/HotSpot 优化或观测方法，无该 GraalVM 构建日志与计数。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q51",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "J18/1",
+          "reason": "保留链及诊断方法只能定位需收集的证据，无该时点堆转储。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J19/1",
+          "reason": "保留链及诊断方法只能定位需收集的证据，无该时点堆转储。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J16/1",
+          "reason": "保留链及诊断方法只能定位需收集的证据，无该时点堆转储。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q52",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "J22/1",
+          "reason": "执行器、队列及容量机制不含指定线上实例配置。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J23/1",
+          "reason": "执行器、队列及容量机制不含指定线上实例配置。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J11/1",
+          "reason": "执行器、队列及容量机制不含指定线上实例配置。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q53",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "S01/1",
+          "reason": "Bean 机制及诊断方法不含指定实例的历史延迟。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S02/1",
+          "reason": "Bean 机制及诊断方法不含指定实例的历史延迟。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S03/1",
+          "reason": "Bean 机制及诊断方法不含指定实例的历史延迟。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S04/1",
+          "reason": "Bean 机制及诊断方法不含指定实例的历史延迟。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J18/1",
+          "reason": "Bean 机制及诊断方法不含指定实例的历史延迟。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q54",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "D03/1",
+          "reason": "索引和测量解释不含指定负载的真实 p99 数据。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D04/1",
+          "reason": "索引和测量解释不含指定负载的真实 p99 数据。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D05/1",
+          "reason": "索引和测量解释不含指定负载的真实 p99 数据。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q55",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "D10/1",
+          "reason": "缓存计数和通用诊断无法列出指定实例历史键。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D13/1",
+          "reason": "缓存计数和通用诊断无法列出指定实例历史键。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q56",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "D17/1",
+          "reason": "DNS 查询与缓存规则不含今日指定运营商的在线答案。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q57",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "S09/1",
+          "reason": "答题与报告读取合同不含个人场次分数。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S10/1",
+          "reason": "答题与报告读取合同不含个人场次分数。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q58",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "D18/1",
+          "reason": "TLS 密钥和证书处理不含 CDN 密钥轮换记录。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q59",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "D13/1",
+          "reason": "仅可解释回填、读版本和 miss，缺该事件的日志与键。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D06/1",
+          "reason": "仅可解释回填、读版本和 miss，缺该事件的日志与键。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D10/1",
+          "reason": "仅可解释回填、读版本和 miss，缺该事件的日志与键。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q60",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "D07/1",
+          "reason": "可作通用事务排查背景，但不能把 MySQL/Spring 现象当作 CockroachDB 原始事件。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D06/1",
+          "reason": "可作通用事务排查背景，但不能把 MySQL/Spring 现象当作 CockroachDB 原始事件。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S06/1",
+          "reason": "可作通用事务排查背景，但不能把 MySQL/Spring 现象当作 CockroachDB 原始事件。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S07/1",
+          "reason": "可作通用事务排查背景，但不能把 MySQL/Spring 现象当作 CockroachDB 原始事件。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    }
+  ]
+}

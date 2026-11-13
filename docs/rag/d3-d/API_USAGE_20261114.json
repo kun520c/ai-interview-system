@@ -1,0 +1,120 @@
+{
+  "runId": "D3-BCD-20261114-v1",
+  "currency": "CNY",
+  "executorBudgetCny": 20,
+  "budgetType": "Executor-side estimate. The vendor bill was not reconciled.",
+  "providers": {
+    "embedding": {
+      "model": "qwen3.7-text-embedding",
+      "region": "cn-beijing",
+      "profile": "qwen3.7-text-embedding-1024-dense-v1",
+      "inputCnyPerMillionTokens": 0.5,
+      "priceSource": "https://help.aliyun.com/zh/model-studio/qwen3-7-text-embedding",
+      "limitsSource": "https://help.aliyun.com/zh/model-studio/text-embedding-synchronous-api",
+      "maxHttpAttempts": 300,
+      "concurrency": 1,
+      "balanceEvidence": "UNAVAILABLE: unauthenticated official quota page; inference credential cannot query billing. Public price verified, authorized operation used a conservative request reservation and succeeded. No wallet balance was inferred."
+    },
+    "deepseek": {
+      "model": "deepseek-flash",
+      "modelVersionAdvertised": "DeepSeek-V4.1-Flash-1017",
+      "peakPriceCnyPerMillionTokens": {
+        "cachedInput": 0.04,
+        "uncachedInput": 2,
+        "output": 8
+      },
+      "priceSource": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+      "maxHttpAttempts": 200,
+      "maxConcurrentReviewCalls": 2,
+      "maxOutputTokensPerRequest": 4096,
+      "balanceEvidence": "Official GET /user/balance succeeded, is_available=true; CNY alone below 20; exact account balance omitted",
+      "freeBalanceRequests": 1
+    }
+  },
+  "plannedModelAttempts": {
+    "ingestion": {
+      "embedding": 50,
+      "deepseek": 0
+    },
+    "productionRetrieval": {
+      "embedding": 72,
+      "deepseek": 0
+    },
+    "publicRetrieval": {
+      "embedding": 60,
+      "deepseek": 0
+    },
+    "independentRetrieval": {
+      "embedding": 24,
+      "deepseek": 0
+    },
+    "optionalSingleEasySmoke": {
+      "embeddingMax": 10,
+      "deepseekMax": 11
+    },
+    "paidContentReview": 0
+  },
+  "plannedEmbeddingTokenUpperBound": {
+    "oneInputPerRequest": true,
+    "maxInputsIncludingSmoke": 216,
+    "maxTokensPerInput": 128000,
+    "maxInputCnyAtListPrice": 13.824
+  },
+  "optionalDeepSeekSmokeEstimate": {
+    "inputTokensPerRequestPlanningAssumption": 12000,
+    "outputTokensPerRequestCap": 4096,
+    "maxRequests": 11,
+    "estimatedPeakCny": 0.624448,
+    "assumption": "Upper output cap plus assumed input size; not a bound on vendor tokens. Check serialized request and observable balance before starting."
+  },
+  "actual": {
+    "embeddingHttpAttempts": 215,
+    "deepseekModelHttpAttempts": 10,
+    "embeddingHttp200": 215,
+    "deepseekHttp200": 10,
+    "deepseekModelHttpAttemptsDuringRecovery": 9,
+    "embeddingInputTokens": 42660,
+    "deepseekInputTokens": 34773,
+    "deepseekCachedInputTokens": 4608,
+    "deepseekUncachedInputTokens": 30165,
+    "deepseekOutputTokens": 5411,
+    "deepseekTotalTokens": 40184,
+    "embeddingEstimatedCny": "0.02133",
+    "deepseekOffPeakEstimatedCny": "0.05190116",
+    "deepseekPeakPriceEstimateCny": "0.10380232",
+    "totalEstimatedCny": "0.07323116",
+    "vendorBillReconciled": false,
+    "usageCaptureNote": "First smoke call logged valid usage then a duplicate empty read due to the one-shot interceptor bug. Counted once by attempt ID. Recovered with the same business request ID, consuming one additional model attempt. All successful vendor responses had reported usage."
+  },
+  "embeddingByStage": {
+    "ingestion": {
+      "attempts": 50,
+      "inputTokens": 22626,
+      "estimatedCny": "0.011313"
+    },
+    "production": {
+      "attempts": 72,
+      "inputTokens": 14759,
+      "estimatedCny": "0.0073795"
+    },
+    "public": {
+      "attempts": 60,
+      "inputTokens": 2467,
+      "estimatedCny": "0.0012335"
+    },
+    "independent": {
+      "attempts": 24,
+      "inputTokens": 1280,
+      "estimatedCny": "0.00064"
+    },
+    "smokeIncludingRecovery": {
+      "attempts": 9,
+      "inputTokens": 1528,
+      "estimatedCny": "0.000764"
+    }
+  },
+  "privateJournalsSha256": {
+    "embedding-usage.jsonl": "aa6b1b6e7c54098e2881c47833263b9933f8d3e419accf5c75cfd70b8fc4406a",
+    "deepseek-usage.jsonl": "ab84f7bd109925b406e9d4f2a94d3bb87b371bb06c627befa0adf29d01a9eebd"
+  }
+}

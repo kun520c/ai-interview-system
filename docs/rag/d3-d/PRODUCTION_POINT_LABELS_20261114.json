@@ -1,0 +1,5472 @@
+{
+  "version": "D3-PRODUCTION-AI-PRELABEL-v1",
+  "date": "2026-11-14",
+  "scope": "冻结生产检索前，按 D1 逐点审核已知机制证据。CORE 使用实际生产切片逐点核对，留精确摘录；其他评分点用已交叉审查的正文侧车和实际切片标题定位。CONTRIBUTION 只支持分项，不算直接评分点覆盖；未标出 Chunk 为未确认有直接证据，生产集 precision 为先验映射口径的诊断值。AI 技术复核。E01 J01/2 已逐点检查真实切片边界。",
+  "corpusManifestSha256": "3a59d6009e82bba7aa91b175ca7a777fd2cbbb121be4c413ead08a8c1664bc0a",
+  "queryInputsSha256": "d501dd9d90deddf2c653a54de618d401d3c6b87d3748e4fd21c537dab1545540",
+  "bankSha256": "d4c1d9f20664308231ab383f5dce67154f3c5d874fc041b44f7499ce8647177e",
+  "pointMapSha256": "dfdd58d2a9d4f108178ae068e45afa910a676046264d67ddb841c72816644f74",
+  "points": [
+    {
+      "pointId": "E01.01",
+      "bankId": "E01",
+      "databasePointId": 94,
+      "type": "CORE",
+      "weight": 30,
+      "evidence": {
+        "J01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "1. Core model"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 431,
+              "spanEndUtf16": 499,
+              "quote": "接口主要描述某种行为契约或能力，让调用者面向共同约定使用不同实现；抽象类适合表达具有共同基础特征的类层次，把共享状态与公共实现放进基类。"
+            }
+          ]
+        },
+        "J01/2": {
+          "role": "CONTRIBUTION",
+          "headings": [
+            "4. Common misconceptions"
+          ],
+          "spans": [],
+          "scope": "提示先按调用者契约和共享状态选择，完整接口／抽象类机制见 J01/1。"
+        }
+      }
+    },
+    {
+      "pointId": "E01.02",
+      "bankId": "E01",
+      "databasePointId": 95,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "2. Main mechanism"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E01.03",
+      "bankId": "E01",
+      "databasePointId": 96,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "2. Main mechanism"
+          ],
+          "spans": []
+        },
+        "J01/2": {
+          "role": "CONTRIBUTION",
+          "headings": [
+            "4. Common misconceptions"
+          ],
+          "spans": [],
+          "scope": "正文可反驳接口不能有方法体和抽象类没有构造，完整字段与方法对照见 J01/1。"
+        }
+      }
+    },
+    {
+      "pointId": "E01.04",
+      "bankId": "E01",
+      "databasePointId": 97,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "3. Important boundary"
+          ],
+          "spans": []
+        },
+        "J01/2": {
+          "role": "DIRECT",
+          "headings": [
+            "4. Common misconceptions"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E02.01",
+      "bankId": "E02",
+      "databasePointId": 98,
+      "type": "CORE",
+      "weight": 30,
+      "evidence": {
+        "J09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "定位和追加"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 81,
+              "spanEndUtf16": 165,
+              "quote": "ArrayList 以可增长数组保存元素引用，按下标访问通常为 O(1)，尾部追加摊还 O(1)，遇到扩容的单次追加可能复制已有引用。LinkedList 使用双向链接"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E02.02",
+      "bankId": "E02",
+      "databasePointId": 99,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "定位和追加"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E02.03",
+      "bankId": "E02",
+      "databasePointId": 100,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "中段修改的两部分成本"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E02.04",
+      "bankId": "E02",
+      "databasePointId": 101,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "选择与验证"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E03.01",
+      "bankId": "E03",
+      "databasePointId": 102,
+      "type": "CORE",
+      "weight": 30,
+      "evidence": {
+        "S01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring IoC、依赖注入与候选 Bean 解析"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 85,
+              "spanEndUtf16": 114,
+              "quote": "IoC 是将组件的创建、配置、组装和受管生命周期交给容器。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E03.02",
+      "bankId": "E03",
+      "databasePointId": 103,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "S01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring IoC、依赖注入与候选 Bean 解析"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E03.03",
+      "bankId": "E03",
+      "databasePointId": 104,
+      "type": "PRINCIPLE",
+      "weight": 25,
+      "evidence": {
+        "S01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring IoC、依赖注入与候选 Bean 解析"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E03.04",
+      "bankId": "E03",
+      "databasePointId": 105,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "S01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring IoC、依赖注入与候选 Bean 解析"
+          ],
+          "spans": []
+        },
+        "S03/1": {
+          "role": "CONTRIBUTION",
+          "headings": [
+            "Spring 受管 Bean 的初始化、销毁与资源所有权"
+          ],
+          "spans": [],
+          "scope": "仅验证实例创建与生命周期侧证据，完整容器组装见 S01。"
+        }
+      }
+    },
+    {
+      "pointId": "E04.01",
+      "bankId": "E04",
+      "databasePointId": 106,
+      "type": "CORE",
+      "weight": 20,
+      "evidence": {
+        "D01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "事务失败时应用需要做什么",
+            "可观察的工程例"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 273,
+              "spanEndUtf16": 308,
+              "quote": "InnoDB 的原子性允许同一事务里的扣款、入账和流水一起提交或回滚。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E04.02",
+      "bankId": "E04",
+      "databasePointId": 107,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "从业务不变量确定边界",
+            "可观察的工程例"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E04.03",
+      "bankId": "E04",
+      "databasePointId": 108,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "隔离与持久各回答一个问题"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E04.04",
+      "bankId": "E04",
+      "databasePointId": 109,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "隔离与持久各回答一个问题"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E04.05",
+      "bankId": "E04",
+      "databasePointId": 110,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "D01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "从业务不变量确定边界",
+            "事务失败时应用需要做什么",
+            "可观察的工程例"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E05.01",
+      "bankId": "E05",
+      "databasePointId": 111,
+      "type": "CORE",
+      "weight": 30,
+      "evidence": {
+        "D15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "TCP 与 UDP 的传输语义和 TCP 连接生命周期"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 77,
+              "spanEndUtf16": 190,
+              "quote": "TCP 为两个端点提供面向连接、可靠、有序的字节流。发送方利用序号和 ACK 跟踪已收到的字节，对丢失数据进行重传，应用需自行定义消息边界。UDP 按数据报保留消息边界，无 TCP 式握手；UDP 自身不保证送达、去重或顺序。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E05.02",
+      "bankId": "E05",
+      "databasePointId": 112,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "D15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "TCP 与 UDP 的传输语义和 TCP 连接生命周期"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E05.03",
+      "bankId": "E05",
+      "databasePointId": 113,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "TCP 与 UDP 的传输语义和 TCP 连接生命周期"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E05.04",
+      "bankId": "E05",
+      "databasePointId": 114,
+      "type": "PRINCIPLE",
+      "weight": 25,
+      "evidence": {
+        "D15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "TCP 与 UDP 的传输语义和 TCP 连接生命周期"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E06.01",
+      "bankId": "E06",
+      "databasePointId": 397,
+      "type": "CORE",
+      "weight": 30,
+      "evidence": {
+        "J02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "受检异常与失败边界"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 97,
+              "spanEndUtf16": 195,
+              "quote": "编译器对可能逃出方法的受检异常要求捕获或在方法的 throws 声明中给出相容类型。例如文件读取的 IOException 可由调用者恢复，就在导入方法声明 throws IOException；"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E06.02",
+      "bankId": "E06",
+      "databasePointId": 398,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "受检异常与失败边界"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E06.03",
+      "bankId": "E06",
+      "databasePointId": 399,
+      "type": "KEY",
+      "weight": 30,
+      "evidence": {
+        "J02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "成功取得资源与关闭顺序"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E06.04",
+      "bankId": "E06",
+      "databasePointId": 400,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "J02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "受检异常与失败边界"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E07.01",
+      "bankId": "E07",
+      "databasePointId": 401,
+      "type": "CORE",
+      "weight": 35,
+      "evidence": {
+        "J03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "引用身份和内容"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 83,
+              "spanEndUtf16": 170,
+              "quote": "引用类型的 == 判断两侧是否指向同一个对象，或是否同时为 null。String.equals 判断另一对象是否也是内容相同的 String。两个对象可以内容相同而身份不同"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E07.02",
+      "bankId": "E07",
+      "databasePointId": 402,
+      "type": "KEY",
+      "weight": 30,
+      "evidence": {
+        "J03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "不可变值和变量重绑定"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E07.03",
+      "bankId": "E07",
+      "databasePointId": 403,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "局部可变缓冲"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E07.04",
+      "bankId": "E07",
+      "databasePointId": 404,
+      "type": "PRINCIPLE",
+      "weight": 10,
+      "evidence": {
+        "J03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "局部可变缓冲"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E08.01",
+      "bankId": "E08",
+      "databasePointId": 405,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "分离序列、成员和索引"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 80,
+              "spanEndUtf16": 132,
+              "quote": "可用 ArrayList 记录完整处理流水，按处理顺序 append，每次尝试都有自己的位置且允许重复。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E08.02",
+      "bankId": "E08",
+      "databasePointId": 406,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "分离序列、成员和索引"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E08.03",
+      "bankId": "E08",
+      "databasePointId": 407,
+      "type": "KEY",
+      "weight": 30,
+      "evidence": {
+        "J10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "分离序列、成员和索引"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E08.04",
+      "bankId": "E08",
+      "databasePointId": 408,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "首次出现和最近访问是不同顺序"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E09.01",
+      "bankId": "E09",
+      "databasePointId": 409,
+      "type": "CORE",
+      "weight": 30,
+      "evidence": {
+        "J11/1": {
+          "role": "DIRECT",
+          "headings": [
+            "双端操作的方向"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 106,
+              "spanEndUtf16": 156,
+              "quote": "把 Deque 用作栈时，同一端入和出，例如 push(a)、push(b)、pop() 得到 b。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E09.02",
+      "bankId": "E09",
+      "databasePointId": 410,
+      "type": "KEY",
+      "weight": 30,
+      "evidence": {
+        "J11/1": {
+          "role": "DIRECT",
+          "headings": [
+            "双端操作的方向"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E09.03",
+      "bankId": "E09",
+      "databasePointId": 411,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J11/1": {
+          "role": "DIRECT",
+          "headings": [
+            "可增长缓冲和硬容量"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E09.04",
+      "bankId": "E09",
+      "databasePointId": 412,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J11/1": {
+          "role": "DIRECT",
+          "headings": [
+            "共享访问"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E10.01",
+      "bankId": "E10",
+      "databasePointId": 413,
+      "type": "CORE",
+      "weight": 30,
+      "evidence": {
+        "S02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring Bean 作用域与请求状态"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 119,
+              "spanEndUtf16": 203,
+              "quote": "默认 `singleton` 在一个容器里按 Bean 定义共享同一实例。同一个 Java 类注册为两个 Bean 定义，可以有两个单例。另一个容器也可以有自己的实例。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E10.02",
+      "bankId": "E10",
+      "databasePointId": 414,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "S02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring Bean 作用域与请求状态"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E10.03",
+      "bankId": "E10",
+      "databasePointId": 415,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "S02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "以 HTTP 请求作为实例边界"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E10.04",
+      "bankId": "E10",
+      "databasePointId": 416,
+      "type": "PRINCIPLE",
+      "weight": 30,
+      "evidence": {
+        "S02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "识别请求身份串用"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E11.01",
+      "bankId": "E11",
+      "databasePointId": 417,
+      "type": "CORE",
+      "weight": 30,
+      "evidence": {
+        "S03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring 受管 Bean 的初始化、销毁与资源所有权"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 92,
+              "spanEndUtf16": 192,
+              "quote": "容器先实例化对象，构造器依赖在创建时提供，属性或 Setter 注入在创建后完成。完成属性填充与相关回调后，`BeanPostProcessor` 可以参与初始化前后的处理。依赖就绪后的配置自检可放在"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E11.02",
+      "bankId": "E11",
+      "databasePointId": 418,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "S03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring 受管 Bean 的初始化、销毁与资源所有权"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E11.03",
+      "bankId": "E11",
+      "databasePointId": 419,
+      "type": "KEY",
+      "weight": 30,
+      "evidence": {
+        "S03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "正常关闭时释放自有资源"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E11.04",
+      "bankId": "E11",
+      "databasePointId": 420,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "S03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "正常关闭时释放自有资源"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E12.01",
+      "bankId": "E12",
+      "databasePointId": 421,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "主键与选填字段"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 59,
+              "spanEndUtf16": 112,
+              "quote": "`PRIMARY KEY (id)` 表示每条记录的行标识，主键的每一列都必须非空，整个键值组合必须唯一。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E12.02",
+      "bankId": "E12",
+      "databasePointId": 422,
+      "type": "KEY",
+      "weight": 30,
+      "evidence": {
+        "D02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "主键与选填字段"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E12.03",
+      "bankId": "E12",
+      "databasePointId": 423,
+      "type": "KEY",
+      "weight": 30,
+      "evidence": {
+        "D02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "NULL、空字符串与条件判断"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E12.04",
+      "bankId": "E12",
+      "databasePointId": 424,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "D02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "NULL、空字符串与条件判断"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E13.01",
+      "bankId": "E13",
+      "databasePointId": 425,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "先匹配、再扩展、最后过滤"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 604,
+              "spanEndUtf16": 631,
+              "quote": "INNER JOIN 只返回满足 ON 条件的左右配对"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E13.02",
+      "bankId": "E13",
+      "databasePointId": 426,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "D02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "先匹配、再扩展、最后过滤",
+            "检查一个常见修补为什么仍丢行"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E13.03",
+      "bankId": "E13",
+      "databasePointId": 427,
+      "type": "KEY",
+      "weight": 30,
+      "evidence": {
+        "D02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "先匹配、再扩展、最后过滤",
+            "检查一个常见修补为什么仍丢行"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E13.04",
+      "bankId": "E13",
+      "databasePointId": 428,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "D02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "先匹配、再扩展、最后过滤",
+            "检查一个常见修补为什么仍丢行"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E14.01",
+      "bankId": "E14",
+      "databasePointId": 429,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "HTTP 方法、状态码与可重试合同"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 40,
+              "spanEndUtf16": 114,
+              "quote": "查询既有任务的表示用 `GET /tasks/{id}`，成功通常为 200。由服务端处理载荷并分配新资源标识的创建可用 `POST /tasks`"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E14.02",
+      "bankId": "E14",
+      "databasePointId": 430,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "HTTP 方法、状态码与可重试合同"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E14.03",
+      "bankId": "E14",
+      "databasePointId": 431,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "HTTP 方法、状态码与可重试合同"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E14.04",
+      "bankId": "E14",
+      "databasePointId": 432,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "D16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "HTTP 方法、状态码与可重试合同"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E14.05",
+      "bankId": "E14",
+      "databasePointId": 433,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "D16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "HTTP 方法、状态码与可重试合同"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E15.01",
+      "bankId": "E15",
+      "databasePointId": 434,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "DNS 递归解析、权威转介与记录缓存"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 83,
+              "spanEndUtf16": 106,
+              "quote": "把查询交给递归解析器，请它给出最终答案或失败。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "E15.02",
+      "bankId": "E15",
+      "databasePointId": 435,
+      "type": "KEY",
+      "weight": 30,
+      "evidence": {
+        "D17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "DNS 递归解析、权威转介与记录缓存"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E15.03",
+      "bankId": "E15",
+      "databasePointId": 436,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "D17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "地址、别名与缓存期限"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "E15.04",
+      "bankId": "E15",
+      "databasePointId": 437,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "D15/1": {
+          "role": "CONTRIBUTION",
+          "headings": [
+            "三次握手如何建立状态"
+          ],
+          "spans": [],
+          "scope": "仅解释 TCP 建连侧，DNS 地址解析与连接分层见 D17。"
+        },
+        "D17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "按连接阶段定位失败"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M01.01",
+      "bankId": "M01",
+      "databasePointId": 115,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "逻辑相等和哈希约束"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 116,
+              "spanEndUtf16": 260,
+              "quote": "业务值如仓库货位可用不可变的仓库 ID 与货架编号定义相等，并满足自反、对称、传递和条件不变时一致，对非 null 实例与 null 比较返回 false。equals 为真时，两个对象在同一次执行中必须具有相同 hashCode。相同 hashCode 可能发生碰撞，不能证明对象相等；"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M01.02",
+      "bankId": "M01",
+      "databasePointId": 116,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "逻辑相等和哈希约束"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M01.03",
+      "bankId": "M01",
+      "databasePointId": 117,
+      "type": "PRINCIPLE",
+      "weight": 30,
+      "evidence": {
+        "J04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "哈希容器中的定位与候选比较"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M01.04",
+      "bankId": "M01",
+      "databasePointId": 118,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "哈希容器中的定位与候选比较"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M02.01",
+      "bankId": "M02",
+      "databasePointId": 119,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J12/1": {
+          "role": "DIRECT",
+          "headings": [
+            "桶定位与更新"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 120,
+              "spanEndUtf16": 335,
+              "quote": "HashMap 用桶数组组织 Node。普通 put 先取得 key 的扰动 hash，表尚未分配时初始化，以 (n - 1) & hash 定位桶。空桶直接安装节点，非空桶先检查首节点，再按普通链表或树桶路径查找或插入。匹配候选的条件包含 hash 一致与键引用相同或 equals 成立。普通 put 命中旧键会替换 value，返回旧值，size 不增加。不同键落在同一桶时可以由链表连接，在符合条件后使用红黑树节点组织桶。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M02.02",
+      "bankId": "M02",
+      "databasePointId": 120,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J12/1": {
+          "role": "DIRECT",
+          "headings": [
+            "桶定位与更新"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M02.03",
+      "bankId": "M02",
+      "databasePointId": 121,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J12/1": {
+          "role": "DIRECT",
+          "headings": [
+            "桶定位与更新"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M02.04",
+      "bankId": "M02",
+      "databasePointId": 122,
+      "type": "INTERNAL",
+      "weight": 20,
+      "evidence": {
+        "J12/1": {
+          "role": "DIRECT",
+          "headings": [
+            "树化与表容量"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M02.05",
+      "bankId": "M02",
+      "databasePointId": 123,
+      "type": "KEY",
+      "weight": 10,
+      "evidence": {
+        "J12/1": {
+          "role": "DIRECT",
+          "headings": [
+            "全表扩容与工程边界"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M03.01",
+      "bankId": "M03",
+      "databasePointId": 124,
+      "type": "CORE",
+      "weight": 20,
+      "evidence": {
+        "J16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "线程私有执行状态与共享区域"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 90,
+              "spanEndUtf16": 208,
+              "quote": "每个 JVM 线程有自己的 pc 和 JVM Stack；如果实现使用本地方法栈，通常在线程创建时分配。线程执行 Java 方法时 pc 记录当前 JVM 指令地址，执行 native 方法时其值未定义。堆和方法区由 JVM 线程共享。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M03.02",
+      "bankId": "M03",
+      "databasePointId": 125,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "线程私有执行状态与共享区域"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M03.03",
+      "bankId": "M03",
+      "databasePointId": 126,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "调用栈帧中的值"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M03.04",
+      "bankId": "M03",
+      "databasePointId": 127,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "调用栈帧中的值"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M03.05",
+      "bankId": "M03",
+      "databasePointId": 128,
+      "type": "ADVANCED",
+      "weight": 15,
+      "evidence": {
+        "J16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "规范布局与实现布局"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M04.01",
+      "bankId": "M04",
+      "databasePointId": 129,
+      "type": "CORE",
+      "weight": 30,
+      "evidence": {
+        "J20/1": {
+          "role": "DIRECT",
+          "headings": [
+            "volatile 发布和读改写"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 90,
+              "spanEndUtf16": 199,
+              "quote": "对同一 volatile 字段的写与同步顺序中后续的读建立 happens-before。结合各线程程序顺序，发布者可先填充数据再写 volatile ready，读取线程观察 ready 后可看到对应发布之前的操作。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M04.02",
+      "bankId": "M04",
+      "databasePointId": 130,
+      "type": "PRINCIPLE",
+      "weight": 25,
+      "evidence": {
+        "J20/1": {
+          "role": "DIRECT",
+          "headings": [
+            "volatile 发布和读改写"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M04.03",
+      "bankId": "M04",
+      "databasePointId": 131,
+      "type": "KEY",
+      "weight": 30,
+      "evidence": {
+        "J20/1": {
+          "role": "DIRECT",
+          "headings": [
+            "volatile 发布和读改写"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M04.04",
+      "bankId": "M04",
+      "databasePointId": 132,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "J20/1": {
+          "role": "DIRECT",
+          "headings": [
+            "volatile 发布和读改写"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M05.01",
+      "bankId": "M05",
+      "databasePointId": 133,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "S04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring AOP 的代理调用路径与方法限制"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 60,
+              "spanEndUtf16": 114,
+              "quote": "Spring AOP 在容器暴露的代理入口拦截目标方法，事务、审计等 advice 可以在进入方法前后执行。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M05.02",
+      "bankId": "M05",
+      "databasePointId": 134,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "S04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring AOP 的代理调用路径与方法限制"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M05.03",
+      "bankId": "M05",
+      "databasePointId": 135,
+      "type": "CORE",
+      "weight": 35,
+      "evidence": {
+        "S04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "外部调用与同类内部调用"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 462,
+              "spanEndUtf16": 542,
+              "quote": "目标内部使用 `this.writeAudit()` 或省略 `this` 直接调用，内层调用走目标引用，未再次进入代理，内层方法的事务或审计声明不会单独生效。"
+            }
+          ]
+        },
+        "S06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring 声明式事务的边界与回滚诊断"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 161,
+              "spanEndUtf16": 202,
+              "quote": "目标对象内部以 `this` 调用事务方法会绕过代理，内层事务声明得不到单独处理。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M05.04",
+      "bankId": "M05",
+      "databasePointId": 136,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "S04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "按事务职责分组件"
+          ],
+          "spans": []
+        },
+        "S06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring 声明式事务的边界与回滚诊断"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M06.01",
+      "bankId": "M06",
+      "databasePointId": 137,
+      "type": "CORE",
+      "weight": 20,
+      "evidence": {
+        "D03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "页组织与访问路径"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 56,
+              "spanEndUtf16": 159,
+              "quote": "普通索引用 B-tree 组织，记录有序存放在叶页，可用 B+ 树类结构帮助理解。内部页用键范围导航到子页，一个页可以索引多个子页。对同样规模的平衡结构，较高扇出通常缩短根到叶的路径，有利于按页读写和缓存。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M06.02",
+      "bankId": "M06",
+      "databasePointId": 138,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "D03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "页组织与访问路径"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M06.03",
+      "bankId": "M06",
+      "databasePointId": 139,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "D03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "聚簇与二级索引"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M06.04",
+      "bankId": "M06",
+      "databasePointId": 140,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "聚簇与二级索引",
+            "覆盖按某次查询判断"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M06.05",
+      "bankId": "M06",
+      "databasePointId": 141,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "D03/1": {
+          "role": "DIRECT",
+          "headings": [
+            "覆盖按某次查询判断",
+            "观察而非猜测磁盘访问"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M07.01",
+      "bankId": "M07",
+      "databasePointId": 142,
+      "type": "CORE",
+      "weight": 20,
+      "evidence": {
+        "D09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "整值、计数和字段",
+            "双端序列和去重集合",
+            "排序集合与范围访问"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 787,
+              "spanEndUtf16": 828,
+              "quote": "String、Hash、List、Set 与 Sorted Set 是五种经典类型"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M07.02",
+      "bankId": "M07",
+      "databasePointId": 143,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "整值、计数和字段"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M07.03",
+      "bankId": "M07",
+      "databasePointId": 144,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "双端序列和去重集合",
+            "可观察的选型对照"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M07.04",
+      "bankId": "M07",
+      "databasePointId": 145,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "双端序列和去重集合",
+            "可观察的选型对照"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M07.05",
+      "bankId": "M07",
+      "databasePointId": 146,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "排序集合与范围访问",
+            "可观察的选型对照"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M08.01",
+      "bankId": "M08",
+      "databasePointId": 438,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "成功取得资源与关闭顺序"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 572,
+              "spanEndUtf16": 621,
+              "quote": "若两个都成功取得，则先尝试 B.close，再尝试 A.close，即使 B.close 抛异常。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M08.02",
+      "bankId": "M08",
+      "databasePointId": 439,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "主异常、抑制异常与 finally"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M08.03",
+      "bankId": "M08",
+      "databasePointId": 440,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "主异常、抑制异常与 finally"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M08.04",
+      "bankId": "M08",
+      "databasePointId": 441,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "主异常、抑制异常与 finally"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M08.05",
+      "bankId": "M08",
+      "databasePointId": 442,
+      "type": "PRINCIPLE",
+      "weight": 10,
+      "evidence": {
+        "J02/1": {
+          "role": "DIRECT",
+          "headings": [
+            "主异常、抑制异常与 finally"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M09.01",
+      "bankId": "M09",
+      "databasePointId": 443,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "不变性保护写入"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 67,
+              "spanEndUtf16": 181,
+              "quote": "Integer 是 Number 的子类型，但 List<Integer> 不能赋给 List<Number>。若允许这种赋值，调用者可通过 List<Number> 写入 Double，原持有者随后却期待读到 Integer。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M09.02",
+      "bankId": "M09",
+      "databasePointId": 444,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "生产者和消费者的静态类型"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M09.03",
+      "bankId": "M09",
+      "databasePointId": 445,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "J05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "生产者和消费者的静态类型"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M09.04",
+      "bankId": "M09",
+      "databasePointId": 446,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "生产者和消费者的静态类型"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M09.05",
+      "bankId": "M09",
+      "databasePointId": 447,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "J05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "生产者和消费者的静态类型"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M10.01",
+      "bankId": "M10",
+      "databasePointId": 448,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "遍历期间的修改"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 70,
+              "spanEndUtf16": 176,
+              "quote": "增强 for 遍历 Iterable 时使用迭代器。循环里调用 ArrayList.remove 直接改变容器结构，绕开当前迭代器，后续遍历可能抛 ConcurrentModificationException。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M10.02",
+      "bankId": "M10",
+      "databasePointId": 449,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "删除与并发协调"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M10.03",
+      "bankId": "M10",
+      "databasePointId": 450,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "J13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "遍历期间的修改"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M10.04",
+      "bankId": "M10",
+      "databasePointId": 451,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "遍历期间的修改"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M10.05",
+      "bankId": "M10",
+      "databasePointId": 452,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "J13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "删除与并发协调"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M11.01",
+      "bankId": "M11",
+      "databasePointId": 453,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "只读容器和元素生命周期"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 496,
+              "spanEndUtf16": 577,
+              "quote": "Collections.unmodifiableList(list) 返回只读视图，读操作仍转发到 backing list；若生产者后续增删或排序，视图也变化。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M11.02",
+      "bankId": "M11",
+      "databasePointId": 454,
+      "type": "KEY",
+      "weight": 30,
+      "evidence": {
+        "J13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "只读容器和元素生命周期"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M11.03",
+      "bankId": "M11",
+      "databasePointId": 455,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "只读容器和元素生命周期"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M11.04",
+      "bankId": "M11",
+      "databasePointId": 456,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "J13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "只读容器和元素生命周期"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M11.05",
+      "bankId": "M11",
+      "databasePointId": 457,
+      "type": "PRINCIPLE",
+      "weight": 10,
+      "evidence": {
+        "J13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "只读容器和元素生命周期"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M12.01",
+      "bankId": "M12",
+      "databasePointId": 458,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "加载、连接和初始化"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 230,
+              "spanEndUtf16": 282,
+              "quote": "读取 Config 声明的非常量 static int retries 首次触发 Config 初始化；"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M12.02",
+      "bankId": "M12",
+      "databasePointId": 459,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "加载、连接和初始化"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M12.03",
+      "bankId": "M12",
+      "databasePointId": 460,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "J17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "加载、连接和初始化"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M12.04",
+      "bankId": "M12",
+      "databasePointId": 461,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "加载、连接和初始化"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M12.05",
+      "bankId": "M12",
+      "databasePointId": 462,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "加载、连接和初始化"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M13.01",
+      "bankId": "M13",
+      "databasePointId": 463,
+      "type": "CORE",
+      "weight": 30,
+      "evidence": {
+        "J18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "生命周期和保留链"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 79,
+              "spanEndUtf16": 165,
+              "quote": "方法将请求详情放入长寿命类的 static Map 后，局部变量离开作用域只解除局部引用。仍可从根经类或其持有的静态字段、Map 条目到达详情对象，强可达的详情可继续保留。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M13.02",
+      "bankId": "M13",
+      "databasePointId": 464,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "生命周期和保留链"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M13.03",
+      "bankId": "M13",
+      "databasePointId": 465,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "生命周期和保留链"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M13.04",
+      "bankId": "M13",
+      "databasePointId": 466,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "J18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "高分配、异常峰值和资源耗尽"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M13.05",
+      "bankId": "M13",
+      "databasePointId": 467,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "J18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "生命周期和保留链"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M14.01",
+      "bankId": "M14",
+      "databasePointId": 468,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J20/1": {
+          "role": "DIRECT",
+          "headings": [
+            "限时获取和释放责任"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 549,
+              "spanEndUtf16": 647,
+              "quote": "对共享容量设置最大等待时，tryLock(time, unit) 成功后进入 try 并在 finally unlock；返回 false 应明确失败、延期或降级，不能进入临界区或 unlock。"
+            }
+          ],
+          "scope": "上一段指明使用同一把锁及 ReentrantLock，摘录支持限时获取和中断分支。"
+        }
+      }
+    },
+    {
+      "pointId": "M14.02",
+      "bankId": "M14",
+      "databasePointId": 469,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J20/1": {
+          "role": "DIRECT",
+          "headings": [
+            "限时获取和释放责任"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M14.03",
+      "bankId": "M14",
+      "databasePointId": 470,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J20/1": {
+          "role": "DIRECT",
+          "headings": [
+            "限时获取和释放责任"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M14.04",
+      "bankId": "M14",
+      "databasePointId": 471,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J20/1": {
+          "role": "DIRECT",
+          "headings": [
+            "监视器和可重入锁"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M14.05",
+      "bankId": "M14",
+      "databasePointId": 472,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "J20/1": {
+          "role": "DIRECT",
+          "headings": [
+            "监视器和可重入锁"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M15.01",
+      "bankId": "M15",
+      "databasePointId": 473,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J21/1": {
+          "role": "DIRECT",
+          "headings": [
+            "sleep 与目标监视器"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 73,
+              "spanEndUtf16": 160,
+              "quote": "Thread.sleep 暂停当前线程，但保留它已经持有的监视器。消费者持有 queueLock 后在空队列上循环 sleep，生产者若也需 queueLock 就无法入队。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M15.02",
+      "bankId": "M15",
+      "databasePointId": 474,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J21/1": {
+          "role": "DIRECT",
+          "headings": [
+            "sleep 与目标监视器"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M15.03",
+      "bankId": "M15",
+      "databasePointId": 475,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J21/1": {
+          "role": "DIRECT",
+          "headings": [
+            "谓词循环和通知"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M15.04",
+      "bankId": "M15",
+      "databasePointId": 476,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "J21/1": {
+          "role": "DIRECT",
+          "headings": [
+            "谓词循环和通知"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M15.05",
+      "bankId": "M15",
+      "databasePointId": 477,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J21/1": {
+          "role": "DIRECT",
+          "headings": [
+            "中断处理"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M16.01",
+      "bankId": "M16",
+      "databasePointId": 478,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "S01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "单值候选与多值注入"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 399,
+              "spanEndUtf16": 469,
+              "quote": "单值参数 `NotificationSender sender` 按类型得到两个候选，在没有限定符、首选者、有效参数名等消歧规则时创建失败。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M16.02",
+      "bankId": "M16",
+      "databasePointId": 479,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "S01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "单值候选与多值注入"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M16.03",
+      "bankId": "M16",
+      "databasePointId": 480,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "S01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "单值候选与多值注入"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M16.04",
+      "bankId": "M16",
+      "databasePointId": 481,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "S01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "单值候选与多值注入"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M16.05",
+      "bankId": "M16",
+      "databasePointId": 482,
+      "type": "KEY",
+      "weight": 10,
+      "evidence": {
+        "S01/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring IoC、依赖注入与候选 Bean 解析"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M17.01",
+      "bankId": "M17",
+      "databasePointId": 483,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "S05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring MVC 请求体转换、参数校验与错误响应"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 126,
+              "spanEndUtf16": 261,
+              "quote": "`@RequestBody` 先由 `HttpMessageConverter` 将内容转成目标对象。JSON 损坏、类型转换不成立或要求的请求体缺失，可能抛 `HttpMessageNotReadableException`。已经解析出 DTO 才能验证 DTO 约束"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M17.02",
+      "bankId": "M17",
+      "databasePointId": 484,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "S05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring MVC 请求体转换、参数校验与错误响应"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M17.03",
+      "bankId": "M17",
+      "databasePointId": 485,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "S05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "直接参数约束与级联"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M17.04",
+      "bankId": "M17",
+      "databasePointId": 486,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "S05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "可验证的对外错误合同"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M17.05",
+      "bankId": "M17",
+      "databasePointId": 487,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "S05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "可验证的对外错误合同"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M18.01",
+      "bankId": "M18",
+      "databasePointId": 488,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "键按字典序排列"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 62,
+              "spanEndUtf16": 210,
+              "quote": "`(device_id, severity, created_at)` 先按设备排序，同设备下按级别排序，同级别内再按时间排序。条件 `device_id=7 AND severity='WARN' AND created_at>=?` 固定两列等值前缀，可在该前缀内从时间下界开始扫描连续区间。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M18.02",
+      "bankId": "M18",
+      "databasePointId": 489,
+      "type": "PRINCIPLE",
+      "weight": 25,
+      "evidence": {
+        "D04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "键按字典序排列"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M18.03",
+      "bankId": "M18",
+      "databasePointId": 490,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "区分排序、过滤与覆盖",
+            "计划与验证"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M18.04",
+      "bankId": "M18",
+      "databasePointId": 491,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "区分排序、过滤与覆盖",
+            "计划与验证"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M18.05",
+      "bankId": "M18",
+      "databasePointId": 492,
+      "type": "PRINCIPLE",
+      "weight": 10,
+      "evidence": {
+        "D04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "区分排序、过滤与覆盖",
+            "计划与验证"
+          ],
+          "spans": []
+        },
+        "D05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "检查哪些工作发生在取行之前"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M19.01",
+      "bankId": "M19",
+      "databasePointId": 493,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "读传统计划"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 75,
+              "spanEndUtf16": 162,
+              "quote": "`possible_keys=ix_customer, key=NULL, type=ALL`，意味着 ix_customer 是候选，本计划未选择索引，访问方式为全表扫描。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M19.02",
+      "bankId": "M19",
+      "databasePointId": 494,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "读传统计划"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M19.03",
+      "bankId": "M19",
+      "databasePointId": 495,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "D05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "比较估计和真正执行"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M19.04",
+      "bankId": "M19",
+      "databasePointId": 496,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "用参数分布定位原因"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M19.05",
+      "bankId": "M19",
+      "databasePointId": 497,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "D05/1": {
+          "role": "DIRECT",
+          "headings": [
+            "比较估计和真正执行",
+            "用参数分布定位原因"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M20.01",
+      "bankId": "M20",
+      "databasePointId": 498,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "到期时间与内存压力分别起作用",
+            "两个可区分的实验"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 142,
+              "spanEndUtf16": 237,
+              "quote": "内存淘汰由 `maxmemory` 与策略触发，作用是让实例按配置腾出内存。若库存展示值设置 10 分钟 TTL，启用某个允许淘汰的策略后仍可能在第 2 分钟被逐出，TTL 只决定过期边界。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M20.02",
+      "bankId": "M20",
+      "databasePointId": 499,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "D10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "到期时间与内存压力分别起作用",
+            "两个可区分的实验"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M20.03",
+      "bankId": "M20",
+      "databasePointId": 500,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "D10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "策略与候选空间",
+            "两个可区分的实验"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M20.04",
+      "bankId": "M20",
+      "databasePointId": 501,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "D10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "策略与候选空间"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M20.05",
+      "bankId": "M20",
+      "databasePointId": 502,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "D10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "在实例层区分可能原因",
+            "两个可区分的实验"
+          ],
+          "spans": []
+        },
+        "D13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "读 miss 与写后失效"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M21.01",
+      "bankId": "M21",
+      "databasePointId": 503,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D11/1": {
+          "role": "DIRECT",
+          "headings": [
+            "从恢复点看 RDB",
+            "把丢失容忍和恢复时长测出来"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 37,
+              "spanEndUtf16": 167,
+              "quote": "Redis OSS 7.2 的 RDB 保存某个时点的数据快照。使用后台保存时，子进程写入快照，父进程继续接受请求，保存成功后替换旧文件。若最近可用快照对应 09:00，实例 09:03 故障，且没有可用于恢复的更新日志，重启加载该快照后，期间的修改可能丢失。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "M21.02",
+      "bankId": "M21",
+      "databasePointId": 504,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "D11/1": {
+          "role": "DIRECT",
+          "headings": [
+            "从日志结构看 AOF",
+            "把丢失容忍和恢复时长测出来"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M21.03",
+      "bankId": "M21",
+      "databasePointId": 505,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "D11/1": {
+          "role": "DIRECT",
+          "headings": [
+            "从日志结构看 AOF"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M21.04",
+      "bankId": "M21",
+      "databasePointId": 506,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "D11/1": {
+          "role": "DIRECT",
+          "headings": [
+            "从恢复点看 RDB",
+            "把丢失容忍和恢复时长测出来"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "M21.05",
+      "bankId": "M21",
+      "databasePointId": 507,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "D11/1": {
+          "role": "DIRECT",
+          "headings": [
+            "用独立故障域覆盖本机失效"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H01.01",
+      "bankId": "H01",
+      "databasePointId": 392,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "擦除与对象身份"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 74,
+              "spanEndUtf16": 140,
+              "quote": "Java 泛型主要在编译期约束赋值与调用。参数化类型擦除到对应原始类型，类型变量擦除到最左上界的擦除，无显式上界时为 Object。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H01.02",
+      "bankId": "H01",
+      "databasePointId": 393,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "擦除与对象身份"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H01.03",
+      "bankId": "H01",
+      "databasePointId": 394,
+      "type": "INTERNAL",
+      "weight": 20,
+      "evidence": {
+        "J06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "擦除后的调用与声明元数据"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H01.04",
+      "bankId": "H01",
+      "databasePointId": 395,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "限制与检查"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H01.05",
+      "bankId": "H01",
+      "databasePointId": 396,
+      "type": "ADVANCED",
+      "weight": 10,
+      "evidence": {
+        "J06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "擦除后的调用与声明元数据"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H02.01",
+      "bankId": "H02",
+      "databasePointId": 152,
+      "type": "CORE",
+      "weight": 20,
+      "evidence": {
+        "J14/1": {
+          "role": "DIRECT",
+          "headings": [
+            "表、空桶和非空桶写入"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 102,
+              "spanEndUtf16": 170,
+              "quote": "8u 的 ConcurrentHashMap 以 table 和链表或树桶承载映射，Segment 类型及字段主要服务于历史序列化兼容。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H02.02",
+      "bankId": "H02",
+      "databasePointId": 153,
+      "type": "INTERNAL",
+      "weight": 25,
+      "evidence": {
+        "J14/1": {
+          "role": "DIRECT",
+          "headings": [
+            "表、空桶和非空桶写入"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H02.03",
+      "bankId": "H02",
+      "databasePointId": 154,
+      "type": "INTERNAL",
+      "weight": 30,
+      "evidence": {
+        "J14/1": {
+          "role": "DIRECT",
+          "headings": [
+            "表、空桶和非空桶写入"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H02.04",
+      "bankId": "H02",
+      "databasePointId": 155,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "J14/1": {
+          "role": "DIRECT",
+          "headings": [
+            "普通读取路径"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H02.05",
+      "bankId": "H02",
+      "databasePointId": 156,
+      "type": "ADVANCED",
+      "weight": 10,
+      "evidence": {
+        "J14/1": {
+          "role": "DIRECT",
+          "headings": [
+            "扩容期间的协作"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H03.01",
+      "bankId": "H03",
+      "databasePointId": 157,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J19/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Region 与年轻代搬迁"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 101,
+              "spanEndUtf16": 180,
+              "quote": "G1 将堆划分为等大的 Region，每个 Region 占用一段连续虚拟地址。Eden、Survivor、Old 分别由若干区域组成，区域角色可随复用变化。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H03.02",
+      "bankId": "H03",
+      "databasePointId": 158,
+      "type": "PRINCIPLE",
+      "weight": 25,
+      "evidence": {
+        "J19/1": {
+          "role": "DIRECT",
+          "headings": [
+            "标记与老年代候选"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H03.03",
+      "bankId": "H03",
+      "databasePointId": 159,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "J19/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Region 与年轻代搬迁"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H03.04",
+      "bankId": "H03",
+      "databasePointId": 160,
+      "type": "INTERNAL",
+      "weight": 20,
+      "evidence": {
+        "J19/1": {
+          "role": "DIRECT",
+          "headings": [
+            "标记与老年代候选"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H03.05",
+      "bankId": "H03",
+      "databasePointId": 161,
+      "type": "ADVANCED",
+      "weight": 15,
+      "evidence": {
+        "J19/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Mixed 和诊断"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H04.01",
+      "bankId": "H04",
+      "databasePointId": 162,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J22/1": {
+          "role": "DIRECT",
+          "headings": [
+            "提交顺序和队列容量"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 76,
+              "spanEndUtf16": 228,
+              "quote": "运行中的 ThreadPoolExecutor 提交时，工作线程不足 corePoolSize 会先尝试创建核心工作线程；达到 core 后先尝试入队。入队后会复核运行状态，必要时移除并拒绝；若无工作线程也会尝试启动。无法入队时才尝试加线程至 maximumPoolSize，达到上限或池关闭走拒绝策略。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H04.02",
+      "bankId": "H04",
+      "databasePointId": 163,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J22/1": {
+          "role": "DIRECT",
+          "headings": [
+            "提交顺序和队列容量"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H04.03",
+      "bankId": "H04",
+      "databasePointId": 164,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J22/1": {
+          "role": "DIRECT",
+          "headings": [
+            "提交顺序和队列容量"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H04.04",
+      "bankId": "H04",
+      "databasePointId": 165,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J22/1": {
+          "role": "DIRECT",
+          "headings": [
+            "任务受理和反馈"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H04.05",
+      "bankId": "H04",
+      "databasePointId": 166,
+      "type": "ADVANCED",
+      "weight": 15,
+      "evidence": {
+        "J22/1": {
+          "role": "DIRECT",
+          "headings": [
+            "任务受理和反馈"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H05.01",
+      "bankId": "H05",
+      "databasePointId": 167,
+      "type": "CORE",
+      "weight": 20,
+      "evidence": {
+        "S04/1": {
+          "role": "DIRECT",
+          "headings": [
+            "外部调用与同类内部调用"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 390,
+              "spanEndUtf16": 542,
+              "quote": "当其他组件通过注入的代理调用 `writeAudit()`，代理可以应用匹配的 advice。若组件调用目标的 `importAll()` 后，目标内部使用 `this.writeAudit()` 或省略 `this` 直接调用，内层调用走目标引用，未再次进入代理，内层方法的事务或审计声明不会单独生效。"
+            }
+          ]
+        },
+        "S06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring 声明式事务的边界与回滚诊断"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 87,
+              "spanEndUtf16": 202,
+              "quote": "调用受管 Bean 的事务方法时，代理在匹配的入口选择事务管理器，创建或参与事务，并让支持 Spring 事务的 JDBC 数据访问使用绑定的连接。目标对象内部以 `this` 调用事务方法会绕过代理，内层事务声明得不到单独处理。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H05.02",
+      "bankId": "H05",
+      "databasePointId": 168,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "S06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "默认回滚与 rollback-only"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H05.03",
+      "bankId": "H05",
+      "databasePointId": 169,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "S06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring 声明式事务的边界与回滚诊断",
+            "默认回滚与 rollback-only"
+          ],
+          "spans": []
+        },
+        "S07/1": {
+          "role": "CONTRIBUTION",
+          "headings": [
+            "Spring JDBC 事务传播、保存点与连接占用"
+          ],
+          "spans": [],
+          "scope": "仅覆盖代理与 rollback-only 的捕获边界，事务管理器选择见 S06。"
+        }
+      }
+    },
+    {
+      "pointId": "H05.04",
+      "bankId": "H05",
+      "databasePointId": 170,
+      "type": "PRINCIPLE",
+      "weight": 25,
+      "evidence": {
+        "S06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "以同库工作单元验证边界"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H05.05",
+      "bankId": "H05",
+      "databasePointId": 171,
+      "type": "ADVANCED",
+      "weight": 15,
+      "evidence": {
+        "S06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "以同库工作单元验证边界"
+          ],
+          "spans": []
+        },
+        "S08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "发送成功和确认成功之间仍有故障窗口"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H06.01",
+      "bankId": "H06",
+      "databasePointId": 172,
+      "type": "CORE",
+      "weight": 20,
+      "evidence": {
+        "D06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "一致性读如何选到历史版本"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 38,
+              "spanEndUtf16": 293,
+              "quote": "MySQL 8.0 的 InnoDB 采用多版本并发控制（MVCC）。聚簇记录的隐藏字段 `DB_TRX_ID` 关联最近插入或修改该记录的事务，`DB_ROLL_PTR` 指向 undo 记录。普通一致性读依据 Read View 判断版本对应的事务是否在可见边界内。当前版本不可见时，引擎可沿 undo 信息重建较早版本，直到找到可见行或确认无可见行。Read View 记录的是事务可见性范围，依赖事务 ID 和生成快照时的事务状态，也纳入当前事务对自身修改的可见性。普通一致性读通常可避开等待并发写锁。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H06.02",
+      "bankId": "H06",
+      "databasePointId": 173,
+      "type": "INTERNAL",
+      "weight": 20,
+      "evidence": {
+        "D06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "一致性读如何选到历史版本"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H06.03",
+      "bankId": "H06",
+      "databasePointId": 174,
+      "type": "PRINCIPLE",
+      "weight": 25,
+      "evidence": {
+        "D06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "一致性读如何选到历史版本"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H06.04",
+      "bankId": "H06",
+      "databasePointId": 175,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "两个连接看见哪些值"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H06.05",
+      "bankId": "H06",
+      "databasePointId": 176,
+      "type": "ADVANCED",
+      "weight": 15,
+      "evidence": {
+        "D06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "锁定读、自身写入和更新谓词"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H07.01",
+      "bankId": "H07",
+      "databasePointId": 177,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D12/1": {
+          "role": "DIRECT",
+          "headings": [
+            "一次获取同时设置租期"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 83,
+              "spanEndUtf16": 190,
+              "quote": "执行 `SET lock:asset:27 token NX PX 3000`。NX 只在键不存在时设置，PX 为新值同时设置毫秒租期。使用 SETNX 和单独的过期命令时，客户端在两步之间故障会留下没有期限的锁。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H07.02",
+      "bankId": "H07",
+      "databasePointId": 178,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "D12/1": {
+          "role": "DIRECT",
+          "headings": [
+            "一次获取同时设置租期",
+            "原子核验所有权后释放"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H07.03",
+      "bankId": "H07",
+      "databasePointId": 179,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "D12/1": {
+          "role": "DIRECT",
+          "headings": [
+            "原子核验所有权后释放"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H07.04",
+      "bankId": "H07",
+      "databasePointId": 180,
+      "type": "INTERNAL",
+      "weight": 15,
+      "evidence": {
+        "D12/1": {
+          "role": "DIRECT",
+          "headings": [
+            "原子核验所有权后释放",
+            "过期后旧执行者可能迟到",
+            "故障与热点回源"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H07.05",
+      "bankId": "H07",
+      "databasePointId": 181,
+      "type": "ADVANCED",
+      "weight": 15,
+      "evidence": {
+        "D12/1": {
+          "role": "DIRECT",
+          "headings": [
+            "过期后旧执行者可能迟到",
+            "故障与热点回源"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H08.01",
+      "bankId": "H08",
+      "databasePointId": 182,
+      "type": "CORE",
+      "weight": 20,
+      "evidence": {
+        "D15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "三次握手如何建立状态"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 361,
+              "spanEndUtf16": 500,
+              "quote": "常见主动建立过程是 A 发 `SYN(seq=x)`，B 回 `SYN(seq=y)+ACK(x+1)`，A 再回 `ACK(y+1)`。双方交换并确认各自初始序号，B 在收到对自己 SYN 的有效确认后完成该方向的同步。SYN 占用一个序号，SYN 与 ACK 可以在同一段。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H08.02",
+      "bankId": "H08",
+      "databasePointId": 183,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "D15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "三次握手如何建立状态"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H08.03",
+      "bankId": "H08",
+      "databasePointId": 184,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "半关闭与两种常见关闭状态"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H08.04",
+      "bankId": "H08",
+      "databasePointId": 185,
+      "type": "INTERNAL",
+      "weight": 20,
+      "evidence": {
+        "D15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "半关闭与两种常见关闭状态"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H08.05",
+      "bankId": "H08",
+      "databasePointId": 186,
+      "type": "ADVANCED",
+      "weight": 20,
+      "evidence": {
+        "D15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "半关闭与两种常见关闭状态"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H09.01",
+      "bankId": "H09",
+      "databasePointId": 187,
+      "type": "CORE",
+      "weight": 30,
+      "evidence": {
+        "D08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "把库存条件放进权威写入",
+            "可以怎样观察"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 97,
+              "spanEndUtf16": 316,
+              "quote": "可执行 `UPDATE slot_quota SET available = available - :qty WHERE slot_id = :id AND available >= :qty`。影响一行表示这次扣减完成，零行则按场景区分不存在或余量不足。正数和唯一定位是这段判断的前提。先普通 SELECT 后无条件更新会让多个请求基于同一个旧值决策。也可在同一事务内用 `SELECT ... FOR UPDATE` 锁行、检查再写"
+            }
+          ],
+          "scope": "同段前一句给定唯一 slot_id 与正数 qty，并在条件更新后检查影响行数。"
+        }
+      }
+    },
+    {
+      "pointId": "H09.02",
+      "bankId": "H09",
+      "databasePointId": 188,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "D08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "让并发重放得到已提交结果",
+            "可以怎样观察"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H09.03",
+      "bankId": "H09",
+      "databasePointId": 189,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "D08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "让并发重放得到已提交结果",
+            "可以怎样观察"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H09.04",
+      "bankId": "H09",
+      "databasePointId": 190,
+      "type": "ADVANCED",
+      "weight": 25,
+      "evidence": {
+        "D07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "重新开始事务的边界"
+          ],
+          "spans": []
+        },
+        "D08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "超时后的恢复"
+          ],
+          "spans": []
+        },
+        "D16/1": {
+          "role": "CONTRIBUTION",
+          "headings": [
+            "请求是否发送与提交是否发生",
+            "去重、重放与恢复预算"
+          ],
+          "spans": [],
+          "scope": "覆盖超时结果未知与有界同键重试，InnoDB 死锁、等待超时及事务重试见 D07/D08。"
+        }
+      }
+    },
+    {
+      "pointId": "H10.01",
+      "bankId": "H10",
+      "databasePointId": 508,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "成员元数据与执行权限"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 89,
+              "spanEndUtf16": 261,
+              "quote": "PluginConfig.class.getDeclaredField(\"token\") 能发现 PluginConfig 自己声明的字段，包括 private 字段；它不向父类搜索。Field 对象保存元数据。随后 Field.get(config) 默认仍检查当前调用者访问权限，没有权限会抛 IllegalAccessException。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H10.02",
+      "bankId": "H10",
+      "databasePointId": 509,
+      "type": "PRINCIPLE",
+      "weight": 25,
+      "evidence": {
+        "J07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "导出和开放的边界"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H10.03",
+      "bankId": "H10",
+      "databasePointId": 510,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "导出和开放的边界"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H10.04",
+      "bankId": "H10",
+      "databasePointId": 511,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "导出和开放的边界"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H10.05",
+      "bankId": "H10",
+      "databasePointId": 512,
+      "type": "ADVANCED",
+      "weight": 10,
+      "evidence": {
+        "J07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "限制反射的输入"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H11.01",
+      "bankId": "H11",
+      "databasePointId": 513,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "延迟执行与副作用"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 81,
+              "spanEndUtf16": 239,
+              "quote": "filter、map、peek 是中间操作，返回管线供后续组合；count、toList 和 forEach 是终止操作。实现可以在不改变结果时省略遍历或中间阶段。对已知大小的 List，stream.peek(audit).count() 在 peek 不改变元素数时可直接使用已知大小，audit 并无必达保证。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H11.02",
+      "bankId": "H11",
+      "databasePointId": 514,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "并行写入与顺序"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 316,
+              "spanEndUtf16": 417,
+              "quote": "parallelStream().forEach(resultArrayList::add) 会使多个任务共享修改普通 ArrayList，可能丢数据或破坏容器。并行 forEach 也不保证遇到顺序。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H11.03",
+      "bankId": "H11",
+      "databasePointId": 515,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "延迟执行与副作用"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H11.04",
+      "bankId": "H11",
+      "databasePointId": 516,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "并行写入与顺序"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H11.05",
+      "bankId": "H11",
+      "databasePointId": 517,
+      "type": "ADVANCED",
+      "weight": 10,
+      "evidence": {
+        "J08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "并行决策的成本"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H12.01",
+      "bankId": "H12",
+      "databasePointId": 518,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "单键原子更新与回调"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 104,
+              "spanEndUtf16": 138,
+              "quote": "两个线程同时 get 到计数 4，各自 put(5)，只会增加一次。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H12.02",
+      "bankId": "H12",
+      "databasePointId": 519,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "单键原子更新与回调"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 138,
+              "spanEndUtf16": 217,
+              "quote": "ConcurrentHashMap.merge(key, 1, Integer::sum) 或 compute 可把同一键的查找、计算、写入作为原子方法操作。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H12.03",
+      "bankId": "H12",
+      "databasePointId": 520,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "单键原子更新与回调"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H12.04",
+      "bankId": "H12",
+      "databasePointId": 521,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "单键原子更新与回调"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H12.05",
+      "bankId": "H12",
+      "databasePointId": 522,
+      "type": "ADVANCED",
+      "weight": 10,
+      "evidence": {
+        "J15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "单键原子更新与回调"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H13.01",
+      "bankId": "H13",
+      "databasePointId": 523,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "写时复制的观察时点"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 458,
+              "spanEndUtf16": 530,
+              "quote": "高遍历、低变更的监听器列表可用 CopyOnWriteArrayList。迭代器固定创建时的成员数组，因此正在广播的一轮仍可能通知刚注销的成员。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H13.02",
+      "bankId": "H13",
+      "databasePointId": 524,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "写时复制的观察时点"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H13.03",
+      "bankId": "H13",
+      "databasePointId": 525,
+      "type": "PRINCIPLE",
+      "weight": 20,
+      "evidence": {
+        "J15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "写时复制的观察时点"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H13.04",
+      "bankId": "H13",
+      "databasePointId": 526,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "J15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "弱一致观察与精确快照"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 649,
+              "spanEndUtf16": 715,
+              "quote": "在线用户近似观测可用 ConcurrentHashMap 的弱一致遍历。遍历可与修改并行，可能看见部分后来更新，不提供全表一致时点。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H13.05",
+      "bankId": "H13",
+      "databasePointId": 527,
+      "type": "ADVANCED",
+      "weight": 10,
+      "evidence": {
+        "J15/1": {
+          "role": "DIRECT",
+          "headings": [
+            "弱一致观察与精确快照"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H14.01",
+      "bankId": "H14",
+      "databasePointId": 528,
+      "type": "CORE",
+      "weight": 30,
+      "evidence": {
+        "J17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "定义加载器与插件冲突"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 459,
+              "spanEndUtf16": 536,
+              "quote": "普通类或接口的运行时身份由二进制名称和定义加载器共同确定。两个加载器各定义一份 api.Payment 时，插件实现的一份接口不能强转为宿主持有的另一份。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H14.02",
+      "bankId": "H14",
+      "databasePointId": 529,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "定义加载器与插件冲突"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H14.03",
+      "bankId": "H14",
+      "databasePointId": 530,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "定义加载器与插件冲突"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H14.04",
+      "bankId": "H14",
+      "databasePointId": 531,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "J17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "定义加载器与插件冲突"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H14.05",
+      "bankId": "H14",
+      "databasePointId": 532,
+      "type": "ADVANCED",
+      "weight": 10,
+      "evidence": {
+        "J17/1": {
+          "role": "DIRECT",
+          "headings": [
+            "SPI 提供者可见性"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H15.01",
+      "bankId": "H15",
+      "databasePointId": 533,
+      "type": "CORE",
+      "weight": 28,
+      "evidence": {
+        "J18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "将时间线与修复验证关联"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 525,
+              "spanEndUtf16": 576,
+              "quote": "在同一时间窗记录进程和线程 CPU，用多次栈采样、JFR 或 GC 日志把应用热点和 GC 活动对齐。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H15.02",
+      "bankId": "H15",
+      "databasePointId": 534,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "高分配、异常峰值和资源耗尽"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H15.03",
+      "bankId": "H15",
+      "databasePointId": 535,
+      "type": "PRINCIPLE",
+      "weight": 22,
+      "evidence": {
+        "J18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "高分配、异常峰值和资源耗尽"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H15.04",
+      "bankId": "H15",
+      "databasePointId": 536,
+      "type": "KEY",
+      "weight": 18,
+      "evidence": {
+        "J18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "将时间线与修复验证关联"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H15.05",
+      "bankId": "H15",
+      "databasePointId": 537,
+      "type": "KEY",
+      "weight": 12,
+      "evidence": {
+        "J18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "将时间线与修复验证关联"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H16.01",
+      "bankId": "H16",
+      "databasePointId": 538,
+      "type": "CORE",
+      "weight": 32,
+      "evidence": {
+        "J22/1": {
+          "role": "DIRECT",
+          "headings": [
+            "复用线程的上下文所有权"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 544,
+              "spanEndUtf16": 606,
+              "quote": "ThreadLocal 按线程保存值。请求 A 未清理，复用同一线程的请求 B 若在设置自身值前读取，会看到 A 的上下文；"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H16.02",
+      "bankId": "H16",
+      "databasePointId": 539,
+      "type": "KEY",
+      "weight": 25,
+      "evidence": {
+        "J22/1": {
+          "role": "DIRECT",
+          "headings": [
+            "复用线程的上下文所有权"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H16.03",
+      "bankId": "H16",
+      "databasePointId": 540,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "J22/1": {
+          "role": "DIRECT",
+          "headings": [
+            "复用线程的上下文所有权"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H16.04",
+      "bankId": "H16",
+      "databasePointId": 541,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J22/1": {
+          "role": "DIRECT",
+          "headings": [
+            "复用线程的上下文所有权"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H16.05",
+      "bankId": "H16",
+      "databasePointId": 542,
+      "type": "ADVANCED",
+      "weight": 8,
+      "evidence": {
+        "J22/1": {
+          "role": "DIRECT",
+          "headings": [
+            "复用线程的上下文所有权"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H17.01",
+      "bankId": "H17",
+      "databasePointId": 543,
+      "type": "CORE",
+      "weight": 28,
+      "evidence": {
+        "J23/1": {
+          "role": "DIRECT",
+          "headings": [
+            "依赖组合和失败边界"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 101,
+              "spanEndUtf16": 199,
+              "quote": "查询用户成功后才能查权限，可用 userFuture.thenCompose(user -> loadPermissions(user.id())) 扁平化依赖；无需用户结果的配置查询可独立启动。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H17.02",
+      "bankId": "H17",
+      "databasePointId": 544,
+      "type": "KEY",
+      "weight": 17,
+      "evidence": {
+        "J23/1": {
+          "role": "DIRECT",
+          "headings": [
+            "依赖组合和失败边界"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H17.03",
+      "bankId": "H17",
+      "databasePointId": 545,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J23/1": {
+          "role": "DIRECT",
+          "headings": [
+            "依赖组合和失败边界"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H17.04",
+      "bankId": "H17",
+      "databasePointId": 546,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "J23/1": {
+          "role": "DIRECT",
+          "headings": [
+            "选择执行器"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H17.05",
+      "bankId": "H17",
+      "databasePointId": 547,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "J23/1": {
+          "role": "DIRECT",
+          "headings": [
+            "总时限与底层工作"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H18.01",
+      "bankId": "H18",
+      "databasePointId": 548,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "S07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring JDBC 事务传播、保存点与连接占用"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 86,
+              "spanEndUtf16": 154,
+              "quote": "外层事务内调用另一个受管组件的 `REQUIRED` 方法时，两个逻辑作用域共享同一个物理事务。订单和必须成功的明细适合共享提交与回滚。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H18.02",
+      "bankId": "H18",
+      "databasePointId": 549,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "S07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "Spring JDBC 事务传播、保存点与连接占用"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H18.03",
+      "bankId": "H18",
+      "databasePointId": 550,
+      "type": "CORE",
+      "weight": 22,
+      "evidence": {
+        "S07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "保存点的局部回滚"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 277,
+              "spanEndUtf16": 378,
+              "quote": "`NESTED` 在已有事务下可以用同一物理事务内的保存点。可选的同库附加记录失败时，若支持保存点且内层触发回滚，可回到保存点，外层决定是否继续。内层正常完成也要等外层提交，外层随后回滚会撤销内层写入。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H18.04",
+      "bankId": "H18",
+      "databasePointId": 551,
+      "type": "KEY",
+      "weight": 21,
+      "evidence": {
+        "S07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "独立提交需要独立资源"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H18.05",
+      "bankId": "H18",
+      "databasePointId": 552,
+      "type": "ADVANCED",
+      "weight": 12,
+      "evidence": {
+        "S07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "独立提交需要独立资源"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H19.01",
+      "bankId": "H19",
+      "databasePointId": 553,
+      "type": "CORE",
+      "weight": 26,
+      "evidence": {
+        "S08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "提交后的外部副作用、持久待办与恢复"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 72,
+              "spanEndUtf16": 225,
+              "quote": "`@TransactionalEventListener` 的默认阶段为 `AFTER_COMMIT`，在关联事务成功提交后执行。默认没有事务时不执行，可显式配置 `fallbackExecution`。提交后通知避免为已回滚的业务发送消息，但数据库已提交、进程尚未执行监听器时可能崩溃。内存事件随进程丢失"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H19.02",
+      "bankId": "H19",
+      "databasePointId": 554,
+      "type": "CORE",
+      "weight": 28,
+      "evidence": {
+        "S08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "同库原子保存业务与待办"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 276,
+              "spanEndUtf16": 486,
+              "quote": "可在同一事务写订单和一条待发送记录，后者保存稳定操作键、必要载荷、状态、尝试次数和下次尝试时间。提交完成后由受控工作器找出待办，短事务取得执行资格，事务外发送，再用短事务独立确认送达或安排重试。若以提交后回调写确认，原事务资源可能仍可访问，但该阶段写入不会随原事务再次提交，应让确认获得自己的事务，例如通过代理入口或 `TransactionTemplate` 启动新事务。崩溃时通过待办状态和可恢复的执行资格继续处理。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H19.03",
+      "bankId": "H19",
+      "databasePointId": 555,
+      "type": "KEY",
+      "weight": 21,
+      "evidence": {
+        "S08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "发送成功和确认成功之间仍有故障窗口"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H19.04",
+      "bankId": "H19",
+      "databasePointId": 556,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "S08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "同库原子保存业务与待办",
+            "发送成功和确认成功之间仍有故障窗口"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H19.05",
+      "bankId": "H19",
+      "databasePointId": 557,
+      "type": "PRINCIPLE",
+      "weight": 10,
+      "evidence": {
+        "S08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "发送成功和确认成功之间仍有故障窗口"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H20.01",
+      "bankId": "H20",
+      "databasePointId": 558,
+      "type": "CORE",
+      "weight": 27,
+      "evidence": {
+        "D06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "两个连接看见哪些值"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 377,
+              "spanEndUtf16": 484,
+              "quote": "A 再做普通 SELECT，REPEATABLE READ 仍读 14，READ COMMITTED 读 11。普通 START TRANSACTION 下，RR 通常由第一次一致性读建立并在后续一致性读复用快照；"
+            }
+          ],
+          "scope": "文档以 14→11 为等价示例，按题设初值 10、B 已提交值 8 分别代入。"
+        }
+      }
+    },
+    {
+      "pointId": "H20.02",
+      "bankId": "H20",
+      "databasePointId": 559,
+      "type": "KEY",
+      "weight": 21,
+      "evidence": {
+        "D06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "两个连接看见哪些值"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H20.03",
+      "bankId": "H20",
+      "databasePointId": 560,
+      "type": "CORE",
+      "weight": 22,
+      "evidence": {
+        "D06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "锁定读、自身写入和更新谓词"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 626,
+              "spanEndUtf16": 718,
+              "quote": "B 已提交且无其他写入时，A 两种隔离级别执行同一行的 `SELECT ... FOR UPDATE` 均读到 11 并取得排他锁。锁定读读取最新可用的版本，遇到未释放的冲突锁可能等待"
+            }
+          ],
+          "scope": "文档以 14→11 为等价示例，按题设初值 10、B 已提交值 8 分别代入。"
+        }
+      }
+    },
+    {
+      "pointId": "H20.04",
+      "bankId": "H20",
+      "databasePointId": 561,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "锁定读、自身写入和更新谓词"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H20.05",
+      "bankId": "H20",
+      "databasePointId": 562,
+      "type": "ADVANCED",
+      "weight": 10,
+      "evidence": {
+        "D06/1": {
+          "role": "DIRECT",
+          "headings": [
+            "锁定读、自身写入和更新谓词"
+          ],
+          "spans": []
+        },
+        "D08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "把库存条件放进权威写入"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H21.01",
+      "bankId": "H21",
+      "databasePointId": 563,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "等待成环与单向等待",
+            "重新开始事务的边界"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 95,
+              "spanEndUtf16": 392,
+              "quote": "死锁检测开启时，引擎选择一个事务作为牺牲者并回滚其整个事务，客户端常见错误 1213。另一个场景是一笔事务已修改账户 5，等待被长事务锁住的账户 9，后者并不等待前者。这种单向等待也可能达到锁等待上限。默认 `innodb_rollback_on_timeout=OFF` 时，锁等待超时只回滚失败语句，通常报错 1205。账户 5 上的前序修改可能仍在当前未提交事务中，业务应显式结束并回滚，避免提交半笔转账。启用整事务超时回滚或关闭死锁检测时，诊断应按实际配置。\n\n## 重新开始事务的边界\n\n把可重试错误的识别、次数上限和退避放在事务外层。确认上一事务结束后，再新开事务执行完整的工作单元"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H21.02",
+      "bankId": "H21",
+      "databasePointId": 564,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "等待成环与单向等待",
+            "重新开始事务的边界"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 196,
+              "spanEndUtf16": 301,
+              "quote": "默认 `innodb_rollback_on_timeout=OFF` 时，锁等待超时只回滚失败语句，通常报错 1205。账户 5 上的前序修改可能仍在当前未提交事务中，业务应显式结束并回滚，避免提交半笔转账。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H21.03",
+      "bankId": "H21",
+      "databasePointId": 565,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "重新开始事务的边界"
+          ],
+          "spans": []
+        },
+        "D08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "超时后的恢复"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H21.04",
+      "bankId": "H21",
+      "databasePointId": 566,
+      "type": "PRINCIPLE",
+      "weight": 18,
+      "evidence": {
+        "D07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "降低等待与找到当时证据"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H21.05",
+      "bankId": "H21",
+      "databasePointId": 567,
+      "type": "KEY",
+      "weight": 12,
+      "evidence": {
+        "D07/1": {
+          "role": "DIRECT",
+          "headings": [
+            "降低等待与找到当时证据"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H22.01",
+      "bankId": "H22",
+      "databasePointId": 568,
+      "type": "CORE",
+      "weight": 24,
+      "evidence": {
+        "D13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "读 miss 与写后失效"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 43,
+              "spanEndUtf16": 132,
+              "quote": "在 MySQL 为权威来源、Redis OSS 7.2 作可丢弃读缓存的场景，应用先读缓存，miss 时读数据库，再按业务条件带 TTL 回填。写路径先提交权威数据，再删除缓存键"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H22.02",
+      "bankId": "H22",
+      "databasePointId": 569,
+      "type": "CORE",
+      "weight": 26,
+      "evidence": {
+        "D13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "用时间轴看陈旧回填",
+            "版本条件与窗口"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 262,
+              "spanEndUtf16": 372,
+              "quote": "读者 R 缓存 miss，从数据库拿到档案版本 41，暂时停在回填前。写者 W 提交版本 42，再删除缓存。R 继续执行，将 41 写回了已经清空的缓存。此时后续请求可能读到旧值，即使 W 完全按「提交后删除」顺序操作。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H22.03",
+      "bankId": "H22",
+      "databasePointId": 570,
+      "type": "KEY",
+      "weight": 20,
+      "evidence": {
+        "D13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "用时间轴看陈旧回填",
+            "版本条件与窗口"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H22.04",
+      "bankId": "H22",
+      "databasePointId": 571,
+      "type": "KEY",
+      "weight": 22,
+      "evidence": {
+        "D12/1": {
+          "role": "DIRECT",
+          "headings": [
+            "故障与热点回源"
+          ],
+          "spans": []
+        },
+        "D13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "热点 miss 与并发预算"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H22.05",
+      "bankId": "H22",
+      "databasePointId": 572,
+      "type": "ADVANCED",
+      "weight": 8,
+      "evidence": {
+        "D13/1": {
+          "role": "DIRECT",
+          "headings": [
+            "热点 miss 与并发预算"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H23.01",
+      "bankId": "H23",
+      "databasePointId": 573,
+      "type": "CORE",
+      "weight": 22,
+      "evidence": {
+        "D14/1": {
+          "role": "DIRECT",
+          "headings": [
+            "独立操作采用批量往返",
+            "如何选取和验证"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 68,
+              "spanEndUtf16": 143,
+              "quote": "Pipeline 允许客户端先连续发送多条命令，再按顺序读取结果，减少网络往返。独立读取不同计数器是适用场景。Pipeline 本身没有命令组隔离保证"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H23.02",
+      "bankId": "H23",
+      "databasePointId": 574,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D14/1": {
+          "role": "DIRECT",
+          "headings": [
+            "WATCH 乐观流程与 EXEC 的两类错误",
+            "如何选取和验证"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 275,
+              "spanEndUtf16": 364,
+              "quote": "在同一连接执行 WATCH 配额键，GET 后判断余额，满足时 MULTI 排队更新，再 EXEC。观察期间键被修改、过期或淘汰时，Redis 7.2 的 EXEC 放弃这批命令"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H23.03",
+      "bankId": "H23",
+      "databasePointId": 575,
+      "type": "KEY",
+      "weight": 21,
+      "evidence": {
+        "D12/1": {
+          "role": "DIRECT",
+          "headings": [
+            "原子核验所有权后释放"
+          ],
+          "spans": []
+        },
+        "D14/1": {
+          "role": "DIRECT",
+          "headings": [
+            "短脚本在一个执行边界内完成检查",
+            "如何选取和验证"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H23.04",
+      "bankId": "H23",
+      "databasePointId": 576,
+      "type": "PRINCIPLE",
+      "weight": 22,
+      "evidence": {
+        "D14/1": {
+          "role": "DIRECT",
+          "headings": [
+            "WATCH 乐观流程与 EXEC 的两类错误",
+            "如何选取和验证"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H23.05",
+      "bankId": "H23",
+      "databasePointId": 577,
+      "type": "ADVANCED",
+      "weight": 10,
+      "evidence": {
+        "D14/1": {
+          "role": "DIRECT",
+          "headings": [
+            "短脚本在一个执行边界内完成检查",
+            "如何选取和验证"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H24.01",
+      "bankId": "H24",
+      "databasePointId": 578,
+      "type": "CORE",
+      "weight": 28,
+      "evidence": {
+        "D18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "TLS 1.3 服务器认证、密钥协商与用户身份"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 86,
+              "spanEndUtf16": 238,
+              "quote": "客户端需要分别验证证书链信任和服务身份。链验证根据受信任锚、签名、有效期和证书约束验证路径，服务身份检查则把应用预期连接的主机名与证书 SAN 中适用的 DNS 标识比较。给 `files.example.com` 签发的受信证书，如果不匹配 `api.example.com`，不应被后者的客户端接受。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H24.02",
+      "bankId": "H24",
+      "databasePointId": 579,
+      "type": "KEY",
+      "weight": 22,
+      "evidence": {
+        "D18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "TLS 1.3 服务器认证、密钥协商与用户身份"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H24.03",
+      "bankId": "H24",
+      "databasePointId": 580,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "从临时密钥份额派生流量密钥"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 325,
+              "spanEndUtf16": 468,
+              "quote": "ClientHello 和 ServerHello 携带协商的公开密钥份额。双方各用自己的临时私有值和对端公开份额计算同一个 (EC)DHE 共享秘密。TLS 1.3 以 HKDF 密钥调度结合握手 transcript 派生握手及应用流量秘密，再导出各方向对称保护所需的密钥和 IV。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H24.04",
+      "bankId": "H24",
+      "databasePointId": 581,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "D18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "从临时密钥份额派生流量密钥"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H24.05",
+      "bankId": "H24",
+      "databasePointId": 582,
+      "type": "KEY",
+      "weight": 10,
+      "evidence": {
+        "D18/1": {
+          "role": "DIRECT",
+          "headings": [
+            "传输认证与应用授权分层"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H25.01",
+      "bankId": "H25",
+      "databasePointId": 583,
+      "type": "CORE",
+      "weight": 26,
+      "evidence": {
+        "D08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "超时后的恢复"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 688,
+              "spanEndUtf16": 757,
+              "quote": "能证实某次尝试从未发送时，服务端不会执行该次尝试。已发送后等待响应超时，或 COMMIT 发出后断连，客户端无法仅凭异常断定是否扣减成功。"
+            }
+          ]
+        },
+        "D16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "请求是否发送与提交是否发生"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 376,
+              "spanEndUtf16": 517,
+              "quote": "若可证明未建立连接且未发送请求，则该次尝试没有抵达应用。Java HTTP Client 的 `HttpConnectTimeoutException` 表示连接建立超时，实际重试判断仍应考虑代理、连接复用和其他尝试。若已发送请求却未收到响应，无法仅凭客户端超时推断数据库是否提交。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H25.02",
+      "bankId": "H25",
+      "databasePointId": 584,
+      "type": "KEY",
+      "weight": 22,
+      "evidence": {
+        "D16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "HTTP 方法、状态码与可重试合同",
+            "请求是否发送与提交是否发生"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H25.03",
+      "bankId": "H25",
+      "databasePointId": 585,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "D08/1": {
+          "role": "CONTRIBUTION",
+          "headings": [
+            "让并发重放得到已提交结果",
+            "超时后的恢复"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 399,
+              "spanEndUtf16": 564,
+              "quote": "给一次预约生成稳定请求 ID，重试保留 ID 和载荷。用非空唯一约束例如 `(account_id, operation, request_id)` 竞争受理资格，并持久化载荷标识、状态和结果。首次执行时，幂等记录、库存变动、预约记录和可供重放的结果处于同一 InnoDB 事务，全部提交或全部回滚。并发副本遇到重复键时不继续扣减"
+            }
+          ],
+          "scope": "预约的稳定请求 ID、同载荷和服务端去重可覆盖幂等合同，HTTP POST 自动重放风险见 D16。"
+        },
+        "D16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "请求是否发送与提交是否发生"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 517,
+              "spanEndUtf16": 611,
+              "quote": "例如预约 POST 已创建记录而响应丢失，直接重放可能再次创建。客户端可在可核实的临时失败下重试符合语义的 GET、PUT。创建 POST 需要双方约定同一业务操作复用稳定幂等键与相同载荷"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H25.04",
+      "bankId": "H25",
+      "databasePointId": 586,
+      "type": "KEY",
+      "weight": 17,
+      "evidence": {
+        "D08/1": {
+          "role": "DIRECT",
+          "headings": [
+            "让并发重放得到已提交结果",
+            "超时后的恢复",
+            "可以怎样观察"
+          ],
+          "spans": []
+        },
+        "D16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "去重、重放与恢复预算"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H25.05",
+      "bankId": "H25",
+      "databasePointId": 587,
+      "type": "ADVANCED",
+      "weight": 10,
+      "evidence": {
+        "D16/1": {
+          "role": "DIRECT",
+          "headings": [
+            "去重、重放与恢复预算"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H26.01",
+      "bankId": "H26",
+      "databasePointId": 588,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "S09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "面试答案提交的授权、幂等与评价提交资格"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 90,
+              "spanEndUtf16": 225,
+              "quote": "答案提交从认证主体取得当前用户 ID。JWT 过滤器核验令牌并加载当前启用用户，控制器将主体 ID、路径会话 ID 与请求体传给服务。服务先校验会话归属和题目属于该会话，再按 `requestId` 查旧答案。这样其他用户即使知道请求键，也不能越过资源归属校验读取响应。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H26.02",
+      "bankId": "H26",
+      "databasePointId": 589,
+      "type": "CORE",
+      "weight": 23,
+      "evidence": {
+        "S09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "面试答案提交的授权、幂等与评价提交资格"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 225,
+              "spanEndUtf16": 272,
+              "quote": "重放要求旧记录的题目 ID 相同且答案正文 Java 字符串精确相等。改题或改正文都返回冲突。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H26.03",
+      "bankId": "H26",
+      "databasePointId": 590,
+      "type": "KEY",
+      "weight": 22,
+      "evidence": {
+        "S09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "两类唯一键与结果重放"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H26.04",
+      "bankId": "H26",
+      "databasePointId": 591,
+      "type": "KEY",
+      "weight": 15,
+      "evidence": {
+        "S09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "两类唯一键与结果重放",
+            "取得评价资格和提交结果是两个步骤"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H26.05",
+      "bankId": "H26",
+      "databasePointId": 592,
+      "type": "PRINCIPLE",
+      "weight": 15,
+      "evidence": {
+        "S09/1": {
+          "role": "DIRECT",
+          "headings": [
+            "取得评价资格和提交结果是两个步骤"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H27.01",
+      "bankId": "H27",
+      "databasePointId": 593,
+      "type": "CORE",
+      "weight": 23,
+      "evidence": {
+        "S10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "面试报告的有效 FINAL、版本接管与原子提交"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 89,
+              "spanEndUtf16": 271,
+              "quote": "报告聚合要求本场每道计划 MAIN 恰有一条关联正确的 FINAL。SQL 取主问题关联的 FINAL 并按计划排序，服务再比对计划集合和顺序、题目归属、答案完成状态与实际答案 ID。无追问时 FINAL 关联主答案，有追问时 FINAL 关联追问答案，并核对主答案的 INITIAL 指向同一主问题且决策为 FOLLOW_UP。汇总分和弱项使用有效 FINAL。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H27.02",
+      "bankId": "H27",
+      "databasePointId": 594,
+      "type": "KEY",
+      "weight": 18,
+      "evidence": {
+        "S10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "查询与生成请求的职责"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H27.03",
+      "bankId": "H27",
+      "databasePointId": 595,
+      "type": "CORE",
+      "weight": 25,
+      "evidence": {
+        "S10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "查询与生成请求的职责"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 433,
+              "spanEndUtf16": 493,
+              "quote": "成功抢占递增会话版本，并把递增后的版本交给本次尝试。完成或失败只能使用此次取得的版本，旧请求不得读取更新后的版本再回写。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pointId": "H27.04",
+      "bankId": "H27",
+      "databasePointId": 596,
+      "type": "KEY",
+      "weight": 24,
+      "evidence": {
+        "S10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "持久化与已有报告恢复"
+          ],
+          "spans": []
+        }
+      }
+    },
+    {
+      "pointId": "H27.05",
+      "bankId": "H27",
+      "databasePointId": 597,
+      "type": "KEY",
+      "weight": 10,
+      "evidence": {
+        "S10/1": {
+          "role": "DIRECT",
+          "headings": [
+            "持久化与已有报告恢复"
+          ],
+          "spans": []
+        }
+      }
+    }
+  ]
+}

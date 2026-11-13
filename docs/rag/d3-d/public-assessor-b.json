@@ -1,0 +1,2401 @@
+{
+  "assessorId": "public-assessor-b",
+  "assessorKind": "AI 技术复核角色 B",
+  "date": "2026-11-14",
+  "scope": "对 60 条公开冻结查询及 52 个生产切片逐查询比对；未读取其他角色标签、真实检索排序或分数。未列组合默认为 IRRELEVANT；DIRECT 支持至少一个实质意图。",
+  "querySha256": "b5515261f5b2a9f4aa0c93e02d62948d2c28b2c0e41367a51273099cdcbc05fd",
+  "corpusManifestSha256": "3a59d6009e82bba7aa91b175ca7a777fd2cbbb121be4c413ead08a8c1664bc0a",
+  "chunks": {
+    "J01/1": "db9396ccf3b0d6d5b527c58c23bf032a776eeb7089e048796b8f231534f08951",
+    "J01/2": "2e276739b01c8d87c25b2f013b34e55d5f73757f3f7053af4147fc367919680e",
+    "J02/1": "89f79da849d7c75bef16bdd9e7f48081d9e29dd2dfe7ee7bfbb70cd8c38a9eed",
+    "J03/1": "62d3d71b4c0cfb55f8b4cb1d8af5f6ada28904bc61ee6476ec59840d6b1c253f",
+    "J04/1": "3a546dcabcba0760fb29b0ef4fe101b84f352539b5436a4f2a276ab41fc0c869",
+    "J05/1": "332205c1e6dc32f017197a638f635fac534a878d4462fc50d8521ac4fe8a3c14",
+    "J06/1": "ef98a035b06de2d2d738bb76d89a5d06ac8dd81b28a63d621da393d82fdfaf3d",
+    "J07/1": "4224d43d7af433758a852c3316e61505d065ddfade96276650560738814cb68a",
+    "J08/1": "d5191eb1ae2b7f4d484e0e0e7fcf2d26ac921bcc4d3d47e922ae8a983f056482",
+    "J09/1": "fc577704a03526da3ac91931cbd199f9869cc4cc1577f98b2425189d48b13d3c",
+    "J10/1": "6bd4952ab0a11b3bba35eb5c159c4c84d886aeed3afd47c283ee00afa66870f3",
+    "J11/1": "9c6da9ac2fd354d55f7fa47d38752ac5f2ff9b92de613273537a128a5e83afea",
+    "J12/1": "92403c150808390825114fdd3edab6d9d2924cbadbc9b991825f8e2fdfde87a0",
+    "J13/1": "924e2da62c4f32efa3e5818904d4e4b8ed636366915aac72c8d8b125e8f18751",
+    "J14/1": "cc39d4a6fdbfd7dd23c1b4a1b1612128131690358622eb6308dd4a405fc896b0",
+    "J15/1": "77be1a5853338fe5145f19c54faafb8d5b128e5045949e0c6479750a3677db43",
+    "J16/1": "7040b4c038cccc13cafab021bcbc4de30f16aa48534b2504cdc7a59f6460a3b1",
+    "J17/1": "4c5c3577f06be1c339c9785588d73311ab51c5c94bddfe1c95b69ac82cd5dd45",
+    "J18/1": "3ca3ff7d09ace3a0168404fb9b4978ee6c39a4a7d8fcde9ff2dff91793aeead7",
+    "J19/1": "0419873bfe44b78127dd51484980eb6551e8d1e9de1eb44649dc86826ccce3c0",
+    "J20/1": "6fa2de891a6f21f7ea526f94bfacb0ebc4c6d08bfdb8ddc8bf3b676275f7f03a",
+    "J21/1": "63bcba7c73387c5a835aaa1b63ca838dd97293a3f64f197ae8ba2a58727be839",
+    "J22/1": "49264d49f8b9cc5a0afe77d7ae2952c16cc0efd6d58c42f360c79dce5b6a672a",
+    "J23/1": "0d1b2e53f75b078ebcb83936f8b16e1edb01eb42ca48652d10f44ea38674ae82",
+    "S01/1": "c223cbd05d90f8035aac79bd6217a278fc444c04d2fdbc6e33946b18f8047a17",
+    "S02/1": "caae19f6bb04e277dd51acfc373a958a2574d4887fac65c6d060c9b5ce04ec19",
+    "S03/1": "2d2661b4fd38f643e69e0abd42aea6423589d634f46c030bbc6f39d1fe968498",
+    "S04/1": "ac7c8e3429dc913f3fab199c0bf3542f69ebe20e4964eec921ae778df854ea7b",
+    "S05/1": "158a5f7f8ae4c4200401bf93733db71ada5d6609e9786357fd6488033cac92ca",
+    "S06/1": "e46ba16bb702efcfed4b13397cc2c1a68fd24c8dfb826626d08937cbef7dc5b8",
+    "S07/1": "c687c7f6a83611d48ea6de97d852c2a38f4633abcef8e69720f9e884ef1e4701",
+    "S08/1": "347117e113f8a6da5972871623071a0139349facff35a628b3c323aea3bac87d",
+    "S09/1": "849ad5b2f1fe69a56a79f84566d248cdfd6bd91738b37c51bc114f3b941616de",
+    "S10/1": "ee56a46280ba78e344b03021733dd220c684c48e924b63bd7546872c3fcc26ea",
+    "D01/1": "6b43a83f71a3430965300ffb2e7ea697d6b98227f212c15215b4f894a181b4e9",
+    "D02/1": "6a84d74680d1741f4b817a913e61a68b0e4c94d0583d9797d1c921fa4697e61b",
+    "D03/1": "8970c32e917141cf24b69f3a3e9d8807a4498d75f5ad2a058519e6018a3d8a3d",
+    "D04/1": "059e5b36183b7fc3e124ffbbb658edc964c085986d85968e9b425bda44816c13",
+    "D05/1": "738610f71b2501d9b095de5bbf838cb00bb51124f14621470ea42c057908ce76",
+    "D06/1": "91f249afbf4503c0cd144f5d33ee85128c248263912c6b6d58e16bd9b277ca11",
+    "D07/1": "c6558b9278be48fa67fcfa66239eabfb5bbccfc10ee88e0a8ca83862ead4fced",
+    "D08/1": "0222aec0efb49de1ed46f23399fc44f090676f62ec4fc746da6b212128c2647b",
+    "D09/1": "28458de8a0b90cc5955215f6fd36a61818090cc9e617c854bf636366c499e0a8",
+    "D10/1": "d421d02e2997643c187689a535fe49ed47aed548ccacad0f48f2d1a2240608b7",
+    "D11/1": "67ff1cd5025b10e3ffb1d0f17a925473cbc4e14c5da0754c99c530c7982ba8e3",
+    "D12/1": "d717a032d91ff277259c986e34553640dc871501f90cdd743d46e4fc04384dea",
+    "D13/1": "b40831f11094e6f4d74c70f0eaa4d26cb0e89c0e0373dd45042f811729140559",
+    "D14/1": "35c60b89c9ae99501bdedf4739d43193c92ce05d38824ef85ccde0f9f5fcea65",
+    "D15/1": "f37581aaf0ea305b43e3d1e348c78f1dede6ae27a2d4c0ba82163f9993e9bc78",
+    "D16/1": "e5ec23628028e6efa9c47978e451fbb8f79d39f16744d13c8cd1c6ee33fa7f8f",
+    "D17/1": "90b1d2d11ce20fb88d3b705de630a7c8812762cef9fadd9a04a7922b64c718a4",
+    "D18/1": "edfcf35a56f403c217cfbdfa5cbbfb9ed3260cf7876f352a5ecb1bfc28be0504"
+  },
+  "defaultLabel": "IRRELEVANT",
+  "queries": [
+    {
+      "queryId": "Q01",
+      "direct": [
+        {
+          "chunkKey": "J01/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 1006,
+              "spanEndUtf16": 1121,
+              "quote": "若多个实现必须共享状态、初始化规则与紧密相关的基类行为，可以考虑抽象类；若重点是稳定调用契约、替换实现、隔离调用者与实现细节，或组合多种能力，则优先考虑接口。也可由抽象基类实现接口，让契约与共享实现各负其责；该建议依据语言能力推导"
+            }
+          ],
+          "versionCondition": "Java SE 21，JLS 8/9。",
+          "reason": "接口用共同约定组织多种实现，抽象基类用于共同状态与初始化，也可分开表达两者。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J01/2",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 111,
+              "spanEndUtf16": 186,
+              "quote": "选择应先说明调用者依赖什么、哪些状态需要复用，再判断继承或实现关系。不要仅因两个类有一段相似代码就建立不合理的基类关系，也不要把接口常量当作对象字段。"
+            }
+          ],
+          "versionCondition": "Java SE 21，JLS 8/9。",
+          "reason": "同一段直接说明按契约和共享状态选择实现关系、相似代码不能单独论证基类。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S01/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；Boot 3.5.16 管理依赖",
+          "reason": "容器以接口注入替换实现，未讨论 Java 基类与状态边界。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q02",
+      "direct": [
+        {
+          "chunkKey": "J10/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 73,
+              "spanEndUtf16": 392,
+              "quote": "处理导入事件时可用 ArrayList 记录完整处理流水，按处理顺序 append，每次尝试都有自己的位置且允许重复。Set 则维护唯一成员，先从事件提取稳定 ID，按成员相等性去重。Map 维护每个键至多一个值，按 ID 查找最新结果可在处理时 put 以更新原值。三个结构分别回答历史、成员和当前状态问题，不能从仅保留最后值的 Map 恢复完整流水。\n\n## 首次出现和最近访问是不同顺序\n\n默认 add 的 LinkedHashSet 保持插入顺序，重复 add 不改变已有元素位置。输入 A、B、A 时，其顺序是 A、B。Java 21 的显式定位操作 addFirst/addLast 可重新定位。HashSet 不承诺遍历顺序"
+            }
+          ],
+          "versionCondition": "Java SE 21 List/Set/Map 及其典型实现。",
+          "reason": "明确 Set 的唯一成员、LinkedHashSet 的插入顺序以及按 ID 查找结果的 Map 合同。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J04/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 API，定位示例固定 OpenJDK jdk-21+35。",
+          "reason": "哈希契约支持去重实现，快照支持稳定展示，但都未合并首次顺序和键值合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J13/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 集合 API。",
+          "reason": "哈希契约支持去重实现，快照支持稳定展示，但都未合并首次顺序和键值合同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q03",
+      "direct": [
+        {
+          "chunkKey": "J17/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 459,
+              "spanEndUtf16": 708,
+              "quote": "普通类或接口的运行时身份由二进制名称和定义加载器共同确定。两个加载器各定义一份 api.Payment 时，插件实现的一份接口不能强转为宿主持有的另一份。先比较宿主和插件使用的接口 Class 是否同一对象，再看定义加载器和代码来源，可配合 -Xlog:class+load 查找重复 API。默认 loadClass 先检查已加载，再委派父级，最后尝试本地查找；自定义加载器可以改变策略。发起加载器可以委派给最终的定义加载器。常见隔离方式是把公共接口交给共同父加载器，插件侧只持有实现和私有依赖。"
+            }
+          ],
+          "versionCondition": "JLS/JVMS SE 21，具名普通类和接口，JDK API。",
+          "reason": "直接解释同名类型的定义加载器差异、强转失败和共享接口位置。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J06/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "JLS/JVMS SE 21，兼述 Java 16 的 instanceof 变化。",
+          "reason": "涉及 Class 元数据或插件可见性，未解释不同定义加载器的类型等价。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J07/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java 21 两个具名模块，普通实例成员。",
+          "reason": "涉及 Class 元数据或插件可见性，未解释不同定义加载器的类型等价。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q04",
+      "direct": [
+        {
+          "chunkKey": "J20/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 90,
+              "spanEndUtf16": 334,
+              "quote": "对同一 volatile 字段的写与同步顺序中后续的读建立 happens-before。结合各线程程序顺序，发布者可先填充数据再写 volatile ready，读取线程观察 ready 后可看到对应发布之前的操作。数据若随后继续被并发改写，还需新的同步规则。volatile int count 的 count++ 包括读取、加一和写回；两个线程都可读到 4，分别写 5，导致丢失更新。单变量计数可用 AtomicInteger.incrementAndGet，多个字段共同满足不变量"
+            }
+          ],
+          "versionCondition": "JLS SE 21 与 Java SE 21 并发 API。",
+          "reason": "同字段的 happens-before 用于发布，复合自增存在丢更新并有原子变量方案。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J15/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 公开 API。",
+          "reason": "支持并发 Map 单键自增机制，缺发布对照。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q05",
+      "direct": [
+        {
+          "chunkKey": "S01/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 399,
+              "spanEndUtf16": 596,
+              "quote": "单值参数 `NotificationSender sender` 按类型得到两个候选，在没有限定符、首选者、有效参数名等消歧规则时创建失败。将邮件实现标为 `@Primary` 可使它成为同一候选集合内的默认单值实现。给短信实现和专用消费者的参数使用相同的 `@Qualifier(\"sms\")` 可先缩小候选集合，邮件的 `@Primary` 不会把被排除的实现带回来。限定符允许多个匹配项。"
+            }
+          ],
+          "versionCondition": "Spring Framework 6.2.19；Boot 3.5.16 管理依赖",
+          "reason": "直接说明按类型候选、Primary 默认、Qualifier 缩小候选范围。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S02/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；Servlet MVC Web-aware ApplicationContext；Java SE 21",
+          "reason": "讨论容器实例与初始化，未解决同类型多候选。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S03/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；jakarta.annotation；正常上下文关闭",
+          "reason": "讨论容器实例与初始化，未解决同类型多候选。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q06",
+      "direct": [
+        {
+          "chunkKey": "D04/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 57,
+              "spanEndUtf16": 251,
+              "quote": "二级索引 `(device_id, severity, created_at)` 先按设备排序，同设备下按级别排序，同级别内再按时间排序。条件 `device_id=7 AND severity='WARN' AND created_at>=?` 固定两列等值前缀，可在该前缀内从时间下界开始扫描连续区间。去掉级别条件后仍可定位设备 7 的前缀，但每个级别有自己的时间子区间，普通范围访问"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB 普通多列 B-tree",
+          "reason": "字典序固定前缀并接时间范围，且区分排序和过滤的验证。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D05/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 578,
+              "spanEndUtf16": 624,
+              "quote": "`Using filesort` 提示还要执行排序，输出本身无法确定排序有多少发生在磁盘上。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0，EXPLAIN ANALYZE 自 8.0.18",
+          "reason": "直接支持检查是否需要独立排序，且计划已选 key 与成本在同一 Chunk。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D03/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB 普通 B-tree",
+          "reason": "讲有序叶页与范围，但没有固定等值前缀如何提供指定排序。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q07",
+      "direct": [
+        {
+          "chunkKey": "D10/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 592,
+              "spanEndUtf16": 676,
+              "quote": "`expired_keys` 的增量说明实例有过期活动，`evicted_keys` 的增量说明实例发生了内存淘汰。它们是聚合统计，无法单独证明哪一原因删除了该商品键。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2，单实例，key 级 TTL / maxmemory",
+          "reason": "提供两个实例统计的区别，结合策略与单键原因限制。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D13/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Redis OSS 7.2 基础命令和 MySQL 权威数据源，明确应用假设",
+          "reason": "提及两类统计和回源，未解释无 TTL 的键为何可能在压力下消失。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q08",
+      "direct": [
+        {
+          "chunkKey": "D15/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 599,
+              "spanEndUtf16": 774,
+              "quote": "TCP 全双工，两个发送方向可分别结束。A 发 FIN 并由 B 确认后，A 结束自己的发送方向但仍可接收 B 的数据。B 应用随后结束发送，B 发 FIN，A 再确认，这是常见的四报文时序，FIN 和 ACK 可以合并。普通主动关闭端进入 `TIME-WAIT`，协议以 2MSL 表达等待要求，用于在对端重发 FIN 时再次确认并让旧连接段过期。"
+            }
+          ],
+          "versionCondition": "IETF RFC 9293、RFC 768、RFC 5681 与 RFC 8085",
+          "reason": "FIN 只结束一个方向，TIME-WAIT 由主动关闭端通常承担并可重发确认。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q09",
+      "direct": [
+        {
+          "chunkKey": "S09/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 157,
+              "spanEndUtf16": 272,
+              "quote": "服务先校验会话归属和题目属于该会话，再按 `requestId` 查旧答案。这样其他用户即使知道请求键，也不能越过资源归属校验读取响应。重放要求旧记录的题目 ID 相同且答案正文 Java 字符串精确相等。改题或改正文都返回冲突。"
+            }
+          ],
+          "versionCondition": "项目 0c6f92afe331954f7cea37d33db688fe781cbf2c；Spring Boot 3.5.16 / MySQL 8.0.45",
+          "reason": "同用户会话、请求键、题目与精确答文比对，已评价时可以重建。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "通用业务幂等背景，缺本项目的归属、题目和答文合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D16/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "IETF RFC 9110；Java 21 超时 API 作为实现例，AWS 实践作为工程例",
+          "reason": "通用业务幂等背景，缺本项目的归属、题目和答文合同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q10",
+      "direct": [
+        {
+          "chunkKey": "J02/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 681,
+              "spanEndUtf16": 920,
+              "quote": "若导入正文抛出 readFailure，而 B.close 与 A.close 分别抛出 closeB 与 closeA，向外传播的是 readFailure，通常可按 B、A 顺序从 readFailure.getSuppressed() 读取清理失败。若正文正常而 B.close 先抛出，则 closeB 成为主异常，closeA 被附在其 suppressed 列表。cause 表示因果包装，由构造器或 initCause 设置；抑制异常表示同一退出过程中的其他失败。"
+            }
+          ],
+          "versionCondition": "Java SE 21 语言语义和 AutoCloseable。",
+          "reason": "主异常和抑制异常，按 B、A 关闭，普通 finally 的覆盖风险。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S03/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；jakarta.annotation；正常上下文关闭",
+          "reason": "资源所有权与正常销毁相关，但不支持多资源关闭顺序或主异常。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q11",
+      "direct": [
+        {
+          "chunkKey": "S02/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 459,
+              "spanEndUtf16": 511,
+              "quote": "长生命周期单例需要使用短生命周期组件时，可以注入作用域代理，在调用时解析当前请求目标，也可显式按需查找。"
+            }
+          ],
+          "versionCondition": "Spring Framework 6.2.19；Servlet MVC Web-aware ApplicationContext；Java SE 21",
+          "reason": "作用域代理或按需查找让单例每次获得当前请求实例。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S01/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；Boot 3.5.16 管理依赖",
+          "reason": "普通注入与生命周期、线程上下文不说明请求作用域的动态目标解析。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S03/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；jakarta.annotation；正常上下文关闭",
+          "reason": "普通注入与生命周期、线程上下文不说明请求作用域的动态目标解析。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J22/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 ThreadPoolExecutor 与复用平台线程。",
+          "reason": "普通注入与生命周期、线程上下文不说明请求作用域的动态目标解析。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q12",
+      "direct": [
+        {
+          "chunkKey": "D02/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 89,
+              "spanEndUtf16": 225,
+              "quote": "主键的每一列都必须非空，整个键值组合必须唯一。ID 长期稳定是业务设计约定。以登记表的选填备用邮箱为例，可以将 `backup_email` 定义为允许 NULL 的列，并为完整列添加 UNIQUE。非空值如果按列的字符集和排序规则相等就会冲突，多个 NULL 可以共存。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，普通 SQL 谓词",
+          "reason": "用主键解释非空与唯一是两项约束，再阐明 nullable UNIQUE 接受多个 NULL。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q13",
+      "direct": [
+        {
+          "chunkKey": "J03/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 83,
+              "spanEndUtf16": 170,
+              "quote": "引用类型的 == 判断两侧是否指向同一个对象，或是否同时为 null。String.equals 判断另一对象是否也是内容相同的 String。两个对象可以内容相同而身份不同"
+            }
+          ],
+          "versionCondition": "Java SE 21，避免把某个编译器拼接策略视为语言契约。",
+          "reason": "说明不同来源的等值字符对象引用仍可不同。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J04/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 API，定位示例固定 OpenJDK jdk-21+35。",
+          "reason": "通用对象相等与 hash 合同，未直接解释字符串构造边界。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q14",
+      "direct": [
+        {
+          "chunkKey": "J13/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 96,
+              "spanEndUtf16": 176,
+              "quote": "循环里调用 ArrayList.remove 直接改变容器结构，绕开当前迭代器，后续遍历可能抛 ConcurrentModificationException。"
+            }
+          ],
+          "versionCondition": "Java SE 21 集合 API。",
+          "reason": "结构修改绕开迭代器；同一迭代器 remove 或独立过滤可用。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J15/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 495,
+              "spanEndUtf16": 530,
+              "quote": "迭代器固定创建时的成员数组，因此正在广播的一轮仍可能通知刚注销的成员。"
+            }
+          ],
+          "versionCondition": "Java SE 21 公开 API。",
+          "reason": "监听器场景可改用明确快照容器，该轮仍可能见到已注销对象。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J08/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 Stream API。",
+          "reason": "流不干扰来源的规则与问题相邻，但未处理原列表迭代器删除。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q15",
+      "direct": [
+        {
+          "chunkKey": "J18/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 525,
+              "spanEndUtf16": 627,
+              "quote": "在同一时间窗记录进程和线程 CPU，用多次栈采样、JFR 或 GC 日志把应用热点和 GC 活动对齐。单次样本可能漏过短暂或间歇问题，先复用已有日志再选择 jcmd Thread.print 或 JFR。"
+            }
+          ],
+          "versionCondition": "Java SE 21 引用契约与 Oracle JDK 21 HotSpot 工具。",
+          "reason": "线程 CPU 同时段多次栈采样/JFR，区分应用热点与 GC。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J19/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Oracle JDK 21 HotSpot G1 实现文档。",
+          "reason": "GC 停顿、线程池指标是邻近诊断，未直接给线程 CPU 与栈关联。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J22/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 ThreadPoolExecutor 与复用平台线程。",
+          "reason": "GC 停顿、线程池指标是邻近诊断，未直接给线程 CPU 与栈关联。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q16",
+      "direct": [
+        {
+          "chunkKey": "J21/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 554,
+              "spanEndUtf16": 690,
+              "quote": "阻塞在 wait 或 sleep 时受到中断可抛 InterruptedException，并清除中断状态。若方法能抛出该异常，可让上层统一决定结束；若接口不允许传播而上层仍需观察信号，可 Thread.currentThread().interrupt() 后尽快退出。"
+            }
+          ],
+          "versionCondition": "Java SE 21 监视器与线程 API。",
+          "reason": "异常路径清中断状态、传播或恢复信号。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J20/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "JLS SE 21 与 Java SE 21 并发 API。",
+          "reason": "限时锁取得被中断也需处理，未直接说明 wait/sleep 清标志条件。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q17",
+      "direct": [
+        {
+          "chunkKey": "S04/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 462,
+              "spanEndUtf16": 542,
+              "quote": "目标内部使用 `this.writeAudit()` 或省略 `this` 直接调用，内层调用走目标引用，未再次进入代理，内层方法的事务或审计声明不会单独生效。"
+            }
+          ],
+          "versionCondition": "Spring Framework 6.2.19；Spring Boot 3.5.16 AOP 自动配置",
+          "reason": "同类自调用绕过代理，另一个受管组件提供等价代理入口；查询注解实际还要确认代理模式。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S06/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 161,
+              "spanEndUtf16": 262,
+              "quote": "目标对象内部以 `this` 调用事务方法会绕过代理，内层事务声明得不到单独处理。多个管理器并存时要核对注解选择的管理器与 Mapper 使用的数据源。分离事务 Service 后，由调用方通过代理进入"
+            }
+          ],
+          "versionCondition": "Spring Framework 6.2.19；命令式本地 JDBC / MySQL 8.0.45",
+          "reason": "另一种 Spring 注解场景直接支持同样的代理自调用机制与外置受管 Service。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q18",
+      "direct": [
+        {
+          "chunkKey": "D07/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 95,
+              "spanEndUtf16": 138,
+              "quote": "死锁检测开启时，引擎选择一个事务作为牺牲者并回滚其整个事务，客户端常见错误 1213。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，分别记录死锁检测与 rollback_on_timeout",
+          "reason": "死锁牺牲者完整事务回滚，正文说明前次结束后从新事务重新开始。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 815,
+              "spanEndUtf16": 886,
+              "quote": "对死锁、锁等待超时等已分类的瞬态失败，先确认本次事务完整结束，再按有限次数、总时限和退避计划开启新事务。若默认只发生语句回滚，先结束整笔事务。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "先完整结束再开启新事务，保留稳定业务请求键。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D01/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0，InnoDB，开发验证对齐项目 8.0.45",
+          "reason": "事务工作单元与回滚背景，未区分死锁重试和失败语句重发。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S06/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；命令式本地 JDBC / MySQL 8.0.45",
+          "reason": "事务工作单元与回滚背景，未区分死锁重试和失败语句重发。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q19",
+      "direct": [
+        {
+          "chunkKey": "D11/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 106,
+              "spanEndUtf16": 167,
+              "quote": "若最近可用快照对应 09:00，实例 09:03 故障，且没有可用于恢复的更新日志，重启加载该快照后，期间的修改可能丢失。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2，多段 AOF 自 7.0",
+          "reason": "同时给出 RDB 恢复窗口和后段 AOF 持久化前提。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D10/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Redis OSS 7.2，单实例，key 级 TTL / maxmemory",
+          "reason": "重启也可能产生 miss，但不解释持久化恢复窗口。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q20",
+      "direct": [
+        {
+          "chunkKey": "D17/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 338,
+              "spanEndUtf16": 530,
+              "quote": "TTL 表示普通缓存回答可使用该资源记录的时间上界，未过期的记录和转介缓存都可能减少上游请求。示例中权威服务给 `api.example.com` 的 A 记录 TTL 60 秒，解析器在缓存仍有效时可直接回答，剩余 TTL 随时间递减。上游无法刷新时，支持 RFC 8767 的解析器可以在规定条件下提供过期数据。地址切换期间，可对照返回记录、查询路径和 TTL 诊断新旧地址并存。"
+            }
+          ],
+          "versionCondition": "IETF RFC 1034、RFC 9499、RFC 3596，常规地址查询",
+          "reason": "支持核对缓存剩余 TTL 并与权威查询对照。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q21",
+      "direct": [
+        {
+          "chunkKey": "S10/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 390,
+              "spanEndUtf16": 493,
+              "quote": "过期时由生成请求通过状态、时间和版本条件更新接管。普通报告查询只返回状态或已准备报告。成功抢占递增会话版本，并把递增后的版本交给本次尝试。完成或失败只能使用此次取得的版本，旧请求不得读取更新后的版本再回写。"
+            }
+          ],
+          "versionCondition": "项目 0c6f92afe331954f7cea37d33db688fe781cbf2c；Spring Boot 3.5.16 / MySQL 8.0.45",
+          "reason": "陈旧 GENERATING 接管、本次版本阻止迟到写、已持久报告复用。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S09/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "项目 0c6f92afe331954f7cea37d33db688fe781cbf2c；Spring Boot 3.5.16 / MySQL 8.0.45",
+          "reason": "答题领取或一般持久待办类比，与报告记录及恢复入口不同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S08/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19 命令式事务事件；MySQL 8.0；RFC 9110；通用工程示例",
+          "reason": "答题领取或一般持久待办类比，与报告记录及恢复入口不同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q22",
+      "direct": [
+        {
+          "chunkKey": "J08/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 142,
+              "spanEndUtf16": 302,
+              "quote": "实现可以在不改变结果时省略遍历或中间阶段。对已知大小的 List，stream.peek(audit).count() 在 peek 不改变元素数时可直接使用已知大小，audit 并无必达保证。流函数应避免修改来源，通常应无状态，避免依赖执行中可能改变的外部值。即使本次 peek 被执行，也没有建立审计的可靠失败合同。"
+            }
+          ],
+          "versionCondition": "Java SE 21 Stream API。",
+          "reason": "已知大小 count 可以不遍历，peek 副作用不能作为审计交付合同。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q23",
+      "direct": [
+        {
+          "chunkKey": "D14/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 68,
+              "spanEndUtf16": 157,
+              "quote": "Pipeline 允许客户端先连续发送多条命令，再按顺序读取结果，减少网络往返。独立读取不同计数器是适用场景。Pipeline 本身没有命令组隔离保证，其他客户端的命令可交错执行"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2 单实例，排除跨槽",
+          "reason": "传输往返优化与执行隔离不同；后续段区分 WATCH 事务和脚本。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D12/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Redis OSS 7.2，单实例经典方案，SET NX/PX 与 Lua",
+          "reason": "Lua 执行边界用于单键租约，未比较批量传输。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q24",
+      "direct": [
+        {
+          "chunkKey": "D05/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 162,
+              "spanEndUtf16": 265,
+              "quote": "高比例记录需要读取或随机回表代价高时，全扫描可能合理。若 `rows=100000, filtered=3.5`，估计本步检查十万行，其中约 3500 行通过本表的条件，`filtered` 单位是百分比。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0，EXPLAIN ANALYZE 自 8.0.18",
+          "reason": "成本可能选择全扫描，估算行数要与实际迭代器、数据分布对照。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D03/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB 普通 B-tree",
+          "reason": "覆盖/范围成本影响计划，但未给估计行数和实际行数的诊断区别。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D04/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB 普通多列 B-tree",
+          "reason": "覆盖/范围成本影响计划，但未给估计行数和实际行数的诊断区别。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q25",
+      "direct": [
+        {
+          "chunkKey": "J13/1",
+          "supportedIntentIds": [
+            "Q25-I1",
+            "Q25-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 496,
+              "spanEndUtf16": 733,
+              "quote": "Collections.unmodifiableList(list) 返回只读视图，读操作仍转发到 backing list；若生产者后续增删或排序，视图也变化。List.copyOf(list) 返回不可修改的结构快照，源后续修改不反映到结果，且拒绝 null 元素。要保留 null 可先用独立 ArrayList 复制，再包只读视图。两种复制路径均可保留同一可变 DTO 引用，DTO 字段变化仍可观察。要固定对外响应的元素状态，可换用不可变 DTO 或复制受影响字段"
+            }
+          ],
+          "versionCondition": "Java SE 21 集合 API。",
+          "reason": "原集合结构变动与元素对象变化各有不同传播边界。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J15/1",
+          "supportedIntentIds": [
+            "Q25-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 495,
+              "spanEndUtf16": 553,
+              "quote": "迭代器固定创建时的成员数组，因此正在广播的一轮仍可能通知刚注销的成员。数组复制的是引用，监听器对象内部状态可以改变。"
+            }
+          ],
+          "versionCondition": "Java SE 21 公开 API。",
+          "reason": "写时复制快照只固定元素引用，内部可变状态仍可变化。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J10/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 List/Set/Map 及其典型实现。",
+          "reason": "有序记录和容器语义不建立独立快照或元素复制。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q26",
+      "direct": [
+        {
+          "chunkKey": "J22/1",
+          "supportedIntentIds": [
+            "Q26-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 563,
+              "spanEndUtf16": 679,
+              "quote": "请求 A 未清理，复用同一线程的请求 B 若在设置自身值前读取，会看到 A 的上下文；残留引用还可能让 A 的对象随工作线程继续被持有。由任务拥有的上下文应在任务边界 set，在 finally remove，嵌套场景则恢复先前值。"
+            }
+          ],
+          "versionCondition": "Java SE 21 ThreadPoolExecutor 与复用平台线程。",
+          "reason": "同一线程复用导致状态串用，任务边界 finally 清理。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S02/1",
+          "supportedIntentIds": [
+            "Q26-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 600,
+              "spanEndUtf16": 791,
+              "quote": "假设默认单例 `OrderService` 把当前用户 ID 写到字段 `currentUserId`。请求 A 写入 42 后挂起，请求 B 将字段改为 73，A 恢复后可能用 73 查询。即使字段改成 `volatile`，两次访问之间仍可发生 B 的覆盖，整个请求不会获得自己的字段副本。可让授权过滤器解析身份，把 `userId` 作为 Service 参数保存到局部变量。"
+            }
+          ],
+          "versionCondition": "Spring Framework 6.2.19；Servlet MVC Web-aware ApplicationContext；Java SE 21",
+          "reason": "单例字段在并发请求间共享，以参数或请求作用域承载请求状态。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J20/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "JLS SE 21 与 Java SE 21 并发 API。",
+          "reason": "可见性和互斥只支持一般共享状态背景。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q27",
+      "direct": [
+        {
+          "chunkKey": "J17/1",
+          "supportedIntentIds": [
+            "Q27-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 459,
+              "spanEndUtf16": 536,
+              "quote": "普通类或接口的运行时身份由二进制名称和定义加载器共同确定。两个加载器各定义一份 api.Payment 时，插件实现的一份接口不能强转为宿主持有的另一份。"
+            }
+          ],
+          "versionCondition": "JLS/JVMS SE 21，具名普通类和接口，JDK API。",
+          "reason": "分别定义的类运行时身份取决于二进制名和定义加载器。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J07/1",
+          "supportedIntentIds": [
+            "Q27-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 392,
+              "spanEndUtf16": 657,
+              "quote": "跨具名模块读取普通 private 字段还需要该包向调用者开放。假设字段所在包仅 exports、未 opens，trySetAccessible() 返回 false，而 setAccessible(true) 抛 InaccessibleObjectException。框架应把无法访问记录为可诊断的配置错误或按契约降级。首选由模块提供明确的 public getter 或序列化协议。确需深反射时，可用 opens config.internal to trusted.mapper 定向授权；部署期 --add-opens"
+            }
+          ],
+          "versionCondition": "Java 21 两个具名模块，普通实例成员。",
+          "reason": "具名模块的深反射授权同样解释构造器场景的包开放边界，正文示例实际为字段。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J06/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "JLS/JVMS SE 21，兼述 Java 16 的 instanceof 变化。",
+          "reason": "类对象与泛型声明元数据不说明具名模块深反射权限。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q28",
+      "direct": [
+        {
+          "chunkKey": "J23/1",
+          "supportedIntentIds": [
+            "Q28-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 580,
+              "spanEndUtf16": 849,
+              "quote": "orTimeout 使该 CompletableFuture 超时异常完成，未承诺停止底层操作；普通 CompletableFuture.cancel 的 mayInterruptIfRunning 对该类型没有中断执行的效果。Java 21 默认 HttpClient 的可取消 future 可尝试取消交换，请求也可用 HttpRequest.Builder.timeout 设置等待响应的请求超时，流式正文的后续消费要按具体 BodyHandler 和调用流程另设约束。取消发生时远端可能已经收到或执行，需按请求合同判断是否能重试。"
+            }
+          ],
+          "versionCondition": "Java SE 21 CompletableFuture、Executor 与 HTTP Client API。",
+          "reason": "Future 状态变化与底层交换尝试取消各有合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D16/1",
+          "supportedIntentIds": [
+            "Q28-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 485,
+              "spanEndUtf16": 630,
+              "quote": "若已发送请求却未收到响应，无法仅凭客户端超时推断数据库是否提交。例如预约 POST 已创建记录而响应丢失，直接重放可能再次创建。客户端可在可核实的临时失败下重试符合语义的 GET、PUT。创建 POST 需要双方约定同一业务操作复用稳定幂等键与相同载荷，或改用等价的唯一资源标识和写入合同。"
+            }
+          ],
+          "versionCondition": "IETF RFC 9110；Java 21 超时 API 作为实现例，AWS 实践作为工程例",
+          "reason": "已发无响应结果未知，是否重发依赖方法和稳定业务合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [
+            "Q28-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 713,
+              "spanEndUtf16": 886,
+              "quote": "已发送后等待响应超时，或 COMMIT 发出后断连，客户端无法仅凭异常断定是否扣减成功。可按同一作用域的键查询持久结果，或提交同键同载荷请求让唯一约束重新裁定。查询暂时没看见记录并不能证明另一事务已结束。对死锁、锁等待超时等已分类的瞬态失败，先确认本次事务完整结束，再按有限次数、总时限和退避计划开启新事务。若默认只发生语句回滚，先结束整笔事务。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "库存提交未知后凭主库状态或同键安全重试，限制重试次数和范围。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S08/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19 命令式事务事件；MySQL 8.0；RFC 9110；通用工程示例",
+          "reason": "外部发送、瞬态事务恢复及 TCP 是邻近背景，未直接给出聚合取消与普通下游重试的适用机制。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D07/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，分别记录死锁检测与 rollback_on_timeout",
+          "reason": "外部发送、瞬态事务恢复及 TCP 是邻近背景，未直接给出聚合取消与普通下游重试的适用机制。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D15/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "IETF RFC 9293、RFC 768、RFC 5681 与 RFC 8085",
+          "reason": "外部发送、瞬态事务恢复及 TCP 是邻近背景，未直接给出聚合取消与普通下游重试的适用机制。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q29",
+      "direct": [
+        {
+          "chunkKey": "S08/1",
+          "supportedIntentIds": [
+            "Q29-I1",
+            "Q29-I2",
+            "Q29-I3"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 276,
+              "spanEndUtf16": 623,
+              "quote": "可在同一事务写订单和一条待发送记录，后者保存稳定操作键、必要载荷、状态、尝试次数和下次尝试时间。提交完成后由受控工作器找出待办，短事务取得执行资格，事务外发送，再用短事务独立确认送达或安排重试。若以提交后回调写确认，原事务资源可能仍可访问，但该阶段写入不会随原事务再次提交，应让确认获得自己的事务，例如通过代理入口或 `TransactionTemplate` 启动新事务。崩溃时通过待办状态和可恢复的执行资格继续处理。\n\n## 发送成功和确认成功之间仍有故障窗口\n\n远端明确拒绝时可按错误合同停止或安排有限重试。响应超时可能是远端已执行而本地尚未确认，应按稳定操作键查询远端结果，或在接收方承诺幂等时用同键同意图重放。接收方可用唯一键将去重记录和业务效果一起提交，发送方按总期限和有限退避恢复"
+            }
+          ],
+          "versionCondition": "Spring Framework 6.2.19 命令式事务事件；MySQL 8.0；RFC 9110；通用工程示例",
+          "reason": "同库待办原子性、重启恢复和发送后确认前窗口的接收端幂等。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D01/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0，InnoDB，开发验证对齐项目 8.0.45",
+          "reason": "业务事务与幂等背景。D08 只说外部另需可靠发送及接收幂等，缺持久通知恢复机制。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "业务事务与幂等背景。D08 只说外部另需可靠发送及接收幂等，缺持久通知恢复机制。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S06/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；命令式本地 JDBC / MySQL 8.0.45",
+          "reason": "业务事务与幂等背景。D08 只说外部另需可靠发送及接收幂等，缺持久通知恢复机制。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q30",
+      "direct": [
+        {
+          "chunkKey": "D13/1",
+          "supportedIntentIds": [
+            "Q30-I1",
+            "Q30-I2",
+            "Q30-I3"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 262,
+              "spanEndUtf16": 619,
+              "quote": "读者 R 缓存 miss，从数据库拿到档案版本 41，暂时停在回填前。写者 W 提交版本 42，再删除缓存。R 继续执行，将 41 写回了已经清空的缓存。此时后续请求可能读到旧值，即使 W 完全按「提交后删除」顺序操作。TTL 可以约束这次回填后的保留时间，但仍要考虑超时请求、重复迟到回填及失效重试延误。严格读新值的路径可直接读主库，并明确事务快照、并发提交等读一致性边界。\n\n## 版本条件与窗口\n\n若读缓存的延迟收益重要，可让权威对象版本随写入单调递增，并在缓存保存最高已知版本的标记。缓存侧原子比较回填版本与标记及现有值，拒绝已过时的回填。删除数据时还需保留有效标记；标记被淘汰、过期或恢复丢失后，比较失去依据。从数据库提交到 Redis 发布新版本标记之间仍有窗口，发布丢失也要由可靠失效和恢复方案处理。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2 基础命令和 MySQL 权威数据源，明确应用假设",
+          "reason": "旧版本晚于删除回填，并用缓存标记和原子比较保护，跨库仍有发布窗口。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D06/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，RR 与 RC，显式事务",
+          "reason": "解释旧数据库快照或缓存丢失，但没有读回填和写失效的交错机制。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D10/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Redis OSS 7.2，单实例，key 级 TTL / maxmemory",
+          "reason": "解释旧数据库快照或缓存丢失，但没有读回填和写失效的交错机制。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q31",
+      "direct": [
+        {
+          "chunkKey": "D12/1",
+          "supportedIntentIds": [
+            "Q31-I1",
+            "Q31-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 539,
+              "spanEndUtf16": 700,
+              "quote": "持有者 A 遇到长暂停，恢复时租约已归 B。随机所有者 token 能保护锁键释放，业务资源若不校验新旧写入资格，A 仍可能覆盖 B 的结果。若采用 fencing token，每次成功授权需获得与授权顺序一致的单调编号，接收方原子记录已接纳的最高编号并拒绝更旧的写入；只有 Redis 中增加编号而资源端不校验并无保护。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2，单实例经典方案，SET NX/PX 与 Lua",
+          "reason": "区分随机所有权 token 与接收端校验单调编号的 fencing。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "有条件更新和过期尝试保护的类似原则，缺 Redis 租约编号和资源端比较的完整前提。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S09/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "项目 0c6f92afe331954f7cea37d33db688fe781cbf2c；Spring Boot 3.5.16 / MySQL 8.0.45",
+          "reason": "有条件更新和过期尝试保护的类似原则，缺 Redis 租约编号和资源端比较的完整前提。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S10/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "项目 0c6f92afe331954f7cea37d33db688fe781cbf2c；Spring Boot 3.5.16 / MySQL 8.0.45",
+          "reason": "有条件更新和过期尝试保护的类似原则，缺 Redis 租约编号和资源端比较的完整前提。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q32",
+      "direct": [
+        {
+          "chunkKey": "D14/1",
+          "supportedIntentIds": [
+            "Q32-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 68,
+              "spanEndUtf16": 217,
+              "quote": "Pipeline 允许客户端先连续发送多条命令，再按顺序读取结果，减少网络往返。独立读取不同计数器是适用场景。Pipeline 本身没有命令组隔离保证，其他客户端的命令可交错执行，因此不能用一组 GET、判断、SET 来保护共享配额。应控制批量大小，服务端需要缓存尚未读走的回复；仍要检查每项回复。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2 单实例，排除跨槽",
+          "reason": "批量传输没有命令组隔离，写在执行期可部分保留，因此批内命令必须分别看副作用。",
+          "harmful": false,
+          "gap": "没有针对无回复的 Pipeline 明示服务端可能已执行任意已发送前缀，未直接逐条列出可重发命令。"
+        },
+        {
+          "chunkKey": "D16/1",
+          "supportedIntentIds": [
+            "Q32-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 485,
+              "spanEndUtf16": 549,
+              "quote": "若已发送请求却未收到响应，无法仅凭客户端超时推断数据库是否提交。例如预约 POST 已创建记录而响应丢失，直接重放可能再次创建。"
+            }
+          ],
+          "versionCondition": "IETF RFC 9110；Java 21 超时 API 作为实现例，AWS 实践作为工程例",
+          "reason": "同样适用于已发无回复的远端执行结果未知；业务幂等判断可借鉴。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D15/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "IETF RFC 9293、RFC 768、RFC 5681 与 RFC 8085",
+          "reason": "TCP、Redis 命令效果和 SQL 幂等各是背景，未结合无回复的批量重放。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D09/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Redis OSS 7.2，经典类型及基础命令",
+          "reason": "TCP、Redis 命令效果和 SQL 幂等各是背景，未结合无回复的批量重放。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "TCP、Redis 命令效果和 SQL 幂等各是背景，未结合无回复的批量重放。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "没有针对无回复的 Pipeline 明示服务端可能已执行任意已发送前缀，未直接逐条列出可重发命令。"
+    },
+    {
+      "queryId": "Q33",
+      "direct": [
+        {
+          "chunkKey": "S10/1",
+          "supportedIntentIds": [
+            "Q33-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 584,
+              "spanEndUtf16": 732,
+              "quote": "完成时在同一短事务写报告、应用有效 FINAL 弱项并按本次版本转为 `READY`，版本或状态条件失败使事务回滚。生成请求取得资格后若在非 READY 会话找到已有持久化报告，先核验该报告有分数及当前 FINAL 合法，再用本次版本对齐 `READY`，直接复用报告且不重复生成摘要或更新弱项。"
+            }
+          ],
+          "versionCondition": "项目 0c6f92afe331954f7cea37d33db688fe781cbf2c；Spring Boot 3.5.16 / MySQL 8.0.45",
+          "reason": "项目用持久报告对齐状态，已有报告不重复更新弱项。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S08/1",
+          "supportedIntentIds": [
+            "Q33-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 463,
+              "spanEndUtf16": 623,
+              "quote": "崩溃时通过待办状态和可恢复的执行资格继续处理。\n\n## 发送成功和确认成功之间仍有故障窗口\n\n远端明确拒绝时可按错误合同停止或安排有限重试。响应超时可能是远端已执行而本地尚未确认，应按稳定操作键查询远端结果，或在接收方承诺幂等时用同键同意图重放。接收方可用唯一键将去重记录和业务效果一起提交，发送方按总期限和有限退避恢复"
+            }
+          ],
+          "versionCondition": "Spring Framework 6.2.19 命令式事务事件；MySQL 8.0；RFC 9110；通用工程示例",
+          "reason": "一般架构给出假设通知独立待办、确认及接收幂等。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S09/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "项目 0c6f92afe331954f7cea37d33db688fe781cbf2c；Spring Boot 3.5.16 / MySQL 8.0.45",
+          "reason": "答题重放或预约去重与报告业务关系不同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "答题重放或预约去重与报告业务关系不同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q34",
+      "direct": [
+        {
+          "chunkKey": "J20/1",
+          "supportedIntentIds": [
+            "Q34-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 90,
+              "spanEndUtf16": 221,
+              "quote": "对同一 volatile 字段的写与同步顺序中后续的读建立 happens-before。结合各线程程序顺序，发布者可先填充数据再写 volatile ready，读取线程观察 ready 后可看到对应发布之前的操作。数据若随后继续被并发改写，还需新的同步规则。"
+            }
+          ],
+          "versionCondition": "JLS SE 21 与 Java SE 21 并发 API。",
+          "reason": "先构造内容再用同步变量发布，读取同一发布变量建立可见性。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J15/1",
+          "supportedIntentIds": [
+            "Q34-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 138,
+              "spanEndUtf16": 217,
+              "quote": "ConcurrentHashMap.merge(key, 1, Integer::sum) 或 compute 可把同一键的查找、计算、写入作为原子方法操作。"
+            }
+          ],
+          "versionCondition": "Java SE 21 公开 API。",
+          "reason": "并发 Map 同键用原子合并解决复合加一。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J13/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 集合 API。",
+          "reason": "J13 支持结构快照但未说明安全发布；J14 是桶写实现，J10 串行 merge 场景不直接给并发合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J14/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "固定 OpenJDK jdk8u402-b06。",
+          "reason": "J13 支持结构快照但未说明安全发布；J14 是桶写实现，J10 串行 merge 场景不直接给并发合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J10/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 List/Set/Map 及其典型实现。",
+          "reason": "J13 支持结构快照但未说明安全发布；J14 是桶写实现，J10 串行 merge 场景不直接给并发合同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q35",
+      "direct": [
+        {
+          "chunkKey": "D16/1",
+          "supportedIntentIds": [
+            "Q35-I1",
+            "Q35-I2",
+            "Q35-I3"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 485,
+              "spanEndUtf16": 702,
+              "quote": "若已发送请求却未收到响应，无法仅凭客户端超时推断数据库是否提交。例如预约 POST 已创建记录而响应丢失，直接重放可能再次创建。客户端可在可核实的临时失败下重试符合语义的 GET、PUT。创建 POST 需要双方约定同一业务操作复用稳定幂等键与相同载荷，或改用等价的唯一资源标识和写入合同。\n\n## 去重、重放与恢复预算\n\n服务端可以用数据库唯一约束将幂等键、载荷语义和业务效果一并提交，并在重复请求时读取已有结果。同键异意图应被拒绝"
+            }
+          ],
+          "versionCondition": "IETF RFC 9110；Java 21 超时 API 作为实现例，AWS 实践作为工程例",
+          "reason": "HTTP 请求失联无法推断提交，复用同键同载荷，服务端唯一约束与已有结果重放。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [
+            "Q35-I1",
+            "Q35-I2",
+            "Q35-I3"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 426,
+              "spanEndUtf16": 619,
+              "quote": "用非空唯一约束例如 `(account_id, operation, request_id)` 竞争受理资格，并持久化载荷标识、状态和结果。首次执行时，幂等记录、库存变动、预约记录和可供重放的结果处于同一 InnoDB 事务，全部提交或全部回滚。并发副本遇到重复键时不继续扣减，应结束本次事务，再按既定隔离语义查主库中已提交的受理记录。如果请求键相同、业务参数不同，返回合同约定的冲突。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "数据库幂等竞争、事务原子提交及现有结果重放，后段解释响应超时。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S09/1",
+          "supportedIntentIds": [
+            "Q35-I2",
+            "Q35-I3"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 505,
+              "spanEndUtf16": 574,
+              "quote": "若旧答案已 `EVALUATED`，可以用持久化数据重建业务响应，无需它仍是当前题。若答复在网络途中丢失，客户端应复用原请求键与同一正文。"
+            }
+          ],
+          "versionCondition": "项目 0c6f92afe331954f7cea37d33db688fe781cbf2c；Spring Boot 3.5.16 / MySQL 8.0.45",
+          "reason": "项目答案提交是具有相同网络失联重放要求的具体业务例，可支持作用域同键和重建。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S08/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19 命令式事务事件；MySQL 8.0；RFC 9110；通用工程示例",
+          "reason": "外部通知去重和数据库瞬态恢复与此相邻，均缺完整 HTTP 订单合同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D07/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，分别记录死锁检测与 rollback_on_timeout",
+          "reason": "外部通知去重和数据库瞬态恢复与此相邻，均缺完整 HTTP 订单合同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q36",
+      "direct": [
+        {
+          "chunkKey": "J16/1",
+          "supportedIntentIds": [
+            "Q36-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 90,
+              "spanEndUtf16": 208,
+              "quote": "每个 JVM 线程有自己的 pc 和 JVM Stack；如果实现使用本地方法栈，通常在线程创建时分配。线程执行 Java 方法时 pc 记录当前 JVM 指令地址，执行 native 方法时其值未定义。堆和方法区由 JVM 线程共享。"
+            }
+          ],
+          "versionCondition": "JVMS SE 21 与 HotSpot JDK 21。",
+          "reason": "区分每线程栈和共享堆，是识别线程数量上涨与堆对象的直接机制。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J18/1",
+          "supportedIntentIds": [
+            "Q36-I1"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 428,
+              "spanEndUtf16": 507,
+              "quote": "本地资源分配失败按对应消息查线程数量或原生内存等证据。HotSpot NMT 需要事先启用，适合比较 JVM 跟踪的本地内存类别，不能覆盖任意第三方本地分配。"
+            }
+          ],
+          "versionCondition": "Java SE 21 引用契约与 Oracle JDK 21 HotSpot 工具。",
+          "reason": "先区分堆错误、线程数量与 JVM 本地内存观测，用 NMT 比对。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J22/1",
+          "supportedIntentIds": [
+            "Q36-I2"
+          ],
+          "spans": [
+            {
+              "spanStartUtf16": 137,
+              "spanEndUtf16": 228,
+              "quote": "达到 core 后先尝试入队。入队后会复核运行状态，必要时移除并拒绝；若无工作线程也会尝试启动。无法入队时才尝试加线程至 maximumPoolSize，达到上限或池关闭走拒绝策略。"
+            }
+          ],
+          "versionCondition": "Java SE 21 ThreadPoolExecutor 与复用平台线程。",
+          "reason": "线程池排队与扩容顺序，配合正文阻塞比例和下游并发确定配置。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J23/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 CompletableFuture、Executor 与 HTTP Client API。",
+          "reason": "阻塞执行器选择与 G1 是邻近机制，缺题设线程池扩展或线程栈证据。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J19/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Oracle JDK 21 HotSpot G1 实现文档。",
+          "reason": "阻塞执行器选择与 G1 是邻近机制，缺题设线程池扩展或线程栈证据。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q37",
+      "direct": [
+        {
+          "chunkKey": "J06/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 814,
+              "spanEndUtf16": 991,
+              "quote": "Java 21 中，Object x 不能直接做 x instanceof List<String>，可以检查 x instanceof List<?>。从静态类型 List<Integer> 对 ArrayList<Integer> 做 instanceof 在可检查转换条件下合法，这只验证对象能否作为对应运行时类使用；它没有逐个检查元素的动态类型。"
+            }
+          ],
+          "versionCondition": "JLS/JVMS SE 21，兼述 Java 16 的 instanceof 变化。",
+          "reason": "依据对比，参数化目标须满足可检查的静态转换，运行时检查不验证元素。",
+          "harmful": false,
+          "gap": "正文未明确给题设 wildcard 到 ArrayList<Integer> 的实际编译拒绝。"
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J05/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "JLS SE 21 与标准集合签名。",
+          "reason": "泛型不变性和捕获说明静态边界，未直接解释 instanceof 的检查规则。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "正文未明确给题设 wildcard 到 ArrayList<Integer> 的实际编译拒绝。"
+    },
+    {
+      "queryId": "Q38",
+      "direct": [
+        {
+          "chunkKey": "J15/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 495,
+              "spanEndUtf16": 715,
+              "quote": "迭代器固定创建时的成员数组，因此正在广播的一轮仍可能通知刚注销的成员。数组复制的是引用，监听器对象内部状态可以改变。修改成员数组通常要进行 O(n) 级引用复制，迭代器持有旧数组越久，旧数组和成员引用的生命周期越长。若注销必须等待所有正在处理的事件结束，需要独立的通知协议。\n\n## 弱一致观察与精确快照\n\n在线用户近似观测可用 ConcurrentHashMap 的弱一致遍历。遍历可与修改并行，可能看见部分后来更新，不提供全表一致时点。"
+            }
+          ],
+          "versionCondition": "Java SE 21 公开 API。",
+          "reason": "本段和后续段直接区分 CopyOnWrite 快照与 ConcurrentHashMap 弱一致迭代。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J13/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 集合 API。",
+          "reason": "集合视图或并发桶不建立题设两类迭代器行为对照。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J14/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "固定 OpenJDK jdk8u402-b06。",
+          "reason": "集合视图或并发桶不建立题设两类迭代器行为对照。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q39",
+      "direct": [
+        {
+          "chunkKey": "J16/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 511,
+              "spanEndUtf16": 592,
+              "quote": "JVMS 用方法区定义共享职责，不要求特定内存组织。HotSpot 类元数据可从本地内存的 Metaspace 相关空间分配，不能逐项等同于方法区的所有逻辑内容。"
+            }
+          ],
+          "versionCondition": "JVMS SE 21 与 HotSpot JDK 21。",
+          "reason": "区分规范职责与 HotSpot 本地内存中的类元数据实现。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J18/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 引用契约与 Oracle JDK 21 HotSpot 工具。",
+          "reason": "给出 Metaspace OOM 的诊断方向，未解释规范方法区的边界。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q40",
+      "direct": [
+        {
+          "chunkKey": "J23/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 580,
+              "spanEndUtf16": 628,
+              "quote": "orTimeout 使该 CompletableFuture 超时异常完成，未承诺停止底层操作；"
+            }
+          ],
+          "versionCondition": "Java SE 21 CompletableFuture、Executor 与 HTTP Client API。",
+          "reason": "说明可导致 stage 异常完成，支持下游观察到异常的半个对照。",
+          "harmful": false,
+          "gap": "正文未明确限时 get 只中断等待而不改变 future 状态。"
+        }
+      ],
+      "relatedOnly": [],
+      "uncertain": [],
+      "evidenceGap": "正文未明确限时 get 只中断等待而不改变 future 状态。"
+    },
+    {
+      "queryId": "Q41",
+      "direct": [
+        {
+          "chunkKey": "S07/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 277,
+              "spanEndUtf16": 614,
+              "quote": "`NESTED` 在已有事务下可以用同一物理事务内的保存点。可选的同库附加记录失败时，若支持保存点且内层触发回滚，可回到保存点，外层决定是否继续。内层正常完成也要等外层提交，外层随后回滚会撤销内层写入。没有外层时，`NESTED` 按类似 `REQUIRED` 的行为创建事务。应验证管理器、驱动与数据库支持，测试过程中避免引入隐式提交的 DDL。\n\n## 独立提交需要独立资源\n\n`REQUIRES_NEW` 挂起外层事务的资源绑定，为内层建立独立物理事务，内层可以独立提交或回滚。若要求安全审计在外层回滚后仍可见，可设计独立审计记录，并避免它依赖外层未提交的数据或等待外层已持有的锁。例如直接用独立事务插入引用尚未提交主记录的外键，可能等待外层，而外层又在等待内层返回。"
+            }
+          ],
+          "versionCondition": "Spring Framework 6.2.19；支持保存点的单数据源命令式事务管理器；MySQL 8.0.45",
+          "reason": "保存点与独立事务的外层依赖、锁等待和连接资源。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S04/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；Spring Boot 3.5.16 AOP 自动配置",
+          "reason": "事务调用和回滚背景，不直接解释保存点和独立事务。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S06/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；命令式本地 JDBC / MySQL 8.0.45",
+          "reason": "事务调用和回滚背景，不直接解释保存点和独立事务。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q42",
+      "direct": [
+        {
+          "chunkKey": "D06/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 605,
+              "spanEndUtf16": 809,
+              "quote": "在上述 MySQL 8.0 两连接时序中，B 已提交且无其他写入时，A 两种隔离级别执行同一行的 `SELECT ... FOR UPDATE` 均读到 11 并取得排他锁。锁定读读取最新可用的版本，遇到未释放的冲突锁可能等待，锁范围也取决于索引和隔离级别。若 A 随后把这行更新为 9，两种隔离级别下 A 都可通过普通 SELECT 读到自己写入的 9。RR 中其他未被 A 修改的行仍可能来自之前的快照。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB，RR 与 RC，显式事务",
+          "reason": "锁定读看最新可用版本，普通 RR 读旧快照，自己写入对自己可见。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D01/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0，InnoDB，开发验证对齐项目 8.0.45",
+          "reason": "隔离或锁定读扣减的一般说明，未说明同事务两种读为何取值不同。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D08/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，权威库存假设，应用级请求合同",
+          "reason": "隔离或锁定读扣减的一般说明，未说明同事务两种读为何取值不同。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q43",
+      "direct": [
+        {
+          "chunkKey": "D14/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 441,
+              "spanEndUtf16": 766,
+              "quote": "已经合法排队的命令也可能在 EXEC 执行时碰到类型错误，此时对应位置返回错误，其他命令继续执行，之前成功的写入保留。测试时可先合法 SET 一键，再对一个已有 String 执行 LPUSH，检查 EXEC 的第二项错误以及第一项写入。\n\n## 短脚本在一个执行边界内完成检查\n\n单键配额也可用短 Lua 脚本先读取、校验，再在满足条件时扣减。执行期间其他客户端命令不能插入脚本步骤，但 Redis 服务端需要运行它，避免无界循环和大集合处理。把数据类型、参数范围、键状态及可能的业务拒绝尽量在写前验证，减少写后出错。在 Redis 7.2，若脚本已执行 SET，随后 `redis.call` 执行错误类型操作导致脚本中断，先前 SET 仍生效。"
+            }
+          ],
+          "versionCondition": "Redis OSS 7.2 单实例，排除跨槽",
+          "reason": "EXEC 运行期错误与脚本运行错误均不撤销此前写入，且和排队错误区分。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D12/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Redis OSS 7.2，单实例经典方案，SET NX/PX 与 Lua",
+          "reason": "Lua 原子执行和数据库回滚是对照背景，缺 Redis 错误阶段。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D01/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0，InnoDB，开发验证对齐项目 8.0.45",
+          "reason": "Lua 原子执行和数据库回滚是对照背景，缺 Redis 错误阶段。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D07/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，分别记录死锁检测与 rollback_on_timeout",
+          "reason": "Lua 原子执行和数据库回滚是对照背景，缺 Redis 错误阶段。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q44",
+      "direct": [
+        {
+          "chunkKey": "D18/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 86,
+              "spanEndUtf16": 238,
+              "quote": "客户端需要分别验证证书链信任和服务身份。链验证根据受信任锚、签名、有效期和证书约束验证路径，服务身份检查则把应用预期连接的主机名与证书 SAN 中适用的 DNS 标识比较。给 `files.example.com` 签发的受信证书，如果不匹配 `api.example.com`，不应被后者的客户端接受。"
+            }
+          ],
+          "versionCondition": "IETF RFC 8446、RFC 9525、RFC 5280，完整服务器证书握手与临时 (EC)DHE",
+          "reason": "TLS 加密之外还要校验证书身份和预期主机名，直接支持第一个实质意图。",
+          "harmful": false,
+          "gap": "正文限定完整握手并排除 0-RTT，未给早期数据防重放边界。"
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "D17/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "IETF RFC 1034、RFC 9499、RFC 3596，常规地址查询",
+          "reason": "DNS 到 TLS 的阶段与 HTTP 幂等只是背景，未给证书身份验证或 TLS 早期数据约束。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D16/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "IETF RFC 9110；Java 21 超时 API 作为实现例，AWS 实践作为工程例",
+          "reason": "DNS 到 TLS 的阶段与 HTTP 幂等只是背景，未给证书身份验证或 TLS 早期数据约束。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "正文限定完整握手并排除 0-RTT，未给早期数据防重放边界。"
+    },
+    {
+      "queryId": "Q45",
+      "direct": [
+        {
+          "chunkKey": "S10/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 89,
+              "spanEndUtf16": 271,
+              "quote": "报告聚合要求本场每道计划 MAIN 恰有一条关联正确的 FINAL。SQL 取主问题关联的 FINAL 并按计划排序，服务再比对计划集合和顺序、题目归属、答案完成状态与实际答案 ID。无追问时 FINAL 关联主答案，有追问时 FINAL 关联追问答案，并核对主答案的 INITIAL 指向同一主问题且决策为 FOLLOW_UP。汇总分和弱项使用有效 FINAL。"
+            }
+          ],
+          "versionCondition": "项目 0c6f92afe331954f7cea37d33db688fe781cbf2c；Spring Boot 3.5.16 / MySQL 8.0.45",
+          "reason": "直接说明 FINAL 资格、追问关联和 INITIAL 排除在聚合外。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S09/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "项目 0c6f92afe331954f7cea37d33db688fe781cbf2c；Spring Boot 3.5.16 / MySQL 8.0.45",
+          "reason": "答案提交和评价 attempt 邻近，但未决定报告所选评价。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q46",
+      "direct": [
+        {
+          "chunkKey": "J14/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 144,
+              "spanEndUtf16": 432,
+              "quote": "Segment 类型及字段主要服务于历史序列化兼容。普通 putVal 发现表槽为空时用 CAS 把新节点从 null 原子替换进去，不需要进入桶头监视器；竞争失败就重试。遇到普通非空桶，写入线程在看到的桶头 f 上 synchronized，取到锁后再次确认表槽仍指向 f，随后修改链或树。其他桶通常可以并行操作，树桶还有自身的读写协调。\n\n## 普通读取路径\n\nget 读取可见的表槽，并通过 Node 的 final 或 volatile 字段读取 hash、key、value 和 next 等必要信息。普通链表读取不走写入者的 synchronized(f) 路径。"
+            }
+          ],
+          "versionCondition": "固定 OpenJDK jdk8u402-b06。",
+          "reason": "固定 OpenJDK 8u 源码标签并区分普通链读与桶写同步。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J12/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 371,
+              "spanEndUtf16": 475,
+              "quote": "若向已经至少有 8 个节点的普通链表桶插入新节点，会尝试 treeifyBin。若 table 长度小于 MIN_TREEIFY_CAPACITY 64，则该路径优先 resize，增加桶数可能分散现有碰撞。"
+            }
+          ],
+          "versionCondition": "固定 OpenJDK jdk8u402-b06，公开契约附 Java SE 8 API。",
+          "reason": "普通 putVal 触发尝试树化，表长小于 64 会先 resize，不能据小表扩容推断已树化。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "J04/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 API，定位示例固定 OpenJDK jdk-21+35。",
+          "reason": "其他 Java 版本或公开契约，只做背景。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J15/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 公开 API。",
+          "reason": "其他 Java 版本或公开契约，只做背景。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q47",
+      "direct": [
+        {
+          "chunkKey": "D04/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 530,
+              "spanEndUtf16": 637,
+              "quote": "满足条件的索引条件下推（ICP）可先用索引元组检查条件，减少之后的完整行访问。ICP 与覆盖处理的是两个不同问题。覆盖要求该索引能提供谓词、投影等所需列。新增只存在于聚簇记录的备注列后，当前二级索引通常需要取表行。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB 普通多列 B-tree",
+          "reason": "区分索引元组过滤与覆盖，并交代备注列需要回表。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D05/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 483,
+              "spanEndUtf16": 577,
+              "quote": "存储引擎先检查索引上的 last_seen，再为幸存项读取完整行。 `Using index condition` 反映这种下推，`Using index` 通常表示能从索引提供所需数据。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0，EXPLAIN ANALYZE 自 8.0.18",
+          "reason": "说明 ICP 过滤后幸存项仍可取完整行，Using index 与 Using index condition 有别。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D03/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 677,
+              "spanEndUtf16": 783,
+              "quote": "加入 `raw_event` 后，该索引不再提供全部所需列，走此路径一般需要回表。覆盖描述查询所需列是否齐全。InnoDB 的 MVCC 可见性检查遇到某些近期更新或删除标记时，仍可能访问聚簇记录并读取历史版本。"
+            }
+          ],
+          "versionCondition": "MySQL 8.0 / InnoDB 普通 B-tree",
+          "reason": "直接说明回表和覆盖前提，以及 MVCC 下覆盖例外，可回答题设的一个实质判断。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q48",
+      "direct": [
+        {
+          "chunkKey": "S05/1",
+          "supportedIntentIds": [],
+          "spans": [
+            {
+              "spanStartUtf16": 314,
+              "spanEndUtf16": 672,
+              "quote": "单独在请求体参数标 `@Valid`，没有触发方法校验的直接约束且没有紧随的 `BindingResult` 时，参数级 DTO 校验失败产生 `MethodArgumentNotValidException`。`@NotBlank` 表达非空白的要求，邮箱格式可再单独约束。\n\n## 直接参数约束与级联\n\n若同一控制器方法还有 `@RequestParam @Min(1) int page`，直接参数约束可触发 MVC 内建方法校验。方法校验覆盖同一方法内 `@Valid` 级联的嵌套约束，失败可抛 `HandlerMethodValidationException`。`@Valid` 自身用于级联验证。请求体解析仍发生在得到可验证的参数之前。该异常默认对输入错误返回 400、对返回值约束错误返回 500。"
+            }
+          ],
+          "versionCondition": "Spring Framework MVC 6.2.19；Jakarta Bean Validation 3.0；RFC 9457",
+          "reason": "给出 DTO 参数级和方法级入口异常、Spring MVC 6.2 前提与输入响应兼容边界。",
+          "harmful": false
+        }
+      ],
+      "relatedOnly": [
+        {
+          "chunkKey": "S04/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；Spring Boot 3.5.16 AOP 自动配置",
+          "reason": "代理校验只是可能另一路径，不是这两个 MVC 校验入口。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": null
+    },
+    {
+      "queryId": "Q49",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "J03/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21，避免把某个编译器拼接策略视为语言契约。",
+          "reason": "字符串驻留和类部署常识不能确认组织部署记录。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J17/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "JLS/JVMS SE 21，具名普通类和接口，JDK API。",
+          "reason": "字符串驻留和类部署常识不能确认组织部署记录。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "字符串驻留和类部署常识不能确认组织部署记录。"
+    },
+    {
+      "queryId": "Q50",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "J16/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "JVMS SE 21 与 HotSpot JDK 21。",
+          "reason": "HotSpot 布局与诊断背景不能给指定 Native Image 运行的优化阶段和统计。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J18/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 引用契约与 Oracle JDK 21 HotSpot 工具。",
+          "reason": "HotSpot 布局与诊断背景不能给指定 Native Image 运行的优化阶段和统计。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "HotSpot 布局与诊断背景不能给指定 Native Image 运行的优化阶段和统计。"
+    },
+    {
+      "queryId": "Q51",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "J18/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 引用契约与 Oracle JDK 21 HotSpot 工具。",
+          "reason": "说明取证方法与堆/GC 概念，语料没有当时转储和真实对象链。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J16/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "JVMS SE 21 与 HotSpot JDK 21。",
+          "reason": "说明取证方法与堆/GC 概念，语料没有当时转储和真实对象链。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J19/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Oracle JDK 21 HotSpot G1 实现文档。",
+          "reason": "说明取证方法与堆/GC 概念，语料没有当时转储和真实对象链。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "说明取证方法与堆/GC 概念，语料没有当时转储和真实对象链。"
+    },
+    {
+      "queryId": "Q52",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "J22/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 ThreadPoolExecutor 与复用平台线程。",
+          "reason": "线程池和异步执行器参数背景，语料没有生产搜索实例配置。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J23/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 CompletableFuture、Executor 与 HTTP Client API。",
+          "reason": "线程池和异步执行器参数背景，语料没有生产搜索实例配置。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "线程池和异步执行器参数背景，语料没有生产搜索实例配置。"
+    },
+    {
+      "queryId": "Q53",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "S03/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；jakarta.annotation；正常上下文关闭",
+          "reason": "Bean 生命周期、代理与诊断手段均没有指定时间窗追踪。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S04/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；Spring Boot 3.5.16 AOP 自动配置",
+          "reason": "Bean 生命周期、代理与诊断手段均没有指定时间窗追踪。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "J18/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Java SE 21 引用契约与 Oracle JDK 21 HotSpot 工具。",
+          "reason": "Bean 生命周期、代理与诊断手段均没有指定时间窗追踪。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "Bean 生命周期、代理与诊断手段均没有指定时间窗追踪。"
+    },
+    {
+      "queryId": "Q54",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "D03/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB 普通 B-tree",
+          "reason": "有数据库成本和实测方法，无法给未知 SQL 的 p99 保证。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D04/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB 普通多列 B-tree",
+          "reason": "有数据库成本和实测方法，无法给未知 SQL 的 p99 保证。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D05/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0，EXPLAIN ANALYZE 自 8.0.18",
+          "reason": "有数据库成本和实测方法，无法给未知 SQL 的 p99 保证。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "有数据库成本和实测方法，无法给未知 SQL 的 p99 保证。"
+    },
+    {
+      "queryId": "Q55",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "D10/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Redis OSS 7.2，单实例，key 级 TTL / maxmemory",
+          "reason": "过期机制和聚合统计没有生产键级记录。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D13/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Redis OSS 7.2 基础命令和 MySQL 权威数据源，明确应用假设",
+          "reason": "过期机制和聚合统计没有生产键级记录。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "过期机制和聚合统计没有生产键级记录。"
+    },
+    {
+      "queryId": "Q56",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "D17/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "IETF RFC 1034、RFC 9499、RFC 3596，常规地址查询",
+          "reason": "DNS 地址和 TTL 机制没有在线递归实例的实际响应。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "DNS 地址和 TTL 机制没有在线递归实例的实际响应。"
+    },
+    {
+      "queryId": "Q57",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "S09/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "项目 0c6f92afe331954f7cea37d33db688fe781cbf2c；Spring Boot 3.5.16 / MySQL 8.0.45",
+          "reason": "提交、授权和报告机制不包含指定候选人记录。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S10/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "项目 0c6f92afe331954f7cea37d33db688fe781cbf2c；Spring Boot 3.5.16 / MySQL 8.0.45",
+          "reason": "提交、授权和报告机制不包含指定候选人记录。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "提交、授权和报告机制不包含指定候选人记录。"
+    },
+    {
+      "queryId": "Q58",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "D18/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "IETF RFC 8446、RFC 9525、RFC 5280，完整服务器证书握手与临时 (EC)DHE",
+          "reason": "证书握手机制没有 CDN 节点运维日志。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "证书握手机制没有 CDN 节点运维日志。"
+    },
+    {
+      "queryId": "Q59",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "D13/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Redis OSS 7.2 基础命令和 MySQL 权威数据源，明确应用假设",
+          "reason": "一般旧值回填、快照和淘汰无法标识生产中的实际请求和键。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D06/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，RR 与 RC，显式事务",
+          "reason": "一般旧值回填、快照和淘汰无法标识生产中的实际请求和键。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D10/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Redis OSS 7.2，单实例，key 级 TTL / maxmemory",
+          "reason": "一般旧值回填、快照和淘汰无法标识生产中的实际请求和键。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "一般旧值回填、快照和淘汰无法标识生产中的实际请求和键。"
+    },
+    {
+      "queryId": "Q60",
+      "direct": [],
+      "relatedOnly": [
+        {
+          "chunkKey": "D07/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，分别记录死锁检测与 rollback_on_timeout",
+          "reason": "MySQL 与 Spring 的锁、事务和重试是邻近背景，无法给出 CockroachDB 实例原始事件。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "D06/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "MySQL 8.0 / InnoDB，RR 与 RC，显式事务",
+          "reason": "MySQL 与 Spring 的锁、事务和重试是邻近背景，无法给出 CockroachDB 实例原始事件。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S06/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；命令式本地 JDBC / MySQL 8.0.45",
+          "reason": "MySQL 与 Spring 的锁、事务和重试是邻近背景，无法给出 CockroachDB 实例原始事件。",
+          "harmful": false
+        },
+        {
+          "chunkKey": "S07/1",
+          "supportedIntentIds": [],
+          "spans": [],
+          "versionCondition": "Spring Framework 6.2.19；支持保存点的单数据源命令式事务管理器；MySQL 8.0.45",
+          "reason": "MySQL 与 Spring 的锁、事务和重试是邻近背景，无法给出 CockroachDB 实例原始事件。",
+          "harmful": false
+        }
+      ],
+      "uncertain": [],
+      "evidenceGap": "MySQL 与 Spring 的锁、事务和重试是邻近背景，无法给出 CockroachDB 实例原始事件。"
+    }
+  ]
+}

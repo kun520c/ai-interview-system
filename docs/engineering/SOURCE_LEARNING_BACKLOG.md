@@ -782,3 +782,23 @@
 后续维护记录：2026-11-13 B5-P2-B新增3条，共60条，全部待学习。工程日志脱敏与恢复回归已有证据；未收到开发者本人讲解、复现或独立修改材料。
 
 后续维护记录：2026-11-13 C6新增L-C6-01～03，共63条；累计基线经证据复核给出CONDITIONAL_GO，但本轮未运行真实服务测试，亦未收到开发者本人学习验收材料，所有条目继续掌握未确认。
+
+### D3-B/C/D 源码学习（2026-11-14）
+
+#### L-D3BCD-01 — 生产切片与向量入库身份
+
+- 入口：`KnowledgeTextChunker.split`、`KnowledgeDocumentProcessingService.processDocument`、`persistChunksAndMarkReady` 与 `D3Inventory.inventory`。
+- 独立练习：解释原文件摘要与规范化 Chunk 摘要各防哪种错误。用两条合成向量记录说明 READY 和 ACTIVE 还需怎样的跨库身份核对，以及结果未知时应读哪些字段。
+- 掌握状态：**待学习（掌握未确认）**。
+
+#### L-D3BCD-02 — 首位命中、Prompt 相关率与独立集
+
+- 入口：`EvaluationRetrievalAdapter.retrieve`、`EvaluationPromptBuilder.build` 与 [补充规程](../rag/d3-d/PROTOCOL_SUPPLEMENT_20261114.md)。
+- 独立练习：重算一次命中靠前、其余内容无直接支持的 A/B/C 结果，解释负例为什么单列。用一条语料缺口和一条原始召回失败说明后续修复的不同证据。
+- 掌握状态：**待学习（掌握未确认）**。
+
+#### L-D3BCD-03 — 付费尝试与业务请求恢复
+
+- 入口：`DeepSeekEvaluationClient`、`InterviewService.submitAnswer`、`D3SmokeServer.UsageResponse` 与 EASY 提交后读回。
+- 独立练习：复现响应流只能读一次造成的包装器故障，证明修复后能保留响应内容并只记一次 usage。解释相同业务请求键仍可能产生新的上游计费，以及如何用 FINAL 核对报告。
+- 掌握状态：**待学习（掌握未确认）**。

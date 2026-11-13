@@ -431,3 +431,12 @@
 后续维护记录：2026-11-13 B5-P2-B完成Embedding日志边界修复、40项日志专项及1832/0/0/19最终普通回归；新增3条待学习任务，共60条。B5-FIX-B候选已按授权收口，其他候选不启动；未暂存、提交或推送。
 
 后续维护记录：2026-11-13 C6完成累计审查、37归档XML及快照／依赖核验，复用1832/0/0/19后端和336/0/0/0前端最终证据，新增五批精确提交计划与真实测试准入条件。未改生产／测试源码，未重跑测试或构建，未执行真实调用或Git写操作；CONDITIONAL_GO。新增3条学习任务，共63条，全部掌握未确认。
+
+<a id="d3-bcd"></a>
+
+### D3-B/C/D — RAG 正文、真实入库与检索验收
+
+- 2026-11-14（Asia/Shanghai），Codex。51 篇冻结语料含原 E01 和 50 篇新正文，52 个生产 Chunk，文档到评分点 316 条关系覆盖 298 个点。正文通过 AI 交叉复核，人工抽查待做。 [最终验收](../verification/D3_BCD_FINAL_ACCEPTANCE_20261114.md)
+- 复用 `KnowledgeDocumentAdminService → KnowledgeDocumentProcessingService → persistChunksAndMarkReady`。evaluation 实查 51 READY、52 ACTIVE、52 条真实向量，E01 和题库 63/298 保全。生产 `EvaluationRagQueryBuilder → EvaluationRetrievalAdapter → KnowledgeRetrievalService → EvaluationPromptBuilder` 实跑 72 条，公开 60 条，独立 24 条。Prompt 直接相关率低于门槛，保留首次记录。
+- 单场 EASY 真实 HTTP 经过一次同键恢复后完成 5 MAIN、3 FOLLOW_UP 和 READY 报告，独立连接核验 5 FINAL。定向 JUnit 首轮 103/0/21/0（Mockito attach），显式 agent 重跑 103/0/0/0。实际 Embedding 215、DeepSeek 10；按量估约 ¥0.07323，未核账单。未执行全量 JUnit。下一轮仅隔离环境人工及小规模 AI 测试 CONDITIONAL_GO。
+- 本轮生产源码没有改动。入场 HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`，实时远端 `89b77dc082272e38cfbbecb4b57c37edae9ee74d`。语料、工具及验收按本地提交记录追溯，未推送。L-D3BCD-01～03 待学习，掌握未确认。

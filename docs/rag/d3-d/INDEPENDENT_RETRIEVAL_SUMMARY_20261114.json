@@ -1,0 +1,1253 @@
+{
+  "labelConfidence": "Two rank-blinded AI judgments, reconciled by one assessor; provisional AI labels",
+  "valid": 24,
+  "planned": 24,
+  "stages": {
+    "A": {
+      "positiveCount": 18,
+      "hitNumerators": {
+        "1": 15,
+        "3": 15,
+        "5": 15
+      },
+      "firstDirectRankCounts": {
+        "miss": 3,
+        "1": 15
+      },
+      "mrrAt5": 0.8333333333333334,
+      "precisionAt5": 0.23333333333333334,
+      "direct": 21,
+      "positiveReturned": 90,
+      "positiveActualPrecision": 0.23333333333333334,
+      "crossTopicIntentCoverage": {
+        "supported": 10,
+        "expected": 11,
+        "complete": 3,
+        "queries": 4
+      },
+      "negativeCount": 6,
+      "negativeNonEmpty": 6,
+      "negativeReturnedLabels": {
+        "RELATED_ONLY": 18,
+        "IRRELEVANT": 12
+      },
+      "harmfulEvidenceQueries": 0
+    },
+    "B": {
+      "positiveCount": 18,
+      "hitNumerators": {
+        "1": 15,
+        "3": 15,
+        "5": 15
+      },
+      "firstDirectRankCounts": {
+        "miss": 3,
+        "1": 15
+      },
+      "mrrAt5": 0.8333333333333334,
+      "precisionAt5": 0.23333333333333334,
+      "direct": 21,
+      "positiveReturned": 90,
+      "positiveActualPrecision": 0.23333333333333334,
+      "crossTopicIntentCoverage": {
+        "supported": 10,
+        "expected": 11,
+        "complete": 3,
+        "queries": 4
+      },
+      "negativeCount": 6,
+      "negativeNonEmpty": 6,
+      "negativeReturnedLabels": {
+        "RELATED_ONLY": 18,
+        "IRRELEVANT": 12
+      },
+      "harmfulEvidenceQueries": 0
+    },
+    "C": {
+      "positiveCount": 18,
+      "hitNumerators": {
+        "1": 15,
+        "3": 15,
+        "5": 15
+      },
+      "firstDirectRankCounts": {
+        "miss": 3,
+        "1": 15
+      },
+      "mrrAt5": 0.8333333333333334,
+      "precisionAt5": 0.23333333333333334,
+      "direct": 21,
+      "positiveReturned": 90,
+      "positiveActualPrecision": 0.23333333333333334,
+      "crossTopicIntentCoverage": {
+        "supported": 10,
+        "expected": 11,
+        "complete": 3,
+        "queries": 4
+      },
+      "negativeCount": 6,
+      "negativeNonEmpty": 6,
+      "negativeReturnedLabels": {
+        "RELATED_ONLY": 18,
+        "IRRELEVANT": 12
+      },
+      "harmfulEvidenceQueries": 0
+    }
+  },
+  "promptDirectRate": {
+    "direct": 21,
+    "returned": 120,
+    "fraction": 0.175
+  },
+  "candidateLoss": {
+    "A->B": {
+      "returned": 0,
+      "direct": 0
+    },
+    "B->C": {
+      "returned": 0,
+      "direct": 0
+    }
+  },
+  "medianElapsedMs": 325.0,
+  "maxElapsedMs": 1469,
+  "embeddingUsageTokens": 1280,
+  "groups": {
+    "domain": {
+      "JAVA_BASIC": {
+        "A": {
+          "positiveCount": 3,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "miss": 1,
+            "1": 2
+          },
+          "mrrAt5": 0.6666666666666666,
+          "precisionAt5": 0.13333333333333333,
+          "direct": 2,
+          "positiveReturned": 15,
+          "positiveActualPrecision": 0.13333333333333333,
+          "crossTopicIntentCoverage": {
+            "supported": 3,
+            "expected": 3,
+            "complete": 1,
+            "queries": 1
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 3,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "miss": 1,
+            "1": 2
+          },
+          "mrrAt5": 0.6666666666666666,
+          "precisionAt5": 0.13333333333333333,
+          "direct": 2,
+          "positiveReturned": 15,
+          "positiveActualPrecision": 0.13333333333333333,
+          "crossTopicIntentCoverage": {
+            "supported": 3,
+            "expected": 3,
+            "complete": 1,
+            "queries": 1
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 3,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "miss": 1,
+            "1": 2
+          },
+          "mrrAt5": 0.6666666666666666,
+          "precisionAt5": 0.13333333333333333,
+          "direct": 2,
+          "positiveReturned": 15,
+          "positiveActualPrecision": 0.13333333333333333,
+          "crossTopicIntentCoverage": {
+            "supported": 3,
+            "expected": 3,
+            "complete": 1,
+            "queries": 1
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        }
+      },
+      "JAVA_COLLECTION": {
+        "A": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "1": 2
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.2,
+          "direct": 2,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.2,
+          "crossTopicIntentCoverage": {
+            "supported": 3,
+            "expected": 3,
+            "complete": 1,
+            "queries": 1
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "1": 2
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.2,
+          "direct": 2,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.2,
+          "crossTopicIntentCoverage": {
+            "supported": 3,
+            "expected": 3,
+            "complete": 1,
+            "queries": 1
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "1": 2
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.2,
+          "direct": 2,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.2,
+          "crossTopicIntentCoverage": {
+            "supported": 3,
+            "expected": 3,
+            "complete": 1,
+            "queries": 1
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        }
+      },
+      "JAVA_CONCURRENCY": {
+        "A": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "1": 2
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.2,
+          "direct": 2,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.2,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "1": 2
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.2,
+          "direct": 2,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.2,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "1": 2
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.2,
+          "direct": 2,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.2,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        }
+      },
+      "JVM": {
+        "A": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 1,
+            "3": 1,
+            "5": 1
+          },
+          "firstDirectRankCounts": {
+            "1": 1,
+            "miss": 1
+          },
+          "mrrAt5": 0.5,
+          "precisionAt5": 0.1,
+          "direct": 1,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.1,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 1,
+          "negativeNonEmpty": 1,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 3,
+            "IRRELEVANT": 2
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 1,
+            "3": 1,
+            "5": 1
+          },
+          "firstDirectRankCounts": {
+            "1": 1,
+            "miss": 1
+          },
+          "mrrAt5": 0.5,
+          "precisionAt5": 0.1,
+          "direct": 1,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.1,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 1,
+          "negativeNonEmpty": 1,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 3,
+            "IRRELEVANT": 2
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 1,
+            "3": 1,
+            "5": 1
+          },
+          "firstDirectRankCounts": {
+            "1": 1,
+            "miss": 1
+          },
+          "mrrAt5": 0.5,
+          "precisionAt5": 0.1,
+          "direct": 1,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.1,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 1,
+          "negativeNonEmpty": 1,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 3,
+            "IRRELEVANT": 2
+          },
+          "harmfulEvidenceQueries": 0
+        }
+      },
+      "MYSQL": {
+        "A": {
+          "positiveCount": 4,
+          "hitNumerators": {
+            "1": 3,
+            "3": 3,
+            "5": 3
+          },
+          "firstDirectRankCounts": {
+            "1": 3,
+            "miss": 1
+          },
+          "mrrAt5": 0.75,
+          "precisionAt5": 0.35,
+          "direct": 7,
+          "positiveReturned": 20,
+          "positiveActualPrecision": 0.35,
+          "crossTopicIntentCoverage": {
+            "supported": 5,
+            "expected": 6,
+            "complete": 1,
+            "queries": 2
+          },
+          "negativeCount": 3,
+          "negativeNonEmpty": 3,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 10,
+            "IRRELEVANT": 5
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 4,
+          "hitNumerators": {
+            "1": 3,
+            "3": 3,
+            "5": 3
+          },
+          "firstDirectRankCounts": {
+            "1": 3,
+            "miss": 1
+          },
+          "mrrAt5": 0.75,
+          "precisionAt5": 0.35,
+          "direct": 7,
+          "positiveReturned": 20,
+          "positiveActualPrecision": 0.35,
+          "crossTopicIntentCoverage": {
+            "supported": 5,
+            "expected": 6,
+            "complete": 1,
+            "queries": 2
+          },
+          "negativeCount": 3,
+          "negativeNonEmpty": 3,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 10,
+            "IRRELEVANT": 5
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 4,
+          "hitNumerators": {
+            "1": 3,
+            "3": 3,
+            "5": 3
+          },
+          "firstDirectRankCounts": {
+            "1": 3,
+            "miss": 1
+          },
+          "mrrAt5": 0.75,
+          "precisionAt5": 0.35,
+          "direct": 7,
+          "positiveReturned": 20,
+          "positiveActualPrecision": 0.35,
+          "crossTopicIntentCoverage": {
+            "supported": 5,
+            "expected": 6,
+            "complete": 1,
+            "queries": 2
+          },
+          "negativeCount": 3,
+          "negativeNonEmpty": 3,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 10,
+            "IRRELEVANT": 5
+          },
+          "harmfulEvidenceQueries": 0
+        }
+      },
+      "NETWORK": {
+        "A": {
+          "positiveCount": 3,
+          "hitNumerators": {
+            "1": 3,
+            "3": 3,
+            "5": 3
+          },
+          "firstDirectRankCounts": {
+            "1": 3
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.4666666666666667,
+          "direct": 7,
+          "positiveReturned": 15,
+          "positiveActualPrecision": 0.4666666666666667,
+          "crossTopicIntentCoverage": {
+            "supported": 4,
+            "expected": 5,
+            "complete": 1,
+            "queries": 2
+          },
+          "negativeCount": 2,
+          "negativeNonEmpty": 2,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 6,
+            "IRRELEVANT": 4
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 3,
+          "hitNumerators": {
+            "1": 3,
+            "3": 3,
+            "5": 3
+          },
+          "firstDirectRankCounts": {
+            "1": 3
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.4666666666666667,
+          "direct": 7,
+          "positiveReturned": 15,
+          "positiveActualPrecision": 0.4666666666666667,
+          "crossTopicIntentCoverage": {
+            "supported": 4,
+            "expected": 5,
+            "complete": 1,
+            "queries": 2
+          },
+          "negativeCount": 2,
+          "negativeNonEmpty": 2,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 6,
+            "IRRELEVANT": 4
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 3,
+          "hitNumerators": {
+            "1": 3,
+            "3": 3,
+            "5": 3
+          },
+          "firstDirectRankCounts": {
+            "1": 3
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.4666666666666667,
+          "direct": 7,
+          "positiveReturned": 15,
+          "positiveActualPrecision": 0.4666666666666667,
+          "crossTopicIntentCoverage": {
+            "supported": 4,
+            "expected": 5,
+            "complete": 1,
+            "queries": 2
+          },
+          "negativeCount": 2,
+          "negativeNonEmpty": 2,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 6,
+            "IRRELEVANT": 4
+          },
+          "harmfulEvidenceQueries": 0
+        }
+      },
+      "PROJECT_SCENARIO": {
+        "A": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "1": 2
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.6,
+          "direct": 6,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.6,
+          "crossTopicIntentCoverage": {
+            "supported": 5,
+            "expected": 6,
+            "complete": 1,
+            "queries": 2
+          },
+          "negativeCount": 2,
+          "negativeNonEmpty": 2,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 7,
+            "IRRELEVANT": 3
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "1": 2
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.6,
+          "direct": 6,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.6,
+          "crossTopicIntentCoverage": {
+            "supported": 5,
+            "expected": 6,
+            "complete": 1,
+            "queries": 2
+          },
+          "negativeCount": 2,
+          "negativeNonEmpty": 2,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 7,
+            "IRRELEVANT": 3
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "1": 2
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.6,
+          "direct": 6,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.6,
+          "crossTopicIntentCoverage": {
+            "supported": 5,
+            "expected": 6,
+            "complete": 1,
+            "queries": 2
+          },
+          "negativeCount": 2,
+          "negativeNonEmpty": 2,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 7,
+            "IRRELEVANT": 3
+          },
+          "harmfulEvidenceQueries": 0
+        }
+      },
+      "REDIS": {
+        "A": {
+          "positiveCount": 3,
+          "hitNumerators": {
+            "1": 3,
+            "3": 3,
+            "5": 3
+          },
+          "firstDirectRankCounts": {
+            "1": 3
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.26666666666666666,
+          "direct": 4,
+          "positiveReturned": 15,
+          "positiveActualPrecision": 0.26666666666666666,
+          "crossTopicIntentCoverage": {
+            "supported": 3,
+            "expected": 3,
+            "complete": 1,
+            "queries": 1
+          },
+          "negativeCount": 1,
+          "negativeNonEmpty": 1,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 2,
+            "IRRELEVANT": 3
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 3,
+          "hitNumerators": {
+            "1": 3,
+            "3": 3,
+            "5": 3
+          },
+          "firstDirectRankCounts": {
+            "1": 3
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.26666666666666666,
+          "direct": 4,
+          "positiveReturned": 15,
+          "positiveActualPrecision": 0.26666666666666666,
+          "crossTopicIntentCoverage": {
+            "supported": 3,
+            "expected": 3,
+            "complete": 1,
+            "queries": 1
+          },
+          "negativeCount": 1,
+          "negativeNonEmpty": 1,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 2,
+            "IRRELEVANT": 3
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 3,
+          "hitNumerators": {
+            "1": 3,
+            "3": 3,
+            "5": 3
+          },
+          "firstDirectRankCounts": {
+            "1": 3
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.26666666666666666,
+          "direct": 4,
+          "positiveReturned": 15,
+          "positiveActualPrecision": 0.26666666666666666,
+          "crossTopicIntentCoverage": {
+            "supported": 3,
+            "expected": 3,
+            "complete": 1,
+            "queries": 1
+          },
+          "negativeCount": 1,
+          "negativeNonEmpty": 1,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 2,
+            "IRRELEVANT": 3
+          },
+          "harmfulEvidenceQueries": 0
+        }
+      },
+      "SPRING": {
+        "A": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "1": 2
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.3,
+          "direct": 3,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.3,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 1,
+          "negativeNonEmpty": 1,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 4,
+            "IRRELEVANT": 1
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "1": 2
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.3,
+          "direct": 3,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.3,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 1,
+          "negativeNonEmpty": 1,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 4,
+            "IRRELEVANT": 1
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 2,
+          "hitNumerators": {
+            "1": 2,
+            "3": 2,
+            "5": 2
+          },
+          "firstDirectRankCounts": {
+            "1": 2
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.3,
+          "direct": 3,
+          "positiveReturned": 10,
+          "positiveActualPrecision": 0.3,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 1,
+          "negativeNonEmpty": 1,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 4,
+            "IRRELEVANT": 1
+          },
+          "harmfulEvidenceQueries": 0
+        }
+      }
+    },
+    "type": {
+      "CROSS_TOPIC": {
+        "A": {
+          "positiveCount": 4,
+          "hitNumerators": {
+            "1": 4,
+            "3": 4,
+            "5": 4
+          },
+          "firstDirectRankCounts": {
+            "1": 4
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.45,
+          "direct": 9,
+          "positiveReturned": 20,
+          "positiveActualPrecision": 0.45,
+          "crossTopicIntentCoverage": {
+            "supported": 10,
+            "expected": 11,
+            "complete": 3,
+            "queries": 4
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 4,
+          "hitNumerators": {
+            "1": 4,
+            "3": 4,
+            "5": 4
+          },
+          "firstDirectRankCounts": {
+            "1": 4
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.45,
+          "direct": 9,
+          "positiveReturned": 20,
+          "positiveActualPrecision": 0.45,
+          "crossTopicIntentCoverage": {
+            "supported": 10,
+            "expected": 11,
+            "complete": 3,
+            "queries": 4
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 4,
+          "hitNumerators": {
+            "1": 4,
+            "3": 4,
+            "5": 4
+          },
+          "firstDirectRankCounts": {
+            "1": 4
+          },
+          "mrrAt5": 1.0,
+          "precisionAt5": 0.45,
+          "direct": 9,
+          "positiveReturned": 20,
+          "positiveActualPrecision": 0.45,
+          "crossTopicIntentCoverage": {
+            "supported": 10,
+            "expected": 11,
+            "complete": 3,
+            "queries": 4
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        }
+      },
+      "DISTINCTION": {
+        "A": {
+          "positiveCount": 10,
+          "hitNumerators": {
+            "1": 8,
+            "3": 8,
+            "5": 8
+          },
+          "firstDirectRankCounts": {
+            "1": 8,
+            "miss": 2
+          },
+          "mrrAt5": 0.8,
+          "precisionAt5": 0.16,
+          "direct": 8,
+          "positiveReturned": 50,
+          "positiveActualPrecision": 0.16,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 10,
+          "hitNumerators": {
+            "1": 8,
+            "3": 8,
+            "5": 8
+          },
+          "firstDirectRankCounts": {
+            "1": 8,
+            "miss": 2
+          },
+          "mrrAt5": 0.8,
+          "precisionAt5": 0.16,
+          "direct": 8,
+          "positiveReturned": 50,
+          "positiveActualPrecision": 0.16,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 10,
+          "hitNumerators": {
+            "1": 8,
+            "3": 8,
+            "5": 8
+          },
+          "firstDirectRankCounts": {
+            "1": 8,
+            "miss": 2
+          },
+          "mrrAt5": 0.8,
+          "precisionAt5": 0.16,
+          "direct": 8,
+          "positiveReturned": 50,
+          "positiveActualPrecision": 0.16,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        }
+      },
+      "INSTANCE_EVIDENCE": {
+        "A": {
+          "positiveCount": 0,
+          "hitNumerators": {
+            "1": 0,
+            "3": 0,
+            "5": 0
+          },
+          "firstDirectRankCounts": {},
+          "mrrAt5": null,
+          "precisionAt5": null,
+          "direct": 0,
+          "positiveReturned": 0,
+          "positiveActualPrecision": null,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 6,
+          "negativeNonEmpty": 6,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 18,
+            "IRRELEVANT": 12
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 0,
+          "hitNumerators": {
+            "1": 0,
+            "3": 0,
+            "5": 0
+          },
+          "firstDirectRankCounts": {},
+          "mrrAt5": null,
+          "precisionAt5": null,
+          "direct": 0,
+          "positiveReturned": 0,
+          "positiveActualPrecision": null,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 6,
+          "negativeNonEmpty": 6,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 18,
+            "IRRELEVANT": 12
+          },
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 0,
+          "hitNumerators": {
+            "1": 0,
+            "3": 0,
+            "5": 0
+          },
+          "firstDirectRankCounts": {},
+          "mrrAt5": null,
+          "precisionAt5": null,
+          "direct": 0,
+          "positiveReturned": 0,
+          "positiveActualPrecision": null,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 6,
+          "negativeNonEmpty": 6,
+          "negativeReturnedLabels": {
+            "RELATED_ONLY": 18,
+            "IRRELEVANT": 12
+          },
+          "harmfulEvidenceQueries": 0
+        }
+      },
+      "SEMANTIC_PARAPHRASE": {
+        "A": {
+          "positiveCount": 4,
+          "hitNumerators": {
+            "1": 3,
+            "3": 3,
+            "5": 3
+          },
+          "firstDirectRankCounts": {
+            "miss": 1,
+            "1": 3
+          },
+          "mrrAt5": 0.75,
+          "precisionAt5": 0.2,
+          "direct": 4,
+          "positiveReturned": 20,
+          "positiveActualPrecision": 0.2,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        },
+        "B": {
+          "positiveCount": 4,
+          "hitNumerators": {
+            "1": 3,
+            "3": 3,
+            "5": 3
+          },
+          "firstDirectRankCounts": {
+            "miss": 1,
+            "1": 3
+          },
+          "mrrAt5": 0.75,
+          "precisionAt5": 0.2,
+          "direct": 4,
+          "positiveReturned": 20,
+          "positiveActualPrecision": 0.2,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        },
+        "C": {
+          "positiveCount": 4,
+          "hitNumerators": {
+            "1": 3,
+            "3": 3,
+            "5": 3
+          },
+          "firstDirectRankCounts": {
+            "miss": 1,
+            "1": 3
+          },
+          "mrrAt5": 0.75,
+          "precisionAt5": 0.2,
+          "direct": 4,
+          "positiveReturned": 20,
+          "positiveActualPrecision": 0.2,
+          "crossTopicIntentCoverage": {
+            "supported": 0,
+            "expected": 0,
+            "complete": 0,
+            "queries": 0
+          },
+          "negativeCount": 0,
+          "negativeNonEmpty": 0,
+          "negativeReturnedLabels": {},
+          "harmfulEvidenceQueries": 0
+        }
+      }
+    }
+  },
+  "querySha256": "9f637abce7442fe663c6c0702de907d17dba16ed6e874708ff481c8fbd134632",
+  "judgmentSha256": "448f69bdb6fcafebbc5b6fe26a66bb05cfdc451d3c48f0d8f8e925802d361498",
+  "status": "THRESHOLDS_NOT_MET",
+  "humanGold": false,
+  "groundTruthBoundary": "Fresh query-author context created after corpus freeze, no project material or rankings accessed. Two AI assessors independently used frozen chunks before retrieval, one reconciled after label freeze. Private inputs, query-level rows and labels stay local.",
+  "positiveGapCount": 3,
+  "positiveGapTopics": [
+    "Java 引用按值传递",
+    "WeakReference 清除语义",
+    "InnoDB 临键锁与间隙锁"
+  ],
+  "pairLabeling": {
+    "pairs": 1248,
+    "categoricalDisagreements": 28,
+    "agreement": 0.9775641025641025,
+    "cohenKappaApprox": 0.805112,
+    "direct": 21,
+    "relatedOnly": 67,
+    "irrelevant": 1160
+  }
+}
