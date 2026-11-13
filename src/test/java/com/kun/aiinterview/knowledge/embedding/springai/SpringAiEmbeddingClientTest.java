@@ -423,13 +423,15 @@ class SpringAiEmbeddingClientTest {
 
     @Test
     void shouldMapSpringAiFailureAndKeepInputFailureUnwrapped() {
-        RuntimeException providerFailure = new RuntimeException("timeout");
+        var providerFailure = new org.springframework.web.client.ResourceAccessException("untrusted timeout",
+                new java.net.SocketTimeoutException("untrusted timeout"));
         when(embeddingModel.call(any())).thenThrow(providerFailure);
 
         assertThatThrownBy(() -> client.embed(List.of("text")))
                 .isInstanceOf(ExternalServiceException.class)
                 .hasMessageContaining("调用Embedding服务失败")
-                .hasCause(providerFailure);
+                .hasMessageContaining("category=TIMEOUT")
+                .hasNoCause();
         assertThatThrownBy(() -> client.embed(List.of(" ")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .isNotInstanceOf(ExternalServiceException.class);

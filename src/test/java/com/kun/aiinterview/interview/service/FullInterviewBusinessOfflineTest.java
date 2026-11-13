@@ -30,7 +30,10 @@ import java.util.function.Function;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingBatchResult;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingClient;
+import com.kun.aiinterview.knowledge.embedding.EmbeddingConfiguration;
+import com.kun.aiinterview.knowledge.embedding.EmbeddingProperties;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingVector;
+import com.kun.aiinterview.knowledge.embedding.springai.SpringAiEmbeddingClient;
 import com.kun.aiinterview.knowledge.vector.VectorSearchHit;
 import com.kun.aiinterview.knowledge.vector.VectorStoreClient;
 import com.kun.aiinterview.knowledge.vector.milvus.MilvusCollectionInitializer;
@@ -93,6 +96,7 @@ class FullInterviewBusinessOfflineTest {
     @Autowired InterviewService interviewService;
     @Autowired EvaluationOrchestrationService orchestration;
     @Autowired DeepSeekProperties deepSeekProperties;
+    @Autowired EmbeddingProperties embeddingProperties;
     @Autowired org.mybatis.spring.SqlSessionTemplate sqlSession;
     @MockitoBean EmbeddingClient embedding;
     @MockitoBean VectorStoreClient vectors;
@@ -101,6 +105,7 @@ class FullInterviewBusinessOfflineTest {
     @MockitoBean MilvusClientV2 milvus;
     @MockitoBean MilvusCollectionInitializer initializer;
     private static final String LOG_SENTINEL = "B4B_TEST_SENSITIVE_BODY_20261112";
+    private static final String EMBEDDING_LOG_SENTINEL = "B5_P2B_SENSITIVE_RESPONSE_SENTINEL";
     private static final String MALICIOUS_RESPONSE = LOG_SENTINEL
             + "\r\nERROR FORGED_LOG_RECORD\u001b[31m\u0000 Authorization: Bearer offline-test-key PRIVATE_CANDIDATE_INPUT";
     private String token;
@@ -250,6 +255,102 @@ class FullInterviewBusinessOfflineTest {
         assertThat(jdbc.queryForObject("SELECT completed_question_count FROM interview_session WHERE id=?",Integer.class,sessionId)).isZero();
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM answer_evaluation e JOIN interview_question q ON q.id=e.main_interview_question_id WHERE q.session_id=?",Integer.class,sessionId)).isZero();
         verifyNoInteractions(reportGenerator,milvus,initializer);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"400", "401", "403", "429", "500", "503", "connect", "timeout", "json", "model", "empty"})
+    void embeddingFailureKeepsLogsSafeAndAllowsExplicitAnswerRecovery(String fault) throws Exception {
+        var calls = new AtomicInteger();
+        var server = useHttpEmbedding(fault, calls);
+        var created = request("POST", "/api/interviews", Map.of("difficulty", "EASY"), 200);
+        long sessionId = created.path("sessionId").asLong();
+        long questionId = created.at("/currentQuestion/interviewQuestionId").asLong();
+        var body = modelAnswer(questionId);
+        withSafeProviderLog(() -> modelAnswerResponse(sessionId, body, 502), "InterviewWorkflowService");
+        assertFailedModelState(sessionId, questionId, body.get("requestId").toString());
+        assertThat(calls.get()).isEqualTo(1);
+        verifyNoInteractions(vectors, judge, reportGenerator);
+        request("POST", "/api/interviews/" + sessionId + "/answers", Map.of("interviewQuestionId", questionId,
+                "requestId", body.get("requestId"), "answerContent", "changed"), 409);
+        var success = modelAnswerResponse(sessionId, body, 200);
+        var replay = modelAnswerResponse(sessionId, body, 200);
+        assertThat(replay.path("data")).isEqualTo(success.path("data"));
+        assertThat(calls.get()).isEqualTo(2);
+        verify(vectors, times(1)).search(any(), anyString(), anyInt());
+        verify(judge, times(1)).evaluate(any(), any());
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM interview_answer WHERE request_id=?",
+                Integer.class, body.get("requestId"))).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM answer_evaluation e JOIN interview_answer a ON a.id=e.answer_id WHERE a.request_id=?",
+                Integer.class, body.get("requestId"))).isEqualTo(1);
+        server.verify();
+    }
+
+    @Test
+    void embeddingFailureDoesNotWriteVectorsAndDocumentRetryCanReachReady() throws Exception {
+        var calls = new AtomicInteger();
+        var server = useHttpEmbedding("503", calls);
+        jdbc.update("UPDATE user SET role='ADMIN' WHERE id=?", userId);
+        String title = "b5p2b-" + UUID.randomUUID();
+        String content = "B5P2B_PRIVATE_KNOWLEDGE_CONTENT";
+        String hash = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
+                .digest(content.getBytes(StandardCharsets.UTF_8)));
+        jdbc.update("""
+                INSERT INTO knowledge_document(title,category,file_name,file_type,content,content_hash,
+                    document_version,processing_status)
+                VALUES (?,'JAVA_BASIC','b5p2b.md','MARKDOWN',?,?,1,'UPLOADED')
+                """, title, content, hash);
+        Long documentId = jdbc.queryForObject("SELECT id FROM knowledge_document WHERE title=?", Long.class, title);
+        String endpoint = "/api/admin/knowledge/documents/" + documentId + "/process";
+        withSafeProviderLog(() -> request("POST", endpoint, null, 502), "KnowledgeDocumentProcessingService");
+        assertThat(jdbc.queryForObject("SELECT processing_status FROM knowledge_document WHERE id=?",
+                String.class, documentId)).isEqualTo("FAILED");
+        assertThat(jdbc.queryForObject("SELECT error_message FROM knowledge_document WHERE id=?",
+                String.class, documentId)).doesNotContain(EMBEDDING_LOG_SENTINEL, content);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM knowledge_chunk WHERE document_id=?",
+                Integer.class, documentId)).isZero();
+        verifyNoInteractions(vectors);
+        assertThat(calls.get()).isEqualTo(1);
+        request("POST", endpoint, null, 200);
+        assertThat(jdbc.queryForObject("SELECT processing_status FROM knowledge_document WHERE id=?",
+                String.class, documentId)).isEqualTo("READY");
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM knowledge_chunk WHERE document_id=? AND status='ACTIVE'",
+                Integer.class, documentId)).isEqualTo(1);
+        verify(vectors, times(1)).insert(any());
+        verify(vectors, never()).deleteByVectorIds(any());
+        assertThat(calls.get()).isEqualTo(2);
+        server.verify();
+    }
+
+    private MockRestServiceServer useHttpEmbedding(String fault, AtomicInteger calls) throws Exception {
+        var builder = EmbeddingConfiguration.createEmbeddingRestClientBuilder(embeddingProperties);
+        var server = MockRestServiceServer.bindTo(builder).build();
+        String upstreamBody = EMBEDDING_LOG_SENTINEL + MALICIOUS_RESPONSE;
+        String valid = json.writeValueAsString(Map.of("model", embeddingProperties.getModel(), "data",
+                List.of(Map.of("index", 0, "embedding", Collections.nCopies(embeddingProperties.getDimension(), .01F))),
+                "usage", Map.of("prompt_tokens", 1, "total_tokens", 1)));
+        ResponseCreator failure = switch (fault) {
+            case "connect" -> withException(new ConnectException(upstreamBody));
+            case "timeout" -> withException(new SocketTimeoutException(upstreamBody));
+            case "json" -> withSuccess("{\"model\":" + EMBEDDING_LOG_SENTINEL + "}", MediaType.APPLICATION_JSON);
+            case "model" -> withSuccess(valid.replace(json.writeValueAsString(embeddingProperties.getModel()),
+                    json.writeValueAsString(upstreamBody)), MediaType.APPLICATION_JSON);
+            case "empty" -> withSuccess("", MediaType.APPLICATION_JSON);
+            default -> withRawStatus(Integer.parseInt(fault)).body(upstreamBody);
+        };
+        String url = embeddingProperties.getBaseUrl() + "/embeddings";
+        server.expect(org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo(url)).andRespond(failure);
+        server.expect(org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo(url))
+                .andRespond(withSuccess(valid, MediaType.APPLICATION_JSON));
+        var api = EmbeddingConfiguration.createOpenAiApi(embeddingProperties, builder);
+        var client = new SpringAiEmbeddingClient(EmbeddingConfiguration.createEmbeddingModel(api, embeddingProperties),
+                embeddingProperties);
+        doAnswer(invocation -> {
+            calls.incrementAndGet();
+            List<String> texts = invocation.getArgument(0);
+            assertThat(String.join("\n", texts)).doesNotContain("PRIVATE_CANDIDATE_INPUT");
+            return client.embed(texts);
+        }).when(embedding).embed(any());
+        return server;
     }
 
     static Stream<Arguments> invalidModelScores() {
@@ -457,7 +558,7 @@ class FullInterviewBusinessOfflineTest {
             String rendered = layout.doLayout(event);
             assertThat(rendered).contains("ERROR", "ExternalServiceException", serviceClass);
             for (String output : List.of(rendered, ThrowableProxyUtil.asString(event.getThrowableProxy()))) {
-                assertThat(output).doesNotContain(LOG_SENTINEL, "PRIVATE_MODEL_OUTPUT", "PRIVATE_CANDIDATE_INPUT",
+                assertThat(output).doesNotContain(LOG_SENTINEL, EMBEDDING_LOG_SENTINEL, "B5P2B_PRIVATE_KNOWLEDGE_CONTENT", "PRIVATE_MODEL_OUTPUT", "PRIVATE_CANDIDATE_INPUT",
                         "private-model-id", "offline-test-key", "Authorization:", "Bearer ", token,
                         "FORGED_LOG_RECORD", "\r", "\u001b", "\u0000");
             }

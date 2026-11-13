@@ -2,6 +2,7 @@ package com.kun.aiinterview.knowledge.embedding;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kun.aiinterview.knowledge.embedding.springai.EmbeddingOpenAiApi;
 import com.kun.aiinterview.knowledge.embedding.springai.SpringAiEmbeddingClient;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -87,12 +88,7 @@ public class EmbeddingConfiguration {
             EmbeddingProperties properties,
             RestClient.Builder restClientBuilder
     ) {
-        return OpenAiApi.builder()
-                .baseUrl(properties.getBaseUrl().toString())
-                .apiKey(properties.getApiKey())
-                .embeddingsPath(EMBEDDINGS_PATH)
-                .restClientBuilder(restClientBuilder)
-                .build();
+        return new EmbeddingOpenAiApi(properties, EMBEDDINGS_PATH, restClientBuilder);
     }
 
     public static EmbeddingModel createEmbeddingModel(

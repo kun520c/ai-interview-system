@@ -1,5 +1,6 @@
 package com.kun.aiinterview.knowledge.embedding.springai;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.kun.aiinterview.common.exception.ExternalServiceException;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingBatchResult;
 import com.kun.aiinterview.knowledge.embedding.EmbeddingClient;
@@ -12,7 +13,16 @@ import org.springframework.ai.embedding.EmbeddingRequest;
 import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.ai.embedding.EmbeddingResponseMetadata;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+import java.net.http.HttpConnectTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -110,14 +120,46 @@ public class SpringAiEmbeddingClient implements EmbeddingClient {
                 );
             }
             return response;
-        } catch (ExternalServiceException exception) {
-            throw exception;
-        } catch (RuntimeException exception) {
+        } catch (RestClientResponseException exception) {
+            // Defensive fallback for a custom RestClient status handler; copy only the numeric status.
             throw new ExternalServiceException(
-                    "调用Embedding服务失败",
-                    exception
+                    "调用Embedding服务失败 [stage=embedding_http, category=HTTP_STATUS, httpStatus="
+                            + exception.getStatusCode().value() + "]"
+            );
+        } catch (RestClientException exception) {
+            throw new ExternalServiceException(
+                    "调用Embedding服务失败 [stage=embedding_http, category="
+                            + safeFailureCategory(exception) + "]"
             );
         }
+    }
+
+    private String safeFailureCategory(RestClientException exception) {
+        // Inspect types only. Never retain upstream messages, bodies, causes or suppressed exceptions.
+        boolean ioFailure = exception instanceof ResourceAccessException;
+        boolean timeout = false;
+        boolean connectionFailure = false;
+        boolean responseJsonFailure = false;
+        Throwable current = exception;
+        for (int depth = 0; current != null && depth < 10; depth++, current = current.getCause()) {
+            if (current instanceof HttpConnectTimeoutException) {
+                return "CONNECT_TIMEOUT";
+            }
+            timeout |= current instanceof HttpTimeoutException || current instanceof SocketTimeoutException;
+            connectionFailure |= current instanceof ConnectException || current instanceof UnknownHostException;
+            responseJsonFailure |= current instanceof JsonProcessingException;
+            ioFailure |= current instanceof IOException;
+        }
+        if (timeout) {
+            return "TIMEOUT";
+        }
+        if (connectionFailure) {
+            return "CONNECTION_ERROR";
+        }
+        if (responseJsonFailure) {
+            return "RESPONSE_JSON";
+        }
+        return ioFailure ? "IO_ERROR" : "HTTP_CLIENT_ERROR";
     }
 
     private List<EmbeddingVector> validateAndConvertResponse(
@@ -188,10 +230,7 @@ public class SpringAiEmbeddingClient implements EmbeddingClient {
         }
         if (!properties.getModel().equals(responseModel)) {
             throw new ExternalServiceException(
-                    "Embedding响应模型与配置不一致，配置模型："
-                            + properties.getModel()
-                            + "响应模型："
-                            + responseModel
+                    "Embedding响应模型与配置不一致 [stage=embedding_response, category=MODEL_MISMATCH]"
             );
         }
     }
