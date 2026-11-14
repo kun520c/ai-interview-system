@@ -1,0 +1,19 @@
+[
+  {
+    "bankId": "H01",
+    "author": "root",
+    "reviewer": "author_easy_medium",
+    "status": "PASS",
+    "technicalCheck": "JLS 21 §4.6、§4.7 和 §15.20.2 支持擦除与带参数化类型测试的边界。Object 无法直接测试 List<String>，List<Integer> 可以测试 ArrayList<Integer>，运行时检查容器类型。JVMS 21 §4.7.9 说明声明签名元数据仍可保留。",
+    "answerAlignment": "答案给出擦除规则、常见限制、合法与非法 instanceof 对照及声明元数据保留，直接回应旧题题干。",
+    "pointIndependence": "SP1 考擦除映射，SP2 考运行时 Class 身份，SP3 考编译器插入转换和桥接，SP4 考限制与条件，SP5 考仍可反射读取的声明元数据。",
+    "weightAssessment": "保留 25/20/20/25/10。擦除机制和使用边界各 25，元数据边界 10，符合核心优先。",
+    "difficultyAssessment": "适合本科 Java 后端 HARD，允许任选两项准确限制，不要求背诵规范节号或记忆特定代码。",
+    "duplicationAssessment": "M09 评估编译期通配符接口的读写，H01 评估擦除与运行时测试。H10 的模块反射访问边界也不重复。",
+    "versionCheck": "限定 Java SE 21。合法的参数化类型测试取决于操作数静态类型能否进行对应测试，Java 16 起放宽。JVMS Signature 支撑声明信息保留。",
+    "wordingCheck": "可接受同等例子。合法的参数化 instanceof 不能因使用具体类型实参而扣分，也不能据此主张 JVM 逐一检查元素。",
+    "findings": [
+      "P2 措辞可进一步精确。SP1 的 bound 是简写，完整参考答案已说明最左边界的擦除。SP2 的 List 例可改为同一 ArrayList 实现，避免把 List 接口与具体实现混读。本轮最小修订保留原 SP1/SP2。"
+    ]
+  }
+]

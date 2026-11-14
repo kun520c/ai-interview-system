@@ -1,0 +1,644 @@
+{
+  "bankSha256": "d4c1d9f20664308231ab383f5dce67154f3c5d874fc041b44f7499ce8647177e",
+  "questionCount": 63,
+  "pointCount": 298,
+  "addedQuestions": 42,
+  "addedPoints": 201,
+  "difficultyCounts": {
+    "EASY": 15,
+    "MEDIUM": 21,
+    "HARD": 27
+  },
+  "categoryCounts": {
+    "JAVA_BASIC": 9,
+    "JAVA_COLLECTION": 9,
+    "SPRING": 9,
+    "MYSQL": 9,
+    "NETWORK": 6,
+    "JVM": 6,
+    "JAVA_CONCURRENCY": 6,
+    "REDIS": 6,
+    "PROJECT_SCENARIO": 3
+  },
+  "buckets": [
+    {
+      "difficulty": "EASY",
+      "category": "JAVA_BASIC",
+      "count": 3
+    },
+    {
+      "difficulty": "EASY",
+      "category": "JAVA_COLLECTION",
+      "count": 3
+    },
+    {
+      "difficulty": "EASY",
+      "category": "MYSQL",
+      "count": 3
+    },
+    {
+      "difficulty": "EASY",
+      "category": "NETWORK",
+      "count": 3
+    },
+    {
+      "difficulty": "EASY",
+      "category": "SPRING",
+      "count": 3
+    },
+    {
+      "difficulty": "HARD",
+      "category": "JAVA_BASIC",
+      "count": 3
+    },
+    {
+      "difficulty": "HARD",
+      "category": "JAVA_COLLECTION",
+      "count": 3
+    },
+    {
+      "difficulty": "HARD",
+      "category": "JAVA_CONCURRENCY",
+      "count": 3
+    },
+    {
+      "difficulty": "HARD",
+      "category": "JVM",
+      "count": 3
+    },
+    {
+      "difficulty": "HARD",
+      "category": "MYSQL",
+      "count": 3
+    },
+    {
+      "difficulty": "HARD",
+      "category": "NETWORK",
+      "count": 3
+    },
+    {
+      "difficulty": "HARD",
+      "category": "PROJECT_SCENARIO",
+      "count": 3
+    },
+    {
+      "difficulty": "HARD",
+      "category": "REDIS",
+      "count": 3
+    },
+    {
+      "difficulty": "HARD",
+      "category": "SPRING",
+      "count": 3
+    },
+    {
+      "difficulty": "MEDIUM",
+      "category": "JAVA_BASIC",
+      "count": 3
+    },
+    {
+      "difficulty": "MEDIUM",
+      "category": "JAVA_COLLECTION",
+      "count": 3
+    },
+    {
+      "difficulty": "MEDIUM",
+      "category": "JAVA_CONCURRENCY",
+      "count": 3
+    },
+    {
+      "difficulty": "MEDIUM",
+      "category": "JVM",
+      "count": 3
+    },
+    {
+      "difficulty": "MEDIUM",
+      "category": "MYSQL",
+      "count": 3
+    },
+    {
+      "difficulty": "MEDIUM",
+      "category": "REDIS",
+      "count": 3
+    },
+    {
+      "difficulty": "MEDIUM",
+      "category": "SPRING",
+      "count": 3
+    }
+  ],
+  "maximumUtf8Bytes": {
+    "questionContent": 434,
+    "referenceAnswer": 1606,
+    "pointContent": 411
+  },
+  "exactDuplicateQuestionContent": 0,
+  "exactDuplicateReferenceAnswer": 0,
+  "logicalIdentityDuplicates": 0,
+  "sourceLineage": [
+    {
+      "bankId": "E01",
+      "knowledgePoint": "interface_vs_abstract_class",
+      "requestSha256": "5b9b8d8a6c94a76442f62b5059a85b90a76508965c39804951c7ddfe3c992d48",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "5b9b8d8a6c94a76442f62b5059a85b90a76508965c39804951c7ddfe3c992d48"
+    },
+    {
+      "bankId": "E02",
+      "knowledgePoint": "arraylist_vs_linkedlist",
+      "requestSha256": "dcff3726324b233e578f06ea917ca92a232bd228e8d0a85f2e166d175c166461",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "dcff3726324b233e578f06ea917ca92a232bd228e8d0a85f2e166d175c166461"
+    },
+    {
+      "bankId": "E03",
+      "knowledgePoint": "ioc_di",
+      "requestSha256": "989a14007b773ccc8d27da830c5c73c36c1af84f6327451935c440551320e5e2",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "989a14007b773ccc8d27da830c5c73c36c1af84f6327451935c440551320e5e2"
+    },
+    {
+      "bankId": "E04",
+      "knowledgePoint": "transaction_acid",
+      "requestSha256": "583228e52f0055cc7ae9014f486c6d44f36085ee888f2e1a72cc0b56ce175480",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "583228e52f0055cc7ae9014f486c6d44f36085ee888f2e1a72cc0b56ce175480"
+    },
+    {
+      "bankId": "E05",
+      "knowledgePoint": "tcp_vs_udp",
+      "requestSha256": "d3cd9fffc5572a3969c5782e73331aeaeeb969522f1df55a75c34e69c59ca647",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "d3cd9fffc5572a3969c5782e73331aeaeeb969522f1df55a75c34e69c59ca647"
+    },
+    {
+      "bankId": "E06",
+      "knowledgePoint": "exceptions_resource_basics",
+      "requestSha256": "44744599270cb1eeba4cf249501ee86718f24dff5206f879a7bb2beeb0738bc6",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "E07",
+      "knowledgePoint": "strings_immutability",
+      "requestSha256": "3973cb70651437e9e57663c62d003ac2efbc4a4d9869e737e05809376481bac7",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "E08",
+      "knowledgePoint": "collection_semantics",
+      "requestSha256": "27b5f1e3b9dba943e0174e0fb88044080ce3c7556431ff3675a20d722dcd8d23",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "E09",
+      "knowledgePoint": "deque_stack_queue",
+      "requestSha256": "bfa2869e6a447d10592ddd5fecc3dbd042f0a8a6726c569ce87ccbd56a9103c8",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "E10",
+      "knowledgePoint": "bean_scope_basics",
+      "requestSha256": "b7bddf14398532d9f553b47bf45be4f8ebaca7233140385ca82a76dcbdbb9bda",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "E11",
+      "knowledgePoint": "bean_lifecycle_basics",
+      "requestSha256": "f5edee01a1b97c66c3956a8792b0141d1453aff11dac4c27fdc6d3bd76547ea2",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "E12",
+      "knowledgePoint": "mysql_constraints_null",
+      "requestSha256": "715e317de012b502f362b643bfea757eb55509c3fe8921f9a9a2cd5f576abcd9",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "E13",
+      "knowledgePoint": "mysql_join_basics",
+      "requestSha256": "41e07a723cfcf03265acbba1b85637b9e17771a5d9952a3678adde9c5d2d638a",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "E14",
+      "knowledgePoint": "http_methods_status",
+      "requestSha256": "8d5e46649da76f594f8575104e24ffdf3b1af458674b3a9a31327dfdcc7c73bc",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "E15",
+      "knowledgePoint": "dns_resolution_basics",
+      "requestSha256": "965342135d06ff07767ad4e540a5e4ba2ccca3035d86b47ed7862f8b1e9c7fdf",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M01",
+      "knowledgePoint": "equals_hashcode_contract",
+      "requestSha256": "63d1b35b15987bb2670fa6ad36ae8545e7b93a5dab956ad00a114c33878bf300",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "63d1b35b15987bb2670fa6ad36ae8545e7b93a5dab956ad00a114c33878bf300"
+    },
+    {
+      "bankId": "M02",
+      "knowledgePoint": "hashmap_put_resize",
+      "requestSha256": "1d7a9ed5561d1dde0aeb4d06596dbb4610f83431959ef6232415d25214fa5dea",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "1d7a9ed5561d1dde0aeb4d06596dbb4610f83431959ef6232415d25214fa5dea"
+    },
+    {
+      "bankId": "M03",
+      "knowledgePoint": "runtime_data_areas",
+      "requestSha256": "7e5e741063cfde85d53255ececf17ad2231868f0aa995b401b3028a251d1be64",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "7e5e741063cfde85d53255ececf17ad2231868f0aa995b401b3028a251d1be64"
+    },
+    {
+      "bankId": "M04",
+      "knowledgePoint": "volatile_jmm",
+      "requestSha256": "2a7d69292c0451932e5c5b6b6d3425c1f71d0d1962493433dd296a60d57b9cde",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "2a7d69292c0451932e5c5b6b6d3425c1f71d0d1962493433dd296a60d57b9cde"
+    },
+    {
+      "bankId": "M05",
+      "knowledgePoint": "spring_aop_proxy",
+      "requestSha256": "4947e37387a87809880a87dc828ad88c3e5bdc0aa608f57fa5d170c86bb28783",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "4947e37387a87809880a87dc828ad88c3e5bdc0aa608f57fa5d170c86bb28783"
+    },
+    {
+      "bankId": "M06",
+      "knowledgePoint": "innodb_index_structure",
+      "requestSha256": "5175fa3fb70e77e68c9a489df5691fd070ec04e1ea262f1888f736d568993d8d",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "5175fa3fb70e77e68c9a489df5691fd070ec04e1ea262f1888f736d568993d8d"
+    },
+    {
+      "bankId": "M07",
+      "knowledgePoint": "redis_data_structures",
+      "requestSha256": "8373cfec744102b8e044168db815ed3cb3a4c98199f8051297a3050f4c00c407",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "8373cfec744102b8e044168db815ed3cb3a4c98199f8051297a3050f4c00c407"
+    },
+    {
+      "bankId": "M08",
+      "knowledgePoint": "resource_exception_suppression",
+      "requestSha256": "f5f72ae3c41eb754d0b6c7fee2d3e31db37b8985affb6c6bcb12e6cf0d38fe25",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M09",
+      "knowledgePoint": "generic_variance_pecs",
+      "requestSha256": "d8d1b13e663dda37e94ebb304cfe68af162d8cbdc403438f06a83792552bc2cf",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M10",
+      "knowledgePoint": "iterator_modification",
+      "requestSha256": "5dbe0193f396129d3895475a1da8a4c77ab42766ac029c93913691d2e0b09bb3",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M11",
+      "knowledgePoint": "collection_copy_views",
+      "requestSha256": "a35fa3f575b8c3a98153d2bcc9fca124a5ef7bd491f5436c4458e0c6c9339262",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M12",
+      "knowledgePoint": "class_loading_initialization",
+      "requestSha256": "9469e93004eaa84ea421e35cffd313371d697424020cecf251de8a1ef1ad785e",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M13",
+      "knowledgePoint": "gc_reachability_leaks",
+      "requestSha256": "7beab535fd9d859110bb84c2d99e661086f766eb9e3bfc173b6c21d6272783ad",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M14",
+      "knowledgePoint": "monitor_reentrant_lock",
+      "requestSha256": "6a790222b806441bc390ccd542a7ab873cfc314a963fdacba825237c365250da",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M15",
+      "knowledgePoint": "thread_interruption_wait",
+      "requestSha256": "72ee9dcecfae5113316bb85438a5e9b7ea6198d638917a87944b12c406655381",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M16",
+      "knowledgePoint": "dependency_injection_resolution",
+      "requestSha256": "bd40bdec6d5ed373da7fd5fe51c64472a185a85426ac4330df6d4325ac5c8b56",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M17",
+      "knowledgePoint": "mvc_validation_errors",
+      "requestSha256": "f9637a4bd0acd11f2ccb834b0d1dc7a527977c03608ea3753748181f1617e7ec",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M18",
+      "knowledgePoint": "composite_index_access",
+      "requestSha256": "b715386b131abcf4d46d206709af52a5138fde45dcaed19b891ecd7b524b1b8c",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M19",
+      "knowledgePoint": "explain_query_plan",
+      "requestSha256": "d978ecd69ee274c5c6efb680ce4cdfe393f7e881a293cf0ede5d17cef1d5afcc",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M20",
+      "knowledgePoint": "redis_expiry_eviction",
+      "requestSha256": "e2e4bd90f04888974c3a820486cd5df3daa1028fc4fdb601aa01605ec529f3db",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "M21",
+      "knowledgePoint": "redis_persistence_tradeoffs",
+      "requestSha256": "6f36f9946e43231034c3c29a57125bd09af93e7117bf7fa18cf0ba5bb475d247",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H01",
+      "knowledgePoint": "generic_type_erasure",
+      "requestSha256": "dc9a0820bee4d426845de8d17d9d017406b2d8639727094566aae23cfdaf9df9",
+      "revision": 2,
+      "provenance": "V1_REVISED",
+      "previousRequestSha256": "c0a261eca279b8c69fa226d33935b36e713d5be87f29d887839ea57c0f79f0ce"
+    },
+    {
+      "bankId": "H02",
+      "knowledgePoint": "concurrent_hashmap",
+      "requestSha256": "5e76f0581bce49f057dda63bb74a6fbf3851ec23d650f80dff9f226933ebc94e",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "5e76f0581bce49f057dda63bb74a6fbf3851ec23d650f80dff9f226933ebc94e"
+    },
+    {
+      "bankId": "H03",
+      "knowledgePoint": "g1_gc",
+      "requestSha256": "8fdbb3f074bfdf3bd82acfcbff785e19fc088388724e4922af2d9a71947ae240",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "8fdbb3f074bfdf3bd82acfcbff785e19fc088388724e4922af2d9a71947ae240"
+    },
+    {
+      "bankId": "H04",
+      "knowledgePoint": "thread_pool_design",
+      "requestSha256": "5508186057959f14e787c2dcdeb2a5f4a10da06b6d4f7108204bc25582eb82db",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "5508186057959f14e787c2dcdeb2a5f4a10da06b6d4f7108204bc25582eb82db"
+    },
+    {
+      "bankId": "H05",
+      "knowledgePoint": "transaction_boundary",
+      "requestSha256": "579447ffb226b03965e682bbe9c92792ed2dc175cea815aa4363890e8b7d6aa1",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "579447ffb226b03965e682bbe9c92792ed2dc175cea815aa4363890e8b7d6aa1"
+    },
+    {
+      "bankId": "H06",
+      "knowledgePoint": "mvcc_read_view",
+      "requestSha256": "927c8a4ccc5a018fae447627a0f8c3b409d46024ff5944d0fc295c0cc695d526",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "927c8a4ccc5a018fae447627a0f8c3b409d46024ff5944d0fc295c0cc695d526"
+    },
+    {
+      "bankId": "H07",
+      "knowledgePoint": "distributed_lock",
+      "requestSha256": "01d8461cea6cc8f6fa2477708bc569f92dd8baba01df391f8104d7e085d9929c",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "01d8461cea6cc8f6fa2477708bc569f92dd8baba01df391f8104d7e085d9929c"
+    },
+    {
+      "bankId": "H08",
+      "knowledgePoint": "tcp_connection_lifecycle",
+      "requestSha256": "03107d44fe65be0ccf1c36b756c3ecf08d795ba552be6ec1e5c85ebd543c9708",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "03107d44fe65be0ccf1c36b756c3ecf08d795ba552be6ec1e5c85ebd543c9708"
+    },
+    {
+      "bankId": "H09",
+      "knowledgePoint": "concurrent_inventory_idempotency",
+      "requestSha256": "4bdd96a47009598937a3c3781d6a8946e99dc6c33ebf2ebf7238ebc7b6be7541",
+      "revision": 1,
+      "provenance": "V1_UNCHANGED",
+      "previousRequestSha256": "4bdd96a47009598937a3c3781d6a8946e99dc6c33ebf2ebf7238ebc7b6be7541"
+    },
+    {
+      "bankId": "H10",
+      "knowledgePoint": "reflection_module_access",
+      "requestSha256": "2b1b29f8e3612df9fb5e13fcee86999073732e23a44e7e4a17c814589ae44080",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H11",
+      "knowledgePoint": "stream_laziness_parallel",
+      "requestSha256": "2618eea0f2855a0792d48a873e4a3563512afff85155ecfda10494d7a033252a",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H12",
+      "knowledgePoint": "concurrent_map_atomicity",
+      "requestSha256": "4ee598f99be0a03fb3e7ac22ddf912b4c4b539e8dd44679a32d74bf538d16ca1",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H13",
+      "knowledgePoint": "concurrent_iteration_tradeoffs",
+      "requestSha256": "c5426d627b19d770003be4e297051ee045b492a3b899b4bbd0949b8dce83f24e",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H14",
+      "knowledgePoint": "classloader_type_identity",
+      "requestSha256": "e45bc89264da6ce27a6ca12ac1eaa8319769dff2f743de9b1088a07073e9ba1e",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H15",
+      "knowledgePoint": "jvm_diagnostics_workflow",
+      "requestSha256": "49e38dede83c2c3e2a31861bf96e33c9fb41fcb0a4eb96e061ade44b22a6dc76",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H16",
+      "knowledgePoint": "threadlocal_pool_cleanup",
+      "requestSha256": "9a9186547cc296ac982ad31f7251a93ba88b53f0eec8c2ce93b869504cefd104",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H17",
+      "knowledgePoint": "future_timeout_composition",
+      "requestSha256": "fbd6a5ff4955d9ce24d179a29f2cfdf5e963338979af69a9f87ade3168e1f65a",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H18",
+      "knowledgePoint": "spring_transaction_propagation",
+      "requestSha256": "079bfffd4322d301a98d9c2e1ab1dd12add55d25413d3d56efd0c6fab86ad8aa",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H19",
+      "knowledgePoint": "transaction_external_side_effect",
+      "requestSha256": "251ceafc003f511631e9871cdb0baff2d2dfcfb644a1da686a7876603e323c12",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H20",
+      "knowledgePoint": "isolation_snapshot_locking",
+      "requestSha256": "3252523a499dbbeaf95dbc918094b4e1dd3914c7b29b310a7973925f14e57de7",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H21",
+      "knowledgePoint": "deadlock_timeout_recovery",
+      "requestSha256": "3d953f5778d1cc21d4cba1a6dfa4fd2b196cebdc2ab24ec8289b19ae6d342816",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H22",
+      "knowledgePoint": "cache_aside_hotkey",
+      "requestSha256": "11afe1def693ee56cb0c000cf5d39c25a3026b9b812ba30d0192e5dae77c2134",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H23",
+      "knowledgePoint": "redis_batch_atomicity",
+      "requestSha256": "a4747e57806026c5b8ab9cdc0292e69089b48cc067e0c46a3a5a5c04592f3e7a",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H24",
+      "knowledgePoint": "tls_authentication_basics",
+      "requestSha256": "caf0c0779af659ac01dc215d459db14a9a7b4468952a590a79998bcf0aee2ac5",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H25",
+      "knowledgePoint": "http_timeout_idempotency",
+      "requestSha256": "f3dd4482039bff2c1ca5e6d1f9ff5e866ebb0b385710df5309c3be845d17b393",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H26",
+      "knowledgePoint": "interview_idempotency_ownership",
+      "requestSha256": "dbd3688916f8bdaf04016fc14e9cba80f19b80084e19b66382b81e089e562dc9",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    },
+    {
+      "bankId": "H27",
+      "knowledgePoint": "report_recovery_final_consistency",
+      "requestSha256": "50fad15c3e640b4a1ab3092ea2ef9a463eae68fb09a69b3672cda91be61c8889",
+      "revision": 1,
+      "provenance": "D1_NEW",
+      "previousRequestSha256": null
+    }
+  ]
+}

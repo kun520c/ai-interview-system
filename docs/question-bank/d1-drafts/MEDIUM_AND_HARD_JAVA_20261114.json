@@ -1,0 +1,942 @@
+[
+  {
+    "bankId": "M12",
+    "title": "类加载、链接和初始化的区别",
+    "category": "JVM",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "class_loading_initialization",
+    "questionContent": "Java 21 中，有个尚未初始化的类 Config，声明了 static final int PORT = 8080 和 static int retries = 3，静态代码块会打印一行日志。依次读取 Config.PORT、读取 Config.retries、new Config()，哪一步首次触发初始化？加载、链接、初始化分别做了什么？",
+    "referenceAnswer": "首次触发的是读取 Config.retries。PORT 是用常量表达式初始化的编译期常量，读它不触发 Config 初始化。retries 是 Config 声明的非常量静态字段，首次读它前会执行初始化。new Config() 也属于可以触发初始化的主动使用，这次类已初始化，所以静态代码块不会重跑。\n加载根据类的二进制表示建立运行时的类。链接把类接入 JVM，包括验证二进制是否合规、为静态字段准备空间和默认值，以及解析符号引用。解析可以延迟，并不要求类初始化前已完成所有引用的解析。初始化阶段执行静态字段初始化和静态代码块，普通静态字段的初始化表达式和静态块按源码顺序执行。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "判断首次读取 Config.retries 会触发 Config 初始化，并解释该字段是本类声明的非常量静态字段。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "判断读取 Config.PORT 不触发初始化，依据是 int 常量变量由编译期常量表达式初始化。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "指出创建实例可以触发类初始化，但同一次成功初始化后再 new 不会重跑静态代码块。",
+        "weight": 15
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "区分加载与初始化：加载建立运行时类表示，初始化执行静态字段初始化和静态代码块。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "概括验证、准备、解析的职责，知道符号引用的解析可以延后。",
+        "weight": 20
+      }
+    ],
+    "versionScope": "Java SE 21，普通类和同一类加载环境。",
+    "sources": [
+      {
+        "title": "Java SE 21 语言规范",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-12.html#jls-12.2",
+        "section": "§12.2、§12.3",
+        "claim": "建立类表示、验证、准备、解析以及解析允许延迟。"
+      },
+      {
+        "title": "Java SE 21 语言规范",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-12.html#jls-12.4.1",
+        "section": "§12.4.1 何时初始化",
+        "claim": "创建实例、读取本类声明的非常量静态字段触发初始化，读取常量变量除外。"
+      },
+      {
+        "title": "Java SE 21 语言规范",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.12.4",
+        "section": "§4.12.4 常量变量",
+        "claim": "本题 PORT 满足 final、基本类型和常量表达式三个条件。"
+      }
+    ],
+    "coverageDifference": "旧 M03 考运行时区域及存放内容。M12 要预测何时执行静态初始化。相邻 H14 考类加载器定义的类型身份，答题不需要解释委派。",
+    "acceptableAlternatives": [
+      "可以用类首次主动使用或 getstatic 的概念解释给定结果。",
+      "可说明已初始化的父类等细节，但不要求背诵完整初始化顺序。"
+    ],
+    "misconceptions": [
+      "读任意 static final 字段都不触发类初始化。",
+      "加载或链接完成就说明静态代码块已经运行。",
+      "每次 new 都执行类的静态初始化。"
+    ]
+  },
+  {
+    "bankId": "M13",
+    "title": "对象可达性、GC Roots 与内存泄漏",
+    "category": "JVM",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "gc_reachability_leaks",
+    "questionContent": "一个 Java 服务把每次请求的详情放进 static Map，业务处理完却从不清理。流量稳定，堆在多次垃圾收集后的基线仍不断上升。请求方法都已经返回，为什么详情可能仍留在堆里？你会怎样确认是引用保留引起的泄漏，并验证修复？",
+    "referenceAnswer": "方法返回只结束了该次调用。从仍存活的类可沿着静态字段找到 Map，再沿着 Map 的普通强引用找到详情，所以请求结束后这些对象仍可达。GC 根据可达性工作，它并不知道业务已经用完这些数据。稳定流量下，回收后仍存活的堆持续增长是线索。我会对比相近负载下的类实例数、堆转储和到 GC Roots 的保留路径，确认是不是这张 Map 保留了大量详情。OOM 只说明某次内存需求无法满足，容量不足、瞬时压力也可能造成 OOM。这里要根据保留需求选择完成后移除、容量上限或到期清理，再用相同负载观察回收后基线和保留数量是否趋稳。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "指出仍存活的类经 static 字段、Map 条目到详情的保留链，并能从该路径识别需要检查的持有方。",
+        "weight": 30
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "解释 GC 根据可达性判断，方法返回不会解除独立存在的 Map 强引用，业务上已用完的强可达对象仍保留。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "给出堆转储保留链等证据来确认引用来源，并以稳定负载下回收后存活量持续增长作为线索。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "区分泄漏与 OOM，说明仅凭 OOM 或单次内存升高无法确认泄漏，并举出容量不足或瞬时峰值一类其他可能。",
+        "weight": 15
+      },
+      {
+        "pointType": "KEY",
+        "content": "提出符合场景的生命周期或容量约束，并在同类负载下比较修复前后的保留数量或回收后基线。",
+        "weight": 15
+      }
+    ],
+    "versionScope": "Java SE 21 的堆对象可达性与 HotSpot 诊断场景。",
+    "sources": [
+      {
+        "title": "Java SE 21 引用 API",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ref/package-summary.html#reachability",
+        "section": "Reachability",
+        "claim": "区分强可达和其他可达性，说明强引用保留的基础。"
+      },
+      {
+        "title": "Oracle Java 21 故障排查指南",
+        "url": "https://docs.oracle.com/en/java/javase/21/troubleshoot/troubleshooting-memory-leaks.html",
+        "section": "The java.lang.OutOfMemoryError Error / Detecting a Memory Leak",
+        "claim": "用稳定负载下回收后存活集判断泄漏线索，并区分容量原因。"
+      },
+      {
+        "title": "Oracle Java 21 故障排查指南",
+        "url": "https://docs.oracle.com/en/java/javase/21/troubleshoot/troubleshooting-memory-leaks.html",
+        "section": "Diagnosing Java Memory Leaks",
+        "claim": "堆转储、对象统计和对象保留用于定位 Java 堆泄漏。"
+      }
+    ],
+    "coverageDifference": "旧 M03 考 JVM 内存区，旧 H03 考 G1 回收设计。M13 只考堆上强引用保留和验证，H15 才需要区分高 CPU、频繁 GC、不同 OOM 来源。",
+    "acceptableAlternatives": [
+      "可通过堆转储路径、JFR Old Object Sample 或等效可定位根路径的工具给证据。",
+      "按题意选择即时清理或有界保留均可。"
+    ],
+    "misconceptions": [
+      "方法返回后其创建的对象立即回收。",
+      "只要触发一次 OOM 就能证明内存泄漏。",
+      "调用 System.gc() 或增大堆能解除仍存在的强引用。"
+    ]
+  },
+  {
+    "bankId": "M14",
+    "title": "synchronized 与 ReentrantLock 的选择",
+    "category": "JAVA_CONCURRENCY",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "monitor_reentrant_lock",
+    "questionContent": "一个订单服务需要在内存中用同一把锁保护计数和状态。普通入口可以等待，另一个入口最多等 100 毫秒拿锁，并且等待期间要响应线程中断。你会怎样选择 synchronized 或 ReentrantLock？如何保证异常、超时和中断时锁都处理正确？",
+    "referenceAnswer": "两个入口都要用同一把锁保护同一份状态。只有简单互斥的场景，synchronized 写法短，离开同步块时会自动释放，即使抛异常也一样。这里有带超时、可中断的获取需求，两个入口可统一使用同一把 ReentrantLock。普通入口先 lock，再在 try 中操作，在 finally 解锁。限时入口调用 tryLock(100, MILLISECONDS)，返回 false 就走超时分支，抛 InterruptedException 就按取消约定传播或处理，只有成功获取才进入临界区和 finally。两种锁都可重入，同一把锁的释放和后续成功获取建立可见性。只要求可中断等待、不设时限时，还可以用 lockInterruptibly。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "为同一份共享状态选择同一 ReentrantLock，并用带超时的 tryLock 取得有上限且可中断的等待。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "区分 tryLock 成功、返回 false 和 InterruptedException 三条路径，只在成功获取后进入临界区并解锁。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明普通 lock 在取得锁后进入 try，且 finally 中释放，从而覆盖业务异常路径。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明两种锁都可重入，且同一把锁释放与后续成功获取提供互斥保护及相应的内存可见性。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明 synchronized 退出同步块会自动释放锁，适合只需简单互斥、没有限时获取需求的代码。",
+        "weight": 15
+      }
+    ],
+    "versionScope": "Java 21，比较内置监视器与标准库 ReentrantLock。",
+    "sources": [
+      {
+        "title": "Java 21 ReentrantLock",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html",
+        "section": "类说明、tryLock(long, TimeUnit)、lockInterruptibly",
+        "claim": "可重入、带超时获取会响应中断，成功获取后用 try/finally。"
+      },
+      {
+        "title": "Java 21 Lock",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/locks/Lock.html",
+        "section": "Memory Synchronization、接口说明",
+        "claim": "成功加解锁的内存同步语义与内置监视器一致，显式锁需要结构化释放。"
+      },
+      {
+        "title": "Java SE 21 语言规范",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-14.html#jls-14.19",
+        "section": "§14.19 synchronized",
+        "claim": "同步块正常或异常退出时释放监视器。"
+      }
+    ],
+    "coverageDifference": "旧 M04 考 volatile 对可见性及复合操作的限制，旧 H04 考线程池容量与过载。M14 考选锁、共用锁和获取失败路径。",
+    "acceptableAlternatives": [
+      "给出等价伪代码，或用显式 acquired 标志且仅在为真时 unlock。",
+      "对中断传播异常，或在不能传播时恢复中断标志并结束工作。"
+    ],
+    "misconceptions": [
+      "不同入口各用一把锁也能保护同一个不变量。",
+      "tryLock 超时或抛中断时照样 unlock。",
+      "synchronized 进入监视器的等待本身提供可中断、限时获取接口。"
+    ]
+  },
+  {
+    "bankId": "M15",
+    "title": "线程中断与 wait/sleep 的边界",
+    "category": "JAVA_CONCURRENCY",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "thread_interruption_wait",
+    "questionContent": "消费者在 synchronized (monitor) 中等待队列变为非空，生产者也需要拿同一个 monitor 才能入队。消费者用 Thread.sleep() 等，为什么可能妨碍生产者？改用 Object.wait() 时应怎样写等待条件，以及怎样处理退出信号 interrupt()？",
+    "referenceAnswer": "sleep 只让线程暂停，持有的监视器不会释放。如果消费者睡着时仍占着 monitor，生产者这段时间就拿不到锁。消费者可以在同步块里用 while 检查队列是否为空，然后 monitor.wait()。wait 要先持有该对象的监视器，等待时只释放这一把监视器，恢复执行前会重新取得它。生产者在同一把锁内入队，再通知等待者。醒来后还要重新检查条件，因为可能虚假唤醒，也可能在重新拿到锁前有其他消费者拿走元素。interrupt 是协作退出信号。wait 或 sleep 抛 InterruptedException 时会清除中断标志。处理方应按约定清理后退出或继续向上抛出，如果无法抛出且要保留信号，就重新设置中断标志。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明 sleep 不释放 monitor，所以持锁休眠期间生产者不能进入需要同一监视器的同步块。",
+        "weight": 25
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明 wait 必须已持有目标监视器，等待时释放目标监视器而保留其他监视器，返回前重新取得目标监视器。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "用同一监视器保护队列状态，在 while 中重新检查谓词，能解释虚假唤醒或被其他消费者抢先取走。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "让生产者在同一监视器内先改变状态再通知等待者，避免将通知当作条件已成立的证明。",
+        "weight": 15
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "把 interrupt 解释为协作信号，知道 wait 或 sleep 抛 InterruptedException 会清标志，并能提出传播、结束或恢复标志的正确处理。",
+        "weight": 20
+      }
+    ],
+    "versionScope": "Java 21，普通 Java 线程和对象监视器。",
+    "sources": [
+      {
+        "title": "Java 21 Object",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait(long,int)",
+        "section": "wait、notifyAll",
+        "claim": "拥有监视器、等待时释放目标锁、返回前重取、用循环应对虚假唤醒及中断。"
+      },
+      {
+        "title": "Java 21 Thread",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html#sleep(long)",
+        "section": "sleep、interrupt、interrupted",
+        "claim": "sleep 保留监视器，阻塞操作中断与状态清除。"
+      }
+    ],
+    "coverageDifference": "旧 M04 问 volatile 与共享变量可见性。M14 问互斥锁获取。M15 用生产者消费者考监视器等待、唤醒条件和中断协作。",
+    "acceptableAlternatives": [
+      "用 while (queue.isEmpty()) 与 notifyAll() 给伪代码即可。",
+      "可以补充 BlockingQueue 是业务代码中的替代，但仍要解释题目指定的 monitor 行为。"
+    ],
+    "misconceptions": [
+      "sleep 会释放 synchronized 的锁。",
+      "wait 会释放当前线程持有的全部锁。",
+      "被唤醒后用 if 不重查条件，或者捕获中断后忽略并继续等待。"
+    ]
+  },
+  {
+    "bankId": "M16",
+    "title": "多个实现如何进行依赖注入",
+    "category": "SPRING",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "dependency_injection_resolution",
+    "questionContent": "Spring 容器同时注册了邮件和短信两个 NotificationSender。普通通知应优先使用邮件，短信验证码必须使用短信。两个消费者都通过构造器依赖这个接口。怎样配置默认实现和指定实现？只写接口类型为什么可能启动失败？如果某处需要注入所有实现，又会怎样？",
+    "referenceAnswer": "容器先找类型匹配的 Bean。有两个候选、且没有进一步消歧的信息时，单值依赖无法决定注入谁，创建依赖 Bean 会报候选不唯一。可以给邮件 Bean 加 @Primary，让普通的单值注入优先选它。给短信 Bean 声明短信限定符，并在验证码消费者的构造器参数上使用相同的 @Qualifier，在类型候选中缩小到短信。限定符可以用语义标签或自定义注解。若某处确实需要全部实现，可注入不带限定符的 List<NotificationSender>，@Primary 不会把其他候选从列表剔除。Spring 6.2 中单构造器的消费者可以省略 @Autowired。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明先按接口类型得到候选，若两个候选缺少足以消歧的规则，单值构造器依赖会因候选不唯一而创建失败。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "为邮件 Bean 配置 @Primary，说明它针对有多个候选时的默认单值选择。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "在短信消费者的构造器参数使用与短信 Bean 匹配的 @Qualifier，将类型候选缩到短信。",
+        "weight": 25
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明不带限定符的 List<NotificationSender> 可以接收所有符合条件的实现，@Primary 只影响单值优先选择。",
+        "weight": 15
+      },
+      {
+        "pointType": "KEY",
+        "content": "采用构造器参数表达必需依赖，知道 Spring Bean 只定义一个构造器时可以省略 @Autowired。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "Spring Framework 6.2，基于注解的构造器注入和单值依赖。",
+    "sources": [
+      {
+        "title": "Spring Framework 6.2 Reference",
+        "url": "https://docs.spring.io/spring-framework/reference/6.2/core/beans/annotation-config/autowired.html",
+        "section": "Using @Autowired",
+        "claim": "单构造器可省略 @Autowired，也可注入与元素类型匹配的所有 Bean。"
+      },
+      {
+        "title": "Spring Framework 6.2 Reference",
+        "url": "https://docs.spring.io/spring-framework/reference/6.2/core/beans/annotation-config/autowired-primary.html",
+        "section": "Fine-tuning Annotation-based Autowiring with @Primary or @Fallback",
+        "claim": "唯一 primary 候选优先用于单值依赖，集合等多值注入仍包含所有符合条件的 Bean。"
+      },
+      {
+        "title": "Spring Framework 6.2 Reference",
+        "url": "https://docs.spring.io/spring-framework/reference/6.2/core/beans/annotation-config/autowired-qualifiers.html",
+        "section": "Fine-tuning Annotation-based Autowiring with Qualifiers",
+        "claim": "限定符缩小类型候选范围，也支持语义标签。"
+      },
+      {
+        "title": "Spring Framework 6.2 Javadoc",
+        "url": "https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/beans/factory/NoUniqueBeanDefinitionException.html",
+        "section": "NoUniqueBeanDefinitionException",
+        "claim": "预期单个 Bean 而匹配多个时的异常。"
+      }
+    ],
+    "coverageDifference": "旧 E03 考 IoC 和依赖注入的基本职责，旧 M05 考代理。M16 要配置两个真实的注入点并解释候选不唯一。",
+    "acceptableAlternatives": [
+      "可以用自定义限定符，或明确按限定值、Bean 名称回退规则举例。",
+      "两个注入点各显式标记限定符也能完成业务选择，回答仍应说明 @Primary 怎样提供题设默认。"
+    ],
+    "misconceptions": [
+      "@Primary 会把其他同类型 Bean 从容器删除。",
+      "@Qualifier 可以匹配类型不兼容的 Bean。",
+      "凡是存在两个实现，Spring 就必然启动失败。"
+    ]
+  },
+  {
+    "bankId": "M17",
+    "title": "接口参数校验与统一异常响应",
+    "category": "SPRING",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "mvc_validation_errors",
+    "questionContent": "一个 Spring MVC 6.2 创建用户接口启用了 Bean Validation，用 @Valid @RequestBody CreateUserRequest 接收 JSON，邮箱字段标有 @NotBlank，未使用 BindingResult 或类级 @Validated。客户端分别发来语法错误的 JSON 和能解析但邮箱为空的 JSON。两个错误在哪一步产生？如果又给同一个方法加了查询参数 @RequestParam @Min(1) int page，统一错误响应要注意什么？",
+    "referenceAnswer": "Spring MVC 先通过消息转换器读请求体。JSON 语法不合法时通常会出现 HttpMessageNotReadableException，此时无法正常得到 DTO。能解析成 DTO 时，@Valid 才会触发字段校验，例如用 @NotBlank 表达邮箱必填。没有紧随的 BindingResult，且方法未触发内建方法校验时，字段不符合约束会抛 MethodArgumentNotValidException。加了直接标在参数上的 @Min 之后，MVC 内建的方法校验会覆盖普通参数级校验，也检查 @Valid 标记的嵌套 DTO。输入约束失败时可得到 HandlerMethodValidationException。可在 @RestControllerAdvice 里统一这些客户端输入错误为 HTTP 400，返回稳定错误码和安全的字段提示。内部异常细节和堆栈只用于受控诊断。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "区分反序列化与 DTO 字段校验：损坏 JSON 在消息转换阶段失败，能够解析的对象才进入 Bean Validation。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "用 @Valid 触发 DTO 校验，用 @NotBlank 等约束表达邮箱必填，指出普通参数级 DTO 校验失败对应 MethodArgumentNotValidException（题设无紧随的 BindingResult）。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明参数上的直接约束可触发 MVC 方法校验，并覆盖同一方法的普通参数级校验，包括嵌套 DTO 的约束。输入校验异常可为 HandlerMethodValidationException。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明用 @RestControllerAdvice 等入口统一 HTTP 400 和稳定的结构化错误码或字段提示，覆盖不可读取的请求体。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明客户端提示可定位错误，但避免返回原始请求中的敏感值、完整异常或堆栈。",
+        "weight": 15
+      }
+    ],
+    "versionScope": "Spring Framework 6.2 MVC，启用 Jakarta Bean Validation，假定未使用类级 @Validated 的 AOP 方法校验。",
+    "sources": [
+      {
+        "title": "Spring Framework 6.2 Reference",
+        "url": "https://docs.spring.io/spring-framework/reference/6.2/web/webmvc/mvc-controller/ann-validation.html",
+        "section": "Validation",
+        "claim": "@Valid 的 DTO 校验和直接约束触发的方法校验，以及两个不同校验异常。"
+      },
+      {
+        "title": "Spring Framework 6.2 Reference",
+        "url": "https://docs.spring.io/spring-framework/reference/6.2/web/webmvc/mvc-ann-rest-exceptions.html",
+        "section": "Error Responses",
+        "claim": "统一问题详情和拦截 Spring MVC 异常，可定制详情以控制对外内容。"
+      },
+      {
+        "title": "Spring Framework 6.2 Javadoc",
+        "url": "https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/web/servlet/mvc/method/annotation/ResponseEntityExceptionHandler.html",
+        "section": "handleHttpMessageNotReadable、handleMethodArgumentNotValid、handleHandlerMethodValidationException",
+        "claim": "统一处理不可读取的请求体、参数对象校验和方法校验错误。"
+      }
+    ],
+    "coverageDifference": "旧 E03 是容器入门，旧 M05 考代理。M17 考请求转换和校验时序，以及不同来源的输入错误如何对外表达。",
+    "acceptableAlternatives": [
+      "可以用 ProblemDetail 或稳定的自定义错误对象。",
+      "接受合适的 ResponseEntityExceptionHandler 继承或具体的 @ExceptionHandler 映射。",
+      "可补充 BindingResult 与类级 @Validated 会改变路径，但按题设回答即可。"
+    ],
+    "misconceptions": [
+      "@Valid 自己就是字段必填约束。",
+      "损坏 JSON 与字段不合法一定是同一种异常。",
+      "把解析器抛出的完整错误和请求内容原样返回。"
+    ]
+  },
+  {
+    "bankId": "M18",
+    "title": "联合索引与查询条件的匹配",
+    "category": "MYSQL",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "composite_index_access",
+    "questionContent": "订单表已有联合索引 (user_id, status, created_at)。查询 A 是 WHERE user_id = ? AND status = ? AND created_at >= ? ORDER BY created_at，查询 B 去掉 status 条件，其余相同。两个查询的索引定位和排序有什么区别？如果 A 只返回 status、created_at，和额外返回未入索引的 remark 有何区别？你会怎样确认优化器实际用了哪些能力？",
+    "referenceAnswer": "索引按 user_id、status、created_at 的顺序组织。A 的前两列等值后，可在该用户和状态下从起始时间做范围扫描，同一段里的时间已有序，有机会直接用索引顺序返回。B 可以用 user_id 前缀，但中间缺少 status，单个普通连续区间不能同时按所有状态的 created_at 下界精确定位。这个用户的不同 status 各有自己的时间顺序，整体不天然按时间排序，优化器可能另行排序。A 只投影 status 和 created_at 时，过滤、排序与返回所需列都在这个索引里，具备覆盖条件。加上 remark 就通常需要取表行。看 EXPLAIN 中的 key、访问方式和 Extra，确认实际选择的索引、是否额外排序以及是否覆盖。即使 created_at 不能缩小 B 的普通连续范围，它的条件仍然可以参与剩余过滤。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "按联合索引列顺序分析 A：user_id 与 status 等值固定前缀，created_at 条件可以构成接下来的时间范围。",
+        "weight": 25
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "分析 B：user_id 前缀仍可用，但缺少中间 status 使普通连续范围不能直接用 created_at 完成跨状态定位。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "判断 A 可利用固定前缀后的 created_at 顺序，B 在多个 status 上扫描时整体并无 created_at 顺序保证。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "判断只取索引中所需列可形成覆盖，额外取不在索引的 remark 通常需取表行。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明不能用于定位的列仍可参与剩余过滤，并用 EXPLAIN 的实际索引及 Using filesort、Using index 等信息核对结论。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "MySQL 8.0 InnoDB，普通 B-tree 二级索引，题设 SQL 为升序且无额外执行提示。",
+    "sources": [
+      {
+        "title": "MySQL 8.0 参考手册",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/multiple-column-indexes.html",
+        "section": "Multiple-Column Indexes",
+        "claim": "复合索引按列序组织，可按最左前缀查找。"
+      },
+      {
+        "title": "MySQL 8.0 参考手册",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/range-optimization.html",
+        "section": "Range Access and Multiple-Part Indexes",
+        "claim": "等值可以继续使用后续索引列来构造范围，范围比较及缺失前缀会改变可用于构造区间的列。"
+      },
+      {
+        "title": "MySQL 8.0 参考手册",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/order-by-optimization.html",
+        "section": "Use of Indexes to Satisfy ORDER BY",
+        "claim": "固定前缀后可按索引列排序，使用索引排序仍取决于计划成本。"
+      },
+      {
+        "title": "MySQL 8.0 参考手册",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/index-condition-pushdown-optimization.html",
+        "section": "Index Condition Pushdown Optimization",
+        "claim": "在适用条件下，存储引擎可在取完整行前使用索引列做剩余过滤。"
+      },
+      {
+        "title": "MySQL 8.0 参考手册",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/explain-output.html",
+        "section": "EXPLAIN Extra Information",
+        "claim": "Using index 表示查询所需列可由索引提供，Using index condition 表示适用索引条件下推。"
+      }
+    ],
+    "coverageDifference": "旧 M06 考 InnoDB 索引结构和回表概念。M18 要把索引列序应用到两个具体查询的定位和排序，覆盖只作为投影差异。M19 则从观察到的计划反推问题。",
+    "acceptableAlternatives": [
+      "可以用排序后的三元组或按用户、状态分组示意。",
+      "可提出其他索引或全表扫描也可能成为计划，但应保留对本索引普通连续范围和排序能力的判断。"
+    ],
+    "misconceptions": [
+      "WHERE 条件书写顺序必须与索引列顺序一致。",
+      "中间一列缺失时整个索引毫无用处。",
+      "只要命中索引，就不会发生额外排序或回表。"
+    ]
+  },
+  {
+    "bankId": "M19",
+    "title": "如何用 EXPLAIN 分析慢查询",
+    "category": "MYSQL",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "explain_query_plan",
+    "questionContent": "一个 MySQL 8.0 订单查询变慢了。传统 EXPLAIN 显示 possible_keys=idx_user、key=NULL、type=ALL、rows=200000、filtered=2.00、Extra=Using where。你如何读这份计划？接下来怎样判断该调整查询、更新统计信息还是改索引，并验证调整有用？",
+    "referenceAnswer": "possible_keys 表示优化器看到了一个可能用于找行的索引，key 为空、type 为 ALL，说明该表在这份计划里是全表扫描。rows 是预计检查约二十万行。filtered 约为百分之二，估计这张表过完条件后留下约四千行，Using where 表示有条件用于过滤。它们是估计和访问方式，不是实际耗时，也不能仅凭 ALL 决定强制用索引。先用实际查询参数和代表性数据看条件选择性、数据倾斜、统计信息以及查询是否能用索引过滤。然后在合适的验证环境对这个 SELECT 用 EXPLAIN ANALYZE，查看各迭代器实际的行数、耗时和循环次数，找估计偏差或真正的耗时步骤。若统计失准就检验更新统计是否改善估计，若索引或查询写法不匹配就验证有针对性的改动。用相同参数和可比负载对照计划、耗时和扫描量。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "结合 possible_keys、key 和 type 判断：idx_user 是候选，但本计划未选择索引，该表访问为全表扫描。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "解释 rows 是估计检查数，filtered 是估计通过比例，正确推算约四千行通过过滤，并能说明 Using where 表示应用过滤条件。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明传统 EXPLAIN 输出是计划和估计。EXPLAIN ANALYZE 会真正执行给定 SELECT，提供迭代器实际时间、行数和循环等证据。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "根据真实参数检验选择性、统计偏差或索引和谓词不匹配，提出与所观察原因对应的一项改动。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "用可比参数和数据对照修改前后，至少验证实际耗时或扫描量，并避免仅凭是否出现索引判断性能。",
+        "weight": 15
+      }
+    ],
+    "versionScope": "MySQL 8.0，传统表格 EXPLAIN 与 8.0.18 起可用的 EXPLAIN ANALYZE。",
+    "sources": [
+      {
+        "title": "MySQL 8.0 参考手册",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/explain-output.html",
+        "section": "EXPLAIN Output Columns / Join Types / Extra",
+        "claim": "定义 possible_keys、key、type、rows、filtered、Using where 和 ALL。"
+      },
+      {
+        "title": "MySQL 8.0 参考手册",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/explain.html",
+        "section": "EXPLAIN ANALYZE / Obtaining Execution Plan Information",
+        "claim": "EXPLAIN ANALYZE 真正执行查询并展示实际数据，手册也说明更新表统计对计划选择的用途。"
+      }
+    ],
+    "coverageDifference": "旧 M06 考索引结构，M18 考根据 SQL 推导索引能力。M19 直接解读一组计划输出，考估计与实测的区分及证据驱动改动。",
+    "acceptableAlternatives": [
+      "可用优化器 trace 或慢查询记录补充判断，在说明传统 EXPLAIN 与 ANALYZE 区别后再展开。",
+      "允许认为全表扫在题设的某些数据分布或成本下合理，需给出验证方法。"
+    ],
+    "misconceptions": [
+      "possible_keys 中出现的索引已经被选用。",
+      "rows 表示实际结果行数或过滤后的行数。",
+      "EXPLAIN ANALYZE 只显示估计，不会执行查询。",
+      "全表扫描必慢，强制索引必快。"
+    ]
+  },
+  {
+    "bankId": "M20",
+    "title": "过期和淘汰有什么区别",
+    "category": "REDIS",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "redis_expiry_eviction",
+    "questionContent": "商品缓存设置了 30 分钟 TTL，流量高峰时有些键不到 30 分钟就查不到。Redis 的过期和内存淘汰分别怎么触发？allkeys-lru、volatile-lru 和 noeviction 对这个现象有什么影响，应用应怎样处理和排查未命中？",
+    "referenceAnswer": "TTL 给键设定一个到期时间。访问时发现已到期，Redis 会把它当作不存在并处理过期，也会定期主动清理部分过期键，不保证所有键在到期瞬间都已从内存删除。淘汰是受 maxmemory 限制时，Redis 按配置尝试回收空间，键可以在到期前被移除。allkeys-lru 在全部键中近似按最近使用情况淘汰，volatile-lru 只从有过期时间的键里选。如果没有可淘汰的候选，或设置了 noeviction，需要更多内存的命令可能报错，读取通常还能继续。应用把未命中作为正常分支，向权威数据源取值并在条件允许时重建缓存。排查时结合 TTL 设置、实际内存与策略，以及一段时间内的 expired_keys、evicted_keys 计数变化。实例计数能提示原因，不能单凭它确定某个键为何消失。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "区分按键到期时间触发的过期与按 maxmemory 和策略触发的淘汰，说明有 TTL 的键也可能提前被淘汰。",
+        "weight": 25
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明过期可在访问时被动处理，也有周期性的主动清理，物理删除并非必须精确发生在到期时刻。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "区分 allkeys-lru 的全体键候选和 volatile-lru 的有过期时间候选，理解 LRU 策略是近似选择。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明 noeviction 或候选不足时，需要增加内存的操作可能报错，读请求通常还能服务。",
+        "weight": 15
+      },
+      {
+        "pointType": "KEY",
+        "content": "提出从权威数据源回源并按需回填，同时能用内存配置与过期和淘汰统计区分实例上的可能原因。",
+        "weight": 15
+      }
+    ],
+    "versionScope": "Redis OSS 7.2，单实例，key 级 TTL 与 maxmemory 淘汰。",
+    "sources": [
+      {
+        "title": "Redis EXPIRE 命令文档",
+        "url": "https://redis.io/docs/latest/commands/expire/",
+        "section": "How Redis expires keys",
+        "claim": "访问时被动过期与后台主动检查。"
+      },
+      {
+        "title": "Redis Key eviction",
+        "url": "https://redis.io/docs/latest/develop/reference/eviction/",
+        "section": "Eviction policies / Using the INFO command",
+        "claim": "maxmemory、策略候选范围和排查计数。"
+      },
+      {
+        "title": "Redis 7.2 配置源码",
+        "url": "https://raw.githubusercontent.com/redis/redis/7.2/redis.conf",
+        "section": "maxmemory / maxmemory-policy",
+        "claim": "7.2 配置对近似 LRU、volatile 策略与无候选时写入错误的说明。"
+      },
+      {
+        "title": "Redis INFO 命令文档",
+        "url": "https://redis.io/docs/latest/commands/info/",
+        "section": "Stats",
+        "claim": "expired_keys 和 evicted_keys 是实例计数。"
+      }
+    ],
+    "coverageDifference": "旧 M07 按业务场景选择 Redis 数据结构。M20 考缓存键何时消失及原因排查，H22 才讨论缓存更新竞态和并发回源。",
+    "acceptableAlternatives": [
+      "可补充主库不存在时的受控空值处理，或用等效监控项观察淘汰趋势。",
+      "明确 TTL 是最长有效期的一项约束，命中仍受其他删除原因影响。"
+    ],
+    "misconceptions": [
+      "有 TTL 就保证键在到期前一直存在。",
+      "设置 noeviction 后 Redis 会停止正常过期。",
+      "volatile-lru 与 allkeys-lru 都会淘汰任何键。"
+    ]
+  },
+  {
+    "bankId": "M21",
+    "title": "RDB 与 AOF 的恢复取舍",
+    "category": "REDIS",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "redis_persistence_tradeoffs",
+    "questionContent": "有个 Redis 7.2 实例保存可重新计算的业务状态。团队能接受丢最近少量更新，但希望重启尽快恢复。RDB 和 AOF 分别保存什么、怎样恢复？如果使用 AOF 的 everysec，你会怎样解释丢失窗口、恢复成本和独立备份的关系？",
+    "referenceAnswer": "RDB 按时间点保存数据快照，重启读入快照重建数据，故障时可能丢失最近一次成功快照后的修改。快照文件通常紧凑，加载较直接，但后台生成快照仍有 fork、写盘等成本。AOF 追加记录会改变数据的操作，恢复时读取基础文件并应用增量，重写可以压缩历史操作。使用 everysec 时通常每秒刷盘一次，常把进程或主机故障下近期写入的典型丢失窗口估在约一秒，具体会受磁盘、操作系统和故障类型影响。更频繁刷盘一般提高耐久性，但也增加 I/O 或延迟。若 RDB 和 AOF 都启用，正常重启从 AOF 恢复。选择前先给出可接受的数据损失和恢复时间，拿真实数据量演练重启。持久化文件若与实例共盘，磁盘损坏或误操作仍可能影响数据，应独立备份并验证可恢复。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明 RDB 保存某时刻的数据快照，恢复时加载最近可用快照，之后的更新存在丢失窗口。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明 AOF 记录写操作，恢复依靠基础状态与增量，重写用于限制历史文件体积。",
+        "weight": 25
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明 everysec 是周期性刷盘，约一秒是典型量级，且更频繁刷盘与持久性及 I/O 成本存在取舍。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "结合数据损失容忍度与恢复时间比较快照加载、日志应用等成本，用恢复演练验证选择。",
+        "weight": 15
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明本地持久化不能覆盖共盘损坏或误删，提出独立备份和恢复验证。",
+        "weight": 15
+      }
+    ],
+    "versionScope": "Redis OSS 7.2，单实例本地持久化，讨论普通故障和恢复目标。",
+    "sources": [
+      {
+        "title": "Redis 持久化文档",
+        "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/",
+        "section": "RDB advantages and disadvantages / AOF / Backing up Redis data",
+        "claim": "快照与日志恢复、刷盘策略、重写、多段 AOF 和备份。"
+      },
+      {
+        "title": "Redis 7.2 配置源码",
+        "url": "https://raw.githubusercontent.com/redis/redis/7.2/redis.conf",
+        "section": "SNAPSHOTTING / APPEND ONLY MODE",
+        "claim": "确认快照策略、appendfsync everysec 和 Redis 7.2 的 AOF 配置。"
+      }
+    ],
+    "coverageDifference": "旧 M07 考数据结构。M20 考在线 TTL 和内存限制。M21 考实例重启时可恢复的状态及独立备份。H23 的原子性和执行错误也不属于本题。",
+    "acceptableAlternatives": [
+      "若状态完全可从权威库重建，可选择 RDB 为快速回暖，或用 AOF 缩小丢失窗口并说明恢复演练计划。",
+      "接受用 RPO 和 RTO 表达目标，无需背出固定的恢复速度排序。"
+    ],
+    "misconceptions": [
+      "everysec 对磁盘和系统故障都能保证最多丢一秒。",
+      "AOF 永远无法压缩或总是比 RDB 恢复慢。",
+      "同盘开启两种持久化就等于独立备份。"
+    ]
+  },
+  {
+    "bankId": "H10",
+    "title": "反射、模块封装与访问边界",
+    "category": "JAVA_BASIC",
+    "difficulty": "HARD",
+    "knowledgePoint": "reflection_module_access",
+    "questionContent": "Java 21 中，序列化模块通过 getDeclaredField 找到了另一个具名模块中 public DTO 的 private 字段。DTO 所在包 exports 了但没有 opens。为什么找到字段仍可能无法读取？trySetAccessible 和 setAccessible(true) 会有什么区别，你会怎样修改代码或模块配置？如果外部请求可以指定字段名，应限制哪些访问？",
+    "referenceAnswer": "getDeclaredField 可以找到类自己声明的私有字段，所以能获得字段的元数据。真正执行 Field.get 时，默认还要做访问检查，跨模块读取这个 private 字段会失败。exports 提供外部模块访问公开 API 的能力，包仅 exports 时并没有允许外部模块做这样的深层反射。按题设 trySetAccessible 会返回 false，setAccessible(true) 会抛 InaccessibleObjectException，未成功放宽检查时直接 Field.get 则会抛 IllegalAccessException。如果能改 DTO，优先使用对外公开的 getter、工厂方法或专门的映射接口。框架确实要访问私有字段，可以将该 DTO 包定向 opens 给序列化模块，并在访问失败时明确报错或回退。反射对象和字段范围由应用配置控制，避免把任意类名、字段名当作无条件可信的请求输入。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "区分查找成员元数据与读取成员：getDeclaredField 能找到本类 private 字段，Field.get 默认仍执行访问检查。",
+        "weight": 25
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "区分 exports 的公开 API 边界与 opens 的深层反射权限，说明题设跨模块 private 访问不能只靠 exports。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "准确区分题设下 trySetAccessible 返回 false 与 setAccessible(true) 抛 InaccessibleObjectException，且未放宽时直接读取可能抛 IllegalAccessException。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "提出通过公开访问方法，或仅将目标包定向 opens 给可信模块解决，并给出访问失败时的明确处理。",
+        "weight": 20
+      },
+      {
+        "pointType": "ADVANCED",
+        "content": "说明反射范围应由应用控制，避免把不可信的类型名或成员名直接变成任意访问目标。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "Java 21，两个具名模块，普通 private 实例字段，不考虑自定义 SecurityManager。",
+    "sources": [
+      {
+        "title": "Java 21 Class",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Class.html#getDeclaredField(java.lang.String)",
+        "section": "getDeclaredField",
+        "claim": "返回当前类或接口声明字段的元数据，成员发现与调用权限分离。"
+      },
+      {
+        "title": "Java 21 AccessibleObject",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/reflect/AccessibleObject.html#trySetAccessible()",
+        "section": "trySetAccessible / setAccessible",
+        "claim": "跨模块 private 深反射的包开放条件与失败表现。"
+      },
+      {
+        "title": "Java 21 Field",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/reflect/Field.html#get(java.lang.Object)",
+        "section": "get",
+        "claim": "执行访问检查且目标不可访问时抛 IllegalAccessException。"
+      },
+      {
+        "title": "Java SE 21 语言规范",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-7.html#jls-7.7.2",
+        "section": "§7.7.2 Exported and Opened Packages",
+        "claim": "exports 与 opens 的用途、定向开放语法。"
+      }
+    ],
+    "coverageDifference": "旧 H01 考泛型擦除与类型检查限制。H10 考普通字段反射和模块权限，题意无需讨论泛型。H14 考类型加载身份，也无需解释反射打开权限。",
+    "acceptableAlternatives": [
+      "接受给出 opens dto.pkg to serializer.module 的示意。",
+      "若部署环境明确允许，可以提出定向 --add-opens 的临时兼容办法，说明其范围和长期取舍。"
+    ],
+    "misconceptions": [
+      "能找到私有字段就一定能成功读取。",
+      "exports 等于 opens。",
+      "setAccessible(true) 在 Java 21 可以绕过所有模块边界。"
+    ]
+  },
+  {
+    "bankId": "H11",
+    "title": "Stream 惰性执行与并行副作用",
+    "category": "JAVA_BASIC",
+    "difficulty": "HARD",
+    "knowledgePoint": "stream_laziness_parallel",
+    "questionContent": "有人用 list.stream().peek(audit::add).count() 同时计数和收集审计数据，发现 audit 可能为空。另一段代码用 list.parallelStream().forEach(out::add) 把结果写进普通 ArrayList。为什么这两段可能出错？如果要筛选结果并按原顺序产出，再记录审计，你会怎样改写并决定是否并行？",
+    "referenceAnswer": "peek 是惰性的中间操作，count 是终止操作。某些已知大小的流可以直接算出 count，只要前面的操作不改变计数，peek 可能不执行，不能把必要审计挂在这里。第二段把多个工作线程写入同一个普通 ArrayList，可能丢数据或破坏结构，即使换成同步容器，forEach 也不保证原顺序。先用不改流来源、也不依赖可变共享状态的 filter 和 map 生成数据，再用 toList 等归约收集。对于有固定遍历顺序的 List，toList 会保留结果顺序。然后在明确的顺序和错误处理下记录审计。只有当数据易拆分、每项计算足够重且彼此独立、实测收益大于调度与合并开销时，再考虑并行。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "区分中间操作和终止操作，说明 count 对已知大小且不改变计数的管线可能跳过遍历，peek 审计副作用无法作为保证。",
+        "weight": 25
+      },
+      {
+        "pointType": "CORE",
+        "content": "识别并行 forEach 写普通 ArrayList 的共享可变状态竞态，同时知道并行 forEach 不保证按流的遍历顺序执行。",
+        "weight": 25
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "要求流函数不干扰来源，并通常不依赖执行时会变化的共享状态。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "提出先用 filter、map 和保序收集得到结果，再在明确的独立步骤执行审计。",
+        "weight": 20
+      },
+      {
+        "pointType": "ADVANCED",
+        "content": "说明选择并行需要考虑数据能否拆分、计算量与调度合并成本，并用实际负载度量。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "Java 21 标准 Stream API，输入为顺序稳定、执行时未被外部修改的普通 List。",
+    "sources": [
+      {
+        "title": "Java 21 Stream",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html#count()",
+        "section": "count、peek",
+        "claim": "已知结果时可直接求 count，可能跳过 peek 等中间操作。"
+      },
+      {
+        "title": "Java 21 Stream",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html#forEach(java.util.function.Consumer)",
+        "section": "forEach / forEachOrdered / toList",
+        "claim": "forEach 不保证并行遇到顺序，toList 按存在的遇到顺序收集。"
+      },
+      {
+        "title": "Java 21 Stream 包规范",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html",
+        "section": "Non-interference / Stateless behaviors / Side-effects / Parallelism",
+        "claim": "流行为参数对干扰、共享可变状态和副作用的约束。"
+      },
+      {
+        "title": "Java 21 ArrayList",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html",
+        "section": "类说明",
+        "claim": "普通 ArrayList 的并发结构修改需要外部同步。"
+      }
+    ],
+    "coverageDifference": "旧 H01 考泛型。M10 考普通集合迭代中结构修改，M11 考复制与视图。H11 核心是流的惰性优化、并行行为参数和保序归约。",
+    "acceptableAlternatives": [
+      "可使用顺序循环完成收集与审计。若选择流，可用保持遇到顺序的收集或在正确位置显式使用 forEachOrdered。",
+      "能解释同步容器只解决部分并发安全问题，仍需处理顺序与失败。"
+    ],
+    "misconceptions": [
+      "调用 count 后所有 peek 必定执行。",
+      "parallelStream 里的 forEach 自动保留输入顺序。",
+      "结果 List 保序说明所有 map 或 peek 的执行也保序。"
+    ]
+  },
+  {
+    "bankId": "H12",
+    "title": "并发 Map 中复合操作如何保持原子性",
+    "category": "JAVA_COLLECTION",
+    "difficulty": "HARD",
+    "knowledgePoint": "concurrent_map_atomicity",
+    "questionContent": "服务用 ConcurrentHashMap 存放按用户 ID 累计的请求次数。现在先 get，空值按 0 处理，再 put(count + 1)，偶尔出现计数少了。为什么？如果还需要按键首次放入一个对象，putIfAbsent 和 computeIfAbsent 有什么区别？能否在计算回调里发远程请求或同时更新其他键？",
+    "referenceAnswer": "get 和 put 各自是线程安全的，但它们之间可以插入另一个线程的操作。两个线程同时读到 3，再各写 4，就丢了一次增量。这个例子可以用 merge(userId, 1L, Long::sum) 或 compute，把单键读改写放到一次原子操作中。对象已经准备好时，putIfAbsent 能原子地检查并写入。它接收的是已经求值的对象，所以并发线程可能都先构造了一遍。computeIfAbsent 只在该次原子调用发现键缺失时调用映射函数，返回非 null 才存入。函数返回 null、失败或映射后续被移除，未来仍可能再次计算。计算期间其他更新可能阻塞，所以回调保持短小，不在其中更新同一个 Map 的其他映射，也别放慢且可能重复产生副作用的远程动作。单键原子操作也不能维护跨键或跨系统的一致性。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "能用两个线程读到同一旧值并覆盖说明 get-then-put 的丢更新竞态。",
+        "weight": 25
+      },
+      {
+        "pointType": "CORE",
+        "content": "用 merge、compute 或等效同步机制原子地实现单键计数增量。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "区分 putIfAbsent 原子地登记已求值对象与 computeIfAbsent 在缺失时才调用函数，知道 null、异常或后续移除可以使未来调用重新计算。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明计算回调会影响并发更新，避免阻塞 I/O 和在回调中修改同一个 Map 的映射。",
+        "weight": 20
+      },
+      {
+        "pointType": "ADVANCED",
+        "content": "说明单键原子性不能保证跨键不变量或远程副作用只执行一次，应单独设计协调。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "Java 21 ConcurrentHashMap 的公开 API 契约。",
+    "sources": [
+      {
+        "title": "Java 21 ConcurrentHashMap",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html",
+        "section": "putIfAbsent / computeIfAbsent / compute / merge",
+        "claim": "单键条件写入、计算与归并的原子性、映射函数边界和潜在阻塞。"
+      }
+    ],
+    "coverageDifference": "旧 H02 考 JDK 8 的桶、CAS、扩容等内部实现。H12 用 Java 21 API 修复丢更新与懒加载竞态。H13 考遍历时观察到的集合视图。",
+    "acceptableAlternatives": [
+      "固定已初始化计数对象的场景，可说明 AtomicLong 配合安全初始化，以及映射被移除时要额外协调。",
+      "可用 LongAdder 说明高并发计数设计，需明确 sum 在并发更新期间的快照语义及是否满足精确读取要求。"
+    ],
+    "misconceptions": [
+      "线程安全容器上的多个调用自然组成一个原子操作。",
+      "computeIfAbsent 在键的整个生命周期中永远只执行一次。",
+      "可以在回调内随意更新同一个 Map 或借它保证远程操作恰好一次。"
+    ]
+  },
+  {
+    "bankId": "H13",
+    "title": "快照迭代与弱一致迭代的取舍",
+    "category": "JAVA_COLLECTION",
+    "difficulty": "HARD",
+    "knowledgePoint": "concurrent_iteration_tradeoffs",
+    "questionContent": "一个服务要遍历监听器分发事件，监听器变更很少，希望本轮遍历看到开始时的注册列表。另一个任务定期遍历在线用户表做近似统计，允许遍历过程中并发加入和退出。分别使用 CopyOnWriteArrayList 和 ConcurrentHashMap 有什么好处？它们在遍历时会看到什么，付出什么代价？若在线统计改为要求同一时点的准确结果，需要怎样调整？",
+    "referenceAnswer": "监听器场景可以用 CopyOnWriteArrayList。迭代器抓住创建时的数组引用，本轮看到旧成员列表，即使某个监听器后来注销，也可能收到本轮通知。它保留的是元素引用，监听器内部状态仍要单独同步。更新通常会复制底层数组，写入越频繁或列表越大，复制和分配成本越明显。长寿命迭代器还会保留旧数组。在线表可用 ConcurrentHashMap。它的弱一致迭代允许读写并发进行，可能看到部分创建迭代器之后的更新，不承诺全表来自同一时点，也不会因此抛 ConcurrentModificationException。用来做近似统计可以。如果要求一个时点的精确集合，就要在应用层协调写入和快照，简单遍历复制仍可能混入并发更新。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "为低变更、高遍历的监听器选择 CopyOnWriteArrayList，说明其迭代器看到创建时的成员列表。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明快照保留元素引用，不能冻结可变元素的内部状态，本轮也可能仍看到已注销成员。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "指出写入通常复制底层数组，带来 O(n) 级复制和内存开销，长期持有迭代器还会延长旧数组寿命。",
+        "weight": 20
+      },
+      {
+        "pointType": "CORE",
+        "content": "为允许近似的在线用户表选择 ConcurrentHashMap，说明弱一致迭代可与更新并发，可能看到部分后续变更，且不提供全表时点快照。",
+        "weight": 25
+      },
+      {
+        "pointType": "ADVANCED",
+        "content": "指出确需跨元素精确快照时需协调写入，例如统一锁保护复制或发布不可变版本，单独从并发 Map 遍历复制并不足够。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "Java 21 CopyOnWriteArrayList 与 ConcurrentHashMap 的迭代契约。",
+    "sources": [
+      {
+        "title": "Java 21 CopyOnWriteArrayList",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CopyOnWriteArrayList.html",
+        "section": "类说明及 iterator",
+        "claim": "写时复制、迭代器保留创建时数组引用及列表结构快照。"
+      },
+      {
+        "title": "Java 21 ConcurrentHashMap",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html",
+        "section": "类说明与 keySet/entrySet",
+        "claim": "迭代器弱一致、可见部分并发更新，聚合状态不宜用于并发下的精确控制。"
+      }
+    ],
+    "coverageDifference": "旧 H02 考并发 Map 内部机制，H12 考单键原子更新。相邻 M10 考普通迭代器修改约定，M11 考只读视图。H13 要根据读取一致性及写入成本选并发容器。",
+    "acceptableAlternatives": [
+      "监听器可用不可变列表副本配合原子发布实现等效语义。",
+      "准确快照可用统一读写锁或支持版本的不可变视图，需解释如何与写入对齐。"
+    ],
+    "misconceptions": [
+      "CopyOnWriteArrayList 会深拷贝每个元素。",
+      "ConcurrentHashMap 迭代器必定观察到所有最新更新。",
+      "不会抛 ConcurrentModificationException 就说明遍历结果是同一时刻的快照。"
+    ]
+  }
+]

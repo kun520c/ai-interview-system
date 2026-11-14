@@ -1,0 +1,755 @@
+[
+  {
+    "bankId": "E06",
+    "title": "异常分类与资源关闭责任",
+    "category": "JAVA_BASIC",
+    "difficulty": "EASY",
+    "knowledgePoint": "exceptions_resource_basics",
+    "questionContent": "Java 方法从文件读取内容时，可能抛出 IOException，调用者传入非法参数时，也可能抛出 IllegalArgumentException。这两类异常在编译时分别有什么要求？读取代码如何保证自己打开的文件在读失败时也能关闭？什么时候适合在当前方法捕获读取异常？",
+    "referenceAnswer": "IOException 是受检异常。编译器要求方法处理可能抛出的受检异常，例如用 try/catch 捕获，或在方法签名用 throws 声明并交由调用方处理。IllegalArgumentException 是 RuntimeException 的子类，属于非受检异常，编译器不要求显式捕获或声明，但它仍能传播给调用方。\n\n我会把自己打开的文件流放进 try-with-resources。只要流成功初始化，离开 try 块时就会调用 close()，读取失败也一样。我只在能恢复或能给调用方提供清楚的业务语义时捕获，避免吞掉异常或在读取失败后返回假成功。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "区分 IOException 是受检异常，并说明在此处捕获或通过 throws 声明向调用方传播。",
+        "weight": 30
+      },
+      {
+        "pointType": "KEY",
+        "content": "区分 IllegalArgumentException 是非受检异常，编译器没有捕获或声明的要求，但异常仍可向外传播。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明用 try-with-resources 管理自己打开的 AutoCloseable 文件流，成功取得的资源在正常或异常退出时均调用 close。",
+        "weight": 30
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "提出有实际处理意义的捕获策略，如返回明确失败、合理恢复或保留原因后转成业务异常，避免吞掉失败。",
+        "weight": 15
+      }
+    ],
+    "versionScope": "Java SE 21",
+    "sources": [
+      {
+        "title": "Java 语言规范 SE 21 · 第 11 章",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-11.html#jls-11.2",
+        "section": "§11.1.1、§11.2",
+        "claim": "受检与非受检异常的分类和编译时检查。"
+      },
+      {
+        "title": "Java 语言规范 SE 21 · 第 14 章",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-14.html#jls-14.20.3",
+        "section": "§14.20.3",
+        "claim": "成功初始化的资源在退出时自动关闭。"
+      }
+    ],
+    "coverageDifference": "与 E01 的接口和类设计不同。与 M08 共用资源语法背景，本题只考异常处理义务和基本关闭责任，M08 才考多个关闭异常的传播顺序。",
+    "acceptableAlternatives": "接受用等价异常或明确说明怎样正确使用 finally 关闭资源，能说明 try-with-resources 的保证即可。",
+    "misconceptions": "受检异常一定要当场捕获。非受检异常不会传播。只在读取成功后调用 close 就足够。"
+  },
+  {
+    "bankId": "E07",
+    "title": "String 不可变与字符串比较",
+    "category": "JAVA_BASIC",
+    "difficulty": "EASY",
+    "knowledgePoint": "strings_immutability",
+    "questionContent": "两个 String 显示的文字相同，为什么用 == 可能得到 false？如果调用 s.replace(...) 后不接收返回值，s 的内容会变吗？在循环里反复追加文本时，你会怎么写？你会让多个线程共用同一个构建器吗？",
+    "referenceAnswer": "== 对引用比较的是不是同一个对象。内容相同可以来自不同对象，因此比较文本应该用 equals。如果两边可能为 null，可以用 Objects.equals。\n\nString 对象一旦创建，字符序列就不会原地变化。replace 的结果通过返回值得到，不接收就不会改变 s 所引用的对象。给 s 重新赋值，是让变量引用别的对象。循环里要反复追加，可以在当前方法内复用一个 StringBuilder，用 append 累积，最后再用 toString 得到结果。StringBuilder 可变且不保证线程安全，我会让它只由当前线程使用。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明 == 比较引用身份，String.equals 比较字符序列内容，文本相同并不保证同一对象。",
+        "weight": 35
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明 replace 不会修改原 String，调用者需要使用返回值，变量重新赋值和对象内容变化是两回事。",
+        "weight": 30
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明循环累积场景可复用 StringBuilder，通过 append 构建后再 toString。",
+        "weight": 25
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明 StringBuilder 不保证线程安全，适合由当前线程独占，不能无保护地多线程共享。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "Java SE 21",
+    "sources": [
+      {
+        "title": "Java 语言规范 SE 21 · 第 15 章",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-15.html#jls-15.21.3",
+        "section": "§15.21.3",
+        "claim": "引用 == 比较对象身份，并提示字符串内容比较使用 equals。"
+      },
+      {
+        "title": "Java SE 21 API · String",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html#replace(char,char)",
+        "section": "类概述、equals、replace",
+        "claim": "String 不可变，equals 判断内容，replace 返回结果。"
+      },
+      {
+        "title": "Java SE 21 API · StringBuilder",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/StringBuilder.html",
+        "section": "类概述",
+        "claim": "StringBuilder 是可变字符序列，提供 append 和 toString，且不保证同步。"
+      },
+      {
+        "title": "Java SE 21 API · Objects",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Objects.html#equals(java.lang.Object,java.lang.Object)",
+        "section": "equals(Object,Object)",
+        "claim": "两个参数可能为 null 时可用 Objects.equals 比较。"
+      }
+    ],
+    "coverageDifference": "与 E01 的类型设计不同。M01 虽涉及 equals，但考自定义对象哈希契约，本题考 String 的值比较、不可变与构建。",
+    "acceptableAlternatives": "允许用 literal 与 new String(...)、变量重新赋值、Objects.equals 等等价例子。",
+    "misconceptions": "用 == 比字符串文本。认为 replace 改写 String 对象。断言所有 + 拼接都会创建 StringBuilder，或认为 StringBuilder 可直接并发写。"
+  },
+  {
+    "bankId": "E08",
+    "title": "List、Set、Map 的语义与选择",
+    "category": "JAVA_COLLECTION",
+    "difficulty": "EASY",
+    "knowledgePoint": "collection_semantics",
+    "questionContent": "一个导入程序要按原顺序保存每条处理结果（允许重复），另外要记录每个出现过的用户 ID，并能按 ID 查询该用户最新的一条结果。这三份数据分别适合用哪种 Java 集合接口？如果去重后的 ID 也要按首次出现顺序输出，怎么选？",
+    "referenceAnswer": "逐条结果用 List。它能保留元素顺序，常见实现也允许相同元素重复。只记录出现过的 ID，可以用 Set，一个 ID 只保留一份。按 ID 查最新结果，用 Map，以 ID 为键，处理同一 ID 的新结果时替换该键对应的值。\n\n如果去重后的 ID 还需要按首次加入的顺序输出，可以选 LinkedHashSet。Set 接口本身不保证首次加入顺序，要看具体实现。HashSet 没有这个顺序承诺。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "为按输入顺序保存全部处理记录选择允许重复的 List 实现，说明它保留位置顺序。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "为 ID 去重选择 Set，说明它用于保存不重复元素。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "为按 ID 查询最新结果选择 Map，说明每个键最多关联一个值，重复出现可更新对应值。",
+        "weight": 30
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明需按首次出现顺序遍历去重结果时选 LinkedHashSet 或能保证同样顺序的实现，不能依赖 HashSet 的遍历顺序。",
+        "weight": 20
+      }
+    ],
+    "versionScope": "Java SE 21",
+    "sources": [
+      {
+        "title": "Java SE 21 API · List",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html",
+        "section": "类概述",
+        "claim": "List 保留顺序，通常允许重复。"
+      },
+      {
+        "title": "Java SE 21 API · Set",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html",
+        "section": "类概述",
+        "claim": "Set 不含重复元素。"
+      },
+      {
+        "title": "Java SE 21 API · Map",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html",
+        "section": "类概述",
+        "claim": "Map 按键关联值，每个键最多对应一个值。"
+      },
+      {
+        "title": "Java SE 21 API · LinkedHashSet",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/LinkedHashSet.html",
+        "section": "类概述",
+        "claim": "LinkedHashSet 默认按插入顺序遍历，普通重复 add 不改变顺序。"
+      }
+    ],
+    "coverageDifference": "与 E02 的 ArrayList/LinkedList 实现取舍不同。本题先从保序、去重和按键索引的业务语义选接口。E09 关注两端操作和进出顺序。",
+    "acceptableAlternatives": "允许举 ArrayList、HashSet、HashMap 等具体实现。若用 LinkedHashMap 的键视图实现首次出现的唯一 ID，需说明如何保序。",
+    "misconceptions": "所有 Set 都无序或都会保留插入顺序。用一个普通 Map 保留同一 ID 的全部记录。把 Set 理解为按索引读取。"
+  },
+  {
+    "bankId": "E09",
+    "title": "用 Deque 表达栈和队列",
+    "category": "JAVA_COLLECTION",
+    "difficulty": "EASY",
+    "knowledgePoint": "deque_stack_queue",
+    "questionContent": "现在有两个单线程场景，一个是撤销最近一次编辑，一个是按到达顺序处理待办。怎么用 Java 的 Deque 分别实现？以 ArrayDeque 为例，如果还需要固定容量或多线程共享，你会考虑什么？",
+    "referenceAnswer": "撤销用后进先出，在同一端存和取，例如 push 进头部，pop 从头部取最新的操作。待办用先进先出，例如 offerLast 从尾部加入，pollFirst 从头部取最早的任务。空队列时 pollFirst 返回 null，pop 则会抛出异常，所以按调用方约定处理空状态。\n\n单线程中可以用 ArrayDeque。构造时的容量参数用于初始容量，实例会按需要增长，没有固定业务上限，也不保证线程安全。如果要并发访问并限制待办数量，可以用显式设了容量的 LinkedBlockingDeque，再决定满时等待还是返回失败。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "能用 Deque 同一端入出实现栈并说明后进先出，例如 push/pop。",
+        "weight": 30
+      },
+      {
+        "pointType": "KEY",
+        "content": "能用 Deque 不同端入出实现队列并说明先进先出，例如 offerLast/pollFirst。",
+        "weight": 30
+      },
+      {
+        "pointType": "KEY",
+        "content": "能区分 ArrayDeque 的初始容量与固定上限，说明固定容量需要额外限制或有界实现。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "知道 ArrayDeque 本身不保证线程安全，能为并发共享选择合适的并发实现或正确加锁。",
+        "weight": 20
+      }
+    ],
+    "versionScope": "Java SE 21",
+    "sources": [
+      {
+        "title": "Java SE 21 API · Deque",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Deque.html",
+        "section": "类概述和方法对应表",
+        "claim": "Deque 支持从同端模拟栈或从不同端模拟队列，并提供不同的空/满返回约定。"
+      },
+      {
+        "title": "Java SE 21 API · ArrayDeque",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayDeque.html",
+        "section": "类概述和 ArrayDeque(int)",
+        "claim": "可扩容且非线程安全，构造参数不构成固定上限。"
+      },
+      {
+        "title": "Java SE 21 API · LinkedBlockingDeque",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/LinkedBlockingDeque.html#%3Cinit%3E(int)",
+        "section": "类概述和 LinkedBlockingDeque(int)",
+        "claim": "双端阻塞队列可用显式容量限制。"
+      }
+    ],
+    "coverageDifference": "与 E02 的数组与链表复杂度和 E08 的通用容器语义不同，本题按操作顺序选择端点，识别实现的容量和并发边界。",
+    "acceptableAlternatives": "接受 addFirst/removeFirst、addLast/removeFirst 等等价配对。可以建议有边界和溢出处理的外部同步方案。",
+    "misconceptions": "栈和队列都从入队端取元素。认为 ArrayDeque 构造参数限定最大元素数，或把 Deque 接口当成并发保证。"
+  },
+  {
+    "bankId": "E10",
+    "title": "Bean 常用作用域与单例状态",
+    "category": "SPRING",
+    "difficulty": "EASY",
+    "knowledgePoint": "bean_scope_basics",
+    "questionContent": "Spring 的 singleton、prototype 和 request 作用域分别在什么范围复用 Bean？一个默认作用域的 Service 把当前请求的用户 ID 暂存在实例字段里，并发请求时会有什么风险？",
+    "referenceAnswer": "Spring 默认的 singleton 是同一个容器里，同一个 Bean 定义复用同一个实例。它不保证整个 JVM 中这个 Java 类只有一个对象。prototype 则是每次向容器请求该 Bean 时得到新实例，例如重新查找或为另一个注入点解析依赖。把一个 prototype 直接注入单例，并不会让单例每次调用方法都拿到新对象。\n\nrequest 是 Web 应用的作用域，同一个 HTTP 请求内复用，下一个请求有独立实例。默认 Service 被多个请求共用，把用户 ID 放到实例字段就可能被并发请求互相覆盖。通常把请求数据保存在方法参数和局部变量里，需要请求级组件时再考虑 request 作用域。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明 singleton 是默认作用域，在单个容器中按 Bean 定义复用实例，并非按 Java 类在整个 JVM 全局唯一。",
+        "weight": 30
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明 prototype 每次向容器取得该 Bean 时创建新实例，普通注入到单例的引用不会在每次业务调用时自动替换。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明 Web request 作用域按 HTTP 请求复用，同一请求与不同请求的实例关系正确。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "识别默认 Service 的请求级可变字段会被不同请求共享并可能串数据，给出方法参数、局部变量或正确的请求级组件等做法。",
+        "weight": 30
+      }
+    ],
+    "versionScope": "Spring Framework 6.2（Spring Boot 3.5）",
+    "sources": [
+      {
+        "title": "Spring Framework 6.2 · Bean Scopes",
+        "url": "https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html",
+        "section": "The Singleton Scope / The Prototype Scope / Request Scope / Singleton Beans with Prototype-bean Dependencies",
+        "claim": "作用域的实例复用范围及单例注入 prototype 的边界。"
+      }
+    ],
+    "coverageDifference": "与 E03 的依赖由谁创建和注入不同。本题考实例复用及请求状态隔离。E11 考注入后的初始化与销毁时机。",
+    "acceptableAlternatives": "可用 request-scoped 组件、方法局部变量或传递不可变请求上下文解释隔离。无需背代理细节。",
+    "misconceptions": "把 Spring singleton 理解为每个类 JVM 只有一个实例，或假设 singleton 自动线程安全、注入的 prototype 每次方法调用都会重建。"
+  },
+  {
+    "bankId": "E11",
+    "title": "Bean 初始化与资源释放",
+    "category": "SPRING",
+    "difficulty": "EASY",
+    "knowledgePoint": "bean_lifecycle_basics",
+    "questionContent": "一个 Spring 容器管理的单例 Bean 需要在依赖就绪后检查配置，并在应用正常关闭时释放它自己持有的资源。这两个动作应该放在哪类回调中？如果同一个类由业务代码直接 new，情况有什么不同？",
+    "referenceAnswer": "对于普通容器 Bean，Spring 先创建对象，提供构造器依赖，按配置完成属性等依赖注入。依赖到位后可以通过 @PostConstruct 做初始化，例如校验配置。这个检查属于受管 Bean 的初始化流程。\n\n在应用上下文正常关闭时，可用 @PreDestroy 关闭该 Bean 自己持有的资源，例如它创建的客户端。直接 new 出来的对象如果没有交给容器管理，Spring 不会自动调用这些回调，创建者要承担相应的初始化和清理责任。进程被强制结束时也不能依赖容器关闭回调执行。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明实例化、注入依赖和初始化的先后关系，知道依赖就绪后的检查放在初始化阶段。",
+        "weight": 30
+      },
+      {
+        "pointType": "KEY",
+        "content": "给出有效的初始化回调机制，例如 @PostConstruct 或配置 initMethod。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明应用上下文正常关闭时可用 @PreDestroy 或配置 destroyMethod 释放该受管单例自己持有的资源。",
+        "weight": 30
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明仅由业务代码 new 且未交给容器管理的实例不会自动获得 Spring 生命周期回调，使用方负责清理。",
+        "weight": 15
+      }
+    ],
+    "versionScope": "Spring Framework 6.2（Spring Boot 3.5）",
+    "sources": [
+      {
+        "title": "Spring Framework 6.2 · Customizing the Nature of a Bean",
+        "url": "https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-nature.html#beans-factory-lifecycle",
+        "section": "Lifecycle Callbacks / Initialization Callbacks / Destruction Callbacks",
+        "claim": "初始化、正常销毁及受管对象的配置回调。"
+      },
+      {
+        "title": "Spring Framework 6.2 · Using @PostConstruct and @PreDestroy",
+        "url": "https://docs.spring.io/spring-framework/reference/6.2/core/beans/annotation-config/postconstruct-and-predestroy-annotations.html",
+        "section": "Using @PostConstruct and @PreDestroy",
+        "claim": "容器处理 jakarta.annotation 生命周期注解。"
+      }
+    ],
+    "coverageDifference": "与 E03 的 IoC/DI 定义不同。本题追问依赖就绪后的初始化和正常停机后的资源释放，与 E10 的实例复用范围分开。",
+    "acceptableAlternatives": "接受 InitializingBean/DisposableBean、@Bean(initMethod=..., destroyMethod=...) 等确实由 Spring 调用的方式。",
+    "misconceptions": "认为构造器之后一定已完成所有注入、注解对任意 new 实例自动生效，或把正常停机回调当成强制终止也有保证的机制。"
+  },
+  {
+    "bankId": "E12",
+    "title": "主键、唯一约束与 NULL",
+    "category": "MYSQL",
+    "difficulty": "EASY",
+    "knowledgePoint": "mysql_constraints_null",
+    "questionContent": "用户表要有稳定的行 ID，邮箱选填，但填了的邮箱不能重复。用 MySQL 8.0 怎样声明 ID 和邮箱约束？两条邮箱都为 NULL 的记录是否冲突，又该怎样查询没填写邮箱的用户？空字符串也会被这个查询找到吗？",
+    "referenceAnswer": "可以用 id 作 PRIMARY KEY，主键唯一且不允许 NULL。邮箱列允许 NULL，再对整列建立 UNIQUE 约束。按该列排序规则比较相等的非 NULL 邮箱会冲突，但 MySQL 的可空唯一列允许多个 NULL，所以未填邮箱的用户可以有多条。\n\n查询没填写的用户用 WHERE email IS NULL。email = NULL 的结果是 UNKNOWN，WHERE 只保留为真的行。如果业务要求所有用户必填且唯一，就给 email 同时加 NOT NULL 和 UNIQUE。空字符串和 NULL 是两个值，应用可以在写入前按业务规则统一处理。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明以 id 做主键，主键约束同时保证行标识唯一且非空。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "为选填邮箱使用允许 NULL 的完整列 UNIQUE 约束，说明非空相等邮箱冲突而多个 NULL 可以共存。",
+        "weight": 30
+      },
+      {
+        "pointType": "KEY",
+        "content": "正确写出或口述 IS NULL 并解释普通的 = NULL 不产生 TRUE。",
+        "weight": 30
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "能区分空字符串与 NULL，说明 IS NULL 不匹配空字符串，业务若要把空字符串视作未填需另做归一化或筛选。",
+        "weight": 15
+      }
+    ],
+    "versionScope": "MySQL 8.0 / InnoDB",
+    "sources": [
+      {
+        "title": "MySQL 8.0 Reference Manual · CREATE TABLE",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/create-table.html",
+        "section": "PRIMARY KEY / UNIQUE",
+        "claim": "主键列 NOT NULL，UNIQUE 可空列允许多个 NULL。"
+      },
+      {
+        "title": "MySQL 8.0 Reference Manual · Working with NULL Values",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/working-with-null.html",
+        "section": "Working with NULL Values",
+        "claim": "NULL 的比较、IS NULL 和空字符串的区别。"
+      }
+    ],
+    "coverageDifference": "与 E04 的事务 ACID 不同。本题考表约束和空值表达，与 E13 的连接结果补 NULL 也有独立目标。",
+    "acceptableAlternatives": "接受内联约束或表级约束语法。不要求 DDL 字符串逐字一致。",
+    "misconceptions": "认为 UNIQUE 一定禁止多个 NULL、空字符串等于 NULL，或用 email = NULL 查询空值。"
+  },
+  {
+    "bankId": "E13",
+    "title": "INNER JOIN 与 LEFT JOIN 的结果差异",
+    "category": "MYSQL",
+    "difficulty": "EASY",
+    "knowledgePoint": "mysql_join_basics",
+    "questionContent": "有 users 和 orders 两张表。想列出所有用户及其已支付订单，没有已支付订单的用户也要保留。INNER JOIN 和 LEFT JOIN 的结果有何不同？你会把 o.status = 'PAID' 放在 ON 还是 WHERE，为什么？",
+    "referenceAnswer": "INNER JOIN 只保留两边满足连接条件的行，没匹配到订单的用户就没有结果行。这里我会用 users u LEFT JOIN orders o ON o.user_id = u.id AND o.status = 'PAID'。这样先规定右表只匹配已支付订单。没有任何订单或者只有未支付订单的用户仍被保留，订单列补 NULL。\n\n如果只按用户 ID 做 LEFT JOIN，再写 WHERE o.status = 'PAID'，补 NULL 的行无法让这个条件为 TRUE，只有未支付订单的用户也会被过滤，所以这次需求无法满足。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明 INNER JOIN 只返回满足连接条件的左右匹配行。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明 LEFT JOIN 保留左表未匹配行，并将右表字段补 NULL。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "在本场景把已支付条件放入 ON 或先在右表子查询内过滤，保证没有已支付订单的用户保留。",
+        "weight": 30
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "解释若将右表支付状态等值条件放到 WHERE，补 NULL 行不会满足条件，未匹配用户因而丢失。",
+        "weight": 20
+      }
+    ],
+    "versionScope": "MySQL 8.0 / InnoDB",
+    "sources": [
+      {
+        "title": "MySQL 8.0 Reference Manual · JOIN Clause",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/join.html",
+        "section": "ON / WHERE / LEFT JOIN",
+        "claim": "ON 描述连接匹配，LEFT JOIN 无匹配时补右表 NULL，WHERE 过滤结果。"
+      },
+      {
+        "title": "MySQL 8.0 Reference Manual · Outer Join Simplification",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/outer-join-simplification.html",
+        "section": "Null-rejected conditions",
+        "claim": "右表谓词对补 NULL 行不可能为真时，该行被过滤。"
+      }
+    ],
+    "coverageDifference": "与 E04 的事务语义不同。E12 考存储和筛选 NULL，这道题考外连接生成补 NULL 行和筛选顺序。",
+    "acceptableAlternatives": "可先把 orders 按已支付过滤成派生表再左连接，不要求写完整 SELECT。",
+    "misconceptions": "认为 LEFT JOIN 无论 WHERE 怎么写都保留左表。用 WHERE status='PAID' OR status IS NULL 冒充通用等价写法，漏掉只有未支付订单的用户。"
+  },
+  {
+    "bankId": "E14",
+    "title": "HTTP 方法和常见状态码",
+    "category": "NETWORK",
+    "difficulty": "EASY",
+    "knowledgePoint": "http_methods_status",
+    "questionContent": "给任务管理系统设计两个 HTTP 接口，一个查询任务，一个创建任务。你会分别选择 GET 还是 POST？查询成功、创建成功、参数错误、查无此任务和服务端意外异常时，可以分别返回什么状态码？怎样用安全性和幂等性解释两种方法的差异？",
+    "referenceAnswer": "查询单个任务一般用 GET，创建由服务端分配 ID 的任务可以用 POST。查询成功用 200，创建成功用 201，有需要时通过 Location 告知新资源地址。参数格式错误用 400，资源不存在用 404，服务端遇到未预期的错误用 500。通常 2xx 表示成功，4xx 表示请求侧问题，5xx 表示服务器无法完成请求。\n\nGET 的标准语义是安全的，客户端请求读取，不要求服务端改变资源状态；服务端记访问日志并不冲突。GET 也是幂等的，多次相同请求的预期服务端效果与一次相同，响应内容仍可能因数据变化不同。POST 没有通用幂等保证，重复提交可能创建多条。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "为读取现有任务选择 GET，为服务端处理创建请求选择 POST，并与接口意图对应。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "正确匹配查询和创建成功，例如 200 和 201，并知道它们属于 2xx。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "合理匹配参数格式错误、资源不存在和服务器意外异常，例如 400、404、500。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明安全性看请求表达的意图，GET 请求读取，服务端正常记日志等附带动作不否定安全性。",
+        "weight": 15
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明幂等比较多次相同请求的预期服务端效果，GET 具备该语义而 POST 无通用保证，幂等不要求每次响应完全相同。",
+        "weight": 20
+      }
+    ],
+    "versionScope": "IETF RFC 9110 · HTTP 语义",
+    "sources": [
+      {
+        "title": "RFC 9110 · HTTP Semantics",
+        "url": "https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.1",
+        "section": "§9.2.1–§9.2.2、§9.3.1、§9.3.3",
+        "claim": "方法安全性和幂等性，以及 GET / POST 语义。"
+      },
+      {
+        "title": "RFC 9110 · HTTP Semantics",
+        "url": "https://www.rfc-editor.org/rfc/rfc9110.html#section-15",
+        "section": "§15.3.1、§15.3.2、§15.5.1、§15.5.5、§15.6.1",
+        "claim": "200、201、400、404、500 的含义。"
+      }
+    ],
+    "coverageDifference": "与 E05 的 TCP/UDP 传输选择不同。本题只考应用层方法与响应语义，H25 才考发生超时后的重试决策和业务幂等。",
+    "acceptableAlternatives": "如果明确区分参数语法错误与语义校验失败，接受后者使用 422。状态码选择需与候选人明示的接口语义一致。",
+    "misconceptions": "把安全性当成 HTTPS 加密。认为幂等要求响应完全相同，或断言所有 POST 必然产生副作用。"
+  },
+  {
+    "bankId": "E15",
+    "title": "从域名到服务地址的 DNS 查询",
+    "category": "NETWORK",
+    "difficulty": "EASY",
+    "knowledgePoint": "dns_resolution_basics",
+    "questionContent": "客户端访问一个未缓存的普通站点域名，从发起查询到拿到 IP 大致会经过谁？在有缓存时，TTL 起什么作用？拿到地址就意味着已经和站点建立 TCP 连接了吗？",
+    "referenceAnswer": "客户端通常经本机的 DNS 客户端向配置好的递归解析器请求地址，递归解析器负责给客户端返回最终结果或查询失败。以解析器不转发、且没有可用缓存为例，它可以从根服务器得到顶级域的指引，再向顶级域问到目标域的权威服务器，最后从权威侧得到地址记录。每一级返回的可以只是下一站信息。\n\n解析器可以按记录的 TTL 缓存结果，有有效缓存时就能减少上游查询。A、AAAA 记录分别提供 IPv4、IPv6 地址。拿到地址只是解析完成。若应用选择基于 TCP 通信，之后还要用地址和端口建立到服务端的 TCP 连接。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "区分客户端通常请求递归解析器，递归解析器负责给出最终答案或失败结果。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "在无可用缓存且直接向权威层级查询时，能概括根、顶级域与目标域权威服务的转介链。",
+        "weight": 30
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明 TTL 控制 DNS 记录可缓存多久，有有效缓存时可减少上游查询。",
+        "weight": 25
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "区分 DNS 取得地址和应用连接服务端，知道使用 TCP 的应用需要另行建连。",
+        "weight": 20
+      }
+    ],
+    "versionScope": "IETF RFC 1034 / RFC 9499 · 常规 DNS 地址查询",
+    "sources": [
+      {
+        "title": "RFC 1034 · Domain Names—Concepts and Facilities",
+        "url": "https://www.rfc-editor.org/rfc/rfc1034.html#section-5.3.3",
+        "section": "§3.6、§4.3.1、§5.3.3",
+        "claim": "递归和非递归模式、解析步骤、记录 TTL 与地址记录。"
+      },
+      {
+        "title": "RFC 9499 · DNS Terminology",
+        "url": "https://www.rfc-editor.org/rfc/rfc9499.html#section-5",
+        "section": "§5 Resource Records、§6 DNS Servers and Clients",
+        "claim": "TTL、解析器与递归服务术语。"
+      },
+      {
+        "title": "RFC 3596 · DNS Extensions to Support IP Version 6",
+        "url": "https://www.rfc-editor.org/rfc/rfc3596.html#section-2",
+        "section": "§2 AAAA Resource Record Type",
+        "claim": "AAAA 记录携带 IPv6 地址。"
+      },
+      {
+        "title": "RFC 9293 · Transmission Control Protocol",
+        "url": "https://www.rfc-editor.org/rfc/rfc9293.html#section-3.5",
+        "section": "§3.5 Establishing a Connection",
+        "claim": "应用目标的 TCP 连接建立是独立的传输层过程。"
+      }
+    ],
+    "coverageDifference": "与 E05 的 TCP/UDP 传输性质不同。本题考域名解析的责任链、转介和缓存，无需复述 H08 的 TCP 连接状态。",
+    "acceptableAlternatives": "允许提到本机缓存、hosts、转发解析器或 CNAME，前提是能说清常见缓存未命中路径。无需背 DNS 报文格式。",
+    "misconceptions": "认为客户端必然自己依次访问所有权威层级，或认为 TTL 等于全网同步时间、解析成功就是应用 TCP 已连通。"
+  },
+  {
+    "bankId": "M08",
+    "title": "try-with-resources 与 suppressed 异常",
+    "category": "JAVA_BASIC",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "resource_exception_suppression",
+    "questionContent": "在 Java 的 try-with-resources 中先声明资源 A，再声明资源 B，两者都已成功初始化。假设每个 close() 都抛出异常，所有抛出的异常彼此是不同的对象且都启用了抑制机制。当 try 块自身也抛出异常时，先关谁、调用者看到哪个异常、剩下的异常在哪？若 try 块正常结束呢？手写 finally 关闭时容易丢失什么？",
+    "referenceAnswer": "先关闭 B，再关闭 A。B 的关闭失败也不会阻止尝试关闭 A。try 块抛出异常时，它仍是向外传播的主异常，B、A 的关闭异常按发生顺序挂在主异常的 getSuppressed() 中，不是 cause 链。\n\n若 try 块正常完成，B 的关闭异常成为主异常，A 的关闭异常附加到它的 suppressed 列表。手写 try/finally 时，如果 finally 又抛出异常而不做处理，finally 的异常可能替换原本正在传播的异常，导致丢失原始失败信息。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明按初始化的逆序关闭 B 再关闭 A，并说明 B.close 失败不会阻止 A.close 被尝试。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明 try 块抛异常时，该异常仍是向外传播的主异常。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明关闭异常附在主异常的 getSuppressed()，可按 B、A 顺序定位，而非把关闭异常当成 cause。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明 try 块正常结束时，先关闭的 B 抛出的异常成为主异常，A 的关闭异常被附加。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "解释普通 finally 不加处理就抛出清理异常，可能覆盖原本的业务异常。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "Java SE 21",
+    "sources": [
+      {
+        "title": "Java 语言规范 SE 21 · 第 14 章",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-14.html#jls-14.20.3",
+        "section": "§14.20.2、§14.20.3.1",
+        "claim": "普通 finally 的异常完成规则，以及多资源逆序关闭、主异常和 suppressed 的规则。"
+      },
+      {
+        "title": "Java SE 21 API · Throwable",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html#getSuppressed()",
+        "section": "addSuppressed / getSuppressed",
+        "claim": "同层多个异常并列记录，区别于异常 cause。"
+      }
+    ],
+    "coverageDifference": "与 M01 的对象相等和哈希契约不同。E06 考基本关闭责任，本题给出可执行顺序和异常树，评分落在失败时异常保真。",
+    "acceptableAlternatives": "可用简短伪代码、异常树或描述 getSuppressed 表达。若补充资源初始化失败或关闭抑制被显式关闭的边界，不影响题设下结论。",
+    "misconceptions": "认为资源按声明顺序关闭、一次关闭异常就停止后续关闭、主异常被最后一个关闭异常覆盖或 suppressed 等同 cause。"
+  },
+  {
+    "bankId": "M09",
+    "title": "泛型通配符与 PECS",
+    "category": "JAVA_BASIC",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "generic_variance_pecs",
+    "questionContent": "要写一个方法把源列表里的 Number 值追加到目标列表。源可能是 List<Integer> 或 List<Double>，目标可能是可修改的 List<Number> 或 List<Object>。不用原生类型或强制转换，参数类型应怎么写？为什么不能把 List<Integer> 当成 List<Number>，两种通配符分别允许怎样读写？",
+    "referenceAnswer": "我会写成 appendNumbers(List<? extends Number> source, List<? super Number> target)。List<Integer> 不能赋给 List<Number>，因为 Java 泛型参数在这里不具协变关系。若允许，其他代码就可能经 List<Number> 引用写入 Double，破坏原本的整数列表。\n\n源列表只保证未知元素类型是 Number 或其子类，所以能把元素读成 Number，不能向其中加入任意非 null 的 Number。目标列表的未知元素类型是 Number 或它的某个父类型，所以可以加入 Number 及其子类。读取目标元素时一般只保证 Object。这就是把生产值的参数写成 extends、消费值的参数写成 super。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明 List<Integer> 并非 List<Number> 的子类型，并用写入 Double 等例子说明不变性的类型安全价值。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "选择 List<? extends Number> 作为源，说明从中读取时可以用 Number 接收。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明源的实际元素类型未知，不能向其中任意加入非 null 的 Number 或任意指定子类型元素。",
+        "weight": 15
+      },
+      {
+        "pointType": "KEY",
+        "content": "选择 List<? super Number> 作为目标，说明可加入 Number 及其子类，适用于题设的两类目标。",
+        "weight": 25
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明从 List<? super Number> 读取一般只能按 Object 接收，目标也可能预先含有非 Number 对象。",
+        "weight": 15
+      }
+    ],
+    "versionScope": "Java SE 21",
+    "sources": [
+      {
+        "title": "Java 语言规范 SE 21 · 第 4 章",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.5.1",
+        "section": "§4.5.1、§4.5.2、§4.10",
+        "claim": "通配符界限、成员类型和泛型参数的不变性。"
+      },
+      {
+        "title": "Java SE 21 API · Collections",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Collections.html#copy(java.util.List,java.util.List)",
+        "section": "copy(List<? super T>, List<? extends T>)",
+        "claim": "源/目标参数的 PECS 示例。官方方法按索引覆盖，题目的追加由候选实现。"
+      }
+    ],
+    "coverageDifference": "与 M01 的哈希契约无重合。与 H01 同属泛型，但本题考编译期参数设计及读写方向，H01 考擦除和运行时边界。",
+    "acceptableAlternatives": "接受保留类型约束的泛型签名，例如 <T extends Number> void append(List<? extends T> src, List<? super T> dst)。不要求背 PECS 缩写。",
+    "misconceptions": "认为 List<Integer> 可当 List<Number>。向 extends 目标任意追加 Number。把 super 列表读出的每个元素都当作 Number。"
+  },
+  {
+    "bankId": "M10",
+    "title": "迭代中修改集合与 fail-fast",
+    "category": "JAVA_COLLECTION",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "iterator_modification",
+    "questionContent": "有一个可修改的 ArrayList，代码用增强 for 遍历，命中条件就直接 list.remove。为什么这种写法可能抛出 ConcurrentModificationException？如果只调用 set 替换已有位置的元素，是否属于同类修改？单线程应如何安全地删除当前元素？能否靠这个异常判断或处理多线程并发修改？",
+    "referenceAnswer": "增强 for 遍历 ArrayList 使用迭代器。直接调用 list.remove 会绕过迭代器修改列表结构，后续执行迭代器检查时可能抛出 ConcurrentModificationException。ArrayList 的结构修改包括增删元素；普通 set 替换现有元素不属于结构修改。\n\n在同一线程里，我会显式取得 Iterator，每次 next 后先判断，再用这个迭代器的 remove 删除刚返回的元素。一次 next 最多允许 remove 一次。如果只需要按谓词过滤，ArrayList 也支持 removeIf，不必自己持有一个迭代器。\n\nfail-fast 是尽力检测，即使只有一个线程也可能触发，并不保证所有修改都会被发现。共享集合要使用正确的同步策略，或按业务语义选择并发容器。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "解释增强 for 依赖迭代器，直接通过列表删除绕过该迭代器，使迭代器可能发现结构改变并抛出 ConcurrentModificationException。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "提供安全的单线程删除方案，例如 next 之后调用同一个迭代器的 remove，或独立用 removeIf 过滤。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "能区分元素增删与替换现有元素，说明 ArrayList 的 set 不属于结构性修改。",
+        "weight": 15
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明 fail-fast 是尽力检测，单线程也可能触发，既不保证必抛也不能作为正确性前提。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明共享列表应采用同步或具备符合业务语义的并发集合，捕获 ConcurrentModificationException 不能代替并发控制。",
+        "weight": 15
+      }
+    ],
+    "versionScope": "Java SE 21",
+    "sources": [
+      {
+        "title": "Java 语言规范 SE 21 · 第 14 章",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-14.html#jls-14.14.2",
+        "section": "§14.14.2",
+        "claim": "增强 for 对 Iterable 使用迭代器。"
+      },
+      {
+        "title": "Java SE 21 API · ArrayList",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html",
+        "section": "类概述、iterator、removeIf",
+        "claim": "ArrayList 的结构修改、fail-fast 及按谓词删除。"
+      },
+      {
+        "title": "Java SE 21 API · Iterator",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Iterator.html#remove()",
+        "section": "remove()",
+        "claim": "删除最近一次 next 返回的元素，每次 next 最多一次。"
+      }
+    ],
+    "coverageDifference": "与 M02 的 HashMap 插入与扩容不同。本题考 ArrayList 的迭代修改契约。H13 考选型时的快照或弱一致迭代语义。",
+    "acceptableAlternatives": "接受 removeIf、在迭代结束后另行修改、保持语义的索引倒序遍历，前提是能说明为何不再从同一个迭代器背后修改列表。",
+    "misconceptions": "认为异常只会在多线程出现、对所有修改都必抛，或 catch 后重试就获得线程安全。"
+  },
+  {
+    "bankId": "M11",
+    "title": "集合视图、不可修改与防御性复制",
+    "category": "JAVA_COLLECTION",
+    "difficulty": "MEDIUM",
+    "knowledgePoint": "collection_copy_views",
+    "questionContent": "接口要返回一个列表，要求调用者不能增删，后续修改内部列表也不能改变已返回列表的元素个数和顺序。Collections.unmodifiableList 和 List.copyOf 哪个合适？如果元素本身是可变 DTO，这个方案还有什么限制？如果源列表可能含有 null 元素，还要注意什么？",
+    "referenceAnswer": "Collections.unmodifiableList(backing) 是底层列表的不可修改视图。调用方不能从视图中添加或删除，内部直接修改 backing 后，视图看到的内容也会变化。List.copyOf(backing) 返回不可修改的列表，底层集合后续的增删和换位不会影响它，符合这里的列表结构要求。\n\n这是对元素引用的浅复制。如果某个 DTO 被改了字段，拿到同一个 DTO 的人仍会看到变化。若要求连元素状态都固定，可以返回不可变 DTO，或者在构建快照时复制元素状态。还要注意 List.copyOf 不接受 null 元素，如果业务允许 null，应选保留 null 的防御性复制加只读包装。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明 unmodifiableList 返回不可修改视图，原列表后续改动仍会反映在视图中。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明 List.copyOf 返回不可修改的列表结构快照，原列表后续增删或重新排序不反映到已返回列表。",
+        "weight": 30
+      },
+      {
+        "pointType": "KEY",
+        "content": "区分浅复制与深复制，明确可变 DTO 字段仍可通过共享对象引用发生变化。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "为需要固定元素状态的场景提出不可变元素、复制 DTO 或等价防御措施。",
+        "weight": 15
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明 List.copyOf 拒绝 null 元素，或明确采用能保留 null 的独立复制加只读包装。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "Java SE 21",
+    "sources": [
+      {
+        "title": "Java SE 21 API · Collections",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Collections.html#unmodifiableList(java.util.List)",
+        "section": "unmodifiableList",
+        "claim": "返回会读取底层列表最新状态的不可修改视图。"
+      },
+      {
+        "title": "Java SE 21 API · List",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html#copyOf(java.util.Collection)",
+        "section": "Unmodifiable Lists / copyOf",
+        "claim": "返回结构不可修改且不随输入变化的列表，拒绝 null，元素自身可变性仍有影响。"
+      }
+    ],
+    "coverageDifference": "与 M02 的 HashMap 写入和扩容不同，与 M10 的遍历删除也不同。本题考 API 输出是否隔离内部结构和元素状态。",
+    "acceptableAlternatives": "接受 Collections.unmodifiableList(new ArrayList<>(backing)) 等独立浅复制方案。对可变元素可使用不可变投影或复制构造。无需声称 List.copyOf 每次都分配新对象。",
+    "misconceptions": "把不可修改视图当成独立快照。把 List.copyOf 当成深复制或认为它必定返回不同实例。"
+  }
+]

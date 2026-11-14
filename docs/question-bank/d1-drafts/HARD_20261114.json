@@ -1,0 +1,848 @@
+[
+  {
+    "bankId": "H14",
+    "title": "类加载器隔离与类型身份",
+    "category": "JVM",
+    "difficulty": "HARD",
+    "knowledgePoint": "classloader_type_identity",
+    "questionContent": "一个 Java 插件启动后抛出 ClassCastException。宿主期望 com.example.Plugin，插件实现也声明了这个接口，两个接口的全限定名相同，但插件包内额外打了一份接口。怎样判断是不是类加载器造成的？应怎样组织宿主和插件的依赖？如果还用 ServiceLoader 发现插件实现，发现过程应使用什么加载器？",
+    "referenceAnswer": "同名接口也可能是两个运行时类型。对这里的普通类和接口，JVM 用二进制名称和定义它的加载器共同确定类型身份。如果宿主与插件分别定义了一份 Plugin，插件实现的是插件那份接口，宿主对自己的 Plugin 做转换就会失败。排查时应比较宿主期望的接口和插件实际实现的接口各自的 Class 对象、getClassLoader() 和类来源，重点确认接口是谁定义的，仅比较名字或 JAR 文件名不够。通常把跨边界接口放在宿主和插件共享的父加载器中，插件包只放实现和私有依赖，插件对共享接口委派给父加载器。如果用 ServiceLoader 发现插件，还需让发现过程使用能看见实现的加载器。默认 load(service) 使用线程上下文类加载器，加载到实现后仍要通过同一份共享接口检查。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明普通类或接口由二进制名称与定义加载器共同标识，并能据此解释同名接口转换失败。",
+        "weight": 30
+      },
+      {
+        "pointType": "KEY",
+        "content": "提出让宿主和插件使用同一份父加载器定义的共享接口，插件保留实现和私有依赖。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "区分发起加载和最终定义类型，说明默认父级委派可复用同一类型，自定义加载器策略可能不同。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "给出能证实冲突的排查步骤，例如比较两侧接口的 Class 对象和定义加载器，再追查包来源。",
+        "weight": 15
+      },
+      {
+        "pointType": "ADVANCED",
+        "content": "说明 SPI 实现发现的加载器可显式选择，或通过线程上下文提供，发现实现后仍须满足共享接口类型关系。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "Java SE 21，普通类和接口。以宿主与插件各自定义 API 接口为故障条件，ServiceLoader 默认重载作为例子。",
+    "sources": [
+      {
+        "title": "JVMS 21：创建与加载",
+        "url": "https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-5.html#jvms-5.3",
+        "section": "§5.3",
+        "claim": "运行时类身份取决于二进制名与定义加载器，委派可使发起与定义加载器不同。"
+      },
+      {
+        "title": "Java 21 ClassLoader API",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ClassLoader.html#loadClass(java.lang.String,boolean)",
+        "section": "loadClass(String, boolean)",
+        "claim": "默认实现先查已加载，再委派父级，最后查找自身。"
+      },
+      {
+        "title": "Java 21 ServiceLoader API",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ServiceLoader.html#load(java.lang.Class)",
+        "section": "load(Class) 与 load(Class, ClassLoader)",
+        "claim": "默认重载使用线程上下文加载器，也可显式指定发现服务的加载器。"
+      }
+    ],
+    "coverageDifference": "同桶 H03 考 G1 回收机制，H15 考 JVM 故障采证。本题与 M12 都涉及类加载，M12 考生命周期阶段，本题要求定位跨加载器的类型身份冲突。",
+    "acceptableAlternatives": "可以用双方 getInterfaces()、Class.isAssignableFrom()、异常中的加载器信息或类加载日志来证明身份差异。共享接口可位于任一双方确实共用的定义加载器。",
+    "misconceptions": "仅按类全限定名判断身份。把上下文加载器设置成任意插件加载器就可以让两个已定义的接口变成同一类型。"
+  },
+  {
+    "bankId": "H15",
+    "title": "Java 服务高 CPU 与内存问题诊断",
+    "category": "JVM",
+    "difficulty": "HARD",
+    "knowledgePoint": "jvm_diagnostics_workflow",
+    "questionContent": "线上 Java 21 服务变慢，监控显示 CPU 持续升高、GC 频率增加，随后有一次 OutOfMemoryError。你会怎样收集证据，区分业务代码占 CPU、分配过快和对象被长期引用？接下来怎么验证修复？",
+    "referenceAnswer": "我会先对齐同一时段的流量、CPU、延迟、堆使用和 GC 日志，同时读 OOM 的具体信息。Java 堆空间不足、元空间不足和本地线程创建失败需要不同证据。高 CPU 时，可结合系统线程 CPU 和多次线程栈，或用 JFR 执行采样与 GC 事件判断时间主要花在哪儿。业务热点就沿调用栈查循环或计算，GC 活跃则同时看分配速率和回收后堆占用。稳定负载下，如果频繁分配但回收后占用能回落，先查临时对象热点。回收后仍持续上升才更像长寿命对象积累，可在评估停顿和磁盘成本后取堆转储，沿到 GC Roots 的引用链找持有者。修复后用相同输入和负载复现，比较 CPU、分配速率、回收后占用和延迟，再判断是否需要调整堆。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "建立同一时间线，用线程 CPU 加多次栈采样或 JFR 区分业务热点和 GC 消耗。",
+        "weight": 28
+      },
+      {
+        "pointType": "KEY",
+        "content": "先读 OOM 具体报错并区分 Java 堆、元空间或本地资源方向，按类型选证据。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "在可比较负载下区分分配速率高与回收后存活对象持续增长，不用 GC 次数直接判定泄漏。",
+        "weight": 22
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明如何用堆转储或同等对象保留证据定位到 GC Roots 的引用链，并考虑现场取证开销。",
+        "weight": 18
+      },
+      {
+        "pointType": "KEY",
+        "content": "用最小复现或可比较负载验证针对性修复，给出与原因相符的前后观测指标。",
+        "weight": 12
+      }
+    ],
+    "versionScope": "Java 21 HotSpot。题设没有给出 OOM 类型或根因，应说明如何获取证据。",
+    "sources": [
+      {
+        "title": "JDK 21 排障指南：内存泄漏",
+        "url": "https://docs.oracle.com/en/java/javase/21/troubleshoot/troubleshooting-memory-leaks.html",
+        "section": "Understand the OutOfMemoryError Exception；Detect a Memory Leak",
+        "claim": "OOM 信息区分故障方向，稳定负载下回收后存活集增长可支持泄漏判断。"
+      },
+      {
+        "title": "JDK 21 jcmd 手册",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html",
+        "section": "Thread.print、JFR.start、GC.heap_dump",
+        "claim": "可取线程栈、JFR 录制和堆转储，堆转储具有较高影响。"
+      },
+      {
+        "title": "JDK 21 java 手册",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html",
+        "section": "Enable Logging with the JVM Unified Logging Framework",
+        "claim": "统一日志可收集带时间线的 GC 事件。"
+      }
+    ],
+    "coverageDifference": "同桶 H03 考 G1 算法，H14 考加载器身份。M13 解释可达性与保留引用，本题把证据串联起来区分 CPU、分配和保留问题，并要求在同负载验证修复。",
+    "acceptableAlternatives": "可以用已有 JFR 录制、线程分析器和监控组合替代某个命令。能说明诊断开销时，可用对象统计作堆转储前的补充。",
+    "misconceptions": "CPU 高与 GC 多足以证明泄漏。所有 OutOfMemoryError 都可以通过加大 Java 堆解决。"
+  },
+  {
+    "bankId": "H16",
+    "title": "线程池中的 ThreadLocal 残留与清理",
+    "category": "JAVA_CONCURRENCY",
+    "difficulty": "HARD",
+    "knowledgePoint": "threadlocal_pool_cleanup",
+    "questionContent": "线程池任务会用 ThreadLocal 保存当前请求的用户信息。请求 A 执行中抛异常，同一工作线程后来执行请求 B，读取到 A 的信息。为什么会串数据？你怎样修复，并处理任务内再次提交异步工作的情况？",
+    "referenceAnswer": "ThreadLocal 的值跟工作线程关联。线程池复用工作线程，A 抛异常退出时不会自动清理线程绑定的值。如果 B 有路径在设置自己的值前就读取，就可能拿到 A 的值。长寿命线程也可能继续持有请求对象，增加内存保留。对于任务自己拥有的 ThreadLocal，可以在任务入口设置，在 finally 中调用 remove。若是可嵌套的上下文作用域，退出时应恢复进入前的上下文，最外层没有旧值时移除。跨线程任务优先把需要的用户信息作为参数传递。如果必须适配依赖 ThreadLocal 的组件，可提交时捕获最少的不可变数据，到执行线程时安装，退出时清理或恢复。InheritableThreadLocal 在子线程创建时继承，预先创建或复用的线程池工作线程不会为每次提交刷新继承值。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "指出 ThreadLocal 按线程保存值，A 未清理且 B 在线程复用后先读才造成越请求残留。",
+        "weight": 32
+      },
+      {
+        "pointType": "KEY",
+        "content": "在自己控制的任务边界设置值并在 finally 中 remove，保证异常路径同样清理。",
+        "weight": 25
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "解释线程寿命长于请求时，线程残留值可继续持有请求对象，区分信息串用和对象保留两种后果。",
+        "weight": 15
+      },
+      {
+        "pointType": "KEY",
+        "content": "对异步任务采用显式参数，或在提交时捕获必要上下文并在执行线程中安装及清理或恢复。",
+        "weight": 20
+      },
+      {
+        "pointType": "ADVANCED",
+        "content": "说明 InheritableThreadLocal 在新建子线程时取初值，不能作为复用工作线程的按任务传播机制。",
+        "weight": 8
+      }
+    ],
+    "versionScope": "Java SE 21，复用平台工作线程的线程池，应用自己管理的请求上下文。",
+    "sources": [
+      {
+        "title": "Java 21 ThreadLocal API",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ThreadLocal.html",
+        "section": "类说明与 remove()",
+        "claim": "值归属于当前线程，remove 清除当前线程中该变量的值。"
+      },
+      {
+        "title": "Java 21 ThreadPoolExecutor API",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html",
+        "section": "类说明与 Hook methods",
+        "claim": "工作线程复用，可在任务执行边界组织上下文管理。"
+      },
+      {
+        "title": "Java 21 InheritableThreadLocal API",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/InheritableThreadLocal.html",
+        "section": "类说明",
+        "claim": "初值继承发生在子线程创建时。"
+      }
+    ],
+    "coverageDifference": "同桶 H04 考容量、队列和拒绝，H17 考 Future 编排和资源超时。本题集中于线程复用下的上下文生命周期和隐私隔离。",
+    "acceptableAlternatives": "可以使用统一任务装饰器或框架提供的上下文包装，能说明捕获、恢复与异常清理边界即可。嵌套时可用明确作用域或栈保存旧值。",
+    "misconceptions": "ThreadLocal 隔离的是请求。线程池任务结束会自动清理所有 ThreadLocal。"
+  },
+  {
+    "bankId": "H17",
+    "title": "CompletableFuture 的编排、异常与超时",
+    "category": "JAVA_CONCURRENCY",
+    "difficulty": "HARD",
+    "knowledgePoint": "future_timeout_composition",
+    "questionContent": "一个聚合接口要先查用户，再按用户 ID 查权限。同时可以独立查租户配置，最终把权限和配置合并。三个查询都是可能阻塞的 HTTP 调用，总预算 800 毫秒。你如何编排 CompletableFuture，如何处理失败和超时？",
+    "referenceAnswer": "先启动查用户和查租户配置。权限查询依赖用户 ID，可以用 thenCompose 把它返回的 Future 接成同一条链。两路都成功后用 thenCombine 合并，也可用 allOf 等两路完成后分别取结果。allOf 自身不返回结果列表，也不会因为一路失败就自动取消另一路。阻塞 HTTP 我会交给显式的、有容量限制的 I/O 执行器，避免把它们都塞进默认的共享池。权限是必需数据，查询失败就让整体失败，不能把异常当成默认授权。配置可选时，只有约定好的错误才能走安全默认值。把 800 毫秒作为端到端预算，传给下游剩余时间，同时让聚合结果能按时结束。orTimeout 只让尚未完成的 Future 异常完成，调用仍可能继续占用资源，所以要在 HTTP 客户端配置相应超时，并在支持时显式取消底层请求。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "正确编排依赖与并行关系，以 thenCompose 或等价扁平组合连接用户与权限，独立启动配置查询。",
+        "weight": 28
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明如何汇合两路实际结果，若用 allOf 则说明它等待全部完成且结果需要分别读取。",
+        "weight": 17
+      },
+      {
+        "pointType": "KEY",
+        "content": "区分必需依赖的异常传播和可选依赖的有条件降级，避免把权限失败解释为成功。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "为阻塞调用选择显式的受控执行器，并说明未指定执行器的常规异步方法使用共享池的风险。",
+        "weight": 15
+      },
+      {
+        "pointType": "KEY",
+        "content": "区分聚合结果超时和底层调用停止，提出总时限、下游剩余预算和客户端超时或受支持的取消。",
+        "weight": 20
+      }
+    ],
+    "versionScope": "Java SE 21，普通 CompletableFuture 静态异步工厂与组合 API。题目假设阻塞 HTTP 和统一 800 毫秒预算。",
+    "sources": [
+      {
+        "title": "Java 21 CompletableFuture API",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html",
+        "section": "类说明、thenCompose、thenCombine、allOf、orTimeout、cancel",
+        "claim": "定义执行器默认策略、组合与异常完成语义。CompletableFuture 的取消不负责通过中断停止底层计算。"
+      },
+      {
+        "title": "Java 21 HttpRequest.Builder API",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.net.http/java/net/http/HttpRequest.Builder.html#timeout(java.time.Duration)",
+        "section": "timeout(Duration)",
+        "claim": "HTTP 请求层具有单独的超时设置，可用作客户端预算示例。"
+      }
+    ],
+    "coverageDifference": "同桶 H04 主考线程池参数，H16 主考上下文清理，H25 主考 HTTP 重试。本题需要在依赖图上安排工作、失败传播和超时资源边界。",
+    "acceptableAlternatives": "用 thenCombine 无需背诵 allOf 的签名。支持取消的客户端可设置取消钩子。显式使用虚拟线程执行器且对外部 I/O 施加并发上限也可。",
+    "misconceptions": "thenApply 会自动扁平化返回的 Future。allOf 在首个失败时停止所有请求。orTimeout 会中断阻塞中的 HTTP 调用。"
+  },
+  {
+    "bankId": "H18",
+    "title": "Spring 事务传播与保存点",
+    "category": "SPRING",
+    "difficulty": "HARD",
+    "knowledgePoint": "spring_transaction_propagation",
+    "questionContent": "Spring 服务的外层事务负责创建订单。三个内层步骤分别要求：明细和订单一起成功或回滚，失败的可选优惠步骤可局部回滚，失败审计独立提交并在订单回滚后保留。假设走 Spring 事务代理且使用支持保存点的单数据源 JDBC 事务管理器。怎样选择传播级别？有什么实际风险？",
+    "referenceAnswer": "明细用 REQUIRED，加入外层的物理事务，外层最终提交或回滚时一起生效。若内层按回滚规则把共享事务标记为 rollback-only，外层即使捕获异常后继续，也可能在提交时报 UnexpectedRollbackException。可选优惠用 NESTED，在同一物理事务中建保存点，内层失败按回滚规则退回保存点，外层捕获该失败后可以继续。外层最终回滚时，保存点内的成功写入也一起回滚。审计可用 REQUIRES_NEW，先挂起外层事务，再在独立物理事务写审计。它提交后可独立保留，但通常需要额外数据库连接，且不应依赖读取外层未提交的订单，也要避免等待外层持有的锁。需要按并发量评估连接池，并保证调用确实经过代理。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "将 REQUIRED 对应订单明细，说明与已有外层事务共享物理事务和最终结果。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明内层标记 rollback-only 时外层捕获异常无法解除，提交可能抛出 UnexpectedRollbackException。",
+        "weight": 20
+      },
+      {
+        "pointType": "CORE",
+        "content": "将 NESTED 对应局部回滚，说明保存点只在支持时可用且外层回滚仍撤销嵌套成功写入。",
+        "weight": 22
+      },
+      {
+        "pointType": "KEY",
+        "content": "将 REQUIRES_NEW 对应独立审计，说明挂起外层并独立提交或回滚。",
+        "weight": 21
+      },
+      {
+        "pointType": "ADVANCED",
+        "content": "指出独立事务额外连接和依赖外层未提交数据或外层持锁的风险，给出相应限制。",
+        "weight": 12
+      }
+    ],
+    "versionScope": "Spring Framework 6.2，命令式代理事务，单数据源 JDBC 事务管理器且驱动支持保存点。内层异常需满足其回滚规则。",
+    "sources": [
+      {
+        "title": "Spring Framework 6.2 事务传播",
+        "url": "https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/tx-propagation.html",
+        "section": "REQUIRED、REQUIRES_NEW、NESTED",
+        "claim": "给出逻辑与物理事务、rollback-only、保存点和连接池风险。"
+      },
+      {
+        "title": "Spring Framework 6.2 声明式回滚",
+        "url": "https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/rolling-back.html",
+        "section": "Rolling Back a Declarative Transaction",
+        "claim": "异常导致回滚取决于事务规则，不能泛化为任意异常。"
+      }
+    ],
+    "coverageDifference": "同桶 H05 考代理生效和通用回滚策略，H19 考提交后的外部失败。本题已把代理生效作为前提，专门考三种传播选择和内部事务作用域。",
+    "acceptableAlternatives": "可用独立 Bean 或 TransactionTemplate 表达三个边界。审计也可由独立异步持久化方案实现，但应先解释题设三种传播级别的行为。",
+    "misconceptions": "捕获异常就能解除 rollback-only。NESTED 可以在外层回滚后独立保留。REQUIRES_NEW 一定能读到外层刚写的订单。"
+  },
+  {
+    "bankId": "H19",
+    "title": "事务提交后外部动作的失败恢复",
+    "category": "SPRING",
+    "difficulty": "HARD",
+    "knowledgePoint": "transaction_external_side_effect",
+    "questionContent": "保存订单后要通过 HTTP 通知另一个服务。你打算用 @TransactionalEventListener(AFTER_COMMIT)。如果订单已提交，但进程在发送前崩溃，或者通知已被对方处理而响应超时，怎样恢复？请给一个适合小项目的做法。",
+    "referenceAnswer": "AFTER_COMMIT 把监听放在本地事务提交之后，订单回滚时不发送。但如果只靠内存事件，提交后、发送前进程退出，通知就可能丢失。可以在保存订单的同一事务里写一条待通知记录，或把明确的通知状态和唯一业务键存到订单里。提交后尝试发送，另有定时或人工补偿扫描未完成状态。发送超时意味着结果未知，应优先查对方处理状态，或用同一个事件 ID 重发，由对方用唯一键识别重复并复用结果。成功确认后用新的短事务更新通知状态，失败则按有限次数和退避重试，超限留给对账处理。如果在 AFTER_COMMIT 回调里落库，也要使用能单独提交的新事务。这个设计让订单和待办一起持久化，通知和确认依然是跨系统过程。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明 AFTER_COMMIT 的执行时点并指出数据库已提交、内存事件尚未发送的崩溃窗口。",
+        "weight": 26
+      },
+      {
+        "pointType": "CORE",
+        "content": "提出在同一数据库事务内原子保存订单与可恢复待办，给出持久化状态和恢复入口。",
+        "weight": 28
+      },
+      {
+        "pointType": "KEY",
+        "content": "区分明确失败与响应超时结果未知，采用稳定业务键和接收方幂等，或先查对方结果。",
+        "weight": 21
+      },
+      {
+        "pointType": "KEY",
+        "content": "给出短事务确认发送结果以及有限退避、超限对账等恢复策略，说明确认需独立提交。",
+        "weight": 15
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明本地数据库事务覆盖订单和待办，跨系统通知无法借该事务得到端到端恰好一次。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "Spring Framework 6.2 的命令式事务事件。题设为通用订单通知场景，待办表或状态字段均是候选方案。",
+    "sources": [
+      {
+        "title": "Spring Framework 6.2 事务事件",
+        "url": "https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/event.html",
+        "section": "Transaction-bound Events",
+        "claim": "监听器可绑定 AFTER_COMMIT；默认无活动事务时不触发。"
+      },
+      {
+        "title": "Spring Framework 6.2 TransactionSynchronization API",
+        "url": "https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/transaction/support/TransactionSynchronization.html#afterCommit()",
+        "section": "afterCommit()",
+        "claim": "回调发生时原事务已提交，后续需要落库的操作应使用独立事务。"
+      },
+      {
+        "title": "RFC 9110 HTTP 语义",
+        "url": "https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.2",
+        "section": "§9.2.2",
+        "claim": "解释响应中断后的重复请求边界，幂等性取决于方法语义或应用合同。"
+      }
+    ],
+    "coverageDifference": "同桶 H05 考数据库事务边界，H18 考事务传播。H25 只从 HTTP 调用方决定重试，本题要求把可恢复待办与业务状态一起提交。H27 基于项目现有报告状态机，无通知待办设计要求。",
+    "acceptableAlternatives": "可以用轻量 outbox 表，或已有业务表中可查询的待办状态。远端支持查询时可先查结果，也可凭接收方稳定键幂等重发。",
+    "misconceptions": "AFTER_COMMIT 能在进程重启后重放事件。回调异常可以回滚已提交订单。只要改用 REQUIRES_NEW 就能让数据库和外部 HTTP 原子提交。"
+  },
+  {
+    "bankId": "H20",
+    "title": "InnoDB 快照读与锁定读的交互",
+    "category": "MYSQL",
+    "difficulty": "HARD",
+    "knowledgePoint": "isolation_snapshot_locking",
+    "questionContent": "MySQL 8.0 有一条库存记录，主键为 1，库存为 10。A 开启事务并普通 SELECT 读到 10。B 将该行更新为 8 并提交。此时 A 先普通 SELECT，再 SELECT ... FOR UPDATE，随后把库存更新为 7 并再次普通 SELECT。没有其他并发写入时，A 在 REPEATABLE READ 和 READ COMMITTED 下各会读到什么？如果扣减前必须基于当前库存判断，应该怎样读写？",
+    "referenceAnswer": "在 RR 下，A 第一次普通 SELECT 建立快照。B 提交后，第二次普通 SELECT 沿用这个快照，还是 10。FOR UPDATE 是锁定读，这个时序下会锁住并读取当前记录 8。A 更新为 7 后，普通 SELECT 能读到本事务自己的写入，所以读到 7。在 RC 下，每次普通一致性读会建立新的快照，B 提交后的普通 SELECT 已经看到 8。随后锁定读读 8，更新后的普通 SELECT 读 7。题目特意让 B 先提交。如果 B 还持有冲突锁，常规 FOR UPDATE 可能等待。需要根据当前值写入时，我会在同一事务里先锁定再做判断，或者直接用带业务条件的原子 UPDATE，避免把早先的快照读误当成当前状态。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "在题设 RR 时序下给出普通读 10，并说明同一事务的后续普通一致性读沿用首个快照。",
+        "weight": 27
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明 RC 每次普通一致性读取新快照，因 B 已提交而读到 8。",
+        "weight": 21
+      },
+      {
+        "pointType": "CORE",
+        "content": "两种隔离级别下锁定读在该时序均读到并锁定 8，能区分锁定读和快照读。",
+        "weight": 22
+      },
+      {
+        "pointType": "KEY",
+        "content": "两种隔离级别下 A 自己更新后均可普通读取 7，解释本事务写入对自身可见。",
+        "weight": 20
+      },
+      {
+        "pointType": "ADVANCED",
+        "content": "指出冲突写锁可能让锁定读等待，或给出对当前值做业务判断时的锁定读或条件更新方案。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "MySQL 8.0 InnoDB，显式事务，主键等值查询，普通非锁定 SELECT，常规 FOR UPDATE，B 在 A 第二次读之前已提交。",
+    "sources": [
+      {
+        "title": "MySQL 8.0 InnoDB 一致性非锁定读",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html",
+        "section": "§17.7.2.3",
+        "claim": "说明 RR 和 RC 的快照时点、事务可见自身早先写入以及 DML 不沿用普通读快照。"
+      },
+      {
+        "title": "MySQL 8.0 InnoDB 锁定读",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html",
+        "section": "§17.7.2.4",
+        "claim": "解释 FOR UPDATE 的锁定语义，包含冲突事务的等待情形。"
+      }
+    ],
+    "coverageDifference": "同桶 H06 考 Read View、Undo 与版本选择原理，H21 考错误后的回滚恢复。本题要求按时间线推导 RR/RC、锁定读及读己之写，能答内部字段但推导不出仍不能覆盖核心评分。",
+    "acceptableAlternatives": "可用 A/B 双连接逐步演算，不要求背诵 Read View 字段。额外说明 START TRANSACTION WITH CONSISTENT SNAPSHOT 的条件时，应遵守题设默认的开启方式。",
+    "misconceptions": "认为 RR 内每次读取都返回 10，或 FOR UPDATE 会刷新之后普通读使用的 RR 快照。"
+  },
+  {
+    "bankId": "H21",
+    "title": "InnoDB 死锁与锁等待超时的恢复",
+    "category": "MYSQL",
+    "difficulty": "HARD",
+    "knowledgePoint": "deadlock_timeout_recovery",
+    "questionContent": "两个 MySQL 8.0 InnoDB 转账事务按相反顺序锁账户，出现死锁。另一次是某条 UPDATE 单独等锁太久，在它之前的扣款语句已经执行成功。假设死锁检测开启，innodb_rollback_on_timeout 为默认关闭，遇到这两种报错分别怎样恢复和排查？",
+    "referenceAnswer": "死锁是两个事务形成循环等待。开启检测时，InnoDB 选择牺牲者并回滚它的整个事务，收到死锁错误的一方如要重试，需要从事务起点重跑。锁等待超时只说明等锁超过时限，未必有环。默认配置只回滚超时语句，前面的扣款仍可能留在未提交事务中。我会让整个业务事务回滚，然后在外层按有限次数、带退避地启动新事务重做，并复用转账业务键。如果是提交结果未知，要先核实结果或走已有的幂等合同，不能直接再扣一次。预防死锁可以让所有转账按账户 ID 固定顺序加锁，缩短事务持锁时间，并检查索引是否缩小锁定范围。排查死锁看 SHOW ENGINE INNODB STATUS 最近记录，正在等待时可以看 Performance Schema 的 data_lock_waits。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明开启检测时死锁牺牲者的整个 InnoDB 事务回滚，重试应开启新事务从头执行。",
+        "weight": 25
+      },
+      {
+        "pointType": "CORE",
+        "content": "说明默认锁等待超时只回滚失败语句，先前扣款可能仍留在未提交事务中，必须显式结束整笔业务事务以免部分提交。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "设计有上限的外层事务重试，保留稳定业务标识，并能处理未知提交结果或幂等去重。",
+        "weight": 20
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "通过统一加锁顺序打断循环，并给出缩短事务或减少不必要锁范围的措施。",
+        "weight": 18
+      },
+      {
+        "pointType": "KEY",
+        "content": "指出至少一种证据来源并能说明用途，例如最近死锁报告与当前阻塞者查询的区别。",
+        "weight": 12
+      }
+    ],
+    "versionScope": "MySQL 8.0 InnoDB，innodb_deadlock_detect=ON，innodb_rollback_on_timeout=OFF，显式转账事务。讨论存储引擎默认回滚范围，应用事务策略需另行明确。",
+    "sources": [
+      {
+        "title": "MySQL 8.0 InnoDB 错误处理",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-error-handling.html",
+        "section": "§17.21.5",
+        "claim": "死锁回滚整个事务，锁等待超时默认回滚当前语句，选项可改变后者。"
+      },
+      {
+        "title": "MySQL 8.0 处理死锁",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html",
+        "section": "§17.7.5.3",
+        "claim": "建议固定操作顺序、缩短事务并查看最近死锁信息。"
+      },
+      {
+        "title": "MySQL 8.0 Performance Schema data_lock_waits",
+        "url": "https://dev.mysql.com/doc/refman/8.0/en/performance-schema-data-lock-waits-table.html",
+        "section": "data_lock_waits",
+        "claim": "提供请求锁和阻塞锁的关系，用于定位当前锁等待。"
+      }
+    ],
+    "coverageDifference": "同桶 H06 考一致性读可见性，H20 考两种隔离级别下的具体读值。本题围绕数据库错误的回滚范围、业务重试和锁诊断。",
+    "acceptableAlternatives": "可以用 MySQL 错误码 1213 和 1205 辅助判断，或描述 Spring 将异常传播出事务边界再由外层重试。关键是准确解释数据库与应用事务边界，不强制背错误码。",
+    "misconceptions": "锁等待超时等同死锁，且默认回滚整个事务。可以在原事务吞掉超时，然后提交前面执行成功的扣款。"
+  },
+  {
+    "bankId": "H22",
+    "title": "Cache-aside 的更新竞态与热点回源",
+    "category": "REDIS",
+    "difficulty": "HARD",
+    "knowledgePoint": "cache_aside_hotkey",
+    "questionContent": "商品详情以 MySQL 为准，Redis 做 cache-aside。写请求更新数据库后删除缓存。并发读已经缓存未命中，并在更新前读到旧值，却在删除缓存后才回填。另外一个热门商品过期时大量请求同时查库。你会怎样分别处理旧值回填和热点回源？",
+    "referenceAnswer": "通常读先查缓存，未命中才查数据库并带 TTL 回填。写通常先提交数据库，再删缓存。如果提前删除，并发读可能在数据库提交前读到旧值并回填。不过这里的读请求拿着旧值，删除之后仍能把它填回去，因此这套顺序本身没有强一致保证。若业务容许短时旧值，可设合适 TTL，并对删除失败记录可重试的失效任务。如果这个竞态不能接受，回源前可读出每键版本，失效时在 Redis 内推进版本并删除缓存，回填时原子核对版本，拒绝已过期版本的结果。版本记录要能跨过删除，数据库提交到 Redis 失效之间仍有跨库窗口。要求关键读立即可靠时，直接读权威库更简单。热点过期时，可对同一键合并回源，获准回源者再检查一次缓存再查库，其他请求有限等待或降级。单实例可本地合并，多实例仍需考虑跨实例重复和回源并发上限。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明 cache-aside 读未命中回填和写提交后失效顺序，并指出数据库是权威来源。",
+        "weight": 24
+      },
+      {
+        "pointType": "CORE",
+        "content": "按题设时序解释旧读在删除后回填的竞态，说明更新库再删除缓存无法单独消除该竞态。",
+        "weight": 26
+      },
+      {
+        "pointType": "KEY",
+        "content": "按业务一致性要求给出可行选择，例如 TTL 与失效重试、跨失效的版本化回填保护，或关键读绕过缓存。",
+        "weight": 20
+      },
+      {
+        "pointType": "KEY",
+        "content": "为热点同键设计合并回源或等价限流，并说明持有回源资格后重查、等待上限或故障降级。",
+        "weight": 22
+      },
+      {
+        "pointType": "ADVANCED",
+        "content": "明确本地合并在多实例的作用范围，或给出回源并发上限与缓存失效故障下的保护。",
+        "weight": 8
+      }
+    ],
+    "versionScope": "Redis Open Source 的基础 GET、SET 带 TTL、DEL 与单键条件操作，配合 MySQL cache-aside。题设两个故障场景独立。",
+    "sources": [
+      {
+        "title": "Redis 官方 cache-aside 指南",
+        "url": "https://redis.io/docs/latest/develop/use-cases/cache-aside/",
+        "section": "Why the problem is hard；Cache-aside flow",
+        "claim": "介绍缓存未命中回源、TTL、显式删除和热点击穿。题中旧值回填是按给定并发时序推导的结果。"
+      },
+      {
+        "title": "Redis 官方 EVAL 指南",
+        "url": "https://redis.io/docs/latest/develop/programmability/eval-intro/",
+        "section": "Executing Lua in Redis",
+        "claim": "可在 Redis 侧原子执行条件检查与回填，原子范围不覆盖 MySQL。"
+      }
+    ],
+    "coverageDifference": "同桶 H07 考租约与安全解锁，H23 考 Redis 命令执行合同。M20 说明 TTL 与淘汰。本题重点是 MySQL 与 Redis 的并发竞态和回源压力，可用不涉及 Redis 分布式锁的做法。",
+    "acceptableAlternatives": "可使用安全的单键代数或版本栅栏，或接受明确的短时旧值并以较短 TTL、可观测补偿失效为代价。单机按键 single-flight 与多机限流可以组合。",
+    "misconceptions": "设置 TTL 或先写库再删缓存即可保证强一致。给各键过期时间加抖动一定能解决单个热点键的瞬时回源。"
+  },
+  {
+    "bankId": "H23",
+    "title": "Redis Pipeline、事务与 Lua 的边界",
+    "category": "REDIS",
+    "difficulty": "HARD",
+    "knowledgePoint": "redis_batch_atomicity",
+    "questionContent": "假设用单个 Redis 实例实现接口配额。场景一是批量查询互不依赖的计数器，场景二是对单个计数器先判断剩余额度，再决定是否扣减。Pipeline、MULTI/EXEC 配合 WATCH，以及 Lua 分别如何选择？如果中间命令出错，之前的写入会怎样？",
+    "referenceAnswer": "独立批量读适合 Pipeline，客户端一次发送多条命令再收响应，减少网络往返，其他客户端仍可能在命令之间执行。单键先读后扣，可以 WATCH 目标键，再读额度，在 MULTI 后排入扣减并 EXEC。如果监听键被其他操作改动，EXEC 放弃本次事务，客户端有限重试。成功执行时队列中的命令不会和其他客户端命令交错。也可以用短 Lua 脚本把判断和扣减留在 Redis 服务端，中间没有其他命令插入，脚本太久会阻塞其他请求。MULTI 排队期遇到语法或参数数量这类错误，EXEC 会拒绝执行该队列。EXEC 内某条命令运行时出错，已经成功的命令不会回滚，后续仍可执行。Lua 运行时失败也不能自动撤销此前写入，应先做校验再做写入。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "为独立读选择 Pipeline，并说明其减少往返但没有事务或命令间隔离保证。",
+        "weight": 22
+      },
+      {
+        "pointType": "CORE",
+        "content": "给出 WATCH、读条件、MULTI 排队、EXEC 的乐观流程，并解释键发生变化导致放弃执行。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明短 Lua 脚本可原子完成单实例内条件检查与修改，且执行期间会占用服务端执行时间。",
+        "weight": 21
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "区分事务排队错误与 EXEC 执行期错误，能说清已经成功的写入不会因为另一命令运行时出错被回滚。",
+        "weight": 22
+      },
+      {
+        "pointType": "ADVANCED",
+        "content": "指出 Lua 运行时异常也不会撤销此前写入，并提出先校验后写入或查看逐条结果等应对。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "Redis Open Source 7.x 单实例的标准命令语义，不涉及 Cluster 跨槽、复制或故障切换。",
+    "sources": [
+      {
+        "title": "Redis 官方 Pipeline 文档",
+        "url": "https://redis.io/docs/latest/develop/using-commands/pipelining/",
+        "section": "Redis pipelining；Pipelining vs Scripting",
+        "claim": "批量发命令降低 RTT，服务端原子读改写宜用脚本。"
+      },
+      {
+        "title": "Redis 官方事务文档",
+        "url": "https://redis.io/docs/latest/develop/using-commands/transactions/",
+        "section": "Errors inside a transaction；Optimistic locking using check-and-set",
+        "claim": "说明 EXEC 的隔离、排队与运行时错误、WATCH 冲突取消。"
+      },
+      {
+        "title": "Redis 官方 Lua 脚本文档",
+        "url": "https://redis.io/docs/latest/develop/programmability/eval-intro/",
+        "section": "Executing Lua in Redis；Interacting with Redis from a script",
+        "claim": "脚本独占执行，区分 redis.call 与 redis.pcall 对命令错误的处理。"
+      }
+    ],
+    "coverageDifference": "同桶 H07 考分布式锁所有权，H22 考跨库缓存和热点回源。本题考一个 Redis 实例的批处理、读改写原子性和错误边界。",
+    "acceptableAlternatives": "仅用 Lua 完成条件扣减是可行设计，但须能解释 WATCH 方案与 Pipeline 为什么不同。用同时返回多值的原生命令可作为独立查询的补充。",
+    "misconceptions": "Pipeline 自带原子性。Redis 事务与 Lua 像关系数据库一样自动回滚中间写入。"
+  },
+  {
+    "bankId": "H24",
+    "title": "TLS 1.3 的服务器认证与加密",
+    "category": "NETWORK",
+    "difficulty": "HARD",
+    "knowledgePoint": "tls_authentication_basics",
+    "questionContent": "客户端首次访问 https://api.example.com，使用 TLS 1.3 的常规证书握手。客户端怎样确认对面就是这个域名的服务？为什么网络旁观者不能从握手消息直接算出会话密钥？握手成功后，服务是否就知道当前业务用户是谁？",
+    "referenceAnswer": "对服务器身份的校验包括根据本地信任根验证证书链及有效期等条件，还要用自己访问的 api.example.com 去匹配证书 SAN 中的 DNS 身份。证书可以被复制，服务器还要用证书对应的私钥给握手记录签名，由客户端验证 CertificateVerify。双方在握手中交换临时的密钥份额，用各自持有的私有部分与收到的公开份额计算共享秘密，再派生流量密钥，传输的公开份额不会直接给出秘密。Finished 验证握手记录与派生密钥，后续 HTTP 数据使用对称加密并校验完整性。普通单向 TLS 在这里认证的是服务器。用户是谁、是否能读取某条业务记录，还需要登录凭证和服务端授权。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "区分证书链信任与目标域名匹配，能说明有受信证书仍须检查请求主机名。",
+        "weight": 28
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明 CertificateVerify 通过签名证明服务端掌握证书对应的私钥，并绑定本次握手。",
+        "weight": 22
+      },
+      {
+        "pointType": "CORE",
+        "content": "解释临时 (EC)DHE 使用公开份额与本地私有值计算共享秘密，再派生对称流量密钥。",
+        "weight": 25
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明 Finished 或等价握手完整性检查，以及后续记录使用带认证的对称加密。",
+        "weight": 15
+      },
+      {
+        "pointType": "KEY",
+        "content": "区分普通服务器认证与应用侧用户识别、访问授权。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "RFC 8446 TLS 1.3，首次完整的证书认证握手，使用临时 (EC)DHE。题设排除 PSK 恢复、0-RTT 与客户端证书认证。",
+    "sources": [
+      {
+        "title": "RFC 8446：TLS 1.3",
+        "url": "https://www.rfc-editor.org/rfc/rfc8446.html#section-2",
+        "section": "§2、§4.4、§5.2、§7.1",
+        "claim": "证书签名和 Finished 绑定握手，(EC)DHE 与密钥派生提供流量密钥，记录层使用带认证的加密。"
+      },
+      {
+        "title": "RFC 9525：TLS 服务身份",
+        "url": "https://www.rfc-editor.org/rfc/rfc9525.html#section-6",
+        "section": "§6",
+        "claim": "对照客户端参考标识验证证书中的服务身份，DNS 由 SAN dNSName 表示。"
+      },
+      {
+        "title": "RFC 5280：证书路径验证",
+        "url": "https://www.rfc-editor.org/rfc/rfc5280.html#section-6.1",
+        "section": "§6.1",
+        "claim": "定义以信任锚为输入的证书路径验证及有效期等约束。"
+      }
+    ],
+    "coverageDifference": "同桶 H08 考 TCP 建连与关闭，H25 考 HTTP 超时重试。E14 考 HTTP 方法和状态码。本题围绕服务器身份、握手签名和密钥协商。",
+    "acceptableAlternatives": "能用公钥份额、私钥与共享秘密解释即可，不要求背握手报文顺序或 HKDF 公式。业务用户凭证可以举 Session Cookie、访问令牌等例子。",
+    "misconceptions": "只要证书由可信 CA 签发就无需检查域名。TLS 1.3 完整握手用证书公钥直接加密 HTTP 正文。服务端认证会替应用完成用户授权。"
+  },
+  {
+    "bankId": "H25",
+    "title": "HTTP 超时后的重试与业务幂等",
+    "category": "NETWORK",
+    "difficulty": "HARD",
+    "knowledgePoint": "http_timeout_idempotency",
+    "questionContent": "客户端向订单服务发请求，有时建立连接时超时，有时已经发出请求却在读响应时超时。对查询 GET、按 URI 替换资源的 PUT、创建订单的 POST，你会怎样判断能否自动重试？如果 POST 允许重试，需要什么服务端合同？",
+    "referenceAnswer": "明确在新连接建立前失败、且没有发送该请求时，服务端没有从这次尝试收到请求，确认同一业务操作也没有其他结果未知的尝试时，即使是 POST 也可以补发。读响应超时就不同，服务端可能没处理，也可能已经提交，只是客户端没拿到响应。GET 通常可以对短暂网络失败有限重试。语义正确的 PUT 重复发送同一请求，其预期资源效果等同一次，响应内容或状态码可以变化。创建订单的 POST 默认不能仅凭超时自动重放。若接口支持业务幂等，应在重试中复用同一个幂等键和相同有效载荷。服务端按租户或用户与操作约定键的作用范围，并原子登记键和业务结果，或以唯一业务标识实现等价保护。同键同内容可重放原结果或返回已有订单，同键不同内容应冲突。实际重试还要受总时限、退避和次数约束，权限或参数错误应直接处理。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "区分明确的请求尚未发送与等待响应超时，后者不能据此判断服务端是否提交。",
+        "weight": 26
+      },
+      {
+        "pointType": "KEY",
+        "content": "根据 GET、PUT 的幂等语义判断可重试条件，说明幂等指预期效果而非每次响应相同。",
+        "weight": 22
+      },
+      {
+        "pointType": "CORE",
+        "content": "指出创建型 POST 自动重放有重复业务风险，提出同一操作复用稳定幂等键和相同载荷。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明服务端原子去重与已有结果重放，并能拒绝同键异载荷或给出等价唯一业务标识方案。",
+        "weight": 17
+      },
+      {
+        "pointType": "ADVANCED",
+        "content": "使用总时限、有限次数和退避约束临时失败重试，不机械重试明显的非临时错误。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "RFC 9110 HTTP 语义。连接超时例子要求能够确认新连接尚未建立且这次请求未发送。POST 幂等键为题设应用合同。",
+    "sources": [
+      {
+        "title": "RFC 9110：方法安全性与幂等性",
+        "url": "https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2",
+        "section": "§9.2.1、§9.2.2、§9.3.3、§9.3.4",
+        "claim": "说明安全、幂等及自动重试非幂等请求的条件，区分 POST 与 PUT 语义。"
+      },
+      {
+        "title": "RFC 9110：Retry-After",
+        "url": "https://www.rfc-editor.org/rfc/rfc9110.html#section-10.2.3",
+        "section": "§10.2.3",
+        "claim": "支持从响应中读取服务建议等待时间，次数和总时限仍由客户端策略约束。"
+      },
+      {
+        "title": "Java 21 HttpConnectTimeoutException",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.net.http/java/net/http/HttpConnectTimeoutException.html",
+        "section": "类说明",
+        "claim": "给出连接建立超时的客户端示例，不能用它推断所有库的异常分类。"
+      }
+    ],
+    "coverageDifference": "同桶 H08 考 TCP 状态，H24 考 TLS 认证。E14 只辨认 HTTP 方法和状态，本题聚焦结果不确定时能否重放及服务端合同。H26 考本项目真实归属校验和评估提交权。",
+    "acceptableAlternatives": "服务端若提供按业务键查询的 API，可先确认结果。由客户端指定稳定资源 URI 且服务端遵守替换语义时，也可使用 PUT 表达创建或更新。",
+    "misconceptions": "读超时必然没有提交。PUT 每次响应必须一样才算幂等。POST 随请求重试生成新键也能去重。"
+  },
+  {
+    "bankId": "H26",
+    "title": "面试答案提交的归属、重放与并发",
+    "category": "PROJECT_SCENARIO",
+    "difficulty": "HARD",
+    "knowledgePoint": "interview_idempotency_ownership",
+    "questionContent": "在这个 AI 面试系统中，用户 A 提交答案时超时，用原 requestId 重试。同时用户 B 知道 A 的 sessionId 和 interviewQuestionId。A 的两次提交也可能并发到达，系统如何阻止越权与重复写入？同一 requestId 换正文、已完成评价重放和评价仍在运行时，分别怎么处理？",
+    "referenceAnswer": "控制器使用认证主体的用户 ID。过滤器校验令牌后会查询当前启用用户，提交服务再验证会话属于此用户、题目属于此会话，之后才按 requestId 查已有答案。已存在时还要精确匹配题目和正文。同键换正文或换题返回冲突。同键同正文且已评价时，服务用持久化结果重建响应，即使面试已推进也能重放。新提交要处在会话当前等待作答的题目，数据库对 requestId 和每题的答案都有唯一约束，短事务一起写答案和更新题目。并发唯一键冲突后重读赢家，并按相同规则判断重放或冲突。评价再由条件更新抢占。新鲜的 EVALUATING 会返回冲突，过期或失败可按状态恢复。提交评价、推进流程以及失败更新都受本次评价 attemptId 约束，旧执行者不能覆盖新执行者的结果。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "从认证主体获取当前用户，依次校验会话归属及题目归属，且在按 requestId 重放前完成。",
+        "weight": 25
+      },
+      {
+        "pointType": "CORE",
+        "content": "说明重放必须匹配同一题目和完全相同的正文，同键换题或换正文返回冲突。",
+        "weight": 23
+      },
+      {
+        "pointType": "KEY",
+        "content": "指出数据库的 requestId 和每题答案唯一约束、短事务内答案和题目更新，并说明竞争后重读判定。",
+        "weight": 22
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明已 EVALUATED 重建持久化响应且不要求题目仍是当前题，新鲜 EVALUATING 则返回冲突。",
+        "weight": 15
+      },
+      {
+        "pointType": "PRINCIPLE",
+        "content": "说明评价资格通过条件更新获得，并由本次 attemptId 约束持久化或失败更新，明确过期恢复仍有旧执行者。",
+        "weight": 15
+      }
+    ],
+    "versionScope": "当前项目 HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c。按真实提交与评价调用链作答，场景只用于口述推演。",
+    "sources": [
+      {
+        "title": "项目 JwtAuthenticationFilter",
+        "url": "/Users/kun/Developer/projects/ai-interview-system/src/main/java/com/kun/aiinterview/security/filter/JwtAuthenticationFilter.java",
+        "section": "HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c · doFilterInternal、authenticate",
+        "claim": "校验 JWT、加载当前启用用户并建立认证主体。"
+      },
+      {
+        "title": "项目 InterviewController",
+        "url": "/Users/kun/Developer/projects/ai-interview-system/src/main/java/com/kun/aiinterview/interview/controller/InterviewController.java",
+        "section": "HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c · submitAnswer",
+        "claim": "从 AuthenticationPrincipal 转发用户 ID。"
+      },
+      {
+        "title": "项目 InterviewService",
+        "url": "/Users/kun/Developer/projects/ai-interview-system/src/main/java/com/kun/aiinterview/interview/service/InterviewService.java",
+        "section": "HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c · submitAnswer、loadOwnedSession、loadAndValidateQuestion、handleExistingAnswer、recoverFromDuplicateKey",
+        "claim": "归属先行；正文精确匹配；重放和竞态恢复。"
+      },
+      {
+        "title": "项目 InterviewWorkflowService",
+        "url": "/Users/kun/Developer/projects/ai-interview-system/src/main/java/com/kun/aiinterview/interview/service/InterviewWorkflowService.java",
+        "section": "HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c · evaluateAnswer、claimOrRecoverEvaluation、recoverStaleEvaluating",
+        "claim": "区分评价抢占、已完成、活跃与过期恢复。"
+      },
+      {
+        "title": "项目 InterviewWorkflowTransactionService",
+        "url": "/Users/kun/Developer/projects/ai-interview-system/src/main/java/com/kun/aiinterview/interview/service/InterviewWorkflowTransactionService.java",
+        "section": "HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c · submitAnswer、persistOwnedEvaluation、markEvaluationFailed",
+        "claim": "短事务保证答案和题目更新一致，attemptId 限制评价持久化和失败更新。"
+      },
+      {
+        "title": "项目隔离数据库基线",
+        "url": "/Users/kun/Developer/projects/ai-interview-system/docs/environment/ISOLATED_SCHEMAS.sql",
+        "section": "HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c · uk_interview_answer_question、uk_interview_answer_request",
+        "claim": "每题答案和 request_id 分别唯一。"
+      }
+    ],
+    "coverageDifference": "同桶 H09 是假设库存并发扣减，H27 关注面试完结后的报告恢复。H25 属于通用 HTTP 重试。本题结合本项目授权顺序、精确载荷、答案唯一键与评价尝试令牌。",
+    "acceptableAlternatives": "用归属、稳定幂等键、载荷一致性、数据库唯一约束、单胜者和尝试令牌表达即可，不要求背方法名、状态枚举或 SQL。",
+    "misconceptions": "有 JWT 就可以访问任意 sessionId。按 requestId 查到记录即可返回。过期接管能停止已经在运行的旧任务。"
+  },
+  {
+    "bankId": "H27",
+    "title": "报告生成的过期接管与最终评价一致性",
+    "category": "PROJECT_SCENARIO",
+    "difficulty": "HARD",
+    "knowledgePoint": "report_recovery_final_consistency",
+    "questionContent": "在这个 AI 面试系统中，会话已完成，但报告一直显示 GENERATING。后来用户重新发起生成，旧请求却在接管之后恢复执行。系统如何判断能否重试、怎样阻止旧请求覆盖结果？报告和用户弱项应该取哪些评价，怎样避免重复累计？",
+    "referenceAnswer": "报告生成先检查会话归属和 COMPLETED，READY 直接读已有报告。GENERATING 未过期时返回冲突，超过阈值后，重新发起的生成请求才能按状态、时间和会话版本做条件更新。抢占成功会递增版本，拿到的本次版本用于 READY 或 FAILED 更新，旧执行者不能重新读取新版本冒用资格。汇总前应核对每道计划主问题恰有一个对应最终答案的 FINAL。有追问取追问产生的综合 FINAL，无追问取主问题的 FINAL，INITIAL 不进入报告或弱项。模型生成摘要在短写事务外。结果完成时，在一个事务里写唯一报告、更新弱项并用本次版本推进 READY，条件更新失败就回滚整次写入。若接管时已有报告，校验评价后补齐状态即可，不重新生成或累计弱项。旧请求可能仍有外部调用，数据库事务和版本限制的是它的提交权。",
+    "scoringPoints": [
+      {
+        "pointType": "CORE",
+        "content": "说明每道计划主问题恰有一个关联正确的 FINAL，有追问使用追问综合评价且排除 INITIAL。",
+        "weight": 23
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明先检查会话归属与完成状态，READY 复用、活跃 GENERATING 冲突，过期后由生成请求触发条件更新抢占。",
+        "weight": 18
+      },
+      {
+        "pointType": "CORE",
+        "content": "解释接管递增会话版本，完成及失败只接受本次版本，旧请求不得改用新版本。",
+        "weight": 25
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明报告唯一、弱项更新和 READY 处于同一短事务，版本检查失败会回滚，外部摘要调用不纳入该事务。",
+        "weight": 24
+      },
+      {
+        "pointType": "KEY",
+        "content": "说明非 READY 下若找到已有持久化报告，验证评价后对齐状态，不重复生成或更新弱项。",
+        "weight": 10
+      }
+    ],
+    "versionScope": "当前项目 HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c。区分报告会话版本和答案评价 attemptId。",
+    "sources": [
+      {
+        "title": "项目 InterviewReportService",
+        "url": "/Users/kun/Developer/projects/ai-interview-system/src/main/java/com/kun/aiinterview/interview/service/InterviewReportService.java",
+        "section": "HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c · generateReport、validateEvaluations、validateEvaluationAssociations、existingReportOrContinue、recoverReportFailure",
+        "claim": "请求触发占用、验证 FINAL 归属、已有报告对账、按捕获版本处理失败。"
+      },
+      {
+        "title": "项目 InterviewSessionMapper",
+        "url": "/Users/kun/Developer/projects/ai-interview-system/src/main/resources/mapper/InterviewSessionMapper.xml",
+        "section": "HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c · claimReportGeneration、reclaimStaleGenerating、markReportReady、markReportFailed",
+        "claim": "过期接管检查时间与状态，更新时匹配期望版本。"
+      },
+      {
+        "title": "项目 InterviewReportTransactionService",
+        "url": "/Users/kun/Developer/projects/ai-interview-system/src/main/java/com/kun/aiinterview/interview/service/InterviewReportTransactionService.java",
+        "section": "HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c · completeReportGeneration",
+        "claim": "同一事务插入报告、累计弱项、条件更新 READY。"
+      },
+      {
+        "title": "项目 AnswerEvaluationMapper",
+        "url": "/Users/kun/Developer/projects/ai-interview-system/src/main/resources/mapper/AnswerEvaluationMapper.xml",
+        "section": "HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c · listFinalEffectiveEvaluationsBySessionId",
+        "claim": "获取本场用于报告的有效最终评价，业务层继续验证完整性与归属。"
+      },
+      {
+        "title": "项目隔离数据库基线",
+        "url": "/Users/kun/Developer/projects/ai-interview-system/docs/environment/ISOLATED_SCHEMAS.sql",
+        "section": "HEAD 0c6f92afe331954f7cea37d33db688fe781cbf2c · uk_interview_report_session",
+        "claim": "数据库限制每场一个报告。"
+      }
+    ],
+    "coverageDifference": "同桶 H09 是假设库存扣减，H26 是当前答案提交与评价。H19 是通用订单外部通知。本题基于项目已实现的报告版本占用、FINAL 关联校验与弱项累计原子性。",
+    "acceptableAlternatives": "可用失败时序说明旧任务提交和失败回写都被挡住，可用数据库条件更新、乐观版本或持久化提交资格解释。只要求每主问题一个有效 FINAL，不要求背具体阈值。",
+    "misconceptions": "只按 FINAL 行数就能保证评价覆盖。接管后旧请求可以读取新版本再提交。报告已经存在时应再次累计弱项。"
+  }
+]

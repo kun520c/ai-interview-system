@@ -1,0 +1,160 @@
+{
+  "date": "2026-11-14",
+  "created": [
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/D1_BANK_MANIFEST_20261114.json",
+      "purpose": "canonical DTO fingerprints and version lineage",
+      "sha256": "53df68cb0cd8e8e9c084013aabbdc0b9937042c735dec6e6b99b7861fd5fcc78"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/D1_DELIVERY_MANIFEST_20261114.json",
+      "purpose": "actual absolute delivery paths and file hashes; self hash omitted",
+      "sha256": null
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/D1_EVALUATION_IMPORT_MANIFEST_20261114.json",
+      "purpose": "database IDs and exact real post-import reconciliation",
+      "sha256": "dfdd58d2a9d4f108178ae068e45afa910a676046264d67ddb841c72816644f74"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/D1_QUESTION_BANK_V2_20261114.json",
+      "purpose": "versioned 63-question bank with sources, weights and alternatives",
+      "sha256": "d4c1d9f20664308231ab383f5dce67154f3c5d874fc041b44f7499ce8647177e"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/D1_QUESTION_BANK_V2_20261114.md",
+      "purpose": "versioned 63-question bank with sources, weights and alternatives",
+      "sha256": "c1c7b2842a4c4c9b2d8eca0bfa1a04ab05f3dfc7cbdcfb6619b5ae12b622c21e"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/D1_REVIEW_CHECKLIST_20261114.json",
+      "purpose": "43 independent decisions bound to final bank bytes",
+      "sha256": "61855b690f785f82594fadc3aa596f2a91a201e458d9c8e19ae8c8a43d2f4e80"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/d1-drafts/EASY_AND_JAVA_MEDIUM_20261114.json",
+      "purpose": "author source or independent review; preserves review provenance",
+      "sha256": "3283929ece8f64506c6d961a138afcf1bf2ad51178f30e9036fefa38be19507e"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/d1-drafts/EASY_AND_JAVA_MEDIUM_AUTHOR_NOTES_20261114.md",
+      "purpose": "author source or independent review; preserves review provenance",
+      "sha256": "58adacbbcee2956e7b8e6903c8e7bd79109d534a509c0634002e2372616f08a5"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/d1-drafts/EASY_MEDIUM_INDEPENDENT_REVIEW_20261114.json",
+      "purpose": "author source or independent review; preserves review provenance",
+      "sha256": "175a66a64bb4ff88b83f7607f4ce424de6837efcd2ec348b022cb12ab1b7fd37"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/d1-drafts/H01_AND_IMPORT_REVIEW_20261114.md",
+      "purpose": "author source or independent review; preserves review provenance",
+      "sha256": "338b709371ab4382f136629fbbe9fd0a972c4bd30d1361442b2b8aaa75929b95"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/d1-drafts/H01_INDEPENDENT_REVIEW_20261114.json",
+      "purpose": "author source or independent review; preserves review provenance",
+      "sha256": "20600f0b9c8a16699de63203b2e4afbc4bf8d0ba853942fd8af425a04a4ce532"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/d1-drafts/H01_REVISION_20261114.json",
+      "purpose": "author source or independent review; preserves review provenance",
+      "sha256": "6274b7b2fbfbf77239e651f7c095c94f9a36584c5a3bd9596eba504014d57f74"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/d1-drafts/HARD_20261114.json",
+      "purpose": "author source or independent review; preserves review provenance",
+      "sha256": "811e2b2cd7178f073cd30167777671cc8720ef00318c6060ae087b0275f3aa2c"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/d1-drafts/HARD_AUTHOR_NOTES_20261114.md",
+      "purpose": "author source or independent review; preserves review provenance",
+      "sha256": "5fd82a06969cde2cd80f3f5f46c2c0917b06b1455ae5335000f18912ebf956bd"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/d1-drafts/HARD_INDEPENDENT_REVIEW_20261114.json",
+      "purpose": "author source or independent review; preserves review provenance",
+      "sha256": "876271575ad317baeba2b61b63d3c0309170fbc76befe0bc3d470eb73afb5d90"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/d1-drafts/MEDIUM_AND_HARD_JAVA_20261114.json",
+      "purpose": "author source or independent review; preserves review provenance",
+      "sha256": "69b02fbe4e01d83791c41a140ab7cb328676392fb10989eaf9653196190d9f90"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/d1-drafts/MEDIUM_AND_HARD_JAVA_AUTHOR_NOTES_20261114.md",
+      "purpose": "author source or independent review; preserves review provenance",
+      "sha256": "db443963693d13f209df9b00d5016518faa07a45e39e110c7e73b2b17f73ed6b"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/question-bank/d1-drafts/MEDIUM_HARD_JAVA_INDEPENDENT_REVIEW_20261114.json",
+      "purpose": "author source or independent review; preserves review provenance",
+      "sha256": "7f2aa20fd84e3fc6cf410c417816015382a1a183c52dde83f7781cecae56cdf1"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/verification/D1_QUESTION_BANK_CONTENT_REVIEW_20261114.md",
+      "purpose": "per-question independent content acceptance",
+      "sha256": "365e9f49b7dd52577f57488f68e7e9e0c04ff22ad5b82486fd18e7a279280274"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/verification/D1_QUESTION_BANK_EXPANSION_20261114.md",
+      "purpose": "real execution acceptance and remaining boundaries",
+      "sha256": "e09e17738cf4ede27ab470823bb25876548cbaab8d1ea0dc0f1b773c9052a7a6"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/tools/question-bank-d1/D1ImportOfflineTest.java",
+      "purpose": "offline content assembly, guarded import, validation or read-only inventory",
+      "sha256": "b151e8cf1597103863e37b4f4e8df1f61be2a1b8d7e083ec836474068a46d6cd"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/tools/question-bank-d1/D1MilvusInventory.java",
+      "purpose": "offline content assembly, guarded import, validation or read-only inventory",
+      "sha256": "c217756f7ba8870da12a13b35805f445ce1ed43af175a7ee5a4a9c117034adab"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/tools/question-bank-d1/D1QuestionBankImport.java",
+      "purpose": "offline content assembly, guarded import, validation or read-only inventory",
+      "sha256": "a60f0e246d730066c7015b18df826ec62f471fb733fff3611efc489e65ce412a"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/tools/question-bank-d1/README.md",
+      "purpose": "offline content assembly, guarded import, validation or read-only inventory",
+      "sha256": "1bbcd77abde5c6d26db700fe68f1d7c0dceddf795998659f5bc29969bca9cc7b"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/tools/question-bank-d1/build_bank.py",
+      "purpose": "offline content assembly, guarded import, validation or read-only inventory",
+      "sha256": "8c306770f1900c781d67285649c7e80f8f34f1af087edf0c527349c6e807c239"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/tools/question-bank-d1/revise_h01.py",
+      "purpose": "offline content assembly, guarded import, validation or read-only inventory",
+      "sha256": "fc289f37d217893bdb4c46cc5444508e05d69b74d45e9e8702d2281b1b3a5ec9"
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/tools/question-bank-d1/run_import.py",
+      "purpose": "offline content assembly, guarded import, validation or read-only inventory",
+      "sha256": "cb1c94f89bc55d1b44db26e9eed8e8d66524823106bdf8c3a7ea130ac4ea3ee2"
+    }
+  ],
+  "modified": [
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/engineering/IMPROVEMENT_LEDGER.md",
+      "purpose": "append D1 engineering evidence / four unconfirmed learning items",
+      "beforeSha256": "d7e84aff3d4dad42a1757fa3d33dcb8e254210207e77d368a4db54745b1c8f59",
+      "afterSha256": "eba078d57c8e06b7db4116efb7cd92884a4cfeecffea146b33fe85c198f89f15",
+      "originalPrefixPreserved": true
+    },
+    {
+      "path": "/Users/kun/Developer/projects/ai-interview-system/docs/engineering/SOURCE_LEARNING_BACKLOG.md",
+      "purpose": "append D1 engineering evidence / four unconfirmed learning items",
+      "beforeSha256": "637c09f6c4f63b6066c8df53cc5450eebbdf2ff06dfc1b1b16f7654464e16b3b",
+      "afterSha256": "e896afbcad75fb7274005dccbf86e352b827d7c4e16ce24edb9a261bec56ede6",
+      "originalPrefixPreserved": true
+    }
+  ],
+  "privateExecutionEvidenceDirectory": "/Users/kun/Developer/projects/ai-interview-system/backups/D1_20261114",
+  "privateArtifactManifest": "/Users/kun/Developer/projects/ai-interview-system/backups/D1_20261114/artifact-manifest.json",
+  "privateEvidenceNote": "Git ignored, local only; no credentials published. Source/class/log/dumps are indexed in the private manifest.",
+  "git": "not staged, not committed, not pushed; existing 8 ahead commits preserved"
+}

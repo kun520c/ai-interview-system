@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Build the reviewed H01 revision without touching the frozen V1 bank."""
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+old = json.loads((ROOT / 'docs/question-bank/PHASE_1_QUESTION_BANK_FINAL.json').read_text())
+h = next(q for q in old if q['knowledgePoint'] == 'generic_type_erasure')
+h['referenceAnswer'] = '''Java 泛型主要在编译期提供类型检查。擦除会将参数化类型映射到对应的原始类型，将类型变量映射到其最左边界的擦除类型；没有显式边界时是 Object。编译器按需要插入类型转换，并生成桥接方法以维持重写后的多态。
+
+例如 ArrayList<String> 和 ArrayList<Integer> 不会各自生成一个不同的 ArrayList 运行时 Class，运行时不能仅凭容器对象确认元素的泛型实参。不能直接 new T()、new T[] 或 new List<String>[]，也不能仅靠擦除后相同的参数签名构成有效重载。
+
+instanceof 的限制要看操作数静态类型：Object x 不能直接写 x instanceof List<String>，但可以检查 List<?>；Java 21 中，List<Integer> x 可以写 x instanceof ArrayList<Integer>，这依赖编译期已经满足的类型关系，运行时仍只检查容器类型，不检查集合里每个元素是不是 Integer。因此不能笼统说所有带具体泛型参数的 instanceof 都不合法。
+
+擦除也不意味着 class 文件完全没有泛型信息：字段、方法或父类型声明的泛型签名可供反射读取，但它不同于任意对象携带完整的实际类型参数。'''
+h['scoringPoints'][3]['content'] = '能正确解释至少两项限制及其条件，例如不能直接 new T()、new T[] 或 new List<String>[]，以及不能仅靠擦除后相同的参数签名重载。若谈 instanceof，应区分 Object 不能直接测试 List<String> 与 Java 21 中 List<Integer> 可以测试 ArrayList<Integer>；不能用该测试证明元素实际泛型类型。无需背出此例，其他准确等价解释同样给分。'
+h.update(
+    bankId='H01', title='泛型擦除与运行时类型边界',
+    versionScope='Java SE 21（instanceof 参数化类型测试放宽自 Java 16 起）',
+    sources=[
+        {'title':'JLS 21 Type Erasure','url':'https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.6','section':'4.6, 4.7','claim':'擦除、最左边界和可具体化类型'},
+        {'title':'JLS 21 instanceof','url':'https://docs.oracle.com/javase/specs/jls/se21/html/jls-15.html#jls-15.20.2','section':'15.20.2','claim':'Java 16 后参数化类型测试的静态条件与示例'},
+        {'title':'JVMS 21 Signature attribute','url':'https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html#jvms-4.7.9','section':'4.7.9','claim':'Signature 属性保留声明泛型信息，支持反射读取，与对象的运行时元素实参不同'}],
+    coverageDifference='沿用 H01 原有泛型擦除主题，仅修正参考答案与 SP4 的条件；与 M09 的 PECS API 读写约束不同。',
+    acceptableAlternatives='限制任选两项准确解释即可；不要求复述例子。准确指出合法的参数化 instanceof 情形不能扣分。',
+    misconceptions='错误：任何具体参数化 instanceof 都不合法；错误：运行时逐个验证 List 元素的实参；错误：任何泛型声明信息都完全消失。')
+out = ROOT / 'docs/question-bank/d1-drafts/H01_REVISION_20261114.json'
+out.parent.mkdir(exist_ok=True)
+out.write_text(json.dumps(h, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+print('H01 revision written; original unchanged')

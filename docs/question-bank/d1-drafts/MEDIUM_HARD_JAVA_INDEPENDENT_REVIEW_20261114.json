@@ -1,0 +1,246 @@
+[
+  {
+    "bankId": "M12",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "JLS 21 §12.3–12.4.1 支持：读取常量变量不触发，首次读取本类声明的非常量静态字段触发，解析可延后。",
+    "answerAlignment": "按 PORT、retries、new 的顺序作出明确预测，再解释加载、链接和初始化。",
+    "pointIndependence": "第 1–3 点考三次操作的不同结论，第 4 点辨认两个阶段，第 5 点专看链接子步骤。",
+    "weightAssessment": "25 分给首次触发判断，35 分给两条对照，40 分给阶段解释。",
+    "difficultyAssessment": "在给定小段代码下分析触发条件，属于中等。",
+    "duplicationAssessment": "M03 考内存区域，H14 考运行时类型身份，这题以静态初始化时间线区分。",
+    "versionCheck": "Java 21 JLS，常量必须由常量表达式初始化。",
+    "wordingCheck": "可说主动使用或讲触发规则，允许任一正确术语。",
+    "findings": []
+  },
+  {
+    "bankId": "M13",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "Java 21 java.lang.ref 可达性约定及 HotSpot 排障指南支持：静态字段持续持有对象，稳定负载下回收后存活集上升是线索。",
+    "answerAlignment": "说明方法返回后仍保留，给出证据及修复前后验证。",
+    "pointIndependence": "第 1 点要求场景保留链，第 2 点说明可达性规则，第 3 点给诊断，第 4 点比较 OOM，第 5 点验证修复。",
+    "weightAssessment": "保留链和原理 50 分，确认故障与验证占 50 分，符合题设重点。",
+    "difficultyAssessment": "具体 Map 故障已经给出，解释引用和验证即可。",
+    "duplicationAssessment": "M03 考区域，H03 考 G1，H15 需区分多种诊断方向，M13 固定检查 Java 堆引用。",
+    "versionCheck": "Java 21 引用契约，诊断工具对应 HotSpot。",
+    "wordingCheck": "允许 JFR、堆转储或能证明根路径的等价工具，修复可用到期、移除或容量上限。",
+    "findings": []
+  },
+  {
+    "bankId": "M14",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "Java 21 Lock/ReentrantLock API 和 JLS §14.19 支持：限时 tryLock 可被中断，成功后才 unlock，同步块退出自动释放。",
+    "answerAlignment": "覆盖同一共享锁的选择、普通路径、限时路径和中断处理。",
+    "pointIndependence": "第 2 点的获取失败路径与第 3 点普通路径的业务异常清理分开，第 4 点同步语义、第 5 点自动释放边界独立。",
+    "weightAssessment": "25 分给选锁，40 分给安全释放与处理失败，35 分给语义和简单场景。",
+    "difficultyAssessment": "小范围 API 选择和伪代码，适合掌握基础并发后的中等题。",
+    "duplicationAssessment": "M04 考 volatile 可见性，M15 考条件等待，本题考显式锁获取策略。",
+    "versionCheck": "Java 21 内置监视器及标准 ReentrantLock。",
+    "wordingCheck": "接受等价伪代码、条件保护或恢复中断位，避免背调用签名。",
+    "findings": []
+  },
+  {
+    "bankId": "M15",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "Java 21 Object.wait 与 Thread API 支持：sleep 持锁，wait 释放并重获目标监视器，抛中断异常清除标志。",
+    "answerAlignment": "解释原代码阻塞生产者，描述 while、通知和退出路径。",
+    "pointIndependence": "持锁休眠、wait 合同、消费者谓词、生产者通知、中断处理各自检验。",
+    "weightAssessment": "45 分给监视器机制，35 分给生产消费协议，20 分给协作中断。",
+    "difficultyAssessment": "给定监视器和队列，考线程行为及短伪代码，符合中等。",
+    "duplicationAssessment": "M14 聚焦互斥锁获取，M04 聚焦 volatile，本题聚焦等待与唤醒协议。",
+    "versionCheck": "Java 21 Object 与 Thread，不套用 Condition 或 BlockingQueue 的 API 契约。",
+    "wordingCheck": "接受 notifyAll 和 while 伪代码，退出或传播按调用约定选择。",
+    "findings": []
+  },
+  {
+    "bankId": "M16",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "Spring 6.2 @Primary 适用单值优先选择，@Qualifier 筛选类型候选，单构造器可省略 @Autowired，集合仍接收匹配 Bean。",
+    "answerAlignment": "直接给邮件默认、短信指定、歧义触发条件及集合注入。",
+    "pointIndependence": "候选发现、默认优先、显式限定、多值注入和构造器约定分开。",
+    "weightAssessment": "默认与限定 50 分，歧义 25 分，多值和构造器 25 分。",
+    "difficultyAssessment": "在两个 Bean 上应用三种注入方式，中等。",
+    "duplicationAssessment": "E03 考 IoC 原理，M05 考代理，本题解构真实的依赖选择。",
+    "versionCheck": "Spring Framework 6.2 注解构造器注入。",
+    "wordingCheck": "允许限定符的标签、自定义注解，或解释名称回退条件。",
+    "findings": []
+  },
+  {
+    "bankId": "M17",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "Spring MVC 6.2 Validation 文档区分对象级校验和内建方法校验。消息转换读取失败与两类校验异常可单独映射。",
+    "answerAlignment": "题干已交代 DTO @NotBlank、Bean Validation、无 BindingResult 和类级 @Validated，答案对应两种参数签名与统一响应。",
+    "pointIndependence": "解析、DTO、方法级、错误协议、敏感值限制分别考查。",
+    "weightAssessment": "65 分给请求失败阶段及方法签名变化，35 分给错误响应可用性和安全。",
+    "difficultyAssessment": "中等偏上。方法校验的差异有明确触发条件，异常名称可用准确行为替代以保持口述难度。",
+    "duplicationAssessment": "E03 是容器，M05 是 AOP，此题考 MVC 输入边界。",
+    "versionCheck": "Spring 6.2 内建 MVC 校验，区分 6.1 前无内建方法校验与类级 AOP 路径。",
+    "wordingCheck": "接受 ProblemDetail 或项目自定义结构。规范术语或说明行为均可。",
+    "findings": [
+      {
+        "severity": "P2",
+        "status": "RESOLVED",
+        "issue": "原题未给邮箱非空约束及 BindingResult 前提。",
+        "resolution": "题干明确 @NotBlank、已启用 Bean Validation、未使用 BindingResult 或类级 @Validated。"
+      },
+      {
+        "severity": "P2",
+        "status": "RESOLVED",
+        "issue": "首个 Spring 参考链接目录错误。",
+        "resolution": "更新为 Spring 6.2 MVC ann-validation 页面。"
+      }
+    ]
+  },
+  {
+    "bankId": "M18",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "MySQL 8.0 range optimization 和复合索引约定支持：A 固定两个前缀后按时间范围，B 缺中间状态使普通连续范围及全局时间顺序不成立。",
+    "answerAlignment": "直接比较两个查询，并解释列覆盖、表行获取和 EXPLAIN 验证。",
+    "pointIndependence": "两种定位、排序、覆盖和实际验证是五个独立判断。",
+    "weightAssessment": "70 分给索引定位与排序，20 分给覆盖，10 分给过滤与实证。",
+    "difficultyAssessment": "以一个索引和两条 SQL 推理，适合中等。",
+    "duplicationAssessment": "M06 考索引结构，M19 解读已给的执行计划，本题从 SQL 推导索引能力。",
+    "versionCheck": "MySQL 8.0 InnoDB 普通 B-tree 二级索引，实际计划仍由优化器选择。",
+    "wordingCheck": "可画三元组排序或分类扫描示意，不背最左前缀口诀。",
+    "findings": [
+      {
+        "severity": "P2",
+        "status": "RESOLVED",
+        "issue": "旧替代表达提及 skip scan 但未限定覆盖等前提，题干有多余空格。",
+        "resolution": "移除该旁支，保留其他索引或扫描的可能性，清理空格。"
+      }
+    ]
+  },
+  {
+    "bankId": "M19",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "MySQL 8.0 EXPLAIN 文档支持：possible_keys 为候选，key=NULL 与 ALL 是未用索引的表扫，200000 × 2% 为估计 4000。",
+    "answerAlignment": "先解读字段再用实际参数和 ANALYZE 定位，给出修改后核对。",
+    "pointIndependence": "候选及访问类型、估计过滤、实际执行、原因改动和前后核验各自检查。",
+    "weightAssessment": "65 分给读计划和实测区别，35 分给诊断及核验。",
+    "difficultyAssessment": "给足执行计划上下文，分析和校验难度中等。",
+    "duplicationAssessment": "M18 考复合索引能做什么，M19 考优化器实际选择和数据证据。",
+    "versionCheck": "MySQL 8.0，EXPLAIN ANALYZE 从 8.0.18 开始提供。",
+    "wordingCheck": "接受统计更新、调整谓词或索引，但需要依据及验证，不要求固定措施。",
+    "findings": []
+  },
+  {
+    "bankId": "M20",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "Redis 7.2 配置和官方淘汰、EXPIRE 文档分别约束 maxmemory 与 TTL；LRU 近似，volatile 无候选时无法为内存增长命令淘汰。",
+    "answerAlignment": "直接说明提前未命中的可能机制及应用回源、监控证据。",
+    "pointIndependence": "机制差别、主动被动过期、两种候选范围、无候选行为、回源与排查分开。",
+    "weightAssessment": "70 分给过期与策略，30 分给命令影响和应用处理。",
+    "difficultyAssessment": "解释常用缓存行为与指标，不要求源码，属于中等。",
+    "duplicationAssessment": "M07 考数据类型，H22 考缓存更新竞态与热点并发，本题考键何时消失。",
+    "versionCheck": "Redis OSS 7.2 单实例，避免把近似 LRU 当精确全局排序。",
+    "wordingCheck": "接受等效监控或回填手段，不凭聚合计数断言单键删除原因。",
+    "findings": []
+  },
+  {
+    "bankId": "M21",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "Redis OSS 持久化文档与 7.2 配置支持 RDB 快照、分段 AOF 恢复、重写及 everysec；约一秒应作为典型量级。",
+    "answerAlignment": "从数据丢失窗口和重启恢复成本回答选择问题，指出独立备份。",
+    "pointIndependence": "快照、日志、刷盘、取舍验证、备份分别检查。",
+    "weightAssessment": "50 分给恢复机制，20 分给刷盘，30 分给选择与备份。",
+    "difficultyAssessment": "用一般缓存状态和可接受损失做选择，中等。",
+    "duplicationAssessment": "M20 考在线键生命周期，H23 考 Redis 执行原子性，本题考重启持久性。",
+    "versionCheck": "Redis OSS 7.2 单实例，多段 AOF，不泛化旧版单文件实现。",
+    "wordingCheck": "可用 RPO/RTO 或直接说明能丢多少、多久恢复，允许不同机制选择。",
+    "findings": []
+  },
+  {
+    "bankId": "H10",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "Java 21 AccessibleObject 与 Field API 区分成员发现、访问检查和跨具名模块包开放，题设 trySetAccessible false 与强制访问异常成立。",
+    "answerAlignment": "明确回答 exports 的不足和两种调用结果，补问后覆盖可信字段约束。",
+    "pointIndependence": "发现与访问、模块规则、API 失败方式、修复与信任边界分开。",
+    "weightAssessment": "70 分给关键权限机制与失败结果，30 分给实际处置。",
+    "difficultyAssessment": "需要结合模块可见性、反射 API 和输入边界，符合困难实习题。",
+    "duplicationAssessment": "H01 是泛型，H11 是流语义，H14 是加载身份；本题考模块反射权限。",
+    "versionCheck": "Java 21 两个具名模块的 private 字段，未配置 opens。",
+    "wordingCheck": "接受 getter、定向 opens、临时 --add-opens 等合理解释。",
+    "findings": [
+      {
+        "severity": "P2",
+        "status": "RESOLVED",
+        "issue": "原题未询问外部输入的反射边界，评分却分配 10 分。",
+        "resolution": "题干补问外部可指定字段名时的访问限制。"
+      }
+    ]
+  },
+  {
+    "bankId": "H11",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "Java 21 Stream.count 可省略有已知数量的遍历，parallel forEach 无顺序保证，ArrayList 并发写有风险，toList 保留遇到顺序。",
+    "answerAlignment": "两段故障分别解释，并提出保序生成和独立审计。",
+    "pointIndependence": "遍历优化、共享状态与顺序、函数契约、改写、并行收益是不同层面的判断。",
+    "weightAssessment": "两处故障 50 分，约束与修复 40 分，性能取舍 10 分。",
+    "difficultyAssessment": "要理解惰性优化和并行副作用，符合困难题。",
+    "duplicationAssessment": "H01 泛型、H10 反射与模块，M10 普通迭代，本题聚焦 Stream。",
+    "versionCheck": "Java 21 标准 Stream，来源为有序 List，不能泛化到任意源。",
+    "wordingCheck": "允许显式循环或安全且有序的流方案，按行为判分。",
+    "findings": []
+  },
+  {
+    "bankId": "H12",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "Java 21 ConcurrentHashMap 公开 API 支持单键 merge/compute 的原子性，computeIfAbsent 的 null 或异常不建立值并可能未来再算。",
+    "answerAlignment": "给出丢更新交错，修复计数，并比较首次放入和回调边界。",
+    "pointIndependence": "竞争复现与原子修复各 1 点，首次初始化、回调副作用和跨键不变量各 1 点。",
+    "weightAssessment": "50 分给计数竞态和修复，40 分给首次写入与回调，10 分给跨边界限制。",
+    "difficultyAssessment": "要求并发交错和 API 合同，符合困难。",
+    "duplicationAssessment": "H02 考 JDK 8 内部桶，H13 考迭代一致性，本题考单键复合操作。",
+    "versionCheck": "Java 21 ConcurrentHashMap，未把该保证推广到任意 Map 默认实现。",
+    "wordingCheck": "接受等价同步或满足明确语义的计数器，避免要求唯一代码。",
+    "findings": []
+  },
+  {
+    "bankId": "H13",
+    "author": "author_medium_hard_java",
+    "reviewer": "author_hard",
+    "status": "PASS",
+    "technicalCheck": "Java 21 CopyOnWriteArrayList 迭代保存创建时数组引用，ConcurrentHashMap 迭代弱一致，不能由遍历推出全表同一时点。",
+    "answerAlignment": "分别覆盖两场景和成本，补问后直接回答精确统计如何改造。",
+    "pointIndependence": "容器选择、元素引用边界、复制成本、弱一致、精确快照各自检查。",
+    "weightAssessment": "50 分给两种关键遍历契约，40 分给实际边界和成本，10 分给精确快照。",
+    "difficultyAssessment": "基于读写比例和一致性契约做取舍，符合困难。",
+    "duplicationAssessment": "H02 考内部并发，H12 考原子单键修改，M10 考普通 fail-fast，本题考并发迭代。",
+    "versionCheck": "Java 21 两个具体容器的契约，避免推广到所有并发集合。",
+    "wordingCheck": "接受不可变版本发布或锁协调的等价设计。",
+    "findings": [
+      {
+        "severity": "P2",
+        "status": "RESOLVED",
+        "issue": "原题未询问精确统计，评分却为精确快照分配 10 分。",
+        "resolution": "题干明确补问同一时点的准确结果。"
+      }
+    ]
+  }
+]
