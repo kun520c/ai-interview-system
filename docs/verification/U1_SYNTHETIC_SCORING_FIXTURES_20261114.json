@@ -1,0 +1,283 @@
+{
+  "version": "U1-synthetic-scoring-v1-20261114",
+  "questionContentFile": "docs/question-bank/U1_QUESTION_CONTENT_CANDIDATES_20261114.json",
+  "questionContentSha256": "10a73a3a6f206a98a50bc5f9f69a67c88f33be39a862479b4b4f34d208881847",
+  "plan": {
+    "purpose": "比较两套内容和提示组成的评分体验。使用固定证据，联动更新的效果不能单独归因于改题干或改 Prompt。",
+    "sampleOrigin": "全部是离线编写的合成回答，不含用户真实回答或报告内容。",
+    "arms": {
+      "OLD": "D1 冻结题干、参考答案与评分点，已提交 Prompt v3。",
+      "NEW": "U1 候选题干、参考答案与评分点，本轮待核验的 Prompt。"
+    },
+    "expectedAttempts": 16,
+    "executionOrder": "八个样本固定顺序，各执行两臂一次。第奇数样本 OLD/NEW，第偶数样本 NEW/OLD；不补跑、重抽或择优。",
+    "constants": "回答、题目身份、评分点逻辑序号和模拟 ID、完整的历史序列化 RAG evidence、模型与采样参数保持一致。证据五条、原顺序和正文冻结。",
+    "interpretation": "每条输出按 covered 布尔与文字反馈分开验收。系统没有三态字段；partial 对应人工解释，不把缩短评价或抬分理解成质量提升。",
+    "retrievalBoundary": "本实验不重新嵌入或搜索。未来生效后题干与评分点改动会改变实际 Query 字节，本实验不能证明新 Query 召回同一证据。",
+    "budgetBoundary": "八个样本、两臂，每个样本每臂最多一次。计划 16 次 DeepSeek、0 次 Embedding。真实尝试仍受空闲窗口、累计账本和共享护栏约束。",
+    "humanReview": "保存所有响应和分歧；比较稿打乱 X/Y 顺序并把索引另存受保护本机路径。工程预期是待人工核对的基准。"
+  },
+  "evidence": {
+    "E08": {
+      "predictionFile": "backups/D3_BCD_20261114/production-predictions/E08.json",
+      "predictionSha256": "793ddf6bb2dc00d48b7c31a8d8fb81aeba12e16b27a88ed91171b3cc45cdbcbb",
+      "promptEvidenceSha256": "70bb89ffd68b4237a52725cc6f7bc7c1e87c7d0e380ff52485cb4bc75a12a78c",
+      "promptOrder": [
+        {
+          "sha256": "6bd4952ab0a11b3bba35eb5c159c4c84d886aeed3afd47c283ee00afa66870f3",
+          "rank": 1,
+          "key": "J10/1"
+        },
+        {
+          "sha256": "28458de8a0b90cc5955215f6fd36a61818090cc9e617c854bf636366c499e0a8",
+          "rank": 2,
+          "key": "D09/1"
+        },
+        {
+          "sha256": "d5191eb1ae2b7f4d484e0e0e7fcf2d26ac921bcc4d3d47e922ae8a983f056482",
+          "rank": 3,
+          "key": "J08/1"
+        },
+        {
+          "sha256": "849ad5b2f1fe69a56a79f84566d248cdfd6bd91738b37c51bc114f3b941616de",
+          "rank": 4,
+          "key": "S09/1"
+        },
+        {
+          "sha256": "3a546dcabcba0760fb29b0ef4fe101b84f352539b5436a4f2a276ab41fc0c869",
+          "rank": 5,
+          "key": "J04/1"
+        }
+      ]
+    },
+    "E04": {
+      "predictionFile": "backups/D3_BCD_20261114/production-predictions/E04.json",
+      "predictionSha256": "807242046d8266a6a8b0975f667dc5838e33cae10d8fda2e0abb9438ab0d587d",
+      "promptEvidenceSha256": "7bc41cacf5459590a010f3571a3839bc777a55914979965d2d942e78ab46560a",
+      "promptOrder": [
+        {
+          "sha256": "6b43a83f71a3430965300ffb2e7ea697d6b98227f212c15215b4f894a181b4e9",
+          "rank": 1,
+          "key": "D01/1"
+        },
+        {
+          "sha256": "91f249afbf4503c0cd144f5d33ee85128c248263912c6b6d58e16bd9b277ca11",
+          "rank": 2,
+          "key": "D06/1"
+        },
+        {
+          "sha256": "0222aec0efb49de1ed46f23399fc44f090676f62ec4fc746da6b212128c2647b",
+          "rank": 3,
+          "key": "D08/1"
+        },
+        {
+          "sha256": "c687c7f6a83611d48ea6de97d852c2a38f4633abcef8e69720f9e884ef1e4701",
+          "rank": 4,
+          "key": "S07/1"
+        },
+        {
+          "sha256": "e46ba16bb702efcfed4b13397cc2c1a68fd24c8dfb826626d08937cbef7dc5b8",
+          "rank": 5,
+          "key": "S06/1"
+        }
+      ]
+    }
+  },
+  "cases": [
+    {
+      "caseId": "E08-NAMES_ONLY",
+      "bankId": "E08",
+      "scenario": "NAMES_ONLY",
+      "answer": "1. List。2. Set。3. Map。额外用 LinkedHashSet。",
+      "expectations": {
+        "covered": [
+          4
+        ],
+        "partial": [
+          1,
+          2,
+          3
+        ],
+        "missing": [],
+        "incorrect": []
+      },
+      "reviewNotes": "前 3 项指出合适容器，但没给保序保重、去重及按 ID 覆盖的理由。第 4 项题面只要求可行实现，LinkedHashSet 名称即回答该项；若旧策略要求说出普通 HashSet 无承诺，是应标记的口径争议。",
+      "outOfScopeChecks": [
+        "时间复杂度",
+        "源码",
+        "时间戳",
+        "并发"
+      ],
+      "legacyBoundary": "旧题干没有明确前三项逐一解释理由，但旧评分点要求机制。不要把旧策略认可正确选型写成事实错误。"
+    },
+    {
+      "caseId": "E08-BRIEF_CORRECT",
+      "bankId": "E08",
+      "scenario": "BRIEF_CORRECT",
+      "answer": "所有结果放进能原样追加的顺序表，有相同内容也不去掉。另用按插入顺序保存的键值表：键是用户 ID，新结果覆盖该 ID 的旧结果；同一个 ID 不增加新键，也不移动原位置。按键遍历就是首次出现的唯一 ID。",
+      "expectations": {
+        "covered": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "partial": [],
+        "missing": [],
+        "incorrect": []
+      },
+      "reviewNotes": "未写 Java 接口名，但完整给出四个行为。同一按插入顺序的键值表兼顾第 2、3、4 点。若人工要求明确具体类或操作，第 4 点可讨论；写法本身给出了保证顺序的行为，不是只说“用一个表”。",
+      "outOfScopeChecks": [
+        "不得要求另建 Set",
+        "不得仅因缺少 API 名、实现细节、复杂度而判未覆盖"
+      ],
+      "legacyBoundary": "旧 E08 题面问接口名，旧参考与第 2 点措辞更偏向命名。旧/新差异用作表达契约诊断，不当成绝对真值。"
+    },
+    {
+      "caseId": "E08-PARTIAL",
+      "bankId": "E08",
+      "scenario": "PARTIAL",
+      "answer": "每处理完一条就追加到 ArrayList，所以先处理的先排，相同结果也保留。ID 放进 HashSet，重复加也只有一份。用用户 ID 当 Map 的键来查结果。",
+      "expectations": {
+        "covered": [
+          1,
+          2
+        ],
+        "partial": [
+          3
+        ],
+        "missing": [
+          4
+        ],
+        "incorrect": []
+      },
+      "reviewNotes": "已说按键查和用 Map，只缺遇到同一 ID 时覆盖以保留最后结果。没有对首次顺序作承诺；HashSet 是普通去重合理选择，不应把正确第 2 项当成第 4 项的错误回答。",
+      "outOfScopeChecks": [
+        "不得要求第 2 项必须用 LinkedHashSet",
+        "不得把已说的 ID 键查写成全漏"
+      ],
+      "legacyBoundary": null
+    },
+    {
+      "caseId": "E08-FACTUAL_ERROR",
+      "bankId": "E08",
+      "scenario": "FACTUAL_ERROR",
+      "answer": "结果放 HashSet，它会保留相同结果，还会按录入顺序排列。ID 用 HashSet，一个 ID 只存一次。按 ID 查结果用 HashMap，每次 putIfAbsent，这样已有结果会自动替换成最新。唯一 ID 用 TreeSet，就能按第一次遇到的顺序输出。",
+      "expectations": {
+        "covered": [
+          2
+        ],
+        "partial": [],
+        "missing": [],
+        "incorrect": [
+          1,
+          3,
+          4
+        ]
+      },
+      "reviewNotes": "可以承认第 3 项选中以 ID 为键的 Map 结构，但 putIfAbsent 不会覆盖已有的非空结果，因此不能认为完整。HashSet 的去重用于 ID 时是正确表述；第 1 项把它用于保留全部结果则错误。TreeSet 的有序是按比较规则。",
+      "outOfScopeChecks": [
+        "不要把错误方法判为正确覆盖",
+        "不要抹掉正确的第 2 点"
+      ],
+      "legacyBoundary": null
+    },
+    {
+      "caseId": "E04-NAMES_ONLY",
+      "bankId": "E04",
+      "scenario": "NAMES_ONLY",
+      "answer": "ACID 是原子性、一致性、隔离性、持久性。",
+      "expectations": {
+        "covered": [],
+        "partial": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "missing": [
+          5
+        ],
+        "incorrect": []
+      },
+      "reviewNotes": "已写对术语，未解释四种保证，也未回答事务用途。反馈应先明确认可名称，补充说明时避免说“四个特性都没有提到”。",
+      "outOfScopeChecks": [
+        "不把隔离级别、锁、MVCC、redo/undo 当漏项"
+      ],
+      "legacyBoundary": null
+    },
+    {
+      "caseId": "E04-BRIEF_CORRECT",
+      "bankId": "E04",
+      "scenario": "BRIEF_CORRECT",
+      "answer": "原子性是一批操作一起完成，失败就撤销这批已经做的修改。一致性是数据变动前后都合乎规定，比如转账不能凭空多钱。隔离性管并发事务彼此能看到和影响什么。持久性是确认提交后，正常情况下重启也找得到这些修改。扣款和入账放在同一事务，两步一起成，避免只扣没到账。",
+      "expectations": {
+        "covered": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "partial": [],
+        "missing": [],
+        "incorrect": []
+      },
+      "reviewNotes": "简短口语已分别解释四项与事务用途。允许以转账规则说明一致性，不要求“业务不变量”用词。隔离性作用说清就够；持久性用正常重启作例子。",
+      "outOfScopeChecks": [
+        "不因未列隔离级别、刷盘、日志、配置参数而判缺失"
+      ],
+      "legacyBoundary": "旧第 3 点额外要求“不同隔离级别提供不同程度的隔离保证”。答文没有列这个差异，因此旧臂可能对第 3 点有合理分歧；详细名称和底层实现依旧不是旧点的文字要求。"
+    },
+    {
+      "caseId": "E04-PARTIAL",
+      "bankId": "E04",
+      "scenario": "PARTIAL",
+      "answer": "原子性是都做好，否则把这次已经做的操作撤掉。一致性是提交后的数据仍符合表约束。隔离性就是控制并发事务间的相互影响。持久性就是存起来。转账不能只扣款，所以扣款和入账要一起提交。",
+      "expectations": {
+        "covered": [
+          1,
+          3,
+          5
+        ],
+        "partial": [
+          2,
+          4
+        ],
+        "missing": [],
+        "incorrect": []
+      },
+      "reviewNotes": "一致性已说了数据规则，但只提提交后表约束，没有明确正确业务操作与前后一致的联系；“从合规状态到合规状态”可由“仍”推断，故可人工上调第 2 点。第 4 项“存起来”未说明已提交变更及可靠保留。第 3 项的基本作用成立。",
+      "outOfScopeChecks": [
+        "不要把“仍符合表约束”写成完全没提一致性",
+        "不追问隔离级别名或刷盘参数"
+      ],
+      "legacyBoundary": "旧第 3 点有隔离级别差异要求；该差异只影响旧臂完整性判断。新第 2 点明确可用规则作口语解释，边界待人工复核。"
+    },
+    {
+      "caseId": "E04-FACTUAL_ERROR",
+      "bankId": "E04",
+      "scenario": "FACTUAL_ERROR",
+      "answer": "A 是一组修改要一起成功，失败就回滚这组。C 是事务执行前后每个值都不能变。I 是所有隔离级别下并发事务都绝对互不影响。D 是没提交的修改也保证重启后不丢。转账的两条 SQL 放进一个事务，可以防止只扣款没收到。",
+      "expectations": {
+        "covered": [
+          1,
+          5
+        ],
+        "partial": [],
+        "missing": [],
+        "incorrect": [
+          2,
+          3,
+          4
+        ]
+      },
+      "reviewNotes": "A 和用途正确。C 混淆约束与数值不变；I 的绝对保证错误；D 把未提交写入放进持久性保证。先承认已答，再针对事实纠正，不凭长度或术语加分。",
+      "outOfScopeChecks": [
+        "改正错误无需列四种级别或底层日志",
+        "不得把正确原子性和转账用途一并否定"
+      ],
+      "legacyBoundary": null
+    }
+  ]
+}

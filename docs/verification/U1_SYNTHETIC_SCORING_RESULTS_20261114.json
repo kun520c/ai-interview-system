@@ -1,0 +1,112 @@
+{
+  "version": "U1-synthetic-scoring-results-v1-20261114",
+  "status": "completed",
+  "model": "deepseek-flash",
+  "pairedSyntheticCasesPlanned": 8,
+  "responsesObserved": 16,
+  "pairedCasesObserved": 8,
+  "fixedRagEvidence": "D3 historical v3, all 5 items were serialized identically in both v3 and v4.",
+  "fixtureSha256": "239d3ac24503c21f16bbd142e1c9f277b881a3b49994073ac4bfc183ad838adb",
+  "contentSha256": "10a73a3a6f206a98a50bc5f9f69a67c88f33be39a862479b4b4f34d208881847",
+  "frozenPlanSha256": "e52326e0d8c5364ec78c108f6d97d3aca01915849f7a51da13ef19212b693b25",
+  "promptSourceSha256": {
+    "OLD": "a5a4350b68ca6ffb56b3beaf084f6e47d52fcd033b86cc5a32579c9177dbfd11",
+    "NEW": "c1059dd84b7d5cab6dfdc427ae8f459b5b7dd967259008e41642b352a5082341"
+  },
+  "scoringBoundary": "Two arms compare question content and Prompt as a single bundle at fixed evidence. No independent effect size, significance, or revised retrieval claim.",
+  "partialBoundary": "Partial point flags require manual review. The report counts Boolean coverage against frozen engineering notes, not human ground truth.",
+  "humanReview": "PENDING",
+  "spend": {
+    "deepseekAttempts": 16,
+    "embeddingAttempts": 0,
+    "httpStatusCounts": {
+      "200": 16
+    },
+    "attemptsWithoutHeaders": [],
+    "usableUsageRecords": 16,
+    "usage": {
+      "prompt_tokens": 62556,
+      "completion_tokens": 8937,
+      "total_tokens": 71493,
+      "prompt_cache_hit_tokens": 15616,
+      "prompt_cache_miss_tokens": 46940
+    },
+    "peakMeasuredEstimateCny": "0.16600064",
+    "journalSha256AtReport": "8125696763de4fa73e11bac4ecf41b87c17af8d1773ada49707c59a283664f38",
+    "vendorBillReconciled": false
+  },
+  "groups": {
+    "OLD": {
+      "observed": 8,
+      "validated": 7,
+      "flagCounts": {
+        "expectedButUncovered": 5,
+        "partialMarkedCovered": 0,
+        "missingMarkedCovered": 0,
+        "incorrectMarkedCovered": 0
+      },
+      "elapsedMs": {
+        "median": 3399,
+        "max": 4136
+      },
+      "meanModelMissingPointEntries": 3.5714285714285716,
+      "recommendedFollowUp": 6,
+      "javaFollowUp": 2
+    },
+    "NEW": {
+      "observed": 8,
+      "validated": 8,
+      "flagCounts": {
+        "expectedButUncovered": 4,
+        "partialMarkedCovered": 1,
+        "missingMarkedCovered": 0,
+        "incorrectMarkedCovered": 0
+      },
+      "elapsedMs": {
+        "median": 3234.5,
+        "max": 3918
+      },
+      "meanModelMissingPointEntries": 2.75,
+      "recommendedFollowUp": 6,
+      "javaFollowUp": 4
+    }
+  },
+  "perCaseDetails": "Owner-only scoring/SCORING_DETAILS.json. Open after the human review is locked.",
+  "pairedCasesBothValidated": 7,
+  "matchedValidatedGroups": {
+    "OLD": {
+      "observed": 7,
+      "validated": 7,
+      "flagCounts": {
+        "expectedButUncovered": 5,
+        "partialMarkedCovered": 0,
+        "missingMarkedCovered": 0,
+        "incorrectMarkedCovered": 0
+      },
+      "elapsedMs": {
+        "median": 3399,
+        "max": 4136
+      },
+      "meanModelMissingPointEntries": 3.5714285714285716,
+      "recommendedFollowUp": 6,
+      "javaFollowUp": 2
+    },
+    "NEW": {
+      "observed": 7,
+      "validated": 7,
+      "flagCounts": {
+        "expectedButUncovered": 4,
+        "partialMarkedCovered": 1,
+        "missingMarkedCovered": 0,
+        "incorrectMarkedCovered": 0
+      },
+      "elapsedMs": {
+        "median": 3192,
+        "max": 3918
+      },
+      "meanModelMissingPointEntries": 2.7142857142857144,
+      "recommendedFollowUp": 5,
+      "javaFollowUp": 3
+    }
+  }
+}

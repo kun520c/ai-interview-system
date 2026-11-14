@@ -1,0 +1,244 @@
+{
+  "version": "U1-question-content-v1-20261114",
+  "status": "OFFLINE_CANDIDATE_UNAPPLIED",
+  "baseline": {
+    "bankPath": "docs/question-bank/D1_QUESTION_BANK_V2_20261114.json",
+    "bankSha256": "d4c1d9f20664308231ab383f5dce67154f3c5d874fc041b44f7499ce8647177e",
+    "historicalEvaluationImportManifestPath": "docs/question-bank/D1_EVALUATION_IMPORT_MANIFEST_20261114.json",
+    "historicalEvaluationImportManifestSha256": "dfdd58d2a9d4f108178ae068e45afa910a676046264d67ddb841c72816644f74"
+  },
+  "requestFingerprint": "SHA-256 of compact UTF-8 JSON with sorted keys and unescaped non-ASCII, as in D1.",
+  "applicationBoundary": {
+    "endpoint": "PUT /api/admin/questions/{questionId}",
+    "service": "QuestionAdminService.updateQuestion",
+    "requestBody": "只发送 candidateRequest。candidateRevision 是文件版本，不是库字段。",
+    "guard": "仅在已授权的空闲窗口和 evaluation 上经正式服务更新。写前确认目标稳定键唯一、状态一致，当前完整旧请求与基线指纹一致。历史 ID 仅供定位。",
+    "snapshot": "服务事务内更新题干及参考答案并替换评分点，会分配新的评分点 ID。新会话读取当前题库，已创建会话继续读取各自的题干、参考答案和评分点快照，无需重评。",
+    "scope": "仅 E08 和 E04。类别、难度、稳定知识点键、评分点类型、顺序及权重保持基线。",
+    "rollback": "生效前保存在用旧请求、目标身份和历史快照摘要。经同一正式服务回退文本时会再次分配当前评分点 ID，已创建会话仍读取各自快照。"
+  },
+  "questions": [
+    {
+      "bankId": "E08",
+      "knowledgePoint": "collection_semantics",
+      "baselineRevision": 1,
+      "candidateRevision": 2,
+      "historicalEvaluationLookupHint": {
+        "questionId": 85,
+        "status": "ENABLED"
+      },
+      "baselineRequestSha256": "27b5f1e3b9dba943e0174e0fb88044080ce3c7556431ff3675a20d722dcd8d23",
+      "candidateRequestSha256": "2eeef5d0e9f553053a2e699b1c48f570aa48a7f073959b0f32ee243229cfddec",
+      "baselineRequest": {
+        "category": "JAVA_COLLECTION",
+        "knowledgePoint": "collection_semantics",
+        "difficulty": "EASY",
+        "questionContent": "一个导入程序要按原顺序保存每条处理结果（允许重复），另外要记录每个出现过的用户 ID，并能按 ID 查询该用户最新的一条结果。这三份数据分别适合用哪种 Java 集合接口？如果去重后的 ID 也要按首次出现顺序输出，怎么选？",
+        "referenceAnswer": "逐条结果用 List。它能保留元素顺序，常见实现也允许相同元素重复。只记录出现过的 ID，可以用 Set，一个 ID 只保留一份。按 ID 查最新结果，用 Map，以 ID 为键，处理同一 ID 的新结果时替换该键对应的值。\n\n如果去重后的 ID 还需要按首次加入的顺序输出，可以选 LinkedHashSet。Set 接口本身不保证首次加入顺序，要看具体实现。HashSet 没有这个顺序承诺。",
+        "scoringPoints": [
+          {
+            "pointType": "CORE",
+            "content": "为按输入顺序保存全部处理记录选择允许重复的 List 实现，说明它保留位置顺序。",
+            "weight": 25
+          },
+          {
+            "pointType": "KEY",
+            "content": "为 ID 去重选择 Set，说明它用于保存不重复元素。",
+            "weight": 25
+          },
+          {
+            "pointType": "KEY",
+            "content": "为按 ID 查询最新结果选择 Map，说明每个键最多关联一个值，重复出现可更新对应值。",
+            "weight": 30
+          },
+          {
+            "pointType": "PRINCIPLE",
+            "content": "说明需按首次出现顺序遍历去重结果时选 LinkedHashSet 或能保证同样顺序的实现，不能依赖 HashSet 的遍历顺序。",
+            "weight": 20
+          }
+        ]
+      },
+      "candidateRequest": {
+        "category": "JAVA_COLLECTION",
+        "knowledgePoint": "collection_semantics",
+        "difficulty": "EASY",
+        "questionContent": "一个导入任务按顺序处理记录。每条记录都有一个用户 ID，也会得到一条处理结果。\n\n1. 按处理顺序保存所有结果，相同的结果也要保留。\n2. 记录所有出现过的用户 ID，同一个 ID 只保留一次。\n3. 给定一个用户 ID，能查到这个用户最后一次处理的结果。同一 ID 后处理的结果替换先前的结果。\n\n这三项分别适合用什么 Java 集合？请各用一句话说明理由。\n如果第 2 项还要按 ID 第一次出现的顺序输出，请举一种能保证这个顺序的实现或写法。",
+        "referenceAnswer": "1. 用支持追加和保留重复值的 List，例如 ArrayList。每处理完一条，就把结果追加到末尾。\n2. 用 Set 存用户 ID，例如无输出顺序要求时可用 HashSet。重复加入同一个 ID 不会多一项。\n3. 用 Map，以用户 ID 为键、结果为值。用新结果替换该键原有的结果，再按键查。\n\n要按首次出现的顺序输出唯一 ID，可用 LinkedHashSet 的普通 add。重复 add 不改变位置。也可用插入顺序的 LinkedHashMap 存最后结果，按键遍历输出 ID。对已有键执行普通 put 时会更新值，保持键第一次插入的位置。说清行为即可，无需逐字使用接口名或写代码。",
+        "scoringPoints": [
+          {
+            "pointType": "CORE",
+            "content": "选用允许重复的顺序列表，或描述等价的保序容器。每条结果按处理顺序保存，相同结果也追加。只说 List 而未说明行为，只算部分表达。",
+            "weight": 25
+          },
+          {
+            "pointType": "KEY",
+            "content": "用 Set 或等价机制保存唯一用户 ID，说明重复 ID 最终只存一份。可复用满足该行为的键集合，无需另建一个容器。",
+            "weight": 25
+          },
+          {
+            "pointType": "KEY",
+            "content": "用 Map 或等价键值索引，以用户 ID 查结果，并按处理顺序用新结果替换同一 ID 的旧值。只说明可按键查，未说明如何保留最后结果，只覆盖了部分机制。",
+            "weight": 30
+          },
+          {
+            "pointType": "PRINCIPLE",
+            "content": "给出能保证唯一 ID 按首次出现顺序输出的实现或写法，例如 LinkedHashSet，或插入顺序的 LinkedHashMap 键视图配合普通 put，也可仅首次见到 ID 时追加到列表。普通 HashSet、TreeSet 或访问顺序的 LinkedHashMap 不具备该保证。",
+            "weight": 20
+          }
+        ]
+      },
+      "scope": {
+        "requiredPointOrdinals": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "enrichment": "可选例子：ID 序列 B、A、B，唯一输出为 B、A，B 的最后结果来自第三条。例子无独立权重。追加问明示需要一个可行实现或写法。",
+        "outOfScope": [
+          "复杂度分析",
+          "并发更新",
+          "时间戳处理",
+          "集合源码",
+          "为前三项逐一背出实现类名"
+        ]
+      },
+      "contentReview": {
+        "acceptedEquivalents": [
+          "按处理顺序追加的可增长序列，保留重复。",
+          "默认插入顺序 LinkedHashMap 用 put 更新最新值并遍历 keySet。同一结构可满足多个行为。",
+          "只有 Set.add 返回 true 时才将新 ID 追加到有序列表。"
+        ],
+        "rejectedMechanisms": [
+          "HashSet 保存全部历史会压缩相等元素，且无遍历顺序保证。",
+          "putIfAbsent 在目标键已有非 null 值时不会换成最新结果。",
+          "TreeSet 按排序规则而非首次顺序迭代，访问顺序的 LinkedHashMap 也可能移动键。"
+        ],
+        "sources": [
+          "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html",
+          "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html",
+          "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html",
+          "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/LinkedHashSet.html",
+          "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/LinkedHashMap.html"
+        ]
+      }
+    },
+    {
+      "bankId": "E04",
+      "knowledgePoint": "transaction_acid",
+      "baselineRevision": 1,
+      "candidateRevision": 2,
+      "historicalEvaluationLookupHint": {
+        "questionId": 24,
+        "status": "ENABLED"
+      },
+      "baselineRequestSha256": "583228e52f0055cc7ae9014f486c6d44f36085ee888f2e1a72cc0b56ce175480",
+      "candidateRequestSha256": "4fc55a54083e1d43685552838c2250d2b13b61625814b19da50a880a08dcb2cb",
+      "baselineRequest": {
+        "category": "MYSQL",
+        "knowledgePoint": "transaction_acid",
+        "difficulty": "EASY",
+        "questionContent": "MySQL 事务的 ACID 分别指什么？为什么数据库需要事务？",
+        "referenceAnswer": "A 是原子性，一组操作要么全部成功，要么全部回滚；C 是一致性，事务执行前后数据库应该满足定义好的数据约束和业务不变量；I 是隔离性，并发事务之间需要按照一定隔离规则运行；D 是持久性，事务提交成功以后结果应该能够被持久保存。\n\n事务的意义是把多个相关数据库操作组成一个逻辑工作单元。例如转账不能只扣一个账户的钱却没有给另一个账户加钱。\n\n不同隔离级别会在并发性能和隔离程度之间做权衡。",
+        "scoringPoints": [
+          {
+            "pointType": "CORE",
+            "content": "能说明原子性表示事务中的操作作为一个整体成功或整体回滚。",
+            "weight": 20
+          },
+          {
+            "pointType": "KEY",
+            "content": "能说明一致性表示事务执行前后数据仍满足数据库约束和业务不变量。",
+            "weight": 20
+          },
+          {
+            "pointType": "KEY",
+            "content": "能说明隔离性用于控制并发事务之间的相互影响，不同隔离级别提供不同程度的隔离保证。",
+            "weight": 20
+          },
+          {
+            "pointType": "KEY",
+            "content": "能说明持久性表示事务成功提交后的结果应当被可靠保存。",
+            "weight": 20
+          },
+          {
+            "pointType": "PRINCIPLE",
+            "content": "能说明事务用于把多个相关数据库操作组成一个逻辑工作单元，避免出现部分成功导致的业务不一致。",
+            "weight": 20
+          }
+        ]
+      },
+      "candidateRequest": {
+        "category": "MYSQL",
+        "knowledgePoint": "transaction_acid",
+        "difficulty": "EASY",
+        "questionContent": "MySQL 的 ACID 分别代表哪四个特性？请各用一句话说明基本含义，再说明为什么同一次业务操作里的多条 SQL 有时需要放在同一个事务中。可用自己的话回答。本题不要求列出隔离级别或解释底层日志。",
+        "referenceAnswer": "A 是原子性：一次事务中的操作要么整体成功，要么整体回滚。\nC 是一致性：正确业务操作与已定义的数据约束配合，让数据从一个符合规则的状态变到另一个符合规则的状态。值本身可以改变。\nI 是隔离性：按所用的隔离保证控制并发事务之间能看到或影响什么。\nD 是持久性：成功提交的变更按适用的持久化保证保存，例如正常持久化保障下重启仍可恢复。\n\n同一业务中的相关 SQL 有时需要一起提交或一起回滚，否则可能只完成一部分。例如转账不能只扣款而没入账。",
+        "scoringPoints": [
+          {
+            "pointType": "CORE",
+            "content": "A：说明事务内操作整体成功或整体回滚。说清“都做成，否则撤销本次已做的操作”即可，无需术语或日志细节。",
+            "weight": 20
+          },
+          {
+            "pointType": "KEY",
+            "content": "C：说明正确的事务操作应让数据继续符合已定义的规则。能解释具体规则或用口语说明前后都合规即可，无需“业务不变量”等固定术语。数据不变或系统自动理解所有业务规则属于误解。",
+            "weight": 20
+          },
+          {
+            "pointType": "KEY",
+            "content": "I：说明事务并发时彼此可见或干扰的范围受到隔离保障约束。说清基本作用即可，无需列出隔离级别或展开实现。断言任何级别均完全互不影响不算完整正确。",
+            "weight": 20
+          },
+          {
+            "pointType": "KEY",
+            "content": "D：说明成功提交的结果能被可靠保存，例如重启后仍能恢复已提交修改。按通常持久化条件解释即可，无需刷盘、配置参数或日志细节。未提交变更不受该保证。",
+            "weight": 20
+          },
+          {
+            "pointType": "PRINCIPLE",
+            "content": "说明把业务相关 SQL 作为一个工作单元，并说明这样能避免只成功一部分造成业务状态不合理。能用转账扣款和入账等正确例子表达同一原因即可。",
+            "weight": 20
+          }
+        ]
+      },
+      "scope": {
+        "requiredPointOrdinals": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "enrichment": "转账规则、并发可见性的例子、重启恢复可以帮助说明同一机制，无额外评分点或固定加分。不因没用同义术语或示例而判遗漏。准确解释含义即可，单独罗列名称只算部分表达。",
+        "outOfScope": [
+          "具体隔离级别名称及差异",
+          "MVCC",
+          "锁",
+          "redo/undo",
+          "刷盘参数",
+          "数据库约束的底层实现"
+        ]
+      },
+      "contentReview": {
+        "acceptedEquivalents": [
+          "要么整组写进去，要么撤销这组已做的修改。",
+          "余额可以改变，但转账两边合起来没凭空多钱或少钱。",
+          "并发事务彼此能看到哪些变化有约束。",
+          "正常持久化条件下，已提交记录重启后还找得到。"
+        ],
+        "rejectedMechanisms": [
+          "某条失败后依旧提交前半部分不满足事务整体回滚。",
+          "一致性不是数据值不变或数据库无条件理解业务规则。",
+          "隔离规则不能一概理解为完全互不影响。",
+          "持久性以提交成功和适用保证为边界。"
+        ],
+        "sources": [
+          "https://dev.mysql.com/doc/refman/8.0/en/mysql-acid.html",
+          "https://dev.mysql.com/doc/refman/8.0/en/commit.html",
+          "docs/rag/source-documents/e04_mysql_8_0_transaction_acid.md"
+        ]
+      }
+    }
+  ]
+}
