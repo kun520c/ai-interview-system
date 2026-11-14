@@ -329,6 +329,10 @@ Do not:
 
 Report the actual test, failure, error, and skipped counts for each relevant run. Do not treat historical counts as permanent expectations. A conditionally skipped real-service test is not a failure, but it is also not evidence that real integration passed.
 
+### Standing DeepSeek API authorization
+
+User authorization recorded on 2026-11-14 (Asia/Shanghai): agents may autonomously use DeepSeek API credits for this project's real functional tests, AI scoring, follow-up questions, report generation, and multi-AI tests without requesting confirmation for each use. This authorization persists for future work in this project; it does not expand the current task's scope or require model calls when they are unnecessary. Continue to protect credentials, preserve environment isolation, and report actual calls and available usage evidence without inventing cost figures.
+
 ### Real external Smoke Tests
 
 Phase 0.5 canonical targets: normal `local` uses MySQL `ai_interview` and Milvus `default/knowledge_chunk_vectors_local`; automated tests use `ai_interview_test` and `knowledge_chunk_vectors_test`; AI baseline uses only the `evaluation` profile, `ai_interview_evaluation`, and `knowledge_chunk_vectors_evaluation`. Never override test/evaluation targets to formal local. `EnvironmentIsolationInitializer` validates resolved settings before datasource or Milvus initialization; do not bypass it. Historical verification records below describe their original environments and are not current startup instructions.
@@ -836,7 +840,9 @@ Interview Workflow core completed capability on 2026-09-09:
 
 Interview Session creation/start completed capability on 2026-09-14:
 
-### Session plan and deterministic selection
+### Session plan and deterministic selection (historical, before D2)
+
+D2 update (2026-11-14): `QuestionPlanSelector` now chooses one ENABLED question uniformly within each required category, after deduplicating IDs and sorting each bucket by ID. Production obtains `ThreadLocalRandom` for each call; tests can supply a call-local bounded-index function. The plan must have exactly one slot per required category, with no fill from unrelated categories. EASY/MEDIUM/HARD remain 5/7/9, category order remains the snapshot order, and missing categories fail before Session persistence. The existing difficulty-filtered candidate SQL, snapshot validation, transactions and CAS remain unchanged. Cross-session deduplication is not implemented. The following deterministic-selection description records the earlier stage.
 
 * The implemented creation chain is `userId + difficulty -> active Session fast idempotency check -> InterviewPlanConfig -> query ENABLED Questions by difficulty -> QuestionPlanSelector -> query ENABLED scoring points -> create CREATED Session draft -> transaction -> lock user row FOR UPDATE -> recheck active Session -> insert Session -> construct all MAIN snapshots -> batch insert all MAIN questions -> reload planOrder=1 MAIN -> first MAIN PENDING -> WAITING_ANSWER -> Session CREATED -> IN_PROGRESS`.
 * All MAIN questions are selected, snapshotted, and persisted once when the Session is created. They are not reselected during the interview.

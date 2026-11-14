@@ -32,6 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
+# Workstation metadata and the separately managed nested checkout
+.DS_Store
+/ai-interview-system/
+
 src/main/resources/application-local.yaml
 
 # Private environment and credential files
