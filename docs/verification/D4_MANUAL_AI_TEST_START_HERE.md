@@ -2,6 +2,16 @@
 
 本次交接适用于本机隔离的 `evaluation` 环境。语料与向量已完成逐条对账，生产业务集和公开冻结集的 Prompt 证据相关率均低于门槛。测试时记录具体误判、缺证据和恢复行为。最终准入与真实 HTTP 冒烟以 [D3-B/C/D 最终验收](D3_BCD_FINAL_ACCEPTANCE_20261114.md) 为准。
 
+## D3-E 补充：先分开功能与质量
+
+2026-11-14 D3-E 没有上线新选择器：当前基线仍为 Top5、水合后全部进入 Prompt、evaluation 默认阈值关闭。[质量复核与准入](D3E_EVIDENCE_QUALITY_REVIEW_20261114.md)的结论为功能体验 **CONDITIONAL_GO**、评分质量 **NO_GO**；不要把可完成面试当作评分可信度已验收。相关性 [12 张盲卡](D4_RELEVANCE_REVIEW_CARDS_20261114.md)和评分盲卡均待人工独立填写，确认并锁定判断后才看各自索引。
+
+本轮只读预检发现近期更新的进行中会话，因此未切换或重启服务、未做新的 EASY HTTP 回归。预检复用旧工具读取了仓库 `.env` 的数据库凭据，按 D3-E 附件限定凭据来源的字面要求存在偏差；只读查询已停止。下面的旧启动器也会读取 `.env`，不适合作为满足该附件限制的本轮新测试入口。检查时后端 `127.0.0.1:18482` PID 76627，前端 `127.0.0.1:15174` PID 76174；PID 可能变化，使用前重新检查。原运行进程来自此前工作区构建，含当时 D2 未提交代码，不能仅用当前 HEAD 推定其二进制 SHA。数据仍使用 evaluation；代码版本和 51 篇/52 块数据版本分别记录。若出现活动人工会话，保留现有服务并等待安全窗口；不要为测试强制停止或覆盖会话。当前没有本轮策略切换，回退即维持此前基线配置；若以后另行变更，应在安全窗口按已记录版本重新启动并重新验证。
+
+U1-R1 后续更新：下方启动器已改用独立的 `~/.config/ai-interview/evaluation-db.env`，不再从项目 `.env` 读取数据库账号或其他字段。上段保留 D3-E 当时的历史事实；专用配置和现有账号的 evaluation 访问权限仍需各自验证。
+
+评分盲卡位于 `backups/D3E_20261114_scoring_v1/SCORING_BLIND_CARDS.md`，独立索引位于同目录 `SCORING_BLIND_INDEX.json`；两者仅供本机有权限的复核人使用，不要在评价前打开索引。人工盲审不要求更改数据库或发起额外模型请求。
+
 ## 1. 在本机启动
 
 使用 Java 21、Node 24 和项目 Maven Wrapper。后端目标固定为 MySQL `127.0.0.1:3308/ai_interview_evaluation` 和 Milvus `127.0.0.1:19532/default/knowledge_chunk_vectors_evaluation`。先用 `lsof` 确认端口属于本轮 evaluation 进程，再直接访问。否则在项目根目录启动后端。
@@ -15,7 +25,7 @@ mkdir -p backups/D3_BCD_20261114
 python3 -B tools/rag-d3/start_evaluation.py
 ```
 
-后端监听 [127.0.0.1:18482](http://127.0.0.1:18482)。启动时会读取项目根目录 `.env` 及 `~/.config/ai-interview/evaluation-embedding.env`、`~/.config/ai-interview/evaluation-deepseek.env`。凭据由启动器加载到子进程。每次启动会生成新的本地 JWT 签名密钥，之前的登录状态失效时重新登录即可。可以在权限受控的终端前台查看日志，或在 `umask 077` 后将输出追加到 `backups/D3_BCD_20261114/d4-backend.log`。本轮进程和日志的现场状态见最终验收记录。
+后端监听 [127.0.0.1:18482](http://127.0.0.1:18482)。启动时从 `~/.config/ai-interview/evaluation-db.env` 读取专用数据库字段，并从独立的 evaluation 模型配置加载运行所需配置。数据库目录须为 0700、文件须为 0600，目标固定为 `127.0.0.1:3308/ai_interview_evaluation`；参见 [D3 工具说明](../../tools/rag-d3/README.md)。凭据由启动器加载到子进程。每次启动会生成新的本地 JWT 签名密钥，之前的登录状态失效时重新登录即可。可以在权限受控的终端前台查看日志，或在 `umask 077` 后将输出追加到 `backups/D3_BCD_20261114/d4-backend.log`。本轮进程和日志的现场状态见最终验收记录。
 
 另开终端，从同一个仓库启动前端。已有 `frontend/node_modules` 时可直接执行，首次安装可用 `npm --prefix frontend ci`。
 
