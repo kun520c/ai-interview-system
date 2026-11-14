@@ -2,6 +2,8 @@
 
 从仓库根目录运行。Java 21，Python 3.9 或更新版本。工作簿只读导出用 `openpyxl`。`backups/D3_BCD_20261114` 是 Git 忽略的 0700 工作目录，受保护文件按 0600 保存。
 
+evaluation 数据库入口使用 `~/.config/ai-interview/evaluation-db.env`；目录权限必须为 0700，文件权限必须为 0600。文件仅允许 `EVALUATION_DB_USERNAME`、`EVALUATION_DB_PASSWORD` 和可选的 `EVALUATION_DB_URL`，账号不得为 root。URL 留空时由工具固定为 `127.0.0.1:3308/ai_interview_evaluation`；如果提供，只接受该 evaluation 地址。不要在终端输出密码或用 `source` 执行配置。配置不存在、权限不符或目标不符时启动器停止，不从项目 `.env` 或其他数据库变量回退。MySQL 还必须允许该现有账号访问 evaluation；工具不会创建账号或授权。
+
 ```bash
 umask 077
 mkdir -p backups/D3_BCD_20261114

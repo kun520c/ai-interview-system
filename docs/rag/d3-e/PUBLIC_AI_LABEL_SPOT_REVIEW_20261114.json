@@ -1,0 +1,167 @@
+{
+  "version": "D3E-ai-label-spot-review-v1",
+  "date": "2026-11-14",
+  "status": "AI_TEMPORARY_HUMAN_REVIEW_PENDING",
+  "scope": "公开冻结集，三个查询每个四对。优先含原标注分歧的样本，再加入实际 Prompt 对。用途为定向诊断，不能外推总体可靠度。",
+  "reviewIsolation": "复审在相对隔离的子代理上下文进行。评分时只展示查询和打散的完整正文，遮蔽文档 ID、排序、相似度、策略名及历史标签；查询选择利用已知结果。审查者已接触公开资料和规程，非未见留出评测。",
+  "pairs": 12,
+  "agreeWithFrozenLabel": 11,
+  "disagreeWithFrozenLabel": 1,
+  "directVsOtherDisagreements": 0,
+  "humanReviews": 0,
+  "paidApiAttempts": 0,
+  "rows": [
+    {
+      "queryId": "Q04",
+      "chunkKey": "J14/1",
+      "bodySha256": "cc39d4a6fdbfd7dd23c1b4a1b1612128131690358622eb6308dd4a405fc896b0",
+      "previousAIJudgments": [
+        "RELATED_ONLY",
+        "IRRELEVANT"
+      ],
+      "frozenLabel": "RELATED_ONLY",
+      "reviewLabel": "RELATED_ONLY",
+      "reviewSpans": [],
+      "reviewReason": "指出 get 后按旧值 put 可能丢更新，可帮助诊断，但在本题上下文中未给共享配置的发布机制或业务计数的原子操作。"
+    },
+    {
+      "queryId": "Q04",
+      "chunkKey": "J15/1",
+      "bodySha256": "77be1a5853338fe5145f19c54faafb8d5b128e5045949e0c6479750a3677db43",
+      "previousAIJudgments": [
+        "DIRECT",
+        "RELATED_ONLY"
+      ],
+      "frozenLabel": "DIRECT",
+      "reviewLabel": "DIRECT",
+      "reviewSpans": [
+        {
+          "startUtf16": 138,
+          "endUtf16": 217,
+          "quote": "ConcurrentHashMap.merge(key, 1, Integer::sum) 或 compute 可把同一键的查找、计算、写入作为原子方法操作。"
+        }
+      ],
+      "reviewReason": "Java 21 单键计数原子性，可直接支持访问次数累加。并发读取配置还需给出发布关系，不能把发布概念本身当机制。单键计数是可用替代。"
+    },
+    {
+      "queryId": "Q04",
+      "chunkKey": "D12/1",
+      "bodySha256": "d717a032d91ff277259c986e34553640dc871501f90cdd743d46e4fc04384dea",
+      "previousAIJudgments": null,
+      "frozenLabel": "IRRELEVANT",
+      "reviewLabel": "IRRELEVANT",
+      "reviewSpans": [],
+      "reviewReason": "Redis 分布式租约及客户端故障边界不能说明 Java 后台线程读取共享配置和更新进程内访问计数。"
+    },
+    {
+      "queryId": "Q04",
+      "chunkKey": "J20/1",
+      "bodySha256": "6fa2de891a6f21f7ea526f94bfacb0ebc4c6d08bfdb8ddc8bf3b676275f7f03a",
+      "previousAIJudgments": null,
+      "frozenLabel": "DIRECT",
+      "reviewLabel": "DIRECT",
+      "reviewSpans": [
+        {
+          "startUtf16": 145,
+          "endUtf16": 199,
+          "quote": "发布者可先填充数据再写 volatile ready，读取线程观察 ready 后可看到对应发布之前的操作。"
+        },
+        {
+          "startUtf16": 285,
+          "endUtf16": 347,
+          "quote": "单变量计数可用 AtomicInteger.incrementAndGet，多个字段共同满足不变量时用同一锁覆盖整个临界区。"
+        }
+      ],
+      "reviewReason": "直接覆盖 volatile 发布与真正原子更新，正文有配置持续写入和多字段不变量的边界。"
+    },
+    {
+      "queryId": "Q41",
+      "chunkKey": "S04/1",
+      "bodySha256": "ac7c8e3429dc913f3fab199c0bf3542f69ebe20e4964eec921ae778df854ea7b",
+      "previousAIJudgments": [
+        "IRRELEVANT",
+        "RELATED_ONLY"
+      ],
+      "frozenLabel": "RELATED_ONLY",
+      "reviewLabel": "RELATED_ONLY",
+      "reviewSpans": [],
+      "reviewReason": "先经 Spring 代理是前置条件，正文不说明已开启的保存点与独立事务在锁和提交上的差异。"
+    },
+    {
+      "queryId": "Q41",
+      "chunkKey": "S06/1",
+      "bodySha256": "e46ba16bb702efcfed4b13397cc2c1a68fd24c8dfb826626d08937cbef7dc5b8",
+      "previousAIJudgments": null,
+      "frozenLabel": "RELATED_ONLY",
+      "reviewLabel": "RELATED_ONLY",
+      "reviewSpans": [],
+      "reviewReason": "同一事务的 rollback-only 与锁持有时间可作背景，缺保存点机制、独立物理事务及相互等待的解释。"
+    },
+    {
+      "queryId": "Q41",
+      "chunkKey": "S08/1",
+      "bodySha256": "347117e113f8a6da5972871623071a0139349facff35a628b3c323aea3bac87d",
+      "previousAIJudgments": [
+        "RELATED_ONLY",
+        "IRRELEVANT"
+      ],
+      "frozenLabel": "RELATED_ONLY",
+      "reviewLabel": "RELATED_ONLY",
+      "reviewSpans": [],
+      "reviewReason": "提交后另开事务写确认属于相邻场景，未说明外层仍持锁时的独立事务，也未说明保存点回滚。"
+    },
+    {
+      "queryId": "Q41",
+      "chunkKey": "D08/1",
+      "bodySha256": "0222aec0efb49de1ed46f23399fc44f090676f62ec4fc746da6b212128c2647b",
+      "previousAIJudgments": null,
+      "frozenLabel": "IRRELEVANT",
+      "reviewLabel": "RELATED_ONLY",
+      "reviewSpans": [],
+      "reviewReason": "InnoDB 行锁与完整事务结束可作背景，没有内外层传播、保存点或独立提交机制。"
+    },
+    {
+      "queryId": "Q52",
+      "chunkKey": "J22/1",
+      "bodySha256": "49264d49f8b9cc5a0afe77d7ae2952c16cc0efd6d58c42f360c79dce5b6a672a",
+      "previousAIJudgments": null,
+      "frozenLabel": "RELATED_ONLY",
+      "reviewLabel": "RELATED_ONLY",
+      "reviewSpans": [],
+      "reviewReason": "支持识别池配置与入队顺序，无法确定指定生产实例所装配的值。"
+    },
+    {
+      "queryId": "Q52",
+      "chunkKey": "J11/1",
+      "bodySha256": "9c6da9ac2fd354d55f7fa47d38752ac5f2ff9b92de613273537a128a5e83afea",
+      "previousAIJudgments": [
+        "RELATED_ONLY",
+        "IRRELEVANT"
+      ],
+      "frozenLabel": "RELATED_ONLY",
+      "reviewLabel": "RELATED_ONLY",
+      "reviewSpans": [],
+      "reviewReason": "说明构造容量和实际硬上限可能不同，未证明指定执行器的队列类型或当前配置。"
+    },
+    {
+      "queryId": "Q52",
+      "chunkKey": "J21/1",
+      "bodySha256": "63bcba7c73387c5a835aaa1b63ca838dd97293a3f64f197ae8ba2a58727be839",
+      "previousAIJudgments": null,
+      "frozenLabel": "IRRELEVANT",
+      "reviewLabel": "IRRELEVANT",
+      "reviewSpans": [],
+      "reviewReason": "wait、sleep 和中断语义不能确定执行器最大线程、队列实现或实例覆盖。"
+    },
+    {
+      "queryId": "Q52",
+      "chunkKey": "J23/1",
+      "bodySha256": "0d1b2e53f75b078ebcb83936f8b16e1edb01eb42ca48652d10f44ea38674ae82",
+      "previousAIJudgments": null,
+      "frozenLabel": "RELATED_ONLY",
+      "reviewLabel": "RELATED_ONLY",
+      "reviewSpans": [],
+      "reviewReason": "说明默认和显式执行器的选择可作定位线索，无法确定特定生产实例使用哪个执行器、最大线程或队列。"
+    }
+  ]
+}

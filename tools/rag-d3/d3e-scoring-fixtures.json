@@ -1,0 +1,54 @@
+{
+  "version": "D3E-scoring-v1",
+  "cases": [
+    {
+      "queryId": "E01",
+      "mainAnswer": "我会用接口约定支付行为，银行卡和积分支付分别实现它，单个类也可实现其他接口。若这一组实现确有共同基类和要共享的实例字段及构造逻辑，可用带实现的抽象类。类只能直接继承一个父类。接口能有默认实现，但没有普通实例字段。",
+      "coveredPoints": [1, 2, 3, 4],
+      "referenceChecks": ["应认可已给出的契约、单继承/多接口、共享状态以及选型四个机制。", "不要把 default 方法误判为抽象类专属。"]
+    },
+    {
+      "queryId": "M09",
+      "mainAnswer": "方法接收 List<? extends Number> source 和 List<? super Number> target。for (Number value : source) target.add(value)。源元素可读成 Number，但不能写入任意非 null 的 Number。目标能放 Number 或 Integer；直接读目标元素只能保证 Object。",
+      "coveredPoints": [2, 3, 4, 5],
+      "referenceChecks": ["缺少泛型不变性及 Double 破坏整数列表的解释。", "不能说参数签名或通配符的读写能力没有给出。"]
+    },
+    {
+      "queryId": "M10",
+      "mainAnswer": "这个异常表示另一个线程改了集合，抓住它再继续即可。单线程直接用增强 for 删除就不会抛。set 也算删除再插入，所以不能在这个循环里用。",
+      "coveredPoints": [],
+      "referenceChecks": ["指出增强 for 使用迭代器，列表增删会绕过该迭代器，单线程也可能抛异常。", "区分非结构性 set 与增删，并给出 Iterator.remove 或 removeIf。", "捕获 fail-fast 异常不能替代并发控制。"]
+    },
+    {
+      "queryId": "H18",
+      "mainAnswer": "明细用 REQUIRED，进入已有的物理事务并跟随订单提交或回滚。若已经标记 rollback-only，外层捕获仍可能在提交时报 UnexpectedRollbackException。审计用 REQUIRES_NEW，挂起外层后独立提交，注意额外连接和外层锁，避免读外层未提交数据。优惠我也用 REQUIRES_NEW，它成功后不应该和订单一起撤销。",
+      "coveredPoints": [1, 2, 4, 5],
+      "referenceChecks": ["未覆盖 NESTED 的局部回滚和外层后续回滚语义。", "应认可订单明细与失败审计的传播行为、异常和资源风险已经说明。"]
+    },
+    {
+      "queryId": "H20",
+      "mainAnswer": "RR 的第二次普通 SELECT 沿用首个快照，读 10；RC 的普通读每条用新快照，读 8。两种隔离级别在此时序的 FOR UPDATE 都锁定并读 8。更新后均能读到自己的写入 7。扣减直接用条件 UPDATE 检查当前库存与更新行数，这样不会依据旧快照判断。",
+      "coveredPoints": [1, 2, 3, 4, 5],
+      "referenceChecks": ["条件 UPDATE 是高级点接受的替代方案，不能因没有先 SELECT FOR UPDATE 而视为漏答。", "应逐项认可 RR、RC、锁定读和读己之写。"]
+    },
+    {
+      "queryId": "H22",
+      "mainAnswer": "先查 Redis，缺失就读权威 MySQL 后回填，写时先提交数据库再删缓存。我认为这个顺序保证不会再出现旧值。热点可以对同一键只放一个加载者，拿到资格后再查缓存，其他请求有限等待，超时读已有可容忍的值或降级。在多实例下本地合并只能管理本实例。",
+      "coveredPoints": [1, 4, 5],
+      "referenceChecks": ["旧读拿到旧值后可能在删除完成之后才回填，先写库再删不消除竞态。", "热点合并、二次检查、有限等待和多实例边界已经陈述。"]
+    },
+    {
+      "queryId": "H25",
+      "mainAnswer": "如果能确认这次请求没发送，服务端没有收到这次尝试；读超时则可能已经提交。GET、同一 URI 同一载荷的 PUT 可以在剩余时间内有限退避重试，效果相同不保证每次响应相同。订单 POST 若要自动重试，客户端复用同一幂等键和载荷；服务器可持久化唯一订单业务标识和载荷摘要，在同一事务保存结果，重复请求回查原订单，摘要不同拒绝。权限、参数错误不重试。",
+      "coveredPoints": [1, 2, 3, 4, 5],
+      "referenceChecks": ["唯一订单业务标识加事务内结果存储是有效的服务端合同。", "追问不应重复询问已经给出的超时、同键异载荷或限次语义。"]
+    },
+    {
+      "queryId": "E05-F",
+      "mainAnswer": "TCP 可靠并适合数据库连接。UDP 比较快，我暂时不能说它如何组织数据。",
+      "followUpAnswer": "TCP 先建连接并提供有序可靠字节流，接收端确认，丢失可重传；UDP 直接发数据报，协议本身不保证到达和顺序，例如可容忍少量丢包的实时语音可以用它。",
+      "coveredPoints": [1, 2, 4],
+      "referenceChecks": ["追问补足 TCP/UDP 核心对比、确认重传和场景选择。", "两段回答仍没解释 TCP 的流控和拥塞控制。", "追问综合评价应覆盖完整评分点且不再追问。"]
+    }
+  ]
+}

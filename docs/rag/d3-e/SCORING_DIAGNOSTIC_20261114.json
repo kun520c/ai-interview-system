@@ -1,0 +1,65 @@
+{
+  "version": "D3E-scoring-v1",
+  "countPlanned": 16,
+  "pairsPlanned": 8,
+  "protocol": "固定回答与评分点，交错 A/C，各一次；C 为截取前两条合法证据的诊断对照。",
+  "diagnosticsLimit": "覆盖对比使用调用前冻结的工程判定，原统计与冻结夹具保留；所列争议与边界、文字反馈及追问均待独立人工复核。",
+  "humanStatus": "PENDING",
+  "pendingReview": {
+    "binaryDisputes": {
+      "E01.03": "回答提到共享字段、构造逻辑和带实现的抽象类，未明确说明可同时声明抽象方法。需确认整条评分点能否记为已覆盖。",
+      "H25.03": "回答给出 POST 重试所需的稳定幂等键和同一载荷，未明确解释无保护重放会重复创建订单。需确认整条评分点能否记为已覆盖。"
+    },
+    "incompleteBoundaryNotes": {
+      "M09.05": "回答明确目标元素只能按 Object 读取，未说明原列表可能包含非 Number 对象。",
+      "E05-F.01": "追问回答写出 TCP 先建连接、UDP 直接发数据报，未用独立措辞明确 UDP 不需建立 TCP 式连接。",
+      "H18.04": "回答说明挂起外层及审计独立提交，独立提交或回滚和外层回滚后仍保留可分别核对。"
+    }
+  },
+  "model": "deepseek-flash",
+  "frozenPlanSha256": "a0b0c365f8357d2f4a15e11337fb38a5d9db747ece0ab75d21d1491da8aa298b",
+  "fixtureSha256": "fb4165825085fa82d920860fabd212de5a73cef686439339c03de7a1469e684c",
+  "evidenceSource": "D3-BCD frozen production predictions",
+  "evidenceNetworkAttempts": 0,
+  "httpAttempts": 16,
+  "http200": 16,
+  "usageCount": 16,
+  "usage": {
+    "prompt_tokens": 49413,
+    "completion_tokens": 9691,
+    "total_tokens": 59104,
+    "prompt_cache_hit_tokens": 21632,
+    "prompt_cache_miss_tokens": 27781
+  },
+  "peakEstimateCny": "0.13395528",
+  "vendorBillReconciled": false,
+  "privateUsageJournalSha256": "2a9fccc69a1cc266f11795986a8d6d85dfc11f93725030be902c207ffcf0c713",
+  "aggregate": {
+    "A": {
+      "count": 8,
+      "validated": 8,
+      "exactPointCoverageMatches": 5,
+      "exactCoreCoverageMatches": 7,
+      "missingPointFlags": 3,
+      "extraPointFlags": 1,
+      "missingCoreFlags": 0,
+      "extraCoreFlags": 1,
+      "followUpRecommendations": 6,
+      "javaFollowUps": 3,
+      "medianElapsedMs": 3673.5
+    },
+    "C": {
+      "count": 8,
+      "validated": 8,
+      "exactPointCoverageMatches": 6,
+      "exactCoreCoverageMatches": 8,
+      "missingPointFlags": 2,
+      "extraPointFlags": 0,
+      "missingCoreFlags": 0,
+      "extraCoreFlags": 0,
+      "followUpRecommendations": 3,
+      "javaFollowUps": 2,
+      "medianElapsedMs": 3449.5
+    }
+  }
+}

@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-from config import protected_config
+from config import evaluation_database_config, protected_config
 
 WORK = Path('backups/D3_BCD_20261114')
 MODEL_CONFIG = Path.home() / '.config/ai-interview/evaluation-embedding.env'
@@ -16,10 +16,8 @@ JDK_OPTIONS = ('-Djdk.httpclient.redirects.retrylimit=1', '-Djdk.httpclient.disa
 
 
 def evaluation_environment(paid):
-    local = protected_config('.env')
     env = {key: os.environ[key] for key in ('PATH', 'HOME', 'JAVA_HOME', 'LANG', 'TMPDIR') if key in os.environ}
-    env['EVALUATION_DB_USERNAME'] = 'root'
-    env['EVALUATION_DB_PASSWORD'] = local['AI_MYSQL_ROOT_PASSWORD']
+    env.update(evaluation_database_config())
     if paid:
         embedding = protected_config(MODEL_CONFIG)
         if not embedding.get('EMBEDDING_API_KEY') or 'placeholder' in embedding['EMBEDDING_API_KEY'].lower():

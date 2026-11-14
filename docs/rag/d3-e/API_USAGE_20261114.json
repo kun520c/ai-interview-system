@@ -1,0 +1,44 @@
+{
+  "version": "D3E-usage-v1",
+  "currency": "CNY",
+  "budget": "沿用 D3-BCD 累计：执行器估算 20 元、Embedding 300 次、DeepSeek 200 次；非供应商硬封顶",
+  "historical": {
+    "embeddingAttempts": 215,
+    "embeddingInputTokens": 42660,
+    "deepseekAttempts": 10,
+    "peakEstimatedCny": "0.12513232"
+  },
+  "d3e": {
+    "replayEmbeddingAttempts": 0,
+    "scoringEmbeddingAttempts": 0,
+    "scoringDeepSeekAttempts": 16,
+    "http200": 16,
+    "promptTokens": 49413,
+    "cachedPromptTokens": 21632,
+    "uncachedPromptTokens": 27781,
+    "completionTokens": 9691,
+    "totalTokens": 59104,
+    "peakEstimatedCny": "0.13395528",
+    "easyEmbeddingAttempts": 0,
+    "easyDeepSeekAttempts": 0,
+    "balancePreflightSandboxFailure": 1,
+    "balancePreflightSucceeded": 1
+  },
+  "cumulative": {
+    "embeddingAttempts": 215,
+    "deepseekAttempts": 26,
+    "peakEstimatedCny": "0.25908760"
+  },
+  "pricesCnyPerMillionTokens": {
+    "embeddingBeijingInput": "0.5",
+    "deepseekCachedInputPeak": "0.04",
+    "deepseekUncachedInputPeak": "2",
+    "deepseekOutputPeak": "8"
+  },
+  "sources": [
+    "https://help.aliyun.com/zh/model-studio/qwen3-7-text-embedding",
+    "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/"
+  ],
+  "vendorBillReconciled": false,
+  "notes": "每次模型请求计一次；usage 的估价非实际账单。EASY 在活动会话预检后停止。"
+}
