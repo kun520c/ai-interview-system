@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 
 import { displayCategory } from '@/features/interview/copy/categoryDisplay'
+import { displayKnowledgePoint } from '@/features/interview/copy/knowledgePointDisplay'
 import {
   currentMainNumber,
   isFollowUpQuestion,
@@ -49,7 +50,7 @@ const progressWidth = computed(() => {
     </div>
     <p v-if="categoryLabel || knowledgePoint" class="progress-context">
       <span v-if="categoryLabel">{{ categoryLabel }}</span>
-      <span v-if="knowledgePoint">{{ knowledgePoint }}</span>
+      <span v-if="knowledgePoint">{{ displayKnowledgePoint(knowledgePoint) }}</span>
       <span v-if="followUp" class="progress-follow-up">追问</span>
     </p>
     <p class="u-sr-only">当前主问题第 {{ mainNumber }} 题，共 {{ session.plannedQuestionCount }} 题</p>

@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.ANSWER_CLAIM;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.ANSWER_COMMIT;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.measure;
+
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(
@@ -140,8 +144,7 @@ public class InterviewWorkflowService {
                 );
 
         String attemptId = UUID.randomUUID().toString().replace("-", "");
-        EvaluationClaim claim =
-                claimOrRecoverEvaluation(answer, attemptId);
+        EvaluationClaim claim = measure(ANSWER_CLAIM, () -> claimOrRecoverEvaluation(answer, attemptId));
         if (claim == EvaluationClaim.REPLAY) {
             return null;
         }
@@ -164,7 +167,7 @@ public class InterviewWorkflowService {
                                     attemptId
                             );
 
-            applyDecision(
+            measure(ANSWER_COMMIT, () -> applyDecision(
                     answerId,
                     attemptId,
                     currentQuestion,
@@ -172,7 +175,7 @@ public class InterviewWorkflowService {
                     session,
                     nextMain,
                     result
-            );
+            ));
 
             return result.withPersistedId();
         } catch (RuntimeException exception) {

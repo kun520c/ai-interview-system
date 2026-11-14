@@ -14,6 +14,7 @@ import { createInterview } from '@/features/interview/api/interviewApi'
 import { CREATE_INTERVIEW_FLOW } from '@/features/interview/copy/interviewFlow'
 import { displayCategory } from '@/features/interview/copy/categoryDisplay'
 import { PEER_DIFFICULTIES } from '@/features/interview/copy/interviewPlan'
+import { displayKnowledgePoint } from '@/features/interview/copy/knowledgePointDisplay'
 import {
   armInterviewResumeNotice,
   interviewResumeNoticeState,
@@ -260,7 +261,7 @@ async function retryCurrent(): Promise<void> {
           </div>
           <div>
             <dt>当前知识点</dt>
-            <dd>{{ session.currentQuestion.knowledgePoint }}</dd>
+            <dd>{{ displayKnowledgePoint(session.currentQuestion.knowledgePoint) }}</dd>
           </div>
         </dl>
         <RouterLink class="resume-cta" :to="{ name: 'interview-session' }">

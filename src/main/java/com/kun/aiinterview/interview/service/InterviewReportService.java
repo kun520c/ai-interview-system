@@ -40,6 +40,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Objects;
 
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.REPORT_CLAIM;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.REPORT_COMMIT;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.REPORT_FINAL_AGGREGATION;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.measure;
+
 @Service
 @RequiredArgsConstructor
 public class InterviewReportService {
@@ -124,18 +129,7 @@ public class InterviewReportService {
             throw new IllegalStateException("Session缺少Report状态或version");
         }
 
-        int claimed;
-        if (session.getReportStatus() == InterviewReportStatus.GENERATING) {
-            if (!staleRecoveryProperties.isGeneratingStale(session.getUpdatedAt())) {
-                throw new ConflictException("报告正在生成中，请稍后重试");
-            }
-            claimed = interviewSessionMapper.reclaimStaleGenerating(
-                    sessionId, staleRecoveryProperties.generatingCutoff(), session.getVersion());
-        } else {
-            requireGenerator();
-            claimed = interviewSessionMapper.claimReportGeneration(
-                    sessionId, session.getVersion(), session.getReportStatus());
-        }
+        int claimed = measure(REPORT_CLAIM, () -> claimReportGeneration(sessionId, session));
 
         if (claimed != 1) {
             InterviewSession latest = loadOwnedSession(sessionId, userId);
@@ -162,6 +156,18 @@ public class InterviewReportService {
         }
     }
 
+    private int claimReportGeneration(Long sessionId, InterviewSession session) {
+        if (session.getReportStatus() == InterviewReportStatus.GENERATING) {
+            if (!staleRecoveryProperties.isGeneratingStale(session.getUpdatedAt())) {
+                throw new ConflictException("报告正在生成中，请稍后重试");
+            }
+            return interviewSessionMapper.reclaimStaleGenerating(
+                    sessionId, staleRecoveryProperties.generatingCutoff(), session.getVersion());
+        }
+        requireGenerator();
+        return interviewSessionMapper.claimReportGeneration(sessionId, session.getVersion(), session.getReportStatus());
+    }
+
     private InterviewReport requireExistingReport(Long sessionId) {
         InterviewReport report = interviewReportMapper.getBySessionId(sessionId);
         if (report == null) {
@@ -175,17 +181,22 @@ public class InterviewReportService {
             InterviewReportGenerator generator
     ) {
         Long sessionId = generatingSession.getId();
-        List<AnswerEvaluation> evaluations = answerEvaluationMapper
-                .listFinalEffectiveEvaluationsBySessionId(sessionId);
-        validateEvaluations(generatingSession, evaluations);
-
-        BigDecimal overallScore = calculateOverallScore(evaluations);
+        var aggregate = measure(REPORT_FINAL_AGGREGATION, () -> aggregateFinalEvaluations(generatingSession));
         InterviewReportGenerationResult generationResult = generator.generate(
-                generatingSession, List.copyOf(evaluations), overallScore);
-        InterviewReport report = buildReport(sessionId, overallScore, generationResult);
+                generatingSession, List.copyOf(aggregate.evaluations()), aggregate.overallScore());
+        InterviewReport report = buildReport(sessionId, aggregate.overallScore(), generationResult);
 
-        return transactionService.completeReportGeneration(report, generatingSession, evaluations);
+        return measure(REPORT_COMMIT,
+                () -> transactionService.completeReportGeneration(report, generatingSession, aggregate.evaluations()));
     }
+
+    private FinalEvaluationAggregate aggregateFinalEvaluations(InterviewSession session) {
+        List<AnswerEvaluation> evaluations = answerEvaluationMapper.listFinalEffectiveEvaluationsBySessionId(session.getId());
+        validateEvaluations(session, evaluations);
+        return new FinalEvaluationAggregate(evaluations, calculateOverallScore(evaluations));
+    }
+
+    private record FinalEvaluationAggregate(List<AnswerEvaluation> evaluations, BigDecimal overallScore) {}
 
     private InterviewSession loadOwnedSession(Long sessionId, Long userId) {
         InterviewSession session = interviewSessionMapper
@@ -220,12 +231,13 @@ public class InterviewReportService {
             );
         }
         // READY history is returned earlier; recovering an unready row must obey the same invariant.
-        validateEvaluations(session, answerEvaluationMapper.listFinalEffectiveEvaluationsBySessionId(session.getId()));
-        int affectedRows = interviewSessionMapper.markReportReady(
+        measure(REPORT_FINAL_AGGREGATION,
+                () -> validateEvaluations(session, answerEvaluationMapper.listFinalEffectiveEvaluationsBySessionId(session.getId())));
+        int affectedRows = measure(REPORT_COMMIT, () -> interviewSessionMapper.markReportReady(
                 session.getId(),
                 session.getVersion(),
                 report.getOverallScore()
-        );
+        ));
         if (affectedRows != 1) {
             throw new IllegalStateException(
                     "已有Report时READY状态恢复失败"

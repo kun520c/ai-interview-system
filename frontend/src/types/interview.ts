@@ -49,7 +49,7 @@ export interface InterviewEvaluationResponse {
   level: EvaluationLevel
   strengths: string[]
   missingPoints: string[]
-  correction: string
+  correction: string | null
 }
 
 export interface SubmitInterviewAnswerResponse {

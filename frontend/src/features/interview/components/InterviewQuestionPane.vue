@@ -60,6 +60,7 @@ const typeLabel = computed(() =>
   line-height: 1.75;
   letter-spacing: -.02em;
   color: var(--text);
+  white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 

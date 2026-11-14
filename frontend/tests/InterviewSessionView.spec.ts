@@ -16,6 +16,7 @@ import { DecisionAction, EvaluationPhase, InterviewSessionStatus, UserRole } fro
 import { authenticate, mountApp } from './helpers/mountApp'
 import {
   currentSession,
+  currentQuestion,
   emptyHistoryPage,
   evaluation,
   evaluationGate,
@@ -85,9 +86,22 @@ describe('InterviewSessionView', () => {
     expect(wrapper.text()).toContain('请说明 Spring Bean 的生命周期。')
     expect(wrapper.text()).toContain('第 3 / 7 题')
     expect(wrapper.text()).toContain('主问题')
+    expect(wrapper.text()).toContain('Bean 生命周期')
     expect(wrapper.text()).toContain('你的回答')
     expect(wrapper.get('#interview-answer').element.tagName).toBe('TEXTAREA')
     expect(fetchInterviewDetail).not.toHaveBeenCalled()
+  })
+
+  it('shows a readable knowledge point and keeps the question line breaks', async () => {
+    const content = '1. 保存全部结果。\n2. 保留唯一的用户 ID。\n3. 查询最后一次处理结果。'
+    vi.mocked(fetchCurrentInterview).mockResolvedValue(currentSession({
+      currentQuestion: currentQuestion({ knowledgePoint: 'collection_semantics', content }),
+    }))
+    const { wrapper } = await mountApp('/interview', (auth) => authenticate(auth))
+    await flushPromises()
+    expect(wrapper.get('.progress-context').text()).toContain('集合的选择与语义')
+    expect(wrapper.get('.progress-context').text()).not.toContain('collection_semantics')
+    expect(wrapper.get('.question-content').element.textContent).toBe(content)
   })
 
   it('persists the durable record before POST and keeps exact content', async () => {
@@ -253,11 +267,40 @@ describe('InterviewSessionView', () => {
     const { wrapper } = await mountSession()
     await typeAnswer(wrapper, EXACT_ANSWER)
     await submitButton(wrapper)!.trigger('click')
-    await flushPromises()
-    expect(wrapper.text()).toContain(SESSION_COPY.submittingStatus)
-    expect(wrapper.text()).toContain(SESSION_COPY.submittingHint)
+    expect(wrapper.get('.submit-status[role="status"]').text()).toBe(SESSION_COPY.submittingStatus)
+    const textarea = wrapper.get<HTMLTextAreaElement>('#interview-answer')
+    expect(textarea.element.value).toBe(EXACT_ANSWER)
+    expect(textarea.element.readOnly).toBe(true)
+    expect(wrapper.find('.total-number').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain(SESSION_COPY.followUp)
     pending.resolve(submitResponse())
     await flushPromises()
+  })
+
+  it('keeps the original request recoverable when an HTTP success lacks evaluation fields', async () => {
+    const malformed = submitResponse()
+    Reflect.deleteProperty(malformed.evaluation, 'correctnessScore')
+    vi.mocked(submitInterviewAnswer)
+      .mockResolvedValueOnce(malformed)
+      .mockResolvedValueOnce(submitResponse({ evaluation: evaluation({ correction: null }) }))
+    const { wrapper } = await mountSession()
+    await typeAnswer(wrapper, EXACT_ANSWER)
+    await submitButton(wrapper)!.trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.total-number').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain(SESSION_COPY.followUp)
+    expect(wrapper.get<HTMLTextAreaElement>('#interview-answer').element.value).toBe(EXACT_ANSWER)
+    expect(readEvaluationGate(21, 3)).toBeNull()
+    const retry = wrapper.findAll('button').find((button) => button.text() === SESSION_COPY.pendingReplay)
+    await retry!.trigger('click')
+    await flushPromises()
+
+    expect(vi.mocked(submitInterviewAnswer).mock.calls).toHaveLength(2)
+    expect(vi.mocked(submitInterviewAnswer).mock.calls[1]).toEqual(vi.mocked(submitInterviewAnswer).mock.calls[0])
+    expect(wrapper.get('.total-number').text()).toBe('70')
+    expect(wrapper.text()).toContain(SESSION_COPY.followUp)
+    expect(readEvaluationGate(21, 3)?.evaluation.correction).toBeNull()
   })
 
   it('locks recovery when the server already has another requestId', async () => {

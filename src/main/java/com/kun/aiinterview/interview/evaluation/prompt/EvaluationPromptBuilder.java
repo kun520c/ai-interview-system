@@ -13,7 +13,7 @@ import java.util.Locale;
 public class EvaluationPromptBuilder {
 
     public static final String PROMPT_VERSION =
-            "evaluation-prompt-v3";
+            "evaluation-prompt-v4";
 
     private static final String SYSTEM_PROMPT = """
             你是 Java 后端模拟面试系统中的回答评价助手。
@@ -54,6 +54,15 @@ public class EvaluationPromptBuilder {
                 输出前逐项核对MAIN和FOLLOW_UP的实际内容；若评分点只有部分内容尚缺，
                 missingPoints只写尚缺的具体子项，不把已说明的子项和未说明的子项合并称为遗漏。
                 correction中的补充建议也不能把已明确表述的内容称为尚需补充；无法确认未提及时不要断言遗漏。
+            14. 依据题干要求和评分点判定必答范围，遵守题干明确排除的内容。参考答案和 RAG
+                可帮助核对事实，其中的额外例子、术语和底层细节不构成隐含必答项。
+                加分或拓展内容不能写入 missingPoints，也不能作为必答缺口提出追问。
+            15. 口语、简短表达和等价方案，只要说明了同样的机制与条件，就应给相同的覆盖评价。
+                仅复述名称不足以满足要求解释机制的评分点。事实错误应指出具体错误及正确说法。
+                部分覆盖时先说明回答已正确解释的内容，再指出该评分点尚缺的必答部分。
+                按原有布尔 covered 字段给出完整覆盖判断，evidence 可引用已正确说明的部分。
+            16. missingPoints 只保留实际必答缺口，按影响从大到小排列，合并重复描述。
+                correction 优先纠正影响结论的错误。确有价值的拓展建议须显式标为「拓展」。
 
             MAIN_ANSWER：
             - 可以设置 followUpRecommended=true。

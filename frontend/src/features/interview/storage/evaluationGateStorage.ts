@@ -62,7 +62,7 @@ export function isInterviewEvaluationResponse(value: unknown): value is Intervie
     evaluation.strengths.every((item) => typeof item === 'string') &&
     Array.isArray(evaluation.missingPoints) &&
     evaluation.missingPoints.every((item) => typeof item === 'string') &&
-    typeof evaluation.correction === 'string'
+    (evaluation.correction === null || typeof evaluation.correction === 'string')
   )
 }
 

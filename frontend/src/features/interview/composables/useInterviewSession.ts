@@ -12,6 +12,7 @@ import {
 } from '@/features/interview/navigation/sessionNavigationContext'
 import {
   clearEvaluationGate,
+  isEvaluationGate,
   readEvaluationGate,
   readLatestEvaluationGate,
   writeEvaluationGate,
@@ -355,7 +356,7 @@ export function useInterviewSession() {
     return issue === AnswerValidationIssue.BLANK ? SESSION_COPY.blankAnswer : SESSION_COPY.oversizedAnswer
   }
 
-  async function persistThenDispatch(record: SubmitRecord, parts: SubmitRecordKeyParts): Promise<SubmitRecord> {
+  function persistThenDispatch(record: SubmitRecord, parts: SubmitRecordKeyParts): SubmitRecord {
     persistSubmitRecord(record)
     const dispatchedAt = new Date().toISOString()
     return markSubmitRecordDispatched(parts, dispatchedAt)
@@ -421,6 +422,10 @@ export function useInterviewSession() {
         alertMessage.value = SESSION_COPY.stateChanged
         submitLocked.value = false
       }
+      return
+    }
+    if (!isEvaluationGate(nextGate)) {
+      await handleSubmitFailure(new Error('评价响应数据不完整'), record, scope)
       return
     }
     if (!isLiveScope(scope)) {
@@ -673,7 +678,7 @@ export function useInterviewSession() {
     }
 
     try {
-      const dispatched = await persistThenDispatch(record, parts)
+      const dispatched = persistThenDispatch(record, parts)
       if (!isLiveScope(scope)) {
         return
       }

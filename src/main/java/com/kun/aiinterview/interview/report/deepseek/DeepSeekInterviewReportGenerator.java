@@ -20,6 +20,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.REPORT_DEEPSEEK;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.REPORT_PROMPT;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.REPORT_VALIDATE;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.measure;
+
 @Component
 @ConditionalOnProperty(
         prefix = "deepseek",
@@ -59,18 +64,17 @@ public class DeepSeekInterviewReportGenerator
             List<AnswerEvaluation> evaluations,
             BigDecimal overallScore
     ) {
-        InterviewReportPrompt prompt = promptBuilder.build(
-                session,
-                evaluations,
-                overallScore
-        );
+        InterviewReportPrompt prompt = measure(REPORT_PROMPT,
+                () -> promptBuilder.build(session, evaluations, overallScore));
 
-        DeepSeekJsonCompletionResult completion =
-                deepSeekClient.completeJson(
-                        prompt.systemPrompt(),
-                        prompt.userPrompt()
-                );
+        DeepSeekJsonCompletionResult completion = measure(REPORT_DEEPSEEK,
+                () -> deepSeekClient.completeJson(prompt.systemPrompt(), prompt.userPrompt()));
 
+        return measure(REPORT_VALIDATE, () -> buildGenerationResult(overallScore, prompt, completion));
+    }
+
+    private InterviewReportGenerationResult buildGenerationResult(BigDecimal overallScore, InterviewReportPrompt prompt,
+                                                                   DeepSeekJsonCompletionResult completion) {
         DeepSeekInterviewReportResponse response =
                 parseResponse(completion.rawJson());
 

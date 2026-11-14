@@ -4,6 +4,7 @@ import { computed } from 'vue'
 import InterviewEvaluationPane from '@/features/interview/components/InterviewEvaluationPane.vue'
 import { displayCategory } from '@/features/interview/copy/categoryDisplay'
 import { DETAIL_COPY } from '@/features/interview/copy/detailCopy'
+import { displayKnowledgePoint } from '@/features/interview/copy/knowledgePointDisplay'
 import { QUESTION_TYPE_LABEL } from '@/features/interview/copy/sessionCopy'
 import { formatInterviewDate } from '@/utils/formatInterviewDate'
 import { InterviewQuestionType } from '@/types/enums'
@@ -36,7 +37,7 @@ const showBody = computed(() => !props.collapsible || props.expanded !== false)
         <p class="timeline-meta">
           <span>{{ typeLabel }}</span>
           <span>{{ displayCategory(item.category) }}</span>
-          <span>{{ item.knowledgePoint }}</span>
+          <span>{{ displayKnowledgePoint(item.knowledgePoint) }}</span>
         </p>
         <h3 :id="headingId" class="timeline-heading">
           <button
@@ -135,6 +136,7 @@ const showBody = computed(() => !props.collapsible || props.expanded !== false)
   font-weight: 650;
   line-height: 1.5;
   color: var(--text);
+  white-space: pre-wrap;
   overflow-wrap: anywhere;
   background: transparent;
 }

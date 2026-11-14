@@ -43,6 +43,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.ANSWER_SUBMIT;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.measure;
+
 @Service
 @RequiredArgsConstructor
 public class InterviewService {
@@ -274,10 +277,10 @@ public class InterviewService {
         InterviewWorkflowService workflowService =
                 requireWorkflowService();
         InterviewAnswer answer = buildAnswer(question, request);
+        InterviewAnswer saved;
 
         try {
-            answer = interviewWorkflowTransactionService
-                    .submitAnswer(answer, question);
+            saved = measure(ANSWER_SUBMIT, () -> interviewWorkflowTransactionService.submitAnswer(answer, question));
         } catch (DuplicateKeyException exception) {
             return recoverFromDuplicateKey(
                     userId,
@@ -292,12 +295,12 @@ public class InterviewService {
             throw new ConflictException("答案提交发生并发冲突，请使用原requestId重试", exception);
         }
 
-        workflowService.evaluateAnswer(answer.getId());
+        workflowService.evaluateAnswer(saved.getId());
 
         return buildSubmitAnswerResponse(
                 userId,
                 sessionId,
-                answer.getId()
+                saved.getId()
         );
     }
 

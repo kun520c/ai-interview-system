@@ -18,6 +18,7 @@ import com.kun.aiinterview.user.mapper.UserMapper;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
@@ -46,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {
         InterviewController.class,
         HttpErrorTaxonomyControllerTest.ErrorTaxonomyProbeController.class
-})
+}, excludeAutoConfiguration = UserDetailsServiceAutoConfiguration.class)
 @ActiveProfiles("test")
 @Import({
         SecurityConfiguration.class,

@@ -68,7 +68,11 @@ describe('InterviewDetailView', () => {
       completedDetail({
         questions: [
           followUpDetailQuestion(),
-          detailQuestion({ displayOrder: 1, questionContent: 'MAIN_QUESTION_BODY' }),
+          detailQuestion({
+            displayOrder: 1,
+            knowledgePoint: 'transaction_acid',
+            questionContent: 'MAIN_QUESTION_BODY',
+          }),
         ],
       }),
     )
@@ -79,6 +83,9 @@ describe('InterviewDetailView', () => {
     expect(text.indexOf('MAIN_QUESTION_BODY')).toBeLessThan(text.indexOf('初始化回调失败时容器会怎样处理？'))
     expect(text).toContain('主问题')
     expect(text).toContain('追问')
+    expect(text).toContain('事务的 ACID 特性')
+    expect(text).not.toContain('transaction_acid')
+    expect(text).toContain('Bean 生命周期追问')
     expect(text).toContain('先实例化，再注入依赖，然后初始化。')
     expect(text).toContain('说明了实例化与依赖注入的顺序。')
     expect(text).not.toContain('requestId')

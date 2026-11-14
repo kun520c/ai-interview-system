@@ -46,4 +46,19 @@ describe('InterviewEvaluationPane heading hierarchy', () => {
     expect(wrapper.text()).toContain('需要补充')
     expect(wrapper.text()).toContain('参考修正')
   })
+
+  it('shows two suggestions initially and keeps the remaining feedback in order', () => {
+    const items = ['第一条补充', '第二条补充', '第三条补充', '第四条补充']
+    const wrapper = mount(InterviewEvaluationPane, {
+      props: { evaluation: evaluation({ missingPoints: items }) },
+    })
+    const warning = wrapper.get('.feedback-block.is-warning')
+    const disclosure = warning.get<HTMLDetailsElement>('details')
+    expect(disclosure.element.open).toBe(false)
+    expect(warning.findAll(':scope > ul > li').map((item) => item.text())).toEqual(items.slice(0, 2))
+    expect(disclosure.get('summary').text()).toBe('查看其余 2 条补充建议')
+    disclosure.element.open = true
+    expect(disclosure.findAll('li').map((item) => item.text())).toEqual(items.slice(2))
+    expect(wrapper.text()).toContain('参考修正')
+  })
 })

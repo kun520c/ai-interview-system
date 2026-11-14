@@ -2,7 +2,7 @@ import { DecisionAction, EvaluationPhase, InterviewQuestionType } from '@/types/
 
 export const SESSION_COPY = {
   resumeNotice: '已为你继续未完成的面试',
-  staleEvaluationNotice: '上一题评价可在完成后的详情中查看。',
+  staleEvaluationNotice: '上一题评价可通过“查看上一题反馈”查看。',
   recoveringQuestion: '当前面试正在恢复',
   recoveringQuestionHint: '当前题目暂时不可用。可以重试加载当前面试，不要编造题目。',
   retryCurrent: '重试当前面试',
@@ -11,8 +11,7 @@ export const SESSION_COPY = {
   blankAnswer: '请先填写答案再提交。',
   oversizedAnswer: '答案超出允许长度，请缩短后再提交。',
   dispatchedLock: '该答案已经提交过一次，恢复操作必须使用原提交内容。',
-  submittingStatus: '正在评估',
-  submittingHint: '系统正在根据回答进行评分，可能需要一些时间。',
+  submittingStatus: '正在评估你的回答',
   pendingTitle: '本次提交结果暂时无法确认。',
   pendingHint: '系统不会创建新的答案提交。',
   pendingRetry: '按原答案重试',

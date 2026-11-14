@@ -190,6 +190,45 @@ class FullInterviewBusinessOfflineTest {
         return vectorId;
     }
 
+    @Test void readsCommittedPreviousEvaluationWithoutResubmissionAndRejectsAnotherUser() throws Exception {
+        var created = request("POST", "/api/interviews", Map.of("difficulty", "EASY"), 200);
+        long sessionId = created.path("sessionId").asLong();
+        long questionId = created.at("/currentQuestion/interviewQuestionId").asLong();
+        var body = modelAnswer(questionId);
+        // The business transaction completes; a client may lose the already produced response.
+        var submitted = request("POST", "/api/interviews/" + sessionId + "/answers", body, 200);
+        var expectedEvaluation = submitted.path("evaluation");
+        assertThat(submitted.path("nextAction").asText()).isEqualTo("FOLLOW_UP");
+        assertThat(providerCalls.get()).isEqualTo(1);
+        var current = request("GET", "/api/interviews/current", null, 200);
+        assertThat(current.at("/currentQuestion/interviewQuestionId").asLong()).isNotEqualTo(questionId);
+        var before = jdbc.queryForMap("SELECT status,version,current_interview_question_id FROM interview_session WHERE id=?", sessionId);
+        clearInvocations(judge, embedding, vectors, reportGenerator);
+
+        var detail = request("GET", "/api/interviews/" + sessionId, null, 200);
+        assertThat(detail.path("questions")).anySatisfy(question -> {
+            assertThat(question.path("interviewQuestionId").asLong()).isEqualTo(questionId);
+            assertThat(question.at("/answer/answerContent").asText()).isEqualTo(body.get("answerContent"));
+            assertThat(question.path("evaluation")).isEqualTo(expectedEvaluation);
+        });
+        assertThat(request("GET", "/api/interviews/" + sessionId, null, 200)).isEqualTo(detail);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM interview_answer a JOIN interview_question q ON q.id=a.interview_question_id WHERE q.session_id=?", Integer.class, sessionId)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM answer_evaluation e JOIN interview_answer a ON a.id=e.answer_id JOIN interview_question q ON q.id=a.interview_question_id WHERE q.session_id=?", Integer.class, sessionId)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM interview_question WHERE session_id=? AND question_type='FOLLOW_UP'", Integer.class, sessionId)).isEqualTo(1);
+        assertThat(jdbc.queryForMap("SELECT status,version,current_interview_question_id FROM interview_session WHERE id=?", sessionId)).isEqualTo(before);
+
+        String otherAccount = "offline_" + UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+        String otherPassword = "OfflineOnly123!";
+        request("POST", "/api/auth/register", Map.of("account", otherAccount, "username", "Other user",
+                "email", otherAccount + "@example.com", "password", otherPassword), 200);
+        String otherToken = request("POST", "/api/auth/login", Map.of("account", otherAccount, "password", otherPassword), 200)
+                .path("accessToken").asText();
+        mvc.perform(get("/api/interviews/" + sessionId).header("Authorization", "Bearer " + otherToken))
+                .andExpect(status().isNotFound()).andExpect(jsonPath("$.data").isEmpty());
+        verifyNoInteractions(judge, embedding, vectors, reportGenerator);
+        assertThat(providerCalls.get()).isEqualTo(1);
+    }
+
     @Test void completesFiveMainsFollowUpReportAndWeaknessThroughPublicContract() throws Exception {
         var created=request("POST","/api/interviews",Map.of("difficulty","EASY"),200);
         long sessionId=created.path("sessionId").asLong();

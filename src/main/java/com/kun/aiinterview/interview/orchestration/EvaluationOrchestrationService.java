@@ -30,6 +30,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.ANSWER_DB_CONTEXT;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.ANSWER_DEEPSEEK;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.ANSWER_PROMPT;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.ANSWER_VALIDATE;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.measure;
+
 @Service
 @ConditionalOnProperty(
         name = {
@@ -126,8 +132,7 @@ public class EvaluationOrchestrationService {
             );
         }
 
-        EvaluationContext context =
-                contextService.buildContext(answerId);
+        EvaluationContext context = measure(ANSWER_DB_CONTEXT, () -> contextService.buildContext(answerId));
 
         String retrievalBatchId =
                 UUID.randomUUID().toString();
@@ -156,18 +161,18 @@ public class EvaluationOrchestrationService {
             EvaluationContext context, String retrievalBatchId,
             EvaluationRetrievalResult retrievalResult, boolean hasNextMainQuestion
     ) {
-        EvaluationPrompt prompt =
-                promptBuilder.build(
-                        context,
-                        retrievalResult
-                );
+        EvaluationPrompt prompt = measure(ANSWER_PROMPT, () -> promptBuilder.build(context, retrievalResult));
 
-        JudgeProvider.Result llmResult =
-                judgeProvider.evaluate(
-                        context,
-                        prompt
-                );
+        JudgeProvider.Result llmResult = measure(ANSWER_DEEPSEEK, () -> judgeProvider.evaluate(context, prompt));
 
+        return measure(ANSWER_VALIDATE,
+                () -> validateEvaluation(context, retrievalBatchId, retrievalResult, hasNextMainQuestion, llmResult));
+    }
+
+    private EvaluationOrchestrationResult validateEvaluation(
+            EvaluationContext context, String retrievalBatchId, EvaluationRetrievalResult retrievalResult,
+            boolean hasNextMainQuestion, JudgeProvider.Result llmResult
+    ) {
         ValidatedEvaluationSuggestion validated =
                 validator.validate(
                         context,
@@ -344,10 +349,8 @@ public class EvaluationOrchestrationService {
             return List.of();
         }
 
-        EvaluationContext context =
-                contextService.buildContext(
-                        evaluation.getAnswerId()
-                );
+        EvaluationContext context = measure(ANSWER_DB_CONTEXT,
+                () -> contextService.buildContext(evaluation.getAnswerId()));
 
         List<LlmEvaluationSuggestion.ScoringPointResult>
                 scoringPointResults =

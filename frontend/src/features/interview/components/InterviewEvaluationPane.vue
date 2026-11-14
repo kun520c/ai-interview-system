@@ -27,6 +27,8 @@ const subheadingTag = computed(() => {
 })
 
 const ICON = { size: 16, strokeWidth: 1.7, 'aria-hidden': true }
+const VISIBLE_MISSING_POINTS = 2
+const remainingMissingPoints = computed(() => props.evaluation.missingPoints.slice(VISIBLE_MISSING_POINTS))
 
 function levelClass(level: EvaluationLevel): string {
   if (level === EvaluationLevel.EXCELLENT || level === EvaluationLevel.GOOD) {
@@ -86,8 +88,14 @@ function levelClass(level: EvaluationLevel): string {
         需要补充
       </component>
       <ul>
-        <li v-for="(item, index) in evaluation.missingPoints" :key="`m-${index}`">{{ item }}</li>
+        <li v-for="(item, index) in evaluation.missingPoints.slice(0, VISIBLE_MISSING_POINTS)" :key="index">{{ item }}</li>
       </ul>
+      <details v-if="remainingMissingPoints.length" class="more-feedback">
+        <summary>查看其余 {{ remainingMissingPoints.length }} 条补充建议</summary>
+        <ul>
+          <li v-for="(item, index) in remainingMissingPoints" :key="index">{{ item }}</li>
+        </ul>
+      </details>
     </section>
 
     <section v-if="evaluation.correction" class="feedback-block is-correction">
@@ -264,6 +272,21 @@ function levelClass(level: EvaluationLevel): string {
 }
 
 .feedback-block li + li {
+  margin-top: 6px;
+}
+
+.more-feedback {
+  margin-top: 10px;
+}
+
+.more-feedback summary {
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.85;
+}
+
+.more-feedback ul {
   margin-top: 6px;
 }
 

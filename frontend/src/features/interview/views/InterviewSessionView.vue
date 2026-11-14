@@ -8,6 +8,7 @@ import InterviewAnswerPane from '@/features/interview/components/InterviewAnswer
 import InterviewEvaluationPane from '@/features/interview/components/InterviewEvaluationPane.vue'
 import InterviewQuestionPane from '@/features/interview/components/InterviewQuestionPane.vue'
 import InterviewSessionDock from '@/features/interview/components/InterviewSessionDock.vue'
+import PreviousInterviewFeedback from '@/features/interview/components/PreviousInterviewFeedback.vue'
 import { useInterviewSession } from '@/features/interview/composables/useInterviewSession'
 import { SESSION_COPY } from '@/features/interview/copy/sessionCopy'
 import { SessionPhase } from '@/features/interview/types/sessionPhase'
@@ -92,7 +93,7 @@ onMounted(() => {
         class="submit-status"
         role="status"
       >
-        {{ SESSION_COPY.submittingHint }}
+        {{ SESSION_COPY.submittingStatus }}
       </p>
       <p
         v-if="session.phase.value === SessionPhase.EVALUATION_PENDING"
@@ -107,6 +108,13 @@ onMounted(() => {
         :question-label="SESSION_COPY.questionPane"
         :answer-label="answerLabel"
       >
+        <template #header>
+          <PreviousInterviewFeedback
+            v-if="session.session.value?.currentQuestion && session.phase.value !== SessionPhase.EVALUATION_GATE"
+            :session-id="session.session.value.sessionId"
+            :current-question-id="session.session.value.currentQuestion.interviewQuestionId"
+          />
+        </template>
         <template #question>
           <InterviewQuestionPane
             :session="session.session.value"

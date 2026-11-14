@@ -5,6 +5,9 @@ import com.kun.aiinterview.knowledge.service.KnowledgeRetrievalService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.QUERY_BUILD;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.measure;
+
 @Service
 @ConditionalOnProperty(
         prefix = "milvus",
@@ -28,7 +31,7 @@ public class EvaluationRetrievalAdapter {
             EvaluationContext context,
             int topK
     ) {
-        String query = queryBuilder.build(context);
+        String query = measure(QUERY_BUILD, () -> queryBuilder.build(context));
 
         RetrievalResult retrievalResult =
                 knowledgeRetrievalService.retrieve(

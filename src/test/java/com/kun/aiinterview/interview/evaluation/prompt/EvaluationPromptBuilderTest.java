@@ -40,7 +40,7 @@ class EvaluationPromptBuilderTest {
         );
 
         assertThat(prompt.promptVersion())
-                .isEqualTo("evaluation-prompt-v3");
+                .isEqualTo("evaluation-prompt-v4");
         assertThat(prompt.userPrompt())
                 .contains(
                         "MAIN_ANSWER",
@@ -126,7 +126,11 @@ class EvaluationPromptBuilderTest {
             var prompt = promptBuilder.build(context, retrievalResult(List.of(), List.of()));
             assertThat(prompt.systemPrompt()).contains(
                     "用户回答明确支持的优点", "不能将未出现的错误观点归给用户",
-                    "missingPoints不能列出MAIN或FOLLOW_UP已经正确说明的机制");
+                    "missingPoints不能列出MAIN或FOLLOW_UP已经正确说明的机制",
+                    "遵守题干明确排除的内容", "不构成隐含必答项",
+                    "加分或拓展内容不能写入 missingPoints",
+                    "就应给相同的覆盖评价", "仅复述名称不足以满足",
+                    "再指出该评分点尚缺的必答部分", "布尔 covered 字段");
         }
         assertThat(promptBuilder.build(mainContext(), retrievalResult(List.of(), List.of())).systemPrompt())
                 .doesNotContain("完整MAIN评分点ID列表");

@@ -20,6 +20,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.EMBEDDING;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.MILVUS_SEARCH;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.MYSQL_HYDRATION;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.measure;
+
 @Service
 @ConditionalOnProperty(
         prefix = "milvus",
@@ -63,10 +68,8 @@ public class KnowledgeRetrievalService {
 
         String normalizedQuery = query.strip();
 
-        EmbeddingBatchResult embeddingResult =
-                embeddingClient.embed(
-                        List.of(normalizedQuery)
-                );
+        EmbeddingBatchResult embeddingResult = measure(EMBEDDING,
+                () -> embeddingClient.embed(List.of(normalizedQuery)));
 
         if (embeddingResult == null) {
             throw new IllegalStateException(
@@ -95,12 +98,8 @@ public class KnowledgeRetrievalService {
             );
         }
 
-        List<VectorSearchHit> hits =
-                vectorStoreClient.search(
-                        queryEmbedding.values(),
-                        embeddingResult.profileVersion(),
-                        topK
-                );
+        List<VectorSearchHit> hits = measure(MILVUS_SEARCH,
+                () -> vectorStoreClient.search(queryEmbedding.values(), embeddingResult.profileVersion(), topK));
 
         if (hits.isEmpty()) {
             return new RetrievalResult(
@@ -127,13 +126,9 @@ public class KnowledgeRetrievalService {
             );
         }
 
-        List<KnowledgeRetrievalRow> rows =
-                knowledgeChunkMapper
-                        .selectRetrievableByVectorIds(
-                                vectorIds,
-                                embeddingResult.model(),
-                                embeddingResult.profileVersion()
-                        );
+        List<KnowledgeRetrievalRow> rows = measure(MYSQL_HYDRATION,
+                () -> knowledgeChunkMapper.selectRetrievableByVectorIds(
+                        vectorIds, embeddingResult.model(), embeddingResult.profileVersion()));
 
         Map<String,KnowledgeRetrievalRow> rowByVectorId =
                 rows.stream()

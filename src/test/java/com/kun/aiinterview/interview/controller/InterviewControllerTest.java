@@ -1,5 +1,6 @@
 package com.kun.aiinterview.interview.controller;
 
+import com.kun.aiinterview.common.exception.ConflictException;
 import com.kun.aiinterview.interview.dto.SubmitInterviewAnswerRequest;
 import com.kun.aiinterview.interview.enums.DecisionAction;
 import com.kun.aiinterview.interview.enums.EvaluationPhase;
@@ -34,9 +35,13 @@ import com.kun.aiinterview.user.enums.UserStatus;
 import com.kun.aiinterview.user.mapper.UserMapper;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -48,6 +53,10 @@ import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.ANSWER_DEEPSEEK;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.REPORT_FINAL_AGGREGATION;
+import static com.kun.aiinterview.common.observability.InterviewRequestTiming.measure;
+import static com.kun.aiinterview.interview.controller.InterviewTimingConfiguration.TIMING_HEADER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -56,11 +65,14 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = InterviewController.class)
+@WebMvcTest(controllers = InterviewController.class,
+        excludeAutoConfiguration = UserDetailsServiceAutoConfiguration.class)
 @ActiveProfiles("test")
+@ExtendWith(OutputCaptureExtension.class)
 @Import({
         SecurityConfiguration.class,
         JwtAuthenticationFilter.class,
@@ -112,9 +124,74 @@ class InterviewControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(validAnswerJson()))
                 .andExpect(status().isUnauthorized())
+                .andExpect(header().doesNotExist(TIMING_HEADER))
                 .andExpect(jsonPath("$.code").value(401));
 
         verifyNoInteractions(interviewService);
+    }
+
+    @Test
+    void shouldCorrelateAnswerAndReportTimingsWithoutRequestData(CapturedOutput captured) throws Exception {
+        stubTokenUser("private-timing-token");
+        when(interviewService.submitAnswer(org.mockito.ArgumentMatchers.eq(USER_ID),
+                org.mockito.ArgumentMatchers.eq(773421L), any())).thenAnswer(call -> measure(ANSWER_DEEPSEEK, this::submitResponse));
+        when(interviewReportService.generateReportForApi(USER_ID, 773421L))
+                .thenAnswer(call -> measure(REPORT_FINAL_AGGREGATION, this::reportResponse));
+
+        var answer = mockMvc.perform(post("/api/interviews/773421/answers?answer=private-query")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer private-timing-token")
+                        .header(TIMING_HEADER, "forged-timing-id")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"interviewQuestionId": 376599, "answerContent": "private-answer", "requestId": "private-request-id"}
+                                """))
+                .andExpect(status().isOk()).andReturn().getResponse();
+        var report = mockMvc.perform(post("/api/interviews/773421/report")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer private-timing-token"))
+                .andExpect(status().isOk()).andReturn().getResponse();
+
+        String answerId = answer.getHeader(TIMING_HEADER);
+        String reportId = report.getHeader(TIMING_HEADER);
+        assertThat(answerId).matches("[0-9a-f-]{36}").isNotEqualTo(reportId);
+        assertThat(reportId).matches("[0-9a-f-]{36}");
+        List<String> timingLines = timingLines(captured);
+        assertThat(timingLines).hasSize(2);
+        assertThat(timingLines.get(0)).contains("operation=ANSWER timingId=" + answerId + " httpStatus=200",
+                        "unhandledError=false", "phasesUs={ANSWER_DEEPSEEK=")
+                .doesNotContain("REPORT_FINAL_AGGREGATION");
+        assertThat(timingLines.get(1)).contains("operation=REPORT timingId=" + reportId + " httpStatus=200",
+                        "unhandledError=false", "phasesUs={REPORT_FINAL_AGGREGATION=")
+                .doesNotContain("ANSWER_DEEPSEEK");
+        assertThat(String.join(" ", timingLines)).doesNotContain("private-", "forged-timing-id", "773421", "376599",
+                "/api/interviews/");
+    }
+
+    @Test
+    void shouldLogHandledFailureAndOmitTimingsForPlainGet(CapturedOutput captured) throws Exception {
+        stubTokenUser("report-timing-token");
+        when(interviewReportService.generateReportForApi(USER_ID, 21L)).thenAnswer(call -> {
+            measure(REPORT_FINAL_AGGREGATION, () -> { throw new ConflictException("private-error-body"); });
+            return null;
+        });
+
+        var failure = mockMvc.perform(post("/api/interviews/21/report")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer report-timing-token"))
+                .andExpect(status().isConflict()).andReturn();
+        assertThat(failure.getRequest().getAttribute(
+                "com.kun.aiinterview.common.observability.InterviewRequestTiming")).isNull();
+        mockMvc.perform(get("/api/interviews/21/report")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer report-timing-token"))
+                .andExpect(status().isOk()).andExpect(header().doesNotExist(TIMING_HEADER));
+
+        assertThat(timingLines(captured)).singleElement().satisfies(line -> assertThat(line)
+                .contains("operation=REPORT timingId=" + failure.getResponse().getHeader(TIMING_HEADER) + " httpStatus=409",
+                        "unhandledError=false", "phasesUs={REPORT_FINAL_AGGREGATION=")
+                .doesNotContain("private-error-body"));
+    }
+
+    private static List<String> timingLines(CapturedOutput captured) {
+        return captured.getAll().lines().filter(line -> line.contains("interview.timing")
+                && line.contains("interview_timing operation=")).toList();
     }
 
     @Test
