@@ -351,8 +351,10 @@ class InterviewHistoryServiceTest {
                 1,
                 InterviewQuestionStatus.WAITING_ANSWER
         );
+        InterviewSession session = inProgressSession(USER_ID);
+        session.setCurrentInterviewQuestionId(UNANSWERED_QUESTION_ID);
         when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(inProgressSession(USER_ID));
+                .thenReturn(session);
         when(interviewQuestionMapper.listBySessionId(SESSION_ID))
                 .thenReturn(List.of(unanswered));
         when(interviewAnswerMapper.listByInterviewQuestionIds(
@@ -366,6 +368,36 @@ class InterviewHistoryServiceTest {
         assertThat(response.questions().get(0).answer()).isNull();
         assertThat(response.questions().get(0).evaluation()).isNull();
         verify(answerEvaluationMapper, never()).listByAnswerIds(anyList());
+        verifyNoWriteInteractions();
+    }
+
+    @Test
+    void shouldOnlyReturnCurrentAndSubmittedHistoryWithoutFutureOrMissingAnswers() {
+        InterviewQuestion answered = question(MAIN_QUESTION_ID, InterviewQuestionType.MAIN,
+                1, 1, InterviewQuestionStatus.ANSWERED);
+        InterviewQuestion current = question(FOLLOW_UP_QUESTION_ID, InterviewQuestionType.MAIN,
+                2, 3, InterviewQuestionStatus.WAITING_ANSWER);
+        InterviewQuestion future = question(UNANSWERED_QUESTION_ID, InterviewQuestionType.MAIN,
+                3, 5, InterviewQuestionStatus.PENDING);
+        InterviewQuestion inconsistent = question(34L, InterviewQuestionType.MAIN,
+                4, 7, InterviewQuestionStatus.ANSWERED);
+        InterviewQuestion skipped = question(35L, InterviewQuestionType.MAIN,
+                5, 9, InterviewQuestionStatus.SKIPPED);
+        InterviewSession session = inProgressSession(USER_ID);
+        session.setCurrentInterviewQuestionId(FOLLOW_UP_QUESTION_ID);
+        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID)).thenReturn(session);
+        when(interviewQuestionMapper.listBySessionId(SESSION_ID))
+                .thenReturn(List.of(answered, current, future, inconsistent, skipped));
+        when(interviewAnswerMapper.listByInterviewQuestionIds(List.of(MAIN_QUESTION_ID, FOLLOW_UP_QUESTION_ID, 34L)))
+                .thenReturn(List.of(answer(MAIN_ANSWER_ID, MAIN_QUESTION_ID, "已提交答案")));
+        when(answerEvaluationMapper.listByAnswerIds(List.of(MAIN_ANSWER_ID))).thenReturn(List.of());
+
+        InterviewDetailResponse response = service.getDetail(USER_ID, SESSION_ID);
+
+        assertThat(response.questions()).extracting(InterviewDetailQuestionResponse::interviewQuestionId)
+                .containsExactly(MAIN_QUESTION_ID, FOLLOW_UP_QUESTION_ID);
+        assertThat(response.questions().get(0).answer().answerContent()).isEqualTo("已提交答案");
+        assertThat(response.questions().get(1).answer()).isNull();
         verifyNoWriteInteractions();
     }
 

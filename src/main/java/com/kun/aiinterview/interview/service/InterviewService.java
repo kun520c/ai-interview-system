@@ -196,7 +196,14 @@ public class InterviewService {
 
         validateQuestions(sessionId, questions);
 
-        List<Long> questionIds = questions.stream()
+        // The persisted plan contains future questions. Only the current question
+        // and submitted history may cross the candidate-facing API boundary.
+        List<InterviewQuestion> visibleCandidates = questions.stream()
+                .filter(question -> Objects.equals(
+                        question.getId(), session.getCurrentInterviewQuestionId())
+                        || question.getStatus() == InterviewQuestionStatus.ANSWERED)
+                .toList();
+        List<Long> questionIds = visibleCandidates.stream()
                 .map(InterviewQuestion::getId)
                 .toList();
         Map<Long, InterviewAnswer> answersByQuestionId =
@@ -205,10 +212,14 @@ public class InterviewService {
                 loadEvaluationsByAnswerId(answersByQuestionId);
 
         List<InterviewDetailQuestionResponse> questionResponses =
-                new ArrayList<>(questions.size());
-        for (InterviewQuestion question : questions) {
+                new ArrayList<>(visibleCandidates.size());
+        for (InterviewQuestion question : visibleCandidates) {
             InterviewAnswer answer =
                     answersByQuestionId.get(question.getId());
+            if (answer == null && !Objects.equals(
+                    question.getId(), session.getCurrentInterviewQuestionId())) {
+                continue;
+            }
             AnswerEvaluation evaluation = answer == null
                     ? null
                     : evaluationsByAnswerId.get(answer.getId());
