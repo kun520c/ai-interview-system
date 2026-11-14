@@ -1,12 +1,16 @@
 # 源码学习待办清单
 
-建立／最近更新：2026-11-13（Asia/Shanghai）。C7 已将 C6 验收的同一源码依次提交，累计源码提交为 `71aeb22f7da906660763e9efb1100a20df7705c9`；B4-D／B4-E／B5-P2-A／B5-P2-B 的完整 SHA 和父子关系见 [工程优化台账](IMPROVEMENT_LEDGER.md#11-git-实际状态)。本清单与台账随其后的独立文档提交归档，未推送。
+建立：2026-11-13；最近更新：2026-11-14（Asia/Shanghai）。C7 已将 C6 验收的同一源码依次提交，累计源码提交为 `71aeb22f7da906660763e9efb1100a20df7705c9`；B4-D／B4-E／B5-P2-A／B5-P2-B 的完整 SHA 和父子关系见 [工程优化台账](IMPROVEMENT_LEDGER.md#11-git-实际状态)。本清单与台账的C7版本随其后的独立文档提交归档，未推送；后续更新尚未提交。
 
 建档及 C6 时点的基线是 `01ac774caff491b978dd2268e8b427355a64b97a` 加四批未提交修改。下文各批“无 SHA／未提交”保留为当时事实，当前提交定位以以上 C7 更新为准。源码内容与历史回归证据不变；新执行的独立编译／类型检查见 [C7 记录](IMPROVEMENT_LEDGER.md#c7)，不等于重跑功能测试或开发者掌握。
 
+2026-11-13 D0 更新：当前 HEAD 为 `0c6f92afe331954f7cea37d33db688fe781cbf2c`（C7 文档提交）；远端 main 实时核验为 `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，本地领先8。D0仅新增离线审计/方案及本轮学习条目，当前未暂存/提交/推送。MySQL/Milvus 实时核验 BLOCKED；随机选题、42题新增正文、30篇新增知识正文及多用户测试均未实施。旧段落继续保留其原时点事实。
+
 ## 1. 学习状态与使用方法
 
-本清单共 **63 条**：历史批次技术点25条，C0/C3共通方法3条，B4-D源码学习7条，B4-E源码学习7条，B5-0审查/验证学习6条，B5-P2-A密码边界学习3条，B5-P2-B日志边界学习3条，C6累计收口学习3条，旧并发/观测未编号候选2条，B6/B7/B8/B9范围占位4条。最后4条不是已经定义的技术点，范围明确后再拆分。B5原1条占位已按本轮明确范围拆为6条；B5-P2-A/B均已完成工程修复，C6完成证据复核，仍没有开发者掌握证据。
+2026-11-14 E3-E01更新：累计 **79条**（不含模板占位行），全部保持待学习、掌握未确认。真实服务入库证据不代替本人讲解、复现或独立修改证据。
+
+D0 时点本清单共 **68 条**：历史批次技术点25条，C0/C3共通方法3条，B4-D源码学习7条，B4-E源码学习7条，B5-0审查/验证学习6条，B5-P2-A密码边界学习3条，B5-P2-B日志边界学习3条，C6累计收口学习3条，D0数据/测试设计学习5条，旧并发/观测未编号候选2条，B6/B7/B8/B9范围占位4条。最后4条不是已经定义的技术点，范围明确后再拆分。B5原1条占位已按本轮明确范围拆为6条；B5-P2-A/B均已完成工程修复，C6完成证据复核，D0仅审计/设计，仍没有开发者掌握证据。
 
 **工程已实现、AI 已生成代码、测试通过、已有源码指南，均不代表开发者掌握。** 本次没有收到开发者逐项学习反馈，因此所有条目初始化为“待学习，掌握情况未确认”；这也不表示已经证明开发者不会。
 
@@ -695,6 +699,121 @@
 
 - 后续状态更新（C7，2026-11-13）：五批文件／hunk 计划已按用户明确授权进入本地 Git 收口，四批代码 SHA 已记录于台账；独立导出的中间代码版本编译／类型检查通过。可用这些真实提交复核缺类／缺导出风险和共享测试归属；未收到开发者本人讲解、复现或独立修改证据，本条仍为待学习（未确认），也未授权推送或真实服务调用。
 
+### D0：数据事实、随机快照与多用户试验设计
+
+关联 [D0 工程记录](IMPROVEMENT_LEDGER.md#d0) 与 D0/D1/D3/D4 四份方案。下列五项新增条目均为待学习；审计和设计产出不能替代开发者学习验收。阅读练习不授权写库、调用模型或启动服务。
+
+<a id="l-d0-01"></a>
+
+#### L-D0-01 — 区分配置、历史证据与实时数据
+
+- 关联工程记录／报告／SHA：[D0](../verification/D0_DATA_READINESS_AUDIT_20261113.md) 第2/5/6节；HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`，D0无新提交。
+- 前置知识：TCP连接、Docker端口映射、进程环境变量、MySQL只读事务、哈希。
+- 源码入口：`application.yaml` 的 datasource/Milvus 配置、`EnvironmentIsolationInitializer`、`QuestionMapper.selectEnabledQuestionsForInterview`、`KnowledgeChunkMapper.selectRetrievableByVectorIds`；本地配置只读且不输出秘密。
+- 核心问题：PermissionError为什么不能证明停服？ConnectionRefused为什么不能证明空库？历史3306导入与当前3308卷如何对应？仓库JSON为什么不能给出ENABLED状态？
+- 独立练习／讲解验收目标：不用历史数字，列出只读连接、实例身份、同快照统计、逻辑题号匹配和MySQL/Milvus双向身份检查的证据链；将未知项明确标BLOCKED。
+- 掌握状态：**待学习（未确认）**。开发者掌握证据：未提供；当前只进行了代理离线审计。
+- 尚未理解／待验证点：真实库/集合数据和迁移完整性，环境恢复后再补，不默认操作已有卷。
+- 最近复核日期／人：2026-11-13／Codex。状态变更：新增；无开发者升级证据。
+
+<a id="l-d0-02"></a>
+
+#### L-D0-02 — 可复现随机组卷与固定快照
+
+- 关联工程记录／报告／SHA：[D1](../verification/D1_QUESTION_BANK_EXPANSION_PLAN_20261113.md) 第4节；同上HEAD。随机方案未实现。
+- 前置知识：集合去重、伪随机数、REPEATABLE_READ、短事务、用户行锁和并发幂等；可复习L-B1条目。
+- 源码入口：`QuestionPlanSelector.select/findFirstUnselectedByCategory`、`InterviewQuestionPlanSnapshotService.prepareSnapshot`、`InterviewSessionService.createSession`、`InterviewSessionTransactionService.createAndStartSession`、`InterviewQuestionSnapshotFactory.createMainQuestion`；对应selector/snapshot/session测试。
+- 核心问题：为什么扩到63题仍不自动随机？seed之外还要固定什么？两个请求抽出不同草稿为何最终只能返回同一活跃Session？历史避重为什么可先不加Schema？
+- 独立练习／讲解验收目标：纸面推演每类3候选抽1、同场无重复、缺分类失败、A/B竞争和管理员更新；解释3^5组合不保证相邻场不重复；提出受控随机索引测试而非“不同seed一定不同”。
+- 掌握状态：**待学习（未确认）**。开发者掌握证据：未提供。
+- 尚未理解／待验证点：历史窗口/回退语义；实际随机实现和真MySQL并发回归均待后续授权。
+- 最近复核日期／人：2026-11-13／Codex。状态变更：新增设计学习，不标已编码或已掌握。
+
+<a id="l-d0-03"></a>
+
+#### L-D0-03 — 评分点、来源版本与切片覆盖
+
+- 关联工程记录／报告／SHA：[D3](../verification/D3_RAG_CORPUS_EXPANSION_PLAN_20261113.md) 第2～7节、D0的H01发现；当前HEAD。
+- 前置知识：Java泛型/JLS静态类型、UTF-8与UTF-16、RAG检索、数据库版本和内容hash。
+- 源码入口：`KnowledgeTextChunker.split/findNaturalBoundary/calculateNextStart`、`KnowledgeDocumentProcessingService.processDocument`、`KnowledgeRetrievalService.retrieve`；H01源文档与题库JSON；4D3切片表。
+- 核心问题：题目参考答案为什么不能充当独立知识来源？97个映射为什么不等于97点无歧义？离线52Chunk为什么不能代表Milvus52实体？READY/ACTIVE/profile过滤后如何保留原排名？
+- 独立练习／讲解验收目标：解释H01两个静态类型的instanceof编译差异；选一评分点，追踪官方节→原创段落→实际Chunk→检索资格→Prompt证据，区分版本、许可待核项及每一步未执行证据。
+- 掌握状态：**待学习（未确认）**。开发者掌握证据：未提供；Codex运行两个临时编译探针不是开发者掌握证据。
+- 尚未理解／待验证点：历史JSON缺失、逐篇许可、留出金标准、新SP及真实召回；30篇新语料只有主题设计。
+- 最近复核日期／人：2026-11-13／Codex。状态变更：新增；保持未确认。
+
+<a id="l-d0-04"></a>
+
+#### L-D0-04 — 独立人审、模型质量与调用预算
+
+- 关联工程记录／报告／SHA：[D4-A](../verification/D4_MULTI_AGENT_TEST_PLAN_20261113.md#2-a多-ai-模拟面试质量测试)；当前HEAD，试验未运行。
+- 前置知识：实验变量、盲评、样本量、MAE、模型token/usage、INITIAL/FINAL和Java计分。
+- 源码入口：`EvaluationPromptBuilder.build`、`LlmEvaluationValidator.validate`、`EvaluationScoreCalculator.calculate`、`FollowUpPolicy.decide`、`InterviewReportService`；候选人运行器未实现。
+- 核心问题：角色标签为什么不是正确性真值？为什么不能让同一模型的判断替代独立人工？requestId重放为何不算新质量样本？评分点权重与五维总分有什么区别？
+- 独立练习／讲解验收目标：独立复算12场84个MAIN的96～180次DeepSeek、84～168次Embedding/考生生成上限；设计先盲评后揭盲的误差分析，列出费用UNKNOWN及停止阈值。
+- 掌握状态：**待学习（未确认）**。开发者掌握证据：未提供。
+- 尚未理解／待验证点：实际模型价格/配额、真实usage、人评一致性和质量样本；没有授权本条自动触发收费请求。
+- 最近复核日期／人：2026-11-13／Codex。状态变更：新增，工程方案与掌握分开。
+
+<a id="l-d0-05"></a>
+
+#### L-D0-05 — 多账号并发、替身边界与最终状态核验
+
+- 关联工程记录／报告／SHA：[D4-B](../verification/D4_MULTI_AGENT_TEST_PLAN_20261113.md#3-b多用户并发与可靠性测试)；当前HEAD；可关联L-B1/B2/B3及L-C6-02。
+- 前置知识：真实HTTP与MockMvc差异、JWT/归属、唯一约束、CAS/attempt fencing、故障注入和数据库事务。
+- 源码入口：`InterviewService.submitAnswer/handleExistingAnswer`、`InterviewWorkflowService.evaluateAnswer`、`InterviewWorkflowTransactionService`、`InterviewReportService/TransactionService`、`InterviewAnswerMapper.xml`与`AnswerEvaluationMapper.xml`；负载替身装配/运行器未实现。
+- 核心问题：跨账号相同requestId为何会冲突？HTTP超时为何不能换新键？stale重试为何可能再次收费却不能重复落业务结果？关闭Milvus开关为什么不等于完整Mock负载链？
+- 独立练习／讲解验收目标：推演响应丢失、旧attempt迟到、报告重启恢复三条时序；逐条说明Q1～Q6核验的归属/快照/FINAL/报告/弱项不变量，给出真上游与替身分开的证据标签。
+- 掌握状态：**待学习（未确认）**。开发者掌握证据：未提供。
+- 尚未理解／待验证点：1/3/5/10真实用户与20/35/50VU实际结果、测试装配和观测；不能从历史单测推出容量。
+- 最近复核日期／人：2026-11-13／Codex。状态变更：新增；未实施、未执行、未掌握均分别记录。
+
+### E0：环境身份、只读快照与隔离恢复
+
+<a id="l-e0-01"></a>
+
+#### L-E0-01 — 从容器与卷追踪实际数据，并区分空样本和跨库一致性
+
+- 关联工程记录／报告／SHA：[E0](IMPROVEMENT_LEDGER.md#e0)、[环境补审](../verification/E0_TEST_ENVIRONMENT_READINESS_20261113.md)；基线 `0c6f92afe331954f7cea37d33db688fe781cbf2c`，本批无提交。
+- 前置知识：L-D0-01、Docker 命名卷/容器生命周期、TCP 端口映射、MySQL 一致性快照、Milvus embedded etcd 与标量查询。
+- 源码／配置入口：`compose.mac.local.yaml`（未跟踪）、`application-evaluation.yaml`、`EnvironmentIsolationInitializer`、`KnowledgeChunkMapper.selectRetrievableByVectorIds`；E0 报告的 SQL 与跨库方案。
+- 核心问题：为什么停止容器不代表数据丢失、空卷启动可能初始化？为什么容器3306与宿主3308是同一服务？空表36项异常为0能证明什么？为什么 MySQL 与 Milvus 各自计数相等仍不足以证明身份一致？为何隔离初始化器不能证明服务端实例身份？
+- 独立练习／讲解验收目标：在不写库、不读取凭据的前提下画出容器→卷→服务器→数据库→chunk→vector ID 的证据链；说明一致性快照和跨库时间差、先完整备份再于副本诊断的原因，并标出当前缺失的 Milvus 证据。
+- 掌握状态：**待学习（未确认）**；开发者掌握证据：未提供。尚待验证：副本恢复、schema/collection 身份和向量双向对照；最近复核 2026-11-13／Codex。状态变更：新增，未从代理检查推断掌握。
+
+E0 仅新增本条学习任务；其余已有条目及历史计数记录保留，未进行开发者学习验收。
+
+<a id="l-e0r2-01"></a>
+
+#### L-E0R2-01 — embedded etcd 启停竞态、独立卷备份与向量持久化
+
+- 关联工程记录／证据：[E0-R2](IMPROVEMENT_LEDGER.md#e0-r2)、[部署验收](../verification/E0R2_MAC_MILVUS_DEPLOYMENT_20261113.md)；代码基线 `0c6f92afe331954f7cea37d33db688fe781cbf2c`，本批未提交。
+- 前置知识：L-E0-01、Docker 只读卷挂载、etcd 单节点选主、COSINE、Milvus 持久化与一致性查询。
+- 入口：`compose.milvus.e0r2.yaml`、`MilvusCollectionInitializer`、`MilvusVectorStoreClient`，以及报告所列上游 issue/修复 PR、隔离 SDK 验收源码与日志。
+- 核心问题：健康检查为何不能证明后续每次启动稳定？为何单节点选主也可能出现 leader changed？归档文件比对与服务恢复分别证明什么？为何 flush 和重启后读取要分别验证？精确删除后如何证明非目标数据保留？为何关闭阶段 panic 不能用下一次 healthy 掩盖？
+- 独立练习：绘制两套容器→卷→etcd/向量与 SDK 测试的边界，解释本次两次重启时序、启动修复未回移及恢复前的身份核验；不在原卷进行破坏性演练。
+- 掌握状态：**待学习（未确认）**；开发者掌握证据未提供，最近复核 2026-11-13／Codex。新增这一条不改变旧批次的历史计数。
+
+2026-11-13 E0-R3 更新：在 D0 的 68 条之后新增 L-E0-01、L-E0R2-01 和以下 2 条，当前共 72 条；历史批次计数保留。工程验证不等于本人掌握。
+
+<a id="l-e0r3-01"></a>
+
+#### L-E0R3-01 — SDK 停机超时、异常边界与恢复
+
+- 证据：[E0-R3](../verification/E0R3_MILVUS_STABILITY_GATE_20261113.md)；入口：`MilvusConfiguration`、`MilvusVectorStoreClient.search`、`MilvusGrpcDeadlineTest`、`MilvusSdkRetryBehaviorTest`。
+- 核心问题：为何 health 恢复后 shard 尚可能不可用？deadline、单次尝试、异常封装与同一客户端后续读成功分别证明什么？为什么不能推断在途写入成功或安全重试？
+- 独立练习：仅阅读记录和源码，画出停止、超时、启动、不可用和恢复的时间线，说明每处证据及未知范围。
+- 掌握状态：**待学习（未确认）**；开发者本人证据未提供。
+
+<a id="l-e0r3-02"></a>
+
+#### L-E0R3-02 — 合成向量持久化与隔离入库对账
+
+- 证据：[E0-R3](../verification/E0R3_MILVUS_STABILITY_GATE_20261113.md)；入口：`EnvironmentIsolationInitializer`、`KnowledgeDocumentProcessingService.processDocument`、`KnowledgeDocumentProcessingTransactionService.persistChunksAndMarkReady`。
+- 核心问题：为何 flush 后重启通过不证明未刷盘写入安全？为什么需要 ID/版本双向对账而非只比数量？隔离 schema、collection、实例身份和旧卷备份各保护什么？
+- 独立练习：以报告中 B/C 的 ID、数量和分数画出重启前后证据链，并设计失败暂停、恢复核验与精确补偿清单；不操作原卷或调用模型。
+- 掌握状态：**待学习（未确认）**；开发者本人证据未提供。
+
 ### 未定义范围的候选占位
 
 2026-11-13用户已明确B5-0为准入审查/测试计划，原B5占位拆为上方6条；B6～B9仍未定义。以下不构成开发授权，没有伪造的源码入口。
@@ -738,6 +857,91 @@
 - 核心问题：本批要解决哪一个有证据的问题？应阅读什么调用链、边界和测试？
 - 下一步：先补问题证据、正式范围与源码入口，再拆成可验证的学习条目；当前无学习完成结论。
 - 掌握状态：**待学习（范围待确认，掌握未确认）**。开发者掌握证据：未提供；复核日期：待补。
+
+
+2026-11-13 E1 更新：新增以下 2 条，现共 74 条；工程结果 BLOCKED，开发者掌握均未确认。
+
+<a id="l-e1-01"></a>
+
+#### L-E1-01 — 隔离 DDL 与并发恢复字段核验
+
+- 证据：[E1 报告](../verification/E1_EVALUATION_ENVIRONMENT_SETUP_20261113.md)；入口：`sql/ai_interview.sql`、`sql/migrations/20261015_timeout_attempt_fencing.sql`、`EnvironmentIsolationInitializer`。
+- 前置知识：MySQL DDL、外键、索引、并发 attempt fencing。
+- 核心问题：为何历史隔离快照不能直接执行，如何确认目标名称及逐列、约束和索引的一致性？
+- 独立练习：指出两个 attempt 字段及调用链；说明静态审阅与实际建库验证的差异。
+- 状态：待学习，掌握未确认；开发者证据未提供。
+
+<a id="l-e1-02"></a>
+
+#### L-E1-02 — Milvus 一致备份与隔离恢复
+
+- 证据：[E1 报告](../verification/E1_EVALUATION_ENVIRONMENT_SETUP_20261113.md)、E0-R2/R3；入口：`MilvusCollectionInitializer` 和 SDK 只读盘点。
+- 前置知识：Docker 容器与数据卷、Milvus Schema、强一致查询、备份恢复。
+- 核心问题：为什么在线打包卷不能直接当一致快照，如何区分备份可读、恢复演练和跨库对账？
+- 独立练习：画出旧卷与新实例的映射，说明停机风险、独立卷恢复和故障中止条件。
+- 状态：待学习，掌握未确认；开发者证据未提供。
+
+2026-11-13 E1–E3 更新：新增3条，累计77条。A/B/C真实环境与导入验收通过，D收费执行仍待授权；没有开发者本人学习验收，全部新增项保持待学习。已有L-E1-01/02的恢复与隔离证据补充见本次报告，不改其掌握状态。
+
+<a id="l-e1e3-01"></a>
+
+#### L-E1E3-01 — 批量业务导入的外层事务和失败回滚
+
+- 工程记录：[E1–E3](IMPROVEMENT_LEDGER.md#e1-e3)；[执行报告](../verification/E1_E3_REAL_DATA_EXECUTION_20261113.md)。基线HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`，本批无新提交SHA。
+- 前置：Spring代理、REQUIRED传播、MyBatis生成键、InnoDB事务及间隙锁。
+- 入口：`QuestionAdminService.createQuestion`、Question/ScoringPoint Mapper；临时 `backups/E1E3_20261113/QuestionImport.java` 的 `rehearseRollback/importQuestions/guardEmptyForWrite`。
+- 核心问题：为何HTTP的@Valid不能覆盖直接Service调用？外层TransactionTemplate如何让21次Service调用原子提交？为什么回滚会留下自增间隙，独立连接验证比同事务SELECT更有说服力？
+- 独立练习：解释20/93后权重拒绝的异常传播，证明无REQUIRES_NEW或吞异常提交；仅在另外明确授权的隔离环境复现，勿重跑当前非空导入。
+- 状态：**待学习（掌握未确认）**；开发者证据未提供；待验证本人能独立定位事务边界与未知提交结果处置。复核2026-11-13／Codex。
+
+<a id="l-e1e3-02"></a>
+
+#### L-E1E3-02 — 冻结内容、运行时题库和MAIN快照的逐项一致性
+
+- 关联记录/代码基线同L-E1E3-01；前置：JSON、Java泛型与type erasure、题库状态、计划分类约束。
+- 入口：冻结21题JSON/MD、`InterviewQuestionPlanSnapshotService.prepareSnapshot`、`InterviewQuestionSnapshotFactory.createMainQuestion`、临时执行器 `verifyQuestionSnapshots/verifyPoints/verifySnapshot`。
+- 核心问题：为何21/97计数和权重100仍不能证明答案或快照完整？如何在不创建用户/会话时验证生产快照工厂？H01为何要区分静态可允许的instanceof与运行时元素类型验证？
+- 独立练习：对照一题的源内容、真实读回题库和序列化快照；按JLS21给出Object→List<?>及List<Integer>→ArrayList<Integer>的边界，形成独立修订建议。
+- 状态：**待学习（掌握未确认）**；开发者证据未提供；H01修订尚未应用，不能将AI导入通过视为内容缺陷或学习验收完成。复核2026-11-13／Codex。
+
+<a id="l-e1e3-03"></a>
+
+#### L-E1E3-03 — RAG试入库的费用门槛与双向身份核验
+
+- 关联记录同上；前置：L-E1-01/02、字符/UTF-8字节/token、Embedding批处理、attempt fencing与补偿。
+- 入口：`KnowledgeTextChunker.split`、`KnowledgeDocumentAdminService.uploadDocument`、`KnowledgeDocumentProcessingService.processDocument`、事务服务 `persistChunksAndMarkReady`、`MilvusVectorStoreClient`；本地 `rag-pilot-manifest.json`。
+- 核心问题：为何2块、3188字节不等于实际tokens？为什么READY与向量计数相等还需对照document/chunk/vector/model/profile？MySQL提交不明时为何不能盲目删除向量或重复process？
+- 独立练习：复算1次2输入的预算，列出授权前检查和1文档/2块/2向量对账字段，解释何时暂停而非重试；不自行触发收费调用。
+- 状态：**待学习（掌握未确认）**；开发者证据未提供；实际tokens、费用、收费恢复验收未执行。复核2026-11-13／Codex。
+
+2026-11-13 E3-E01更新：新增1条，累计78条（不含模板占位行）。单次收费调用已授权，但因真实配置未迁移而BLOCKED，0请求；不将授权、静态审查或AI说明当作工程执行及本人掌握证据。
+
+<a id="l-e3e01-01"></a>
+
+#### L-E3E01-01 — 本地占位配置与真实单请求计费门禁
+
+- 记录：[E3-E01](IMPROVEMENT_LEDGER.md#e3-e01)、[执行报告](../verification/E3_E01_REAL_INGESTION_20261113.md)；HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`，本批无新提交。
+- 前置：L-E1E3-03、Spring属性来源、HTTP请求重发、秘密管理、服务地域计价。
+- 入口：`application-evaluation.yaml`、`EnvironmentIsolationInitializer`、`EmbeddingConfiguration.createNoRetryTemplate/applyEmbeddingTimeouts`、`SpringAiEmbeddingClient`，JDK21 HttpClient/MultiExchange；本轮无新业务实现。
+- 核心问题：为什么已有.env及非空Key不代表真实模型可用？为什么不能向占位loopback发送凭据？Spring的一次尝试和底层HTTP一次exchange有什么区别？为什么未收到usage时不能填写实际tokens、分摊到Chunk或声称账单已扣费？
+- 独立练习：只输出非秘密的配置来源/目标/model/profile，辨别占位值；解释地域绑定及单请求上限，区分预算、usage计算价和供应商账单。真实请求仍遵循既定授权和前置核验，不以练习名义追加。
+- 状态：**待学习（掌握未确认）**；开发者讲解、复现或独立修改证据未提供；重发保护运行时验证及真实服务入库尚未执行。复核2026-11-13／Codex。
+
+L-E3E01-01后续证据（2026-11-14）：真实配置已补齐，禁重试与一次请求门禁已用于E01成功入库，见[本次报告](../verification/E3_E01_REAL_INGESTION_20261114.md)。有应用层1次执行及HTTP 200证据，无独立抓包；没有故障重发实验。本人掌握状态仍待学习。L-E1E3-03现可引用实际请求级821 tokens及按usage计算的¥0.0004105，但账单与收费故障恢复仍未验证。
+
+2026-11-14 E3-E01真实入库更新：新增以下1条，累计79条；无开发者学习验收，不升级旧条目状态。
+
+<a id="l-e3e01-02"></a>
+
+#### L-E3E01-02 — 真实向量逐条对账与请求级费用证据
+
+- 关联：[工程记录](IMPROVEMENT_LEDGER.md#e3-e01-live)、[E01验收](../verification/E3_E01_REAL_INGESTION_20261114.md)；HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`，本批无新提交。
+- 前置：L-E1E3-01/03、L-E3E01-01、Spring事务代理、CAS领取、Milvus一致性级别、Float32和摘要。
+- 入口／调用链：`KnowledgeDocumentAdminService.uploadDocument/processDocument → KnowledgeDocumentProcessingService → KnowledgeDocumentProcessingTransactionService.persistChunksAndMarkReady`；`SpringAiEmbeddingClient`、`MilvusVectorStoreClient`。本地临时 `backups/E3_E01_LIVE_20261113/E01Verifier.java` 读取真实MySQL及STRONG Milvus，比较vectorId集合、documentId/chunkIndex/profile、版本关系、完整内容及向量逐值。
+- 核心问题：为何总数相等不足以证明一致？为什么需要对全体ID双向核对及非目标数据前后比较？为什么复用向量的COSINE自检不等于独立语义检索？请求级usage、Chunk token_count、公开价格计算和实际账单有何区别？成功入库为何不能证明补偿或旧备份包含新向量？
+- 独立练习：用脱敏证据复核doc1、chunk1/2及两vectorId映射，独立复算 `821×0.50/1,000,000`，解释completion_tokens=null和两个Chunk token_count=NULL；只读材料练习不追加模型调用。讲解短事务提交权与跨库失败时定向补偿边界，列出仍未验证场景。
+- 工程证据：真实1请求/2Chunk/2向量，逐条对账PASS；原两库、evaluation其余11表和非目标集合保全PASS；未运行JUnit/全量回归，未做故障实验或账单核验。
+- 掌握状态：**待学习（掌握未确认）**。开发者掌握证据：未提供；尚待本人独立讲解、复算和失败边界分析。最近复核：2026-11-14／Codex；新增状态，不因AI执行通过升级。
 
 ## 3. 推荐阅读顺序与现有材料
 
@@ -783,6 +987,132 @@
 
 后续维护记录：2026-11-13 C6新增L-C6-01～03，共63条；累计基线经证据复核给出CONDITIONAL_GO，但本轮未运行真实服务测试，亦未收到开发者本人学习验收材料，所有条目继续掌握未确认。
 
+
+2026-11-14 D1 更新：新增 L-D1-01～04，累计 **83 条**（不含模板占位行），全部保持待学习、掌握未确认。题库审核和真实验收不替代开发者本人证据。
+
+### D1 — 版本化题库与受控导入
+
+<a id="l-d1-01"></a>
+
+#### L-D1-01 — Java 版本条件与评分口径
+
+- 关联工程记录／版本：[D1 工程记录](IMPROVEMENT_LEDGER.md#d1)、[V2 题库](../question-bank/D1_QUESTION_BANK_V2_20261114.json)。源码基线 `0c6f92afe331954f7cea37d33db688fe781cbf2c`，D1 无新提交。
+- 前置：泛型擦除、可具体化类型、Java 21 `instanceof` 转换，L-D0-03。
+- 源码与材料：原 V1 的 H01 题、V2 的 H01 及 SP4，`tools/question-bank-d1/revise_h01.py`，评分点模型与 `EvaluationScoreCalculator`。 [JLS 21 §15.20.2](https://docs.oracle.com/javase/specs/jls/se21/html/jls-15.html#jls-15.20.2)
+- 核心问题：为什么 `Object instanceof List<String>` 的限制不能扩展到所有操作数？为什么已知泛型上下文可接受某些窄化测试，但运行时并不逐元素确认？内容覆盖权重与后端五维评分总分各表达什么？
+- 独立练习：自行写两个合法和一个非法片段，用 Java 21 `javac` 说明结果；用另一种口述方式解释例外，并独立给出两个可检验评分点。
+- 掌握状态：**待学习（掌握未确认）**。开发者证据未提供；待本人独立讲解及复现。最近复核 2026-11-14／Codex，首次登记。
+
+<a id="l-d1-02"></a>
+
+#### L-D1-02 — 逻辑题号、内容指纹与来源版本
+
+- 关联工程记录／版本：同 L-D1-01。[版本与来源清单](../question-bank/D1_BANK_MANIFEST_20261114.json)
+- 前置：JSON、SHA-256、主键、来源版本与许可，L-D0-01/03。
+- 源码入口：`tools/question-bank-d1/build_bank.py` 的 `canonical/request/build`，`D1QuestionBankImport.readBank/checkReview`，冻结 V1、V2 JSON 和逐题审核记录。
+- 核心问题：题号、knowledgePoint、题目内容指纹和数据库自增 ID 为什么要分别维护？H01 改答案后哪个标识变化？为什么通过 DTO 和权重校验仍需逐题审查，导入器如何确保写入的是已审字节？
+- 独立练习：任选一个新增题和 H01，复算指纹并从 V1/V2 对照追到资料版本、审核记录、入库映射，解释调整权重及仅重排 JSON 键的影响。
+- 掌握状态：**待学习（掌握未确认）**。开发者证据未提供；待本人复算和解释身份边界。最近复核 2026-11-14／Codex，首次登记。
+
+<a id="l-d1-03"></a>
+
+#### L-D1-03 — Service 代理、整批事务与失败恢复
+
+- 关联工程记录／版本：同 L-D1-01。前置：L-E1E3-01、Spring 代理、`REQUIRED`、InnoDB RR 与 MyBatis 生成键。
+- 源码入口：`D1QuestionBankImport.guard/tx/rehearse/importBank/verifyFinal` → `QuestionAdminService.updateQuestion/createQuestion` → Question/ScoringPoint Mapper。定向测试 `QuestionAdminServiceTest` 与 `D1ImportOfflineTest` 分别验证 Service 逻辑及输入边界。
+- 核心问题：直接调用 Service 如何补上 Controller 的 DTO 校验？外层事务如何绑定多次写入和 H01 替换？为什么回滚后业务行相同仍可能出现自增间隙？提交成功但回执写失败时怎样确认结果？
+- 独立练习：画出正常提交、最后一题权重失败和提交回执丢失三个时序，列出锁定、回滚、独立读回的证据。实际演练仅在另行授权的隔离环境执行。
+- 掌握状态：**待学习（掌握未确认）**。开发者证据未提供；待本人能识别事务代理和回执丢失的恢复路径。最近复核 2026-11-14／Codex，首次登记。
+
+<a id="l-d1-04"></a>
+
+#### L-D1-04 — 历史快照与有效评分点隔离
+
+- 关联工程记录／版本：同 L-D1-01。前置：L-E1E3-02、L-D0-02、REPEATABLE READ、持久化快照、启停状态。
+- 源码入口：`QuestionAdminService.updateQuestion`、`QuestionScoringPointMapper.selectEnabledByQuestionId`、`InterviewQuestionPlanSnapshotService.prepareSnapshot`、`InterviewQuestionSnapshotFactory.createMainQuestion`、`D1QuestionBankImport.verifyBank/verifyPreserved`。
+- 核心问题：当前题库更新后，为什么历史题干、答案及评分点不能随之改变？当前题目总行数和可参与组卷的启用题数如何分别验收？H01 整体替换评分点后，为什么快照的旧点 ID 仍可用于历史重放？
+- 独立练习：用脱敏读回或本地推演比较 H01 更新前后的当前题库数据与已生成快照，列出需要相等与允许变化的字段。分析某个点禁用后权重和变成 75 的入库／组卷门禁。
+- 掌握状态：**待学习（掌握未确认）**。开发者证据未提供；待本人能独立指出快照与实时状态的读取边界。最近复核 2026-11-14／Codex，首次登记。
+
+
+2026-11-14 D2更新：新增L-D2-01～04，累计 **87条**（不含模板），全部保持待学习、掌握未确认。真实工程验收不代表开发者本人掌握。
+
+### D2 — 分类随机、可控测试与快照保护
+
+<a id="l-d2-01"></a>
+
+#### L-D2-01 — 分类分桶、均匀抽样与稳定索引
+
+- 工程／版本：[D2台账](IMPROVEMENT_LEDGER.md#d2)、[独立验收](/Users/kun/Documents/Reports/ai-interview-system/2026-11-14-D2-随机组卷与真实数据库验收.md)。基线 `0c6f92afe331954f7cea37d33db688fe781cbf2c` 加D2未提交修改。
+- 前置：List/Map、枚举、排序、主键唯一性、均匀分布，L-D0-02。
+- 源码入口：`QuestionPlanSelector.select/groupCandidates/validateCandidate`，`InterviewPlanConfig.getRule`，`QuestionMapper.xml#selectEnabledQuestionsForInterview`；测试 `shouldGiveEachUniqueCandidateOneReachableIndex`、`shouldReplayTheSamePlanWithFixedSeedEvenIfCandidateOrderChanges`。
+- 核心问题：按ID排序为何不会恢复首题偏差？重复行如何改变概率？为什么每类一个随机下标能保证覆盖且无需补题？难度由哪一层约束？同一固定随机序列遇到反转输入为何仍能重放？
+- 独立练习：自行列出两分类各三题，包含相同重复行与禁用题，手算每个合法下标对应的唯一候选，再实现输入重排测试。解释计划总数与必选分类数不等时为何拒绝。
+- 掌握状态：**待学习（掌握未确认）**。开发者证据未提供，待本人讲解与独立修改；尚待验证公平性和错误边界的独立解释。最近复核2026-11-14／Codex，首次登记。
+
+<a id="l-d2-02"></a>
+
+#### L-D2-02 — 线程本地随机源与确定性测试
+
+- 工程／版本：同L-D2-01。前置：函数式接口、方法引用、Spring单例、线程安全、固定种子、CyclicBarrier。
+- 源码入口：`QuestionPlanSelector.select`公开入口与包级随机源重载；`QuestionPlanSelectorTest.shouldKeepConcurrentDrawsAndTheirResultsIndependent`、`shouldBuildValidPlansWhenProductionRandomSourceIsUsedConcurrently`、`fixedSeedSampleShouldShowNoObviousFirstCandidateBias`。
+- 核心问题：为什么不能把测试的可变随机序列放进共享生产Bean？ThreadLocalRandom在何时取得、何线程使用？固定seed、逐下标穷举、真实小样本各证明什么？HARD/MYSQL观察到1/0/7为何不能直接判定算法不公平？
+- 独立练习：用两个独立固定源并发抽取首/末候选，解释局部桶为何不相互污染；改一个候选顺序重放；设计不依赖严格随机频率的失败断言。
+- 掌握状态：**待学习（掌握未确认）**。开发者证据未提供，待本人复现并解释测试边界；最近复核2026-11-14／Codex，首次登记。
+
+<a id="l-d2-03"></a>
+
+#### L-D2-03 — 随机计划、活动会话幂等与历史快照
+
+- 工程／版本：同L-D2-01。前置：L-D1-04、REPEATABLE_READ、Spring REQUIRED、用户行锁、乐观CAS与JSON序列化。
+- 源码入口：未改 `InterviewSessionService.createSession → InterviewQuestionPlanSnapshotService.prepareSnapshot → InterviewSessionTransactionService.createAndStartSession → InterviewQuestionSnapshotFactory.createMainQuestion`；工具 `create/testHistoricalSnapshot`，Mapper `startSession/batchInsertMainQuestions/listBySessionId`。
+- 核心问题：新建场次需要随机，活动Session重复请求为何必须返回原场次？用户行锁后的第二次检查解决什么竞态？管理员更新评分点主键后，历史快照为什么保留旧id和顺序？planOrder与displayOrder为什么不同？
+- 独立练习：绘制正常创建、同用户竞争、管理员更新三种时序；追踪题干/答案/点JSON的读写位置。仅在后续明确授权的隔离环境自行复现非空历史快照保护。
+- 掌握状态：**待学习（掌握未确认）**。开发者证据未提供；尚待本人独立区分内存草稿、事务内落库及提交后持久事实。最近复核2026-11-14／Codex，首次登记。
+
+<a id="l-d2-04"></a>
+
+#### L-D2-04 — 真实验收的目标门禁与可回滚证据
+
+- 工程／版本：同L-D2-01。前置：L-D1-03、逻辑备份、摘要、MySQL自增、事务可见性与独立连接。
+- 源码入口：`tools/question-plan-d2/run_acceptance.py` 的 `check_identity/backup/verify`；`D2QuestionPlanAcceptance.verifyBackup/verifyBank/readRows/rollback/concurrent`。证据：D2 `write-plan.json`、`writes.jsonl`、`result.json`、`protection-result.json`。
+- 核心问题：为什么库名正确还要核对host/端口/UUID/触发器？为什么写前登记可能产生的行，生成后再记录具体ID？回滚后业务行相等为何允许自增号不同？29个fixture检查与最后总体检查如何计数？外围事务为何使本验收不能证明正常独立commit可见性？
+- 独立练习：不连数据库复现四种失败门禁，区分预期exit1与测试失败；从已留证据追出一个Session的计划、生成行和最终零残留结论，并列出本轮未验证的事项。
+- 掌握状态：**待学习（掌握未确认）**。开发者证据未提供；待本人能制定精确恢复方案并如实区分Mock、真实SQL、回滚与commit证据。最近复核2026-11-14／Codex，首次登记。
+
+
+### D3-A — 评分证据、切片与独立检索评测
+
+关联 [D3-A 工程记录](IMPROVEMENT_LEDGER.md#d3-a)、[覆盖工作簿](../rag/d3-a/D3A_KNOWLEDGE_COVERAGE_20261114.xlsx) 和 [评测规程](../verification/D3A_RETRIEVAL_PROTOCOL_V1_20261114.md)。工作区基于 HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`，本批无提交。以下练习在本地阅读和离线推演范围内。
+
+#### L-D3A-01 — 技术事实、版本与评分覆盖
+
+- 前置及入口：D1 V2 评分要求、旧 H01/M02、工作簿的「评分点矩阵」和「来源索引」，以及 `InterviewQuestionSnapshotFactory.createMainQuestion` 的评分点冻结。
+- 核心问题：为什么已定位到权威来源仍可能有正文缺口？何时要把规范、实现、工程建议或项目行为分开？同一类型擦除的例子需要哪些静态与运行时前提？
+- 独立练习：为 H01.02 和 M02.04 分别写一条可核查事实、一个反例和一个可接受作答，定位 JLS 条款或固定 8u 源码分支。用原题核对边界，保留来源和理由。
+- 掌握状态：**待学习（掌握未确认）**。待本人给出核对与反例证据。最近复核 2026-11-14／Codex。
+
+#### L-D3A-02 — 生产切片与文档版本保全
+
+- 前置及入口：`KnowledgeDocumentAdminService.uploadDocument → KnowledgeTextChunker.split/findNaturalBoundary/calculateNextStart → KnowledgeDocumentProcessingService.processDocument → KnowledgeDocumentProcessingTransactionService.persistChunksAndMarkReady`。
+- 核心问题：UTF-16 单元、UTF-8 字节和 token 有何不同？为什么引用尾块、前提丢失或 READY 文档改正文都会影响证据？遇到提交确认不明时怎样避免误删有效向量？
+- 独立练习：本地用 E01 原文计算规范化 hash 和两个 Chunk 摘要，另用一段含 CRLF 与非 BMP 字符的合成文档检查边界。画出上传、领取、外部写入、MySQL 提交及补偿顺序。
+- 掌握状态：**待学习（掌握未确认）**。待本人复现摘要并解释故障窗口。最近复核 2026-11-14／Codex。
+
+#### L-D3A-03 — 原始排名、资格与 Prompt
+
+- 前置及入口：`EvaluationRagQueryBuilder.build`、`KnowledgeRetrievalService.retrieve`、`KnowledgeChunkMapper.selectRetrievableByVectorIds`、`EvaluationPromptBuilder.build` 和 `RagTracePersistenceService.persist`。
+- 核心问题：原始 Top5 只剩 rank 2、4 时，为什么 rank 2 不应在主口径改记 rank 1？MySQL 的 ACTIVE/READY、版本、模型和 profile 如何决定资格？哪些证据会进入 Prompt 与持久化追踪？
+- 独立练习：用手工合成的 5 条命中，标记两条资格丢失、两条直接证据和一条相邻材料。计算三阶段 Hit@1/3/5、Precision@5、MRR@5 与最终相关率，说明空证据的分母。
+- 掌握状态：**待学习（掌握未确认）**。待本人独立算出指标并定位资格过滤与序列化源码。最近复核 2026-11-14／Codex。
+
+#### L-D3A-04 — 冻结独立查询与人工真值
+
+- 前置及入口：[评测规程](../verification/D3A_RETRIEVAL_PROTOCOL_V1_20261114.md)、`KnowledgeTextChunker.split`、`tools/rag-p1/IndependentRetrieval.java` 与 [历史留出集记录](../rag/PHASE_4C2_HOLDOUT_FREEZE_REPORT.md)。
+- 核心问题：题库回放能验证什么？共享概念与题干泄漏如何区别？为什么正例没 DIRECT 仍计 miss，负例有背景却无法提供所请求的实例事实？覆盖同一个子意图两次如何计数？
+- 独立练习：自行写两条全新查询和一个负例，为六段自备证据独立标注并记录争议。生成查询与标注摘要，模拟收到 Top5 后分析失败原因，保留首次结果并设计另一组验证样本。
+- 掌握状态：**待学习（掌握未确认）**。待本人提供可重算的小样本和裁决理由。最近复核 2026-11-14／Codex。
+
 ### D3-B/C/D 源码学习（2026-11-14）
 
 #### L-D3BCD-01 — 生产切片与向量入库身份
@@ -802,3 +1132,129 @@
 - 入口：`DeepSeekEvaluationClient`、`InterviewService.submitAnswer`、`D3SmokeServer.UsageResponse` 与 EASY 提交后读回。
 - 独立练习：复现响应流只能读一次造成的包装器故障，证明修复后能保留响应内容并只记一次 usage。解释相同业务请求键仍可能产生新的上游计费，以及如何用 FINAL 核对报告。
 - 掌握状态：**待学习（掌握未确认）**。
+
+### D3-E 源码与评测学习（2026-11-14）
+
+<a id="l-d3e-01"></a>
+
+#### L-D3E-01 — 候选、真实证据和精度分母
+
+- 入口：`EvaluationRagQueryBuilder`、`KnowledgeRetrievalService.retrieve`、`EvaluationRetrievalAdapter`、`EvaluationPromptBuilder` 和 `tools/rag-d3/d3e_replay.py`。
+- 独立练习：对原始 rank 1、2、4 合成一次资格过滤与去重，分别计算原始 Hit@1/3/5、固定 P@5、最终 micro/macro 精度，解释空证据及负例的分母；指出追踪表如何对应实际 Prompt。
+- 掌握状态：**待学习（掌握未确认）**，等待本人演算与源码定位证据。
+
+#### L-D3E-02 — 机制覆盖、误拒绝与有界选择
+
+- 入口：[D3-E 报告](../verification/D3E_EVIDENCE_QUALITY_REVIEW_20261114.md)、版本化回放和公开 Q26/Q29/Q33。
+- 独立练习：解释为什么首位命中和高精度不能保证所有子意图覆盖；对比 0.70 阈值的 CORE 丢失与无答案误供，设计不读取标签或题号的下一轮测试，并区分语料缺口与召回 miss。
+- 掌握状态：**待学习（掌握未确认）**，等待本人解释和独立复核证据。
+
+#### L-D3E-03 — 评分盲审与外部调用记账
+
+- 入口：`D3EScoringProbe`、`D3SmokeServer.UsageResponse`、`LlmEvaluationValidator` 和人工盲审卡。
+- 独立练习：解释固定题答的 A/C 对照为什么不能证明因果显著；分别核对 E01.03、H25.03 的预期歧义。描述一次 HTTP 失败、业务重放与供应商计费计数的不同边界，并验证错误体和重复读取不会丢失响应。
+- 掌握状态：**待学习（掌握未确认）**，等待本人独立判定与复现证据。
+
+### U1 题目表达、评价边界与可见等待（2026-11-14）
+
+<a id="l-u1-01"></a>
+
+#### L-U1-01 — 稳定知识点键和历史评分点快照
+
+- 入口：`QuestionAdminService.updateQuestion → InterviewQuestionSnapshotFactory → EvaluationContextService`。
+- 独立练习：从两题的新旧 DTO 识别哪些值可改，解释评分点替换为何分配新 ID，如何确认旧会话仍用旧评分点和报告。区分当前题库内容与客户端知识点显示文字。
+- 掌握状态：**待学习（掌握未确认）**。
+
+#### L-U1-02 — 评价必答边界与固定证据对照
+
+- 入口：`EvaluationPromptBuilder`、`LlmEvaluationValidator`、[U1 合成样本](../verification/U1_SYNTHETIC_SCORING_FIXTURES_20261114.json)。
+- 独立练习：为 ACID 的一种口语解释和一种错误解释分别写出 Boolean 覆盖及部分反馈，说明为何不应拿参考答案中的隔离级别举例当作必答。比较同一答案在两组方案中的覆盖分歧，锁定判断后再解盲。
+- 掌握状态：**待学习（掌握未确认）**。
+
+#### L-U1-03 — 同步答题、报告和浏览器等待计时
+
+- 入口：`InterviewTimingConfiguration`、`InterviewRequestTiming`、`InterviewService`、`InterviewReportService`、`useInterviewSession`。
+- 独立练习：通过安全关联头把一条浏览器时间线匹配到后端阶段，解释为何 MVC 总时间和用户点击到结果的时间不同，为什么超时不等价于服务端失败，记录同键恢复作用。
+- 掌握状态：**待学习（掌握未确认）**。
+
+### U1-R1 evaluation 账号边界与证据追溯（2026-11-14）
+
+<a id="l-u1r1-01"></a>
+
+#### L-U1R1-01 — 专用数据库配置与权限验证
+
+- 入口：`tools/rag-d3/config.py → evaluation_database_config`、`run.py → evaluation_environment`、`EnvironmentIsolationInitializer`。
+- 前置知识：文件属主与 0700/0600、JDBC 目标、MySQL 账号的主机和 Schema 授权。
+- 独立练习：解释为什么字面配置不能当 shell 执行；使用只读连接核对 Schema 与服务器身份，区分配置路径正确、连接成功和账号仅具备预期权限；设计只覆盖 evaluation 的 DML 权限。
+- 证据和状态：本轮仅有离线门禁测试，evaluation 真实连接因账号权限阻塞；开发者本人讲解、复现或修改证据未提供。**待学习（掌握未确认）**。
+
+#### L-U1R1-02 — RAG 历史证据与浏览器验收范围
+
+- 入口：`RagTracePersistenceService`、`rag_hit_log`、`U1EvaluationQuestions.history`、`InterviewRequestTiming` 和 U1 浏览器验收入口。
+- 前置知识：历史快照与当前引用、随机抽题、请求关联及样本统计。
+- 独立练习：说明为何仅凭当前 Chunk 不一定能证明历史提示词正文；为双目标随机组卷列出可检查的会话条件，分别设计重复点击、失败恢复和阶段耗时证据，并解释样本不足时为何不能给 P95。
+- 证据和状态：本轮仅完成代码和测试边界检查，未执行真实会话或记录耗时；开发者本人证据未提供。**待学习（掌握未确认）**。
+
+2026-11-14 U1-R1 后续证据：专用账号已创建并通过精确授权及两个其他 Schema 的拒绝访问检查；人工历史会话 的数据库归属、题答及两道题的历史快照已只读核验，题库更新经正式 Service 提交并回读。复核了 MySQL Schema 级授权下划线通配符的转义要求。上述为工程代理证据，L-U1R1-01～02 仍为**待学习（掌握未确认）**；开发者本人讲解或复现尚未提供，真实浏览器耗时与完整流程仍待验收。
+
+同日补充：真实 HTTP 未登录边界及合成账号 API 登录已核验；浏览器工具未能使用脱敏后的凭据完成 GUI 登录，完整浏览器与计时仍未验收。学习状态不变。
+
+同日最终证据：普通合成用户 Session 31 的真实 Chrome/HTTP 评分、追问、报告及与数据库的答案逐项比对已完成；同页响应丢失后原请求恢复通过。跨服务及浏览器重启并重新登录的组合场景发现上一题反馈未自动恢复，详见 [U1-R1 最终报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-14-U1-R1-真实浏览器终验.md)。这些为工程代理验证证据，L-U1R1-01～02 的学习状态仍为**待学习（掌握未确认）**。
+
+<a id="l-u1r1-03"></a>
+
+#### L-U1R1-03 — 结果未知、同键恢复与跨重启状态
+
+- 入口：`useInterviewSession.handleSubmitFailure/postAnswer/applyBootstrapResult`、`submitRecordStorage`、`sessionBootstrap.resolveSessionBootstrap`、`InterviewService.submitAnswer`。
+- 独立练习：分别画出服务端未提交、已提交但响应丢失、已推进后浏览器与服务重启三条时序；说明同一请求 ID 和答案为什么能取得已保存评价、何时仍可能触发模型收费。解释本轮 8 次 HTTP 正文、6 个唯一答案与 6 次模型评分之间的关系，提出身份切换和最终题目的反例。
+- 掌握状态：**待学习（掌握未确认）**；尚无开发者本人讲解、复现或独立修改证据。
+
+#### L-U1R1-04 — 样本配对、真实耗时与用量
+
+- 入口：`InterviewRequestTiming`、`EvaluationRetrievalAdapter`、`KnowledgeRetrievalService.retrieve`、`InterviewReportService`，以及本轮私有浏览器网络与后端计时记录。
+- 独立练习：将一条实际请求关联到浏览器可见时间和各后端阶段；解释为什么 4 条正常端到端、6 条服务端评分和 1 条报告不能混用分母，也不能提供可靠 P95。用缓存命中、未命中和输出 token 独立复算使用量估价，并区分估算与供应商账单。
+- 掌握状态：**待学习（掌握未确认）**；尚无开发者本人复算或解释证据。
+
+### U2 反馈恢复与启动安全（2026-11-14）
+
+<a id="l-u2-01"></a>
+
+#### L-U2-01 — 提交结果未知与只读反馈恢复
+
+- 入口：`InterviewWorkflowTransactionService`、`InterviewService.getDetail`、`useInterviewSession.recordForBootstrap`、`PreviousInterviewFeedback.vue`。
+- 独立练习：画出答案已提交、响应丢失、当前题已推进和全新浏览器登录的状态；解释 localStorage 的旧题键为什么不能靠当前题 ID 命中。使用已有详情结果推导 INITIAL 主答与 FINAL 追问各应显示哪个评价，说明为何本次查看不应调用模型或回退 Session。
+- 掌握状态：**待学习（掌握未确认）**；工程代理已复现并修复，尚无开发者本人讲解或独立复现证据。
+
+#### L-U2-02 — Boot 默认用户与 JWT 安全链
+
+- 入口：`AiInterviewSystemApplication`、`SecurityConfiguration.securityFilterChain`、`DefaultSecurityUserDisabledIntegrationTest` 及六个 `@WebMvcTest` 安全切片。
+- 独立练习：解释自定义 SecurityFilterChain 为何不自动等于禁止默认 UserDetailsService，定位自动配置排除条件；说明 401、普通用户 403、注册登录与当前用户角色查询各自验证什么，为什么隐藏日志不能证明默认用户不存在。
+- 掌握状态：**待学习（掌握未确认）**；尚无开发者本人解释或独立修改证据。
+
+#### L-U2-03 — 故障注入、跨进程读回与计费边界
+
+- 入口：`FullInterviewBusinessOfflineTest.readsCommittedPreviousEvaluationWithoutResubmissionAndRejectsAnotherUser`、U2 私有浏览器与数据库读回证据。
+- 独立练习：区分 Mock 事务测试、服务端已提交后截断响应、浏览器刷新、前后端重启及全新用户目录分别证明的内容；核对 5 次答案 POST、5 条持久化答案/评价、6 次 DeepSeek（含报告）与 5 次 Embedding，解释为何两次只读恢复不计为模型调用。
+- 掌握状态：**待学习（掌握未确认）**；尚无开发者本人复核或演算证据。
+
+### S1 候选人数据可见性（2026-11-14）
+
+<a id="l-s1-01"></a>
+
+#### L-S1-01 — 持久化计划与接口可见边界
+
+- 入口：`InterviewQuestionPlanSnapshotService`、`InterviewService.getDetail`、`InterviewDetailQuestionResponse`。
+- 独立练习：画出创建时完整快照、当前题、已提交历史和未来题四者关系；解释为何界面隐藏不足以阻止直接 HTTP 请求，以及为什么已作答但评价尚未完成时仍可查看本人答案。
+- 掌握状态：**待学习（掌握未确认）**；未收到开发者本人讲解或复现证据。
+
+#### L-S1-02 — JWT、归属校验与反馈恢复
+
+- 入口：`JwtAuthenticationFilter`、`InterviewService.loadOwnedSession`、`PreviousInterviewFeedback.vue`、`InterviewVisibilityHttpIntegrationTest`。
+- 独立练习：区分无令牌 401、普通用户管理接口 403、跨用户详情 404；解释按当前题和展示顺序恢复主答或追问评价时，身份或 Session 变化如何避免串读。
+- 掌握状态：**待学习（掌握未确认）**；未收到开发者本人讲解或复现证据。
+
+#### L-S1-03 — 隔离回归与时间语义
+
+- 入口：`EnvironmentIsolationInitializer`、超时回收 CAS 测试、`InterviewVisibilityHttpIntegrationTest`。
+- 独立练习：对比 MySQL 服务器时区、JDBC 配置和 JVM 本地时间对过期判断的影响；设计只连接临时测试库的真实 HTTP 与 Mock 模型验证，分别报告失败、重测、跳过和真实外部服务范围。
+- 掌握状态：**待学习（掌握未确认）**；未收到开发者本人讲解或复现证据。

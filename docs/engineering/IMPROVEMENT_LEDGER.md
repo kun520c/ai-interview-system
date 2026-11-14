@@ -1,13 +1,18 @@
 # 工程优化台账
 
-建立／最近核验日期：2026-11-13（Asia/Shanghai）。仓库：`/Users/kun/Developer/projects/ai-interview-system`。
+建立日期：2026-11-13；最近核验：2026-11-14（Asia/Shanghai）。仓库：`/Users/kun/Developer/projects/ai-interview-system`。
 
 本台账记录可追溯的工程事实，不替代原验收报告。源码学习及掌握证据独立维护于 [SOURCE_LEARNING_BACKLOG.md](SOURCE_LEARNING_BACKLOG.md)。初次建档只修改文档；同日 B4-D 后续开发、回归和当前 Git 状态另见本批记录，不改写历史验收。
 
 ## 1. 维护口径与证据基线
 
+- 2026-11-14 E3-E01更新：真实配置已加载，1次百炼请求完成E01 READY、2个Chunk和2条向量的双向对账，真实入库 **PASS**；详见[本次验收](../verification/E3_E01_REAL_INGESTION_20261114.md)。下方旧BLOCKED记录保留原时点事实，没有新增生产实现批次。
+
+- 2026-11-13 E0 补审时点：local MySQL 中 user=1、其余12核心表为空，test 13表为空；Milvus 启动失败，跨库状态未知，整体仍 BLOCKED。见 [E0](../verification/E0_TEST_ENVIRONMENT_READINESS_20261113.md)；下方 D0 是当时历史状态。
+
 - 当前登记 **12 条已开展批次记录**：J1、B1、B2、B3、B4-A、B4-B、B4-C、B4-D、B4-E、B5-0、B5-P2-A、B5-P2-B；另有 **4 条未来编号候选**：B6、B7、B8、B9。B5-0仅审查、测试与计划，不计为业务修复。C0/C3是累计验收证据，不重复计为实现批次；B5-0提出的B5-FIX-A已获本轮明确授权，以B5-P2-A完成密码边界修复；B5-FIX-B亦已获明确授权，以B5-P2-B完成Embedding日志边界修复。
 - 2026-11-13 C6 新增累计审查／证据复核记录，不增加生产实现批次；12条批次、4条候选口径不变。C6没有修改生产／测试源码，没有重新执行功能测试或构建；经快照、依赖与原始证据核实复用最新后端1832/0/0/19和前端336/0/0/0，详见[C6收口](../verification/C6_RELIABILITY_PHASE_CLOSEOUT_20261113.md)。
+- 2026-11-13 D0 新增离线数据审计及 D1/D3/D4 方案，不增加生产实现批次；12 条批次、4 条候选口径不变。D0 当时 MySQL/Milvus 实时核验 BLOCKED，不能将仓库 21 题/97 点/21 文档或离线 52 Chunk 当作在线数据。详见 [D0 审计](../verification/D0_DATA_READINESS_AUDIT_20261113.md)；本轮未执行功能回归或真实模型测试。
 - 此处 B1/B2/B3 是 2026-11 的并发、恢复、报告修复，不是 AGENTS 历史章节中的 Embedding B1、Milvus B2 或 Phase 5 Batch 1～3。
 - 区分设计／审计完成、已编码、已编译、已测试、已打包、已暂存、已本地提交、已进入远端分支。测试通过与开发者掌握源码分别记账。
 - `T/F/E/S` 表示 Tests / Failures / Errors / Skipped。完整测试数包含跳过；不同轮次存在重叠，禁止相加称为独立用例总数。编译／`-DskipTests package` 的测试计数不适用。
@@ -18,6 +23,8 @@
 - 不将验收日志耗时写成性能提升，不将预算估算写成 P95/SLA，不将 skipped 写成真实服务通过。
 
 ### 1.1 Git 实际状态
+
+2026-11-13 D0 只读更新：本地 `main` HEAD 为 `0c6f92afe331954f7cea37d33db688fe781cbf2c`，即 C7 的独立文档提交；累计源码提交仍为 `71aeb22f7da906660763e9efb1100a20df7705c9`。本轮 GitHub 连接器实时核验远端 main 为 `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，与缓存相同，0 落后 / 8 领先。暂存区为空；本轮四份 D0/D1/D3/D4 新文档与本台账、学习清单修改均未提交、未推送，无 D0 SHA。入场 5 个用户变动保持，未 fetch 或修改 Git 引用。以下 C7/C6 段落保留当时事实。
 
 2026-11-13 C7 本地提交更新：用户明确授权按 C6 五批计划执行 `git add` / `git commit`，未授权推送。四批代码已依次形成以下本地提交（每项父提交为上一项，首项父提交为原 HEAD `01ac774caff491b978dd2268e8b427355a64b97a`）：
 
@@ -323,6 +330,54 @@
 - 临时证据：`/private/tmp/ai-c7-20261113-zz1q6mlv/`，包含入场清单、各批暂存 patch／审计、独立编译日志、历史测试复核与提交后 final-check.json；临时文件未进入 Git，仍有被系统清理的留存限制。
 - 学习与边界：关联 L-X-02、L-C6-01／03，仅增加实际 Git 定位依据，63 条仍待学习／掌握未确认。没有真实 DeepSeek、Embedding、Milvus 调用，没有数据库操作、部署或推送；远端同步等待下一次明确指令。原 C6 风险及真实测试准入条件不变。
 
+<a id="d0"></a>
+
+### D0 — 真实数据准备离线审计与扩容/多用户测试方案
+
+- 建立／更新日期、负责人：2026-11-13，Codex。用户仅授权只读审计、数据设计和指定文档；补充明确不启动/创建/重建数据库容器、不修改配置，实时不可读时记录 BLOCKED 并交付离线方案。
+- 关联报告：[D0 数据审计](../verification/D0_DATA_READINESS_AUDIT_20261113.md)、[D1 题库/组卷](../verification/D1_QUESTION_BANK_EXPANSION_PLAN_20261113.md)、[D3 RAG](../verification/D3_RAG_CORPUS_EXPANSION_PLAN_20261113.md)、[D4 质量/并发](../verification/D4_MULTI_AGENT_TEST_PLAN_20261113.md)；基线为上节完整 HEAD；临时证据 `/private/tmp/ai-d0-20261113/`，不替代永久数据库审计。
+- 状态：离线审计、设计及文档完成；未编码随机逻辑、未扩充完整题目/知识正文、未入库、未运行面试测试。MySQL/Milvus 实时核验 BLOCKED；不能给出真实数据或真实应用可用 PASS。
+- 问题／证据：`.env` 配置指向 127.0.0.1:3308/ai_interview，与历史 3306 不同；沙箱外独立 TCP 3308/3306/19530/9091/8080 均 ConnectionRefusedError:61，Docker 指定容器 exited 为补充证据。首轮沙箱 PermissionError 不是停服证据。现有历史入库/检索 JSON 在 Mac 仓库缺失，当前数据迁移完整性未知。
+- 内容事实：仓库 21 题、97 点、每题权重和100、CORE齐备、精确重复0；139/139题干/答案/评分点正文在配套Markdown中存在。H01-SP4 的 `instanceof List<String>` 缺静态类型条件，Java21临时正负编译探针验证，列为后续修订；没有修改原题。现有21篇文档经当前生产chunker离线得到52块，52/52长度与历史表一致；不证明历史内容hash或实际MySQL/Milvus身份相同。
+- 改动文件与关键入口：仅新增上述四报告、更新两工程清单。读取但未修改 InterviewPlanConfig、QuestionPlanSelector.select/findFirstUnselectedByCategory、InterviewQuestionPlanSnapshotService.prepareSnapshot、InterviewSessionService/TransactionService、QuestionAdminService、KnowledgeTextChunker.split、KnowledgeDocumentProcessingService.processDocument、KnowledgeRetrievalService.retrieve 及 Mapper/Schema。
+- 调用链／边界：创建预查活跃Session→RR只读选题/评分点快照→user行锁短事务重查/完整落库；答案按归属+精确载荷/requestId→attempt→外部评价→fenced收口；知识处理按attempt写向量/短事务换Chunk/READY；检索按profile→MySQL资格过滤→Prompt证据。以上均为当前源码审计，不是D0新实现。
+- 方案／取舍：新增42个主题使各难度必选类别各3候选，目标15/21/27=63；优先Java分类内独立随机+可控RandomGenerator，历史避重作为后续候选，不改Schema。RAG暂定21+30=51篇，按机制和来源组织，不复制参考答案。A真实模型质量+独立人审与B真实用户/Mock上游负载分开证据、预算和账号。
+- 新执行检查：Python结构/对应检查21题97点无结构异常、139/139正文存在；独立javac当前生产chunker退出0，21/21文档离线成功、52块；Java21泛型编译探针2项符合预期（1个exit0、1个预期exit1）；端口及容器只读元数据检查完成；报告数量/覆盖/链接/文件保全检查另记D0最终结果。均不是JUnit测试。
+- 最终文档检查：20项通过、0项失败，覆盖题目/文档/评分映射与数量、预算算术、68条学习记录、链接/表格/围栏、敏感模式和保全；两种git diff --check退出0。临时证据为`final-document-checks.json`，997/997非授权变更的入场文件正文/mode不变。
+- 测试类型／计数：JUnit/Surefire/Vitest、全项目构建、Unit/Mock回归、MockMvc、真实HTTP、真实MySQL SQL、真实Milvus数据查询和模型评价均未执行，T/F/E/S不适用；SQL/Milvus数据核验为BLOCKED。实际DeepSeek/Embedding调用0、SQL写入0、Milvus写入0。C6/C7历史计数只引用，不充作本轮结果。
+- Git／保全：本轮无暂存/commit/push；HEAD与index保持，入场999文件中除两份授权工程文档外正文/mode保全，5个用户变动原样保留。当前远端main及0/8关系见1.1；未核验其他远端分支。
+- 学习：[L-D0-01](SOURCE_LEARNING_BACKLOG.md#l-d0-01)～05，新增5条，总计68条，全部待学习（未确认），没有开发者本人讲解/复现证据。
+- 残余风险／下一步：服务准备和实时数据补审、H01修订、历史原始证据恢复、逐篇许可与版本核对、新题人工审查、模型预算和真人评审。全部列为后续任务，本轮停止，不自动实施或收费测试。
+
+<a id="e0"></a>
+
+### E0 — 本机环境恢复与只读数据补审
+
+- 日期／负责人：2026-11-13，Codex；证据：[E0 报告](../verification/E0_TEST_ENVIRONMENT_READINESS_20261113.md)、[D0 第7节](../verification/D0_DATA_READINESS_AUDIT_20261113.md)。状态 **BLOCKED**：MySQL 已恢复和只读核验，Milvus 启动失败后停止，跨库检查未执行；独立 evaluation 环境仍为方案。
+- 问题与边界：D0 无法连接；原项目 MySQL/Milvus 容器与专用卷存在。检查挂载和空卷初始化风险后只启动原容器；Milvus 日志显示 etcd leader changed，不能推断卷损坏，已终止重启循环。没有创建库、导入、删卷、改配置或调用模型。
+- 数据：MySQL 8.0.45 在 3308，local 库 13 表中 user=1、其余 12 表均为0；test 13表全0；36项完整性 SELECT 成功、均为空样本0，评分权重无题可核验。该实例无 evaluation 库；Milvus collection/向量及跨库一致性未知。仓库 21题/97点和21文档为离线来源，不代表数据库当前内容。
+- 文件与调用链：新增 E0，追加 D0、本台账和学习清单；未修改生产、测试或配置。环境核验链为容器/卷与端口→确认数据库身份→只读一致性快照→SQL 回滚；向量链因 Milvus 不可用而中断。权衡是保留原卷并隔离副本诊断，不以重建覆盖历史证据。
+- 验证：本轮离线静态检查21题/97点及42题、30文档规划编号；MySQL 36/36 SELECT 正常，空样本异常0，首次回滚调用和一条列名失败后修正复跑成功。Docker Compose config --quiet exit 0。Milvus gRPC 连接失败；未运行 JUnit/Mock/真实模型/真实Milvus测试或构建，T/F/E/S 不适用。没有功能或性能通过结论。
+- Git：HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`；E0及D0均未跟踪，两个台账已有并保留未提交变更，未暂存、提交或推送；本地缓存 `origin/main` 为 `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，本轮未核验实时远端。其他用户改动保留。
+- 学习：[L-E0-01](SOURCE_LEARNING_BACKLOG.md#l-e0-01)，待学习（未确认），没有开发者掌握证据。后续先备份 Milvus 并在副本诊断，或明确独立环境与单库 schema 写入清单；真实导入、处理及费用预算需后续独立授权。
+
+<a id="e0-r2"></a>
+
+### E0-R2 — Mac 独立 Milvus 备份、部署和基础验收
+
+- 2026-11-13／Codex；证据：[E0-R2 报告](../verification/E0R2_MAC_MILVUS_DEPLOYMENT_20261113.md)。状态：独立 Compose 已配置、真实基础功能已验证；稳定性 **有条件/未完全验收**。旧实例 2.6.24 退出的直接触发链与上游 issue #53144 一致，本机根因未证实；新 2.6.26 不含相应启动竞态修复。
+- 旧卷只读归档并 `tar -df` 与原卷核对，再在独立临时目录逐文件解包比对；归档 SHA-256 `1112ab06387ad2c5c6c3e5dc409f578c63678d729abb601b52a22fdddb98f533`。未执行旧服务恢复演练。新建 `compose.milvus.e0r2.yaml`、新容器/卷及 19532/9093 回环端口；旧卷和 MySQL 卷保留，MySQL 未写入。具体文件、资源、恢复边界和调用链见报告；未改生产源码、状态机或环境门禁。
+- 验证：定向 Maven T/F/E/S **25/0/0/0**（门禁 23，真实 Milvus schema 2），退出 0；真实 SDK 合成向量 seed/verify/cleanup **3/0/0/0**（阶段数，非 JUnit），首次主动重启后数据保留、按 ID 删除后非目标保留。第二次重启后只读检查退出 0。两次主动重启关闭时均出现 `panic: context canceled`，服务随后 healthy；启动期出现 `leader changed` 警告。未执行全量回归、真实模型、正式 RAG 或长期负载，不能推断性能提升与长期稳定。
+- Git：基线 HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`；本轮文件未暂存、未提交、未推送，保留工作区既有更改；本地缓存 `origin/main` 为 `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，未核验实时远端。本批无提交 SHA。
+- 学习：[L-E0R2-01](SOURCE_LEARNING_BACKLOG.md#l-e0r2-01)，待学习、掌握未确认。后续先调查两次关闭 panic 与竞态、资源余量和长期稳定，必要时另行设计外置 etcd；不自动导入题库、文档或调用收费模型。
+
+### E0-R3 — Milvus 稳定性与隔离入库准入
+
+- 2026-11-13／Codex；[验收报告](../verification/E0R3_MILVUS_STABILITY_GATE_20261113.md)，结论 **CONDITIONAL_GO**，仅在备份、专用 evaluation 目标、串行小批导入、失败暂停和逐批对账等条件及后续授权满足时适用。未修改源码或业务状态，未调用模型或导入业务资料。
+- 链路：`MilvusConfiguration → MilvusCollectionInitializer → MilvusVectorStoreClient → SDK 2.6.20 → 19532/独立卷`；已 flush 的 B/C 重启前后强一致 ID/数量/检索分数一致，精确清理后 0；同客户端停机时失败三次后恢复。stop 退出134、`CloseEtcdClient` panic 与启动 `leader changed` 复现，未刷盘和长期稳定仍未知。PR #53367 未进入核查的 2.6 分支，2.6.27 不因此解决竞态；具体来源、限制与独立方案见报告。
+- 真实验证：Maven Schema Smoke **2/0/0/0**（T/F/E/S）；SDK seed/watch/verify/cleanup **4/0/0/0**（阶段/失败/错误/跳过，非 JUnit）；只读 MySQL 和 Milvus 盘点见报告。未执行完整应用、全量回归、收费模型、长期/压力或断电验证。新增报告与 `backups/E0R3_MILVUS_20261113/` 探针/日志；修改本台账和学习清单。旧卷/容器保留，旧服务恢复演练未完成。
+- Git：基线 HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`；远端 main 实时查得 `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，本地领先 8；本批无 SHA、未暂存/提交/推送，既有工作区更改保留。学习见 L-E0R3-01/02，均待学习、掌握未确认。
+
 ## 3. C0/C3/C6 累计证据与口径修正
 
 - C0：聚焦 **553/0/0/0**，全量 **1589/0/0/19**；工具 gate **37/0/0/0**、公开离线 Java **28/0/0/0**／Python **9/0/0/0**／候选证据 Java **54/0/0/0**。另有真实 MySQL 历史 Jev × B3 的 **2 个手工 Java 断言场景**，失败／错误／跳过 0，不混入 JUnit 总数；编译、package 退出 0。首次 JAR 检查脚本路径错误退出 1，修正路径后退出 0，不是源码失败。
@@ -330,6 +385,16 @@
 - C3 loopback 全量 **606/602/606/607ms**；与 B4-C 的四个数是不同轮次，不能混写或以差值声称性能改善。
 - C0-P2-001 的 DeepSeek 错误 body 日志通道已由 B4-B 定向处理；C3-P2-01 是验收口径澄清：business/full 各 **3 次 `PRIVATE_MODEL_OUTPUT`** 来自既有 `internalExceptionsKeep500WithoutModelRetry` 编程异常 fixture，绕过 DeepSeek 边界；其余 9 个扫描标记为 0。不是专用 DeepSeek 测试失败，也不证明所有日志全局脱敏，更不证明真实秘密已泄漏。
 - 上述每次普通全回归的 19 skipped：KnowledgePersistenceIntegrationTest 10，RealEmbeddingSmokeTest 1，RealMilvusVectorStoreSmokeTest 1，RealKnowledgeDocumentProcessingSmokeTest 2，RealKnowledgeDocumentProcessingFailureIntegrationTest 2，RealMilvusSchemaValidationSmokeTest 2，AiSystemBaselineEvaluationTest 1。普通真实 MySQL Mapper／事务测试不属于这些跳过开关。
+
+
+### E1 — 独立 Evaluation 环境初始化（阻塞）
+
+- 2026-11-13／Codex；[E1 验收报告](../verification/E1_EVALUATION_ENVIRONMENT_SETUP_20261113.md)，**BLOCKED**。两目标只读核验均不存在，未创建对象或导入数据；自动审批拒绝停止新 Milvus 实例，离线一致备份未完成。
+- 文件：新增 evaluation 专用 DDL 候选和验收报告；更新本台账和学习清单；无业务代码、配置或测试更改。源 SQL 13 表保留并包含两个 attempt 字段，历史隔离 DDL 不直接执行；候选未执行，实际目标结构和索引待验。配置选 evaluation schema/collection，实际端口需显式覆盖；隔离初始化器不校验端点。
+- 证据与类型：真实 MySQL 只读盘点及两次逻辑导出摘要一致；真实 Milvus Java SDK 只读 health/三个集合 Strong count，evaluation 不存在；旧卷归档 SHA-256 和可读性通过。新实例离线备份、恢复、创建后重启、完整应用、真实模型和 JUnit 未执行；无 T/F/E/S 测试计数可报告。详见报告。
+- 取舍与边界：原两个 MySQL 库及三份卷保留；受限本地导出含敏感数据且未恢复演练，不能当作恢复已证实。只在保护条件满足后重查目标并执行候选；发生部分创建应停下核查。
+- Git：HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`；本轮无提交 SHA，文档与既有改动未暂存，未提交/推送；`origin/main` 跟踪引用 `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，本轮未实时核验远端。学习见 L-E1-01/02，均未确认。
+- 风险与后续：已知停止 panic、启动竞态和未刷盘数据风险；取得停机批准和审批后完成一致备份、恢复方案和现场复核再继续。E2、模型调用和正式导入不在本次范围。
 
 ## 4. 未来候选任务（未授权实施）
 
@@ -368,6 +433,47 @@
 - 尚未找到正式名称、问题定义或验收范围。源码入口／依赖／技术取舍／测试计划待补；证据、实现与 SHA：无。学习占位：[L-B9-01](SOURCE_LEARNING_BACKLOG.md#l-b9-01)。
 
 未映射到编号的证据池：跨层 deadline 与 stale 配置关系、独立维护 CLI 的 Milvus 策略、其他模块日志边界、可选 usage／费用。来源为 B4-A/B4-C/C3，不擅自把它们分配给 B5～B9，也不承诺实施顺序或完成时间。前端 GENERATING 显式恢复已按本轮明确授权完成 B4-E，真实端到端证据仍待补。
+
+<a id="e1-e3"></a>
+
+### E1–E3 — Evaluation 真实环境与首批题库落地
+
+- 2026-11-13／Codex；证据：[分阶段执行报告](../verification/E1_E3_REAL_DATA_EXECUTION_20261113.md)，本机运行目录 `/Users/kun/Developer/projects/ai-interview-system/backups/E1E3_20261113/`。**A PASS、B PASS、C PASS；D 离线准备 PASS、收费执行 BLOCKED（待预算授权）**。本记录更新旧 E1 阻塞的当前结果，不覆盖历史审批拒绝记录。
+- 实际问题：缺少新 Milvus 一致离线恢复点和独立 evaluation 数据环境；冻结资料仅在仓库。已获本轮短停授权并通过执行审批；新实例停止时再次退出134/panic，离线归档、独立卷恢复和原实例重启SDK对账通过，不宣称优雅停机或长期稳定。
+- 实际创建：MySQL `127.0.0.1:3308/ai_interview_evaluation`，13表/163列/42索引/15FK/42CHECK；Milvus `127.0.0.1:19532/default/knowledge_chunk_vectors_evaluation`，1024/COSINE/AUTOINDEX，空向量。旧两库全量逻辑dump逐字节不变，SHA `3048c1b5926ecac9ad5aeb9906d23366a4bba556e5acd123c071fe32c76165e8`；三个旧集合元数据和Strong count不变，旧卷/备份保留。
+- 文件：新增上述报告；追加本台账与学习清单；临时执行器/日志/备份在Git忽略目录（artifact-manifest.json列全路径）。生产/测试源码、正式及候选DDL、YAML、冻结题库未改。关键调用链：`QuestionImport → Validator → TransactionTemplate → QuestionAdminService.createQuestion → MyBatis → PlanSnapshotService/SnapshotFactory`；所有业务INSERT经正式Service，模型开关关闭。
+- 真实结果：回滚演练20题/93点全部撤销；单事务提交冻结21题/97点；独立只读核对5/7/9题及97点完整快照，其他11表0。H01原文未改，泛型instanceof修订建议待审，真实评分准入仍受该缺陷限制。D仅选E01切成2块，拟1次百炼Embedding、预算上限¥0.15，未授权、未上传、未处理、未调用。
+- 验证：当前HEAD，Java21，Maven离线定向Unit/Mock **123/0/0/0**（隔离/Service/快照/Milvus Schema/chunker），MockMvc/DTO **27/0/0/0**，两组无重叠总150；真实MySQL手工rollback/import/verify **3阶段/0/0/0**；SDK before/restored/restarted/final四次完整盘点退出0、目标既存Schema复核退出0。归档SHA与tar原卷/恢复卷比较通过。XML、日志和实际命令见报告。
+- 失败与限制：首次Python摘要API兼容错误后仅修执行器继续校验；SQL原始文本比较因自增计数/等价ASCII字符集标记失败，结构复核通过；Milvus首次新集合尚未加载，后续只读检查通过，未重建。未执行全量mvn test，因为会写用户明确保护的ai_interview_test；未重定向/削弱原测试。真实模型/完整面试/收费故障恢复/长期压力均未执行。
+- Git：本地HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`；GitHub连接器2026-11-13实时main `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，本地领先8。SSH读取publickey认证失败，不影响后续连接器核验。本批文档与证据无SHA、未暂存/提交/推送，既有工作区保留。
+- 取舍与下一步：一次性严格目标执行器满足原子导入，不新增通用生产导入框架、不重构环境配置。保留异常停机和H01问题，收费步骤分开审批；D1内容扩充、D2随机组卷、D3知识扩充的准入见报告。新增学习 L-E1E3-01～03，均待学习、掌握未确认；已有L-E1-01/02可关联本次新证据。
+
+<a id="e3-e01"></a>
+
+### E3-E01 — 单篇收费入库授权后的环境门禁（BLOCKED）
+
+- 2026-11-13／Codex；[执行记录](../verification/E3_E01_REAL_INGESTION_20261113.md)，证据目录 `/Users/kun/Developer/projects/ai-interview-system/backups/E3_E01_20261113/`。用户已授权百炼qwen3.7-text-embedding、2块3188字节、1024维、最多1次请求/¥0.15；后来确认“尚未配置，先记录阻塞”。**未执行真实入库**，没有新的业务实现。
+- 实际阻塞：项目受保护.env仍是18080本地占位端点和占位Key，local YAML不存在，进程无真实EmbeddingKey；18080由其他应用监听。未替换配置或把真实请求发往该地址。实际地域/适用计费绑定未知，暂停付费步骤，授权本身仍有效且未消费。
+- 已核验：E01原始/规范化hash和2块切片输出与阶段D完全一致；归档SHA一致；MySQL及Milvus原服务healthy。真实MySQL结构/计数及完整逻辑导出与上轮终态一致，evaluation21题/97点/知识0/Chunk0；SDK四集合Strong count=0及元数据与原快照一致，没有可复用READY E01。
+- 静态调用链和取舍：未来仍走 `AdminService.uploadDocument/processDocument → ProcessingService → SpringAiEmbeddingClient → MilvusVectorStoreClient → persistChunksAndMarkReady`；Spring maxAttempts=1不单独证明底层HTTP零重发，独立执行器的JDK单次exchange与请求门禁仅提出方案，未编码或运行。本轮不创建半成品UPLOADED文档、不发付费探针、不重启。
+- 验证数量：离线Java探针1次退出0、真实MySQL只读1阶段通过、真实SDK盘点1次退出0；Maven/JUnit/Mock/全量0次。Embedding/DeepSeek/其他模型0次，无usage、响应向量、实际费用或账单证据；不是收费成功或补偿测试。
+- 文件：新增E3报告及忽略目录中的只读证据，追加本台账和学习清单；生产/测试源码、题库/H01、DDL/YAML/.env未改。未暂存/提交/推送，本地HEAD仍 `0c6f92afe331954f7cea37d33db688fe781cbf2c`；远端本轮未重查，上一轮同日main为 `89b77dc082272e38cfbbecb4b57c37edae9ee74d`。本批无SHA。
+- 后续：用户补齐本机受保护配置并通知路径后，重新前置核验，在既定授权范围内执行；不得把0.15元预算当作额外重试额度。学习 L-E3E01-01，待学习，开发者掌握未确认。
+
+<a id="e3-e01-live"></a>
+
+### E3-E01 — 受控单次真实入库完成（PASS）
+
+- 2026-11-14／Codex；[执行报告](../verification/E3_E01_REAL_INGESTION_20261114.md)，证据目录 `/Users/kun/Developer/projects/ai-interview-system/backups/E3_E01_LIVE_20261113/`（按准备开始日期命名）。本轮解决真实配置缺失，保留上一条BLOCKED历史记录；发送门禁北京时间00:03:22.923948落标记后执行收费请求，该时间不是独立抓包时间。
+- 配置：读取权限0600的 `/Users/kun/.config/ai-interview/evaluation-embedding.env`，北京业务空间HTTPS端点、qwen3.7-text-embedding、1024维、profile `qwen3.7-text-embedding-1024-dense-v1`。DeepSeek文件 `/Users/kun/.config/ai-interview/evaluation-deepseek.env` 仅静态检查，未注入本轮应用或调用，不宣称连通性通过。没有输出凭据或修改Codex全局配置。
+- 持续授权记录：用户授权后续本项目既定真实功能测试、评分、追问、报告和多AI测试自主使用上述DeepSeek额度，无需重复申请同范围许可；必须保持evaluation隔离，记录真实请求/usage/费用，合理限制并发和重试，禁止无限付费压测。本次仍严格只有1次百炼Embedding、DeepSeek 0次；持续授权不自动启动其他任务，也不扩大Embedding许可。
+- 实际目标：MySQL `127.0.0.1:3308/ai_interview_evaluation`，UUID `85dd1e00-cf98-11f1-8677-9eb9380f25e7`；Milvus `127.0.0.1:19532/default/knowledge_chunk_vectors_evaluation`，collectionId `470437151302223600`。保持EnvironmentIsolationInitializer；对象已存在才启动，既存Schema校验通过，无DDL或账号授权修改。
+- 文件／调用链：新增20261114报告、旧报告追加完成链接、更新本台账和学习清单；临时执行器及证据在Git忽略目录。沿用 `AdminService.uploadDocument/processDocument → ProcessingService.claimProcessing → KnowledgeTextChunker → SpringAiEmbeddingClient → MilvusVectorStoreClient → persistChunksAndMarkReady`，真实Spring事务代理，没有新增业务算法或修改切片/补偿规则。
+- 费用与尝试：两块固定3188 UTF-8字节，1次HTTP 200；请求级prompt_tokens=821、total_tokens=821、completion_tokens=null。北京¥0.50/百万输入tokens，usage计算值 **¥0.0004105**，账单未核验；两条保守上限¥0.128低于授权¥0.15。无实时硬预算，采用固定输入、一次拦截放行、发送前持久标记、进程锁及Spring/JDK禁重试；计数依据应用执行证据，未提供独立抓包。预算不是重试额度。
+- 真实落库：documentId=1/version=1/READY；2个ACTIVE Chunk、2条1024维有限向量，attempt `b6b493157f4545b8a5966ae61e845519`。MySQL vectorId集合与Milvus STRONG读取完整集合逐条相等，文档/序号/profile正确，向量逐元素等于本次响应。复用2个向量的1次COSINE搜索Top1均为自身，非独立语义或Hit@K评测。
+- 保全：旧两库前后dump逐字节相同（SHA `3048c1b5926ecac9ad5aeb9906d23366a4bba556e5acd123c071fe32c76165e8`）；evaluation其余11表逐块一致，21题/97点和H01未动；其余3集合及目标Schema不变。服务均healthy且无重启。历史离线备份SHA复核通过，本次未追加停服备份，新数据不在旧离线恢复点内。
+- 验证／失败：临时Java执行器初次编译因AutoCloseable不兼容失败，修正后编译通过；无费预检2次（首次MySQL SQLSyntaxErrorException，调整为已有管理员凭据后PASS，均0模型/0上传）；正式真实管道1次PASS，MySQL/SDK身份对账和独立前后保全PASS，无模型失败、补偿或故障实验。Maven/JUnit/Unit/Mock/MockMvc/全量回归0次未执行，T/F/E/S不适用，历史150项不计入本轮。
+- Git／后续：HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`不变，本批无SHA，未暂存/提交/推送；远端本轮未重查。新增L-E3E01-02，累计79条，全部待学习、掌握未确认。E01保留且本轮结束；账单、独立语义质量、DeepSeek实际调用、故障恢复仍未验证，原Milvus停机风险和H01内容审查不因本次成功解除。
 
 ## 5. 证据留存与待补事项
 
@@ -432,6 +538,62 @@
 
 后续维护记录：2026-11-13 C6完成累计审查、37归档XML及快照／依赖核验，复用1832/0/0/19后端和336/0/0/0前端最终证据，新增五批精确提交计划与真实测试准入条件。未改生产／测试源码，未重跑测试或构建，未执行真实调用或Git写操作；CONDITIONAL_GO。新增3条学习任务，共63条，全部掌握未确认。
 
+
+2026-11-14 D1 Git复核：本地main为 `0c6f92afe331954f7cea37d33db688fe781cbf2c`，GitHub连接器实时main为 `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，本地领先8/落后0。D1无新提交，未暂存、未提交、未推送；数据库COMMIT不表示Git提交。
+
+<a id="d1"></a>
+
+### D1 — 63 道正式题库建设与受控扩容
+
+- 建立／更新日期、负责人：2026-11-14（Asia/Shanghai），Codex。目标为 63 个正式候选及其来源、审查和持久化证据。
+- 关联报告及版本：[D1 规划](../verification/D1_QUESTION_BANK_EXPANSION_PLAN_20261113.md)、[E1–E3 基线](../verification/E1_E3_REAL_DATA_EXECUTION_20261113.md)、[E01 真实验收](../verification/E3_E01_REAL_INGESTION_20261114.md)、[V2 JSON](../question-bank/D1_QUESTION_BANK_V2_20261114.json)、[V2 可读题库](../question-bank/D1_QUESTION_BANK_V2_20261114.md)、[来源和指纹清单](../question-bank/D1_BANK_MANIFEST_20261114.json)。[最终验收](../verification/D1_QUESTION_BANK_EXPANSION_20261114.md)、[逐题内容审核](../verification/D1_QUESTION_BANK_CONTENT_REVIEW_20261114.md)、[真实导入映射](../question-bank/D1_EVALUATION_IMPORT_MANIFEST_20261114.json)。
+- 状态：V2 编写、结构校验和独立逐题内容审查完成，共新增 42 题、201 点；修订 H01 参考答案及 SP4，不新增其评分点。V2 合计 EASY 15、MEDIUM 21、HARD 27 道，298 个评分点。21 个“难度 × 必选分类”各 3 道，每题有效权重合计 100。实际导入状态见下文，不以离线题库数字代替数据库。
+- 实际问题：V1 每个必选分类只有一个候选。H01 原题库把 `instanceof List<String>` 一概表述为非法，忽略 Java 21 取决于操作数静态类型和转换条件。新版区分 `Object` 的限制、`List<?>` 检查及允许的参数化类型测试，并说明运行时不逐一检查元素。原 V1 JSON、配套 Markdown 和审查证据保留。 [JLS 21 §15.20.2](https://docs.oracle.com/javase/specs/jls/se21/html/jls-15.html#jls-15.20.2)
+- 改动及入口：`docs/question-bank/` 版本化题库、清单和逐题审查。 `tools/question-bank-d1/build_bank.py` 按矩阵组装并验证完整题库，`revise_h01.py` 保留旧版并生成修订数据，`run_import.py` 组织本机受控运行，`D1QuestionBankImport.java` 的 `readBank/validate/checkReview/rehearse/importBank/verifyFinal` 负责业务导入与核验，`D1MilvusInventory.java` 只读盘点向量，`D1ImportOfflineTest.java` 检查 DTO 和题库负例。生产、测试源树及 Schema 不变。现有 `InterviewPlanConfig`、`QuestionPlanSelector`、RAG 和评分逻辑不改。
+- 事务和隔离：导入器按版本及内容摘要绑定审查结果和回滚凭证，确认 evaluation profile、库身份和完整基线后，通过外层 `TransactionTemplate` 调用代理化 `QuestionAdminService.updateQuestion/createQuestion`。H01 保留题目主键，现有 Service 整体替换其评分点，因此评分点数据库 ID 可变。新题生成主键；事务内核对题目、评分点和保护数据，独立读回验收。历史 `interview_question` 快照独立保存，D1 不重算或改写。
+- 技术取舍：一次性工具复用正式 DTO、Bean Validation、Service 和 MyBatis，无需新增生产导入接口或表结构。逻辑题号、题库指纹、数据库自增主键用途不同。独立代理内容审核与机器结构检查分别记录。若提交结果未知，先独立只读核验，再决定恢复；重复运行不会绕过基线条件。
+- 定向验证：在当前 HEAD、Java 21、模型禁用条件下，Maven/Surefire 最终 **113/0/0/0**，含 Unit/Mock 93、MockMvc 20。覆盖环境隔离、题库 Service、DTO、管理员接口、快照工厂和组卷规则。首次 **113/0/73/0**，错误来自沙箱中 Mockito 附加失败；调整执行环境后同组重跑退出 0。原始结果保存在 `backups/D1_20261114/focused-{initial,retry}-summary.json` 和 XML 目录。
+- 离线工具验证：Java 21 实际 Bean Validation 接受 V1 21 与 V2 63 个 DTO；独立工具边界测试 **14 项通过 / 0 失败 / 0 错误 / 0 跳过**，为 1 个有效输入与 13 个拒绝用例（重复标识、未批准映射、分类/难度、权重、枚举、未知字段、空值、UTF-8 上限及版本）。日志见 `backups/D1_20261114/question-validate.log`、`offline-boundary-strict.log`。该工具用例不与 Surefire 相加。
+- 真实验证及持久化：真实 MySQL baseline/rollback/import/verify 四阶段最终均退出0。入场21题97点，正式提交并独立读回63题298点；H01题目ID33不变，5点评分点由147–151替换为392–396，新增42题净增201点。失败演练在H01替换及41题创建后触发正式权重拒绝，独立验证三库39表行摘要回到基线。最终原业务库和测试库完整dump逐字节相同，evaluation其他11表及旧20题/92点不变，Milvus四集合（含E01全2048个Float32值）完全相同；重复导入在初始化数据库前按预期拒绝。详见最终验收和本地backups/D1_20261114证据。本轮 DeepSeek 和 Embedding 调用均为 0，未开展真实面试、模型质量、浏览器端到端或全量回归。普通全量 Maven 测试涉及受保护测试库，不能用 113 个定向用例替代。
+- Git：本地 HEAD 与实时远端核验见 §1.1。D1 新文档与工具及两份工程台账增量未暂存、未提交、未推送。入场1013文件中除两份授权追加台账外的1011文件保持正文和权限；两台账保留原文，HEAD/index不变。
+- 学习关联：L-D1-01～04，累计 83 条，新增项待学习、掌握未确认，开发者证据未提供。
+- 残余风险和下一步：**D2 数据准入 GO**，不代表当前已随机或RAG已覆盖63题。D2 另行实现、验证分类内随机，当前选择器仍按现有候选顺序选首项。题目难度和判分效果尚待独立候选人试答与后续评估。
+
+
+<a id="d2"></a>
+
+### D2 — 分类内随机组卷与真实 MySQL 回滚验收
+
+- 建立／更新：2026-11-14（Asia/Shanghai），Codex；本批已设计、编码、编译、定向测试及受控真实MySQL验证，未打包、未暂存、未提交、未推送。独立报告：[D2验收](/Users/kun/Documents/Reports/ai-interview-system/2026-11-14-D2-随机组卷与真实数据库验收.md)。原D1与其他历史报告保留。
+- 原因与输入：原 `QuestionPlanSelector` 每分类取首题并补题，现有SQL按分类／ID排序，使入库63题无法得到公平的分类内随机机会。实际evaluation基线63 ENABLED题、298有效评分点，EASY/MEDIUM/HARD为15/21/27、21桶各3；逐字段摘要与D1 manifest匹配，数据准入通过。
+- 生产变更：仅 `src/main/java/com/kun/aiinterview/interview/service/QuestionPlanSelector.java` 的 `select`／调用级随机源重载、`groupCandidates`、`validateCandidate`。去重ID、筛选启用且必选分类、按ID稳定索引，每桶均匀抽1，按配置分类顺序返回。拒绝计划总数不等于必选分类数，移除补题；空分类明确失败。
+- 随机机制与取舍：正式每次调用使用当前线程的 `ThreadLocalRandom`；测试注入本次调用独有的 `IntUnaryOperator`。没有单例可变随机器、缓存或跨会话状态。相比数据库随机排序，保留已有候选SQL，确定性测试可控制下标；没有新依赖、Schema、Redis或MQ。稳定排序成本在当前63题规模可接受，但未做性能对照，不声称提速。
+- 未改调用链：`InterviewSessionService.createSession → prepareSnapshot(只读RR) → QuestionMapper(难度+ENABLED) → selector → enabled scoring points → createAndStartSession(用户行锁、二次幂等检查、全MAIN快照、激活、Session CAS)`。快照工厂、事务注解、Mapper SQL、评分／RAG／追问／报告／认证均未改。
+- 测试变更：`src/test/java/com/kun/aiinterview/interview/service/QuestionPlanSelectorTest.java` 最终17项；覆盖5/7/9、分类／顺序、唯一ID、禁用／无关分类排除、重复行公平性、输入顺序变化、可重放、空桶拒绝和并发。固定seed300次为99/99/102，另穷举合法索引证明每题可达；非确定性生产源仅验结构，统计不作为唯一证据。
+- 新工具：`tools/question-plan-d2/D2QuestionPlanAcceptance.java`、`run_acceptance.py`、`README.md`。固定3308/evaluation及UUID，保留EnvironmentIsolationInitializer，先备份+完整D1门禁+写入计划，再29个独立回滚探针，逐次独立连接核对13表。运行日志和全部原始证据位于 `/Users/kun/Developer/projects/ai-interview-system/backups/D2_20261114/`。
+- 定向JUnit：`./mvnw -B -ntp -o -Dtest=<focused-command.json中14类> test`，**268/0/0/0**、exit0。Unit/Mock/DTO232、MockMvc36（面试16、管理员20），相关创建／事务／工作流及隔离测试通过。原XML在 `focused-surefire/`；未含历史报告。
+- 工具负例：首次无凭据门禁 **4/1/0/0**，仅辅助脚本错误预期缺回执异常为NoSuchFileException、实际为FileNotFoundException；拒绝和零数据库操作正确。修正辅助预期后 **4/0/0/0**（各预期Java exit1），保留首次证据；生产未为此修改。工具最终javac与Python AST检查通过。
+- 真实MySQL：`python3 tools/question-plan-d2/run_acceptance.py backup/baseline/exercise/verify` 四阶段exit0。exercise为 **29个探针/0失败/0错误/0跳过**，非JUnit：24串行+3并发+1空桶拒绝+1历史快照，成功创建28 Session及194 MAIN。三难度各8场均有8种组合；所有场逐项验证内容／点JSON／顺序／归属；重复创建请求另一难度仍复用原活动Session。
+- 历史快照：在回滚事务临时禁用正式EASY/JAVA_BASIC的21、83、84，验证SQL排除禁用候选及缺桶拒绝；另一事务创建临时题125／点598、Session28，再用正式管理员Service更新临时题并替换点为599，重读历史快照完全不变。正式298评分点无修改或删除，临时status及自动更新时间全部回滚。
+- 真实并发：3线程各自事务／禁用临时身份，Session25/26/27分别为EASY/MEDIUM/HARD，身份与快照互不污染；外层回滚合并了正常读写事务，只证明实际SQL/CAS/回滚内读取，不冒充独立commit后可见性。
+- 最终保全：三库data-only摘要前后相同，另外两库完整结构加数据导出亦相同；evaluation13表逐次29次+最终1次独立核对。E01文档、Chunk与两条完整向量不变，Milvus前后SHA为 `ac27c00aafb21ac1191e73b1b2f4c5f1d6cf7f810de6ccb64b18af500bd14a07`。自增号段被回滚消耗，不重置序列。备份未做恢复演练。
+- 未执行：普通全量mvn test及既有真实测试库集成测试（禁止写受保护ai_interview_test，未另启独立环境）；真实DeepSeek/Embedding调用0，未跑浏览器／模型质量／性能测试。选定JUnit skipped=0，不把未运行的guarded tests记作通过或跳过。
+- Git：本地HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`；2026-11-14 GitHub连接器实查main `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，ahead8/behind0。index不变，原1040个非忽略文件除本批5个授权修改外1035个正文/mode保留；两台账仅追加。D2无提交SHA，未执行任何Git写操作。
+- 用户追加约定：`AGENTS.md`记录2026-11-14持续DeepSeek额度授权（真实功能测试、评分、追问、报告和多AI测试不再逐次询问），并标注旧确定性组卷为历史、记录D2现行规则；不扩展当前D2到模型调用。
+- 学习：新增L-D2-01～04，累计87条，全部待学习、掌握未确认；AI实现和测试不作为开发者证据。残余风险：未实现跨场去重；坏评分点仍按既有逻辑抽中后失败；小样本不证明严格均匀性；正常独立事务全回归未执行；RAG仍仅E01。本批停止，不自动进入D3或发布。
+
+
+<a id="d3-a"></a>
+
+### D3-A — RAG 知识来源、评分点覆盖与独立检索设计
+
+- 2026-11-14（Asia/Shanghai），Codex。来源核查、逐点映射、旧文审查和语料/评测设计完成。本批没有生产实现。详见 [独立审查报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-14-D3-A-RAG知识覆盖审查.md)、[覆盖工作簿](../rag/d3-a/D3A_KNOWLEDGE_COVERAGE_20261114.xlsx)、[独立评测规程](../verification/D3A_RETRIEVAL_PROTOCOL_V1_20261114.md)、[查询 v1](../verification/D3A_RETRIEVAL_QUERIES_V1_20261114.json)。
+- 数据基线：只读实查 MySQL 8.0.45 evaluation 的 63/298，全部逐字段及 ID 匹配 D1。E01 READY v1，2 个 ACTIVE Chunk。Milvus 2.6.26 evaluation Strong count=2，向量身份及 Float32 摘要匹配。两张检索追踪表各 0。仓库 21 篇用生产切片器离线得到 52 块，不计作在线数据。
+- 覆盖与取舍：SUPPORTED 107、PARTIALLY_SUPPORTED 47、SOURCE_GAP 143、NEEDS_REVIEW 1（H01.02 同一实现类的条件）。保留现有题库与 D1 修订。51 个计划主题按版本和机制分批，J01 原字节复用，其他 50 篇需后续编写或修订。冻结 60 条独立查询、人工标注规程和指标。语料定稿后需冻结 Chunk 真值，公开仓库可见查询的限制已记入规程。
+- 源码入口：`KnowledgeTextChunker.split → KnowledgeDocumentProcessingService.processDocument → KnowledgeDocumentProcessingTransactionService.persistChunksAndMarkReady`。检索入口为 `EvaluationRagQueryBuilder.build → EvaluationRetrievalAdapter.retrieve → KnowledgeRetrievalService.retrieve → KnowledgeChunkMapper.selectRetrievableByVectorIds → EvaluationPromptBuilder.build`。本轮确认 Top5 可能只剩部分合格证据，PromptBuilder 逐条写入实际合格证据。
+- 验证：MySQL 最终只读对账 1/0/0/0，Milvus 最终只读盘点 1/0/0/0；21 篇/52 块离线检查与 298 点/21 旧篇/51 篇目录及 60 条查询校验通过。JUnit 0，Embedding/DeepSeek/真实入库/真实相似检索均 0。执行环境的 Docker socket 拒绝及临时脚本下标错误已在独立报告记录。
+- Git：本地 HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`，GitHub API 实查远端 main `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，本地领先 8、落后 0。D3-A 文件未暂存、未提交、未推送，无新 SHA。新增 L-D3A-01～04，待学习，掌握未确认。D3-A 到此结束。
+
 <a id="d3-bcd"></a>
 
 ### D3-B/C/D — RAG 正文、真实入库与检索验收
@@ -440,3 +602,87 @@
 - 复用 `KnowledgeDocumentAdminService → KnowledgeDocumentProcessingService → persistChunksAndMarkReady`。evaluation 实查 51 READY、52 ACTIVE、52 条真实向量，E01 和题库 63/298 保全。生产 `EvaluationRagQueryBuilder → EvaluationRetrievalAdapter → KnowledgeRetrievalService → EvaluationPromptBuilder` 实跑 72 条，公开 60 条，独立 24 条。Prompt 直接相关率低于门槛，保留首次记录。
 - 单场 EASY 真实 HTTP 经过一次同键恢复后完成 5 MAIN、3 FOLLOW_UP 和 READY 报告，独立连接核验 5 FINAL。定向 JUnit 首轮 103/0/21/0（Mockito attach），显式 agent 重跑 103/0/0/0。实际 Embedding 215、DeepSeek 10；按量估约 ¥0.07323，未核账单。未执行全量 JUnit。下一轮仅隔离环境人工及小规模 AI 测试 CONDITIONAL_GO。
 - 本轮生产源码没有改动。入场 HEAD `0c6f92afe331954f7cea37d33db688fe781cbf2c`，实时远端 `89b77dc082272e38cfbbecb4b57c37edae9ee74d`。语料、工具及验收按本地提交记录追溯，未推送。L-D3BCD-01～03 待学习，掌握未确认。
+
+<a id="d3-e"></a>
+
+### D3-E — 评分证据质量、受控对照与人工复核
+
+- 2026-11-14／Codex。[质量与准入报告](../verification/D3E_EVIDENCE_QUALITY_REVIEW_20261114.md)、[回放结果](../rag/d3-e/EVIDENCE_SELECTION_REPLAY_20261114.json)、[人工复核入口](../verification/D4_RELEVANCE_REVIEW_CARDS_20261114.md)、[评分诊断](../rag/d3-e/SCORING_DIAGNOSTIC_20261114.json)及[累计用量](../rag/d3-e/API_USAGE_20261114.json)。入场 HEAD `921f8cdb24bfda50e4e9a4d76d4e1017449fe032`；原 D2 等未提交改动保留。本批没有生产 Java 或 Schema 修改；功能测试 CONDITIONAL_GO，评分质量 NO_GO。
+- 源码链路：`EvaluationRagQueryBuilder → KnowledgeRetrievalService.retrieve → EvaluationRetrievalAdapter → EvaluationPromptBuilder`，同一结果用于 `RagTracePersistenceService`。新增 `tools/rag-d3/d3e_replay.py` 核验 156 条原始候选、水合和实际 Prompt；新增评分固定夹具、`D3EScoringProbe`、`d3e_scoring.py` 与摘要脚本；`SmokeUsageProbe` 扩充四类响应流场景，`balance.py` 复用余额校验。未引入运行时选择器。现有阈值、TopK、轨迹和业务状态保持原逻辑。
+- 联合结果：公开 A/B/C/D 的 Prompt 直接数/实际条数 67/300、41/60、57/120、1/1；无答案误供 12/12、12/12、12/12、0/12。D 损失 MAIN 7 个 CORE 和 29 个点；C 丢 3 个公开跨主题意图并向所有负例给出材料。原独立集 15/18 <85%，3 个语料缺口保留原分母。标注为 AI 临时、人工待审，不能视为精准真值。评分八对 16 次 HTTP 200、16 个 JSON/Java 校验通过；对照仅是诊断，工程预期存在 E01.03、H25.03 等争议。
+- 验证：独立临时 MySQL 8.0.45、13 张测试表和工作区副本上的普通 `mvn test` **1844/0/0/19**（T/F/E/S）、exit 0；`package -DskipTests` exit 0，19 skipped 非实服务通过。回放两次字节一致及合成边界校验通过；用量记录器四类探针 **4/0/0/0**，exit 0，不是 JUnit。新真实 HTTP EASY 因检测到近期活动 Session 安全停止，本轮未验证报告/历史真实读回；已有历史 EASY 不能替代。无前端源码变化，浏览器完整流程未跑。
+- API：本轮 Embedding 0、DeepSeek 16，累计 215/26；以峰值及实际 usage 估总 ¥0.25908760，未对账。额度预检一次沙箱连接失败、一次成功；首次评分冻结比较在发请求前停止，证据保留、修正后从零请求恢复。未重试已发起模型请求。未切换服务或修改现有数据。EASY 只读预检复用了旧 `.env` 凭据来源，按本轮附件的私有凭据文件限制存在执行偏差；仅 SELECT/rollback，没有输出或外传凭据，已停止该路径。
+- Git：本批工作区文件未暂存、未提交、未推送，无本批提交 SHA；`origin/main` 仅为本地缓存 `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，本轮未查询远端。两份台账保留入场未提交内容并追加本段。盲审卡和答案索引保存在本地 Git 忽略目录，不入库。
+- 学习：[L-D3E-01～03](SOURCE_LEARNING_BACKLOG.md#l-d3e-01) 均待学习、掌握未确认。下一步先人工复核，再在明确安全窗口进行隔离 HTTP 验证；本批不自动进入 MQ 或部署。
+
+<a id="u1"></a>
+
+### U1 — 人工体验反馈的两题、评分范围与等待状态
+
+- 2026-11-14（Asia/Shanghai），Codex。基线 `921f8cdb24bfda50e4e9a4d76d4e1017449fe032` 加已有 D2 与 D3-E 工作区变动。交付两题候选、评分范围与交互代码及真实合成评分对照。实际用户原答核验、在线更新、真实浏览器和报告延迟待授权数据库入口与归属。报告保留 D3-E 评分质量 **NO_GO**。[U1 复核和命令](../verification/U1_MANUAL_FEEDBACK_REVIEW_20261114.md)
+- `EvaluationPromptBuilder` v4 将题干与评分点作为必答边界，认可简短和等价表达，按已答与尚缺描述部分覆盖。`InterviewRequestTiming` 通过 MVC 拦截器关联提交、RAG 内部阶段、DeepSeek、报告聚合及提交。只记录低基数阶段和请求级关联 ID。前端 `useInterviewSession` 保护完整回包和同键恢复，增加即时等待说明、稳定键显示及可展开反馈。
+- `U1EvaluationQuestions` 提供先归属、后读取的 owner-only 证据和固定两题正式 Service 事务工具。两题沿用类别、难度、知识点、点型及权重，未来更新由旧快照与当前行身份和哈希锁定。`tools/u1/` 封存真实合成对照，共享预算。8 对固定证据，16 HTTP 200，旧 7/8、新 8/8 通过 Java，仍有遗漏和部分覆盖争议。用量新增 DeepSeek 16、Embedding 0。正式真实业务读写需单独核实。
+- 定向后端 **280/0/0/0**，独立日志通道 MockMvc **18/0/0/0**。独立临时 MySQL 普通全量 **1846/0/0/19**，exit 0，package exit 0。最终前端定向 **132/0/0/0**，全量 **339/0/0/0**，typecheck/lint/build exit 0。跑通工具离线检查及 DTO 校验。浏览器、报告完整真实耗时暂未测；模型诊断耗时不是 MQ 前的同步报告基线。
+- 本批无提交 SHA，未暂存、提交或推送。远端仅见本地缓存，上轮盲卡与评价结果保持各自版本。新增学习条目 [L-U1-01～03](SOURCE_LEARNING_BACKLOG.md#l-u1-01)，掌握待确认。
+
+<a id="u1-r1"></a>
+
+### U1-R1 — evaluation 凭据入口与人工反馈归因复核
+
+- 2026-11-14／Codex；[受阻验收报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-14-U1-R1-人工反馈与真实浏览器复测.md)。状态：**BLOCKED / NO-GO**；已编码并完成离线定向测试，真实数据库、模型和浏览器端到端尚未验收。
+- 问题与方案：旧 D3 入口从项目环境中获取高权限数据库字段；`tools/rag-d3/config.py` 的 `evaluation_database_config` 只接受权限受限的专用文件和固定 evaluation 目标，并拒绝 root、其他字段和数据库目标。`run.py → evaluation_environment`、`u1_timing.py` 及新增 `u1_questions.py → U1EvaluationQuestions` 使用该入口，缺配置即停止；不调用 shell 执行配置、不回退其他 DB 变量。名称检查不证明其他账号确实最小授权，仍需真实验证。历史 D1/D2 脚本保留旧高权限行为，D2 还会访问其他 Schema，本轮不运行。
+- 实际环境：`127.0.0.1:3308/ai_interview_evaluation` 的普通应用账号返回 MySQL 1044；未成功读取目标 Schema 或 UUID，专用配置文件尚不存在。自动审批拒绝历史 root 连接，理由是高权限账号不符合其专用账号边界；未执行该连接、创建账户、改权限或在拒绝后间接绕过。拒绝前打开过历史入口启动的既有服务工作台，其当前数据库账号及 Schema 未独立验证。用户已确认账号和当时空闲窗口，浏览器仅显示该用户及 EASY 人工历史会话 链接；数据库归属、user_id、题答评价完整性和历史原答均未核验。
+- 证据准备：`U1EvaluationQuestions.history` 的受保护证据增加当前 Chunk 正文、版本与时间；`rag_hit_log` 本身没有内容快照，不能无条件将当前内容当作历史提示词。集合 E08 和 ACID E04 仅完成候选 DTO 校验，未通过 Service 写入；当前服务未切换。现有计时脚本不保证目标题被随机抽中，也不覆盖双击或故障恢复，不得据此宣称真实验收通过。
+- 验证：配置 Python unittest **7/0/0/0**；U1 包装器 **2/0/0/0**；前端四文件 Vitest **109/0/0/0**、typecheck 退出 0；隔离后端首轮 **46/0/18/0**（Mockito 自动附加失败），显式已有 Byte Buddy 测试代理重跑 MockMvc **18/0/0/0**，首轮另有 28 项通过。候选 DTO、计时工具编译和语法、Python 内存语法检查及 `git diff --check` 通过；`py_compile` 首次因缓存目录写入受限失败。一次已结束的隔离 MockMvc 启动日志意外显示临时测试口令，测试输出文件已脱敏。无真实模型调用和可计费请求；本轮费用 ¥0，未核账单。真实耗时样本为 0，不计算分位数。
+- 变更：`tools/rag-d3/config.py`、`run.py`、`README.md`、新增 `test_evaluation_config.py`；`tools/question-bank-u1/U1EvaluationQuestions.java`、`u1_timing.py`、`README.md`、新增 `u1_questions.py` 与 `test_u1_questions.py`；`docs/verification/D4_MANUAL_AI_TEST_START_HERE.md` 和两份工程台账。原工作区改动及历史报告保留。生产 RAG 选择、数据库结构及历史会话未修改。
+- Git：本地 HEAD `921f8cdb24bfda50e4e9a4d76d4e1017449fe032`；本地缓存 `origin/main` `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，ahead 11、behind 0；未实时查询远端。暂存区为空，本轮无提交 SHA、未提交或推送。学习：[L-U1R1-01～02](SOURCE_LEARNING_BACKLOG.md#l-u1r1-01)，均待学习、掌握未确认。
+- 后续：取得经授权的非 root evaluation 专用账号，或由管理员在批准后按报告的 Schema 级最小 DML 方案创建；配置文件须 0600、目录 0700。先只读校验实际 Schema 和会话所有权，再重新确认空闲窗口、通过正式 Service 更新候选并做带目标题、双击及失败恢复的新会话真实浏览器验收，记录带样本数的耗时和实际用量。
+
+#### U1-R1 后续 — evaluation 账号、历史归因与两题生效（2026-11-14）
+
+- 按用户明确授权，经新的正式权限审核使用项目已有管理员连接执行账号管理；先查候选账号和授权，未发现重复。新建 `ai_eval_app@172.19.0.1`，仅授予 evaluation 的 `SELECT/INSERT/UPDATE/DELETE`；数据库名中的下划线已转义。私有配置 `~/.config/ai-interview/evaluation-db.env` 权限 0600、目录 0700。随后以该账号独立只读核验 MySQL UUID、固定 Schema 和精确授权，连接原业务库及测试库均被 1044 拒绝，未读取两库业务数据。
+- 安全更正：服务器 `partial_revokes=OFF`；先前 U1-R1 报告的未转义 GRANT 示例可能匹配其他数据库，示例未被执行，现已明确加注并改正。依据 [MySQL GRANT 官方文档](https://dev.mysql.com/doc/refman/8.0/en/grant.html)。客户端来源由无默认 Schema 的非 root 只读连接实测，后续 Docker 网络变化时应重新验证。
+- 已按授权只读核验人工历史会话归属及相关历史快照；原始答复、标识与证据保存在受保护的本地目录，未改写旧会话。
+- 归因初判、历史得分与原始答复仅保存在受保护的本地证据；RAG 命中关联不证明历史提示词正文未变化。
+- 两题在无活动会话／评价／报告的窗口，经 `QuestionAdminService.updateQuestion` 外层事务更新并独立读回；集合 ID 85 新评分点 600–603，ACID ID 24 新评分点 604–608，权重不变。受保护记录摘要和 人工历史会话 历史比较通过，证据 `backups/U1_20261114/question-apply-{intent,receipt}.json` 均 0600。数据库提交不等于 Git 提交。
+- 真实浏览器验收准备：临时回环测试进程固定仅限合成账号的两道题抽样索引，仍调用原选择器及正式快照流程；计时和首次成功答题响应丢失注入仅作用于本轮合成会话。当前测试进程已准备，完整浏览器交互、评分和报告结果待后续记录；不得将准备状态写成通过。
+- 后续状态：[账号与人工反馈归因补充报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-14-U1-R1-账号配置与人工反馈归因补充.md)。未登录真实 HTTP 检查 401／业务码 401；既有 D3 合成账号本地 HTTP 登录成功，但浏览器工具对读取到的凭据做了脱敏，GUI 未能使用实际值登录；不能归咎应用认证逻辑，也未绕过保护。未新建合成应用账号或 Session，账号创建确认待用户；本轮启动的测试进程已停止，准备证据保留。原常驻后端未切换，不能将独立测试进程的启动视为 v4 提示词和计时代码已在常驻进程生效。模型请求 DeepSeek 0、Embedding 0；真实计时样本 0，浏览器答题／失败恢复／报告验收未通过。
+
+#### U1-R1 后续 — 合成账号与真实浏览器验收（2026-11-14）
+
+- [最终报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-14-U1-R1-真实浏览器终验.md)补充上述时点记录。用户授权后通过正式注册接口创建普通 USER 账号（user ID 32），凭据仅保存在 `backups/U1_R1_BROWSER_20261114/synthetic-credentials.json`，文件 0600、目录 0700。先查无活动用户工作，再在 evaluation 中创建合成 Session 31；人工 人工历史会话 始终只读。
+- 使用真实 Chrome、HTTP、evaluation MySQL/Milvus 和真实模型，合成会话完成 5 MAIN、1 FOLLOW_UP、6 条答案、5 FINAL、1 READY 报告；两道新题的浏览器展示和数据库快照分别与候选一致。临时测试选择器仅为本合成用户指定两题的抽样下标，仍通过原选择器及正式快照路径；不代表随机分布测试，常驻服务不使用该选择器或故障代理。
+- 一次真实双击只发出 1 个提交。对服务端成功答题后的返回人为注入丢失，同页保留并锁定答案，使用原请求 ID 与原正文取得评价；独立 JDBC 对实际浏览器捕获的首轮 1/1、续跑 7/7 个 HTTP 答案正文逐项匹配，最终仅有 6 个唯一答案。前端展示的总分、缺项与修正匹配响应；报告生成和读取通过。首次临时选题器非目标类别空值异常导致创建事务回滚、0 模型调用；第二次故障注入后测试脚本的网络事件假设错误，提前终止，保留已提交会话并同键恢复，未重复该次评分。
+- **P1：**响应丢失后，测试服务和 Chrome 重启、同一用户重新登录时，旧答案与请求记录仍在本机，服务端已推进下一题，页面未自动显示上一题反馈或旧题同键恢复入口；正式 HTTP 以原请求可取回。普通单次刷新未独立验证，勿将该组合场景扩大为所有刷新。后续需要覆盖跨重启、身份与多记录边界，并重新浏览器验证；不在本验收批中擅自修改恢复策略。
+- 运行边界：13 张 evaluation 表先前已有行逐行摘要保持不变，题库、评分点、知识文档和 Chunk 无新增或变化；合成数据允许新增。Milvus 仅检索，Strong count 前后 52；未逐个比较向量摘要。经新安全窗口启动未经测试代理包装的 U1 evaluation 服务：前端 `127.0.0.1:15174`、后端 `127.0.0.1:18482`；与实测后端 261 个编译资源一致。部署后合成用户登录、Session 31 完成及报告只读取回通过，未登录 API 401。未改生产 RAG 筛选或数据库结构。
+- 耗时：正常浏览器评分 n=4，点击到反馈 P50 3.105 s、范围 2.973–3.280 s；两次响应注入丢失与毫秒级重放不计入该分母。6 次服务端评分阶段中位数：Embedding 362.158 ms、Milvus 6.405 ms、MySQL 水合 3.249 ms、DeepSeek 2780.602 ms、校验 0.268 ms、提交 18.809 ms。报告 READY 可见 n=1，为 3.147 s。样本过小，不报告可靠 P95 或总体性能收益。
+- 用量：新增 DeepSeek 7 次（评分 6、报告 1），输入 26127 tokens（命中 5120、未命中 21007）、输出 3624；Embedding 6 次共 1284 tokens，全部有 usage 且 HTTP 200。按周六空闲价格估算分别 ¥0.0356054、¥0.0006420，合计 ¥0.0362474，未核实际账单；此前 U1 的 16 次调用另计。[DeepSeek 价格](https://api-docs.deepseek.com/zh-cn/quick_start/pricing/)；[百炼价格](https://help.aliyun.com/zh/model-studio/qwen3-7-text-embedding)。
+- 验证：临时五类别选题器离线 3/0/0/0、故障代理自检 1/0/0/0；1 场真实浏览器完成及上述独立读回、保全通过。本轮 Maven、Vitest 和全量回归 0 次，沿用此前独立记录，未将历史通过数称为本轮结果。真实请求证据在 `backups/U1_R1_BROWSER_RETRY_20261114/` 和 `backups/U1_R1_BROWSER_RECOVERY_20261114/`，权限均为 0700/0600。
+- 本轮生产源码未改，仅新增私有证据、外部验收报告并追加本台账与学习清单。本地 HEAD `921f8cdb24bfda50e4e9a4d76d4e1017449fe032`；本地缓存 `origin/main` ahead/behind 11/0，未实时查询远端。本批无 Git 提交 SHA、暂存区为空，未自动 add/commit/push/reset/clean/stash/rebase。现有工作区内容保留。**evaluation 有限试用；整体发布与评分质量仍 NO-GO**。学习 [L-U1R1-03～04](SOURCE_LEARNING_BACKLOG.md#l-u1r1-03) 仍为待学习、掌握未确认。
+- 日志补记：常驻后端首次启动时，Spring 自动生成的默认安全口令短暂写入权限 0600 的本机启动日志；发现后在运行日志内等长遮盖，未输出到对话、报告或 Git。当前安全链禁用表单登录与 HTTP Basic；后续应消除该启动日志中的口令输出，不能把已遮盖当成从未落盘。
+
+<a id="u2"></a>
+
+### U2 — 已提交评价的跨重启查看与默认用户自动配置（2026-11-14）
+
+- **状态：U1-R1 对应 P1 已解决并通过真实浏览器验收；D3-E 评分质量 NO-GO 不变。** [独立验收报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-14-U2-恢复修复与运行安全验收.md)，私有实测证据 `backups/U2_BROWSER_20261114/`（目录 0700、文件 0600）。本条更新先前时点的 P1 待修状态，保留原记录。
+- 根因：服务端评分与推进已提交，响应丢失导致前端评价展示的 sessionStorage 未建立；localStorage 的原提交记录按旧题 ID 存储，而恢复只按 Session 当前题 ID 查找。全新浏览器没有任何原记录。`InterviewService.getDetail` 已先校验 Session 归属并返回持久化题答与评价，因此不新增接口、Schema 或状态机。
+- 变更：新增 `PreviousInterviewFeedback.vue`，按需调用现有 GET 详情，从当前题之前按 `displayOrder` 选最近 `EVALUATED` 答案及有效评价，复用 `InterviewEvaluationPane`；在 `InterviewSessionView.vue` 加入口，调整 `sessionCopy.ts` 的旧提示。请求以账号代次、Session、当前题和组件生命周期约束，避免迟到结果串页；不重发答案或改 Session。现有详情响应还包含本场未来题目，组件不渲染；如需避免客户端拿到未来题目，属于待单独设计的接口范围问题。
+- 安全：`AiInterviewSystemApplication` 排除 `UserDetailsServiceAutoConfiguration`，避免 Boot 在 JWT 安全链之外生成默认用户；没有关闭安全日志。六个独立 `@WebMvcTest` 切片各自排除同一自动配置，仍运行现有 JWT/401/403 断言。实际两次测试启动及常驻启动无默认口令提示；最终完整回归日志也无此提示。此前两次私有测试日志中的临时默认口令已遮盖，不能称为从未落盘。
+- 测试文件：新增 `frontend/tests/PreviousInterviewFeedback.spec.ts`、`DefaultSecurityUserDisabledIntegrationTest`；`FullInterviewBusinessOfflineTest.readsCommittedPreviousEvaluationWithoutResubmissionAndRejectsAnotherUser` 用真实 MySQL/事务和 Mock 外部模型核对原评价、一个追问、重复 GET 不触发模型或 Session 变化、跨用户 404。六个控制器测试切片仅调整自动配置排除，未删除或弱化测试。前端覆盖原答未重发、无本机状态、主答/追问排序、未来题目不渲染、切换用户及迟到响应。
+- 最终验证：独立临时 MySQL 8.0.45、13 表、模拟外部模型；定向后端 **165/0/0/0**，完整 Maven **1848/0/0/19**（140 套件），package 退出 0；19 项守护真实服务测试按配置跳过。前端完整 Vitest **346/0/0/0**（37 文件），lint、typecheck、build 退出 0。两次早期后端回归暴露测试切片仍生成临时默认口令，随后补全六个切片并重跑；修复前前端入口缺失的 6 项失败也保留为前置复现。最终聚合及 140 个 XML 摘要在 `backups/U2_BROWSER_20261114/maven-{results,suites}.json`，原始 XML 在 `/private/tmp/ai-u2-regression-rfsdkf_r/target/surefire-reports/`；临时容器和其随机口令已移除。
+- 真实浏览器：用户确认停止操作且只读检查无活动工作后，新注册普通合成用户 33、Session 32。代理丢弃服务端成功评价后的首个响应；实际刷新后查看原题、原答及 93 分反馈，DeepSeek/Embedding 调用数始终 1/1。停止本轮前后端和 Chrome，启动新的前后端及全新浏览器目录并重新登录后仍可查看同一反馈，无答案 POST、无新增模型调用。继续完成 5 主答、5 评价、5 FINAL、1 READY 报告；HTTP 正文独立读回 5/5 一致，无重复评价或追问。真实会话未产生追问；有追问分支由上述 Mock 模型集成测试覆盖。已完成会话的最后一题可从工作台→报告→复盘只读查看。
+- 实测前后 evaluation 13 表既有行摘要一致，题库、评分点、知识文档及 Chunk 无新增或修改，人工历史会话 不变；Milvus 只检索且 Strong count 前后 52，未做逐向量摘要。两次只读完成会话浏览器检查因工具提前匹配报告页时间线而失败，等待实际复盘路径后通过；一次端口复用失败改空闲端口，均无模型调用。
+- 用量：DeepSeek 6 次（5 评分、1 报告），输入 21633 tokens（命中 3968、未命中 17665）、输出 2905；Embedding 5 次、952 tokens，均 HTTP 200。按周六空闲单价估算 DeepSeek ¥0.02936436、Embedding ¥0.00047600，合计 **¥0.02984036**，未核供应商账单。[DeepSeek 价格](https://api-docs.deepseek.com/zh-cn/quick_start/pricing/)；[百炼价格](https://help.aliyun.com/zh/model-studio/qwen3-7-text-embedding)。
+- 安全窗口再次核验后，仅替换上一轮本项目所启动的 evaluation 后端：现有前端 `127.0.0.1:15174`、后端 `127.0.0.1:18482`，正常应用不含测试代理。实际登录、只读报告及 401/403 通过；新签名密钥使旧令牌需重新登录。Git 本地 HEAD `921f8cdb24bfda50e4e9a4d76d4e1017449fe032`，本地缓存 `origin/main` ahead/behind 11/0，远端本轮未实时核验；本批无提交 SHA、暂存区为空，未自动 add/commit/push/reset/clean/stash/rebase。学习 [L-U2-01～03](SOURCE_LEARNING_BACKLOG.md#l-u2-01) 仍待学习、掌握未确认。
+
+<a id="s1"></a>
+
+### S1 — 候选人详情题目可见性与 Git 收口（2026-11-14）
+
+- 状态：完成审计、编码、定向和全量验证；[S1 记录](../verification/S1_INTERVIEW_VISIBILITY_SECURITY_20261114.md)。修复前真实 HTTP 新建 EASY 会话后详情返回全部 5 主问题，其中 4 个尚未作答；按本场提前泄题定为 P1。当前题和详情的独立 VO 未包含参考答案快照、评分点、权重或内部原始评价。
+- 调用链与取舍：JWT 验签并读取当前数据库用户 → `InterviewController.getDetail` → `InterviewService.loadOwnedSession` → `getDetail` 仅保留当前题和已有答案的 `ANSWERED` 历史 → 独立 VO。未知或其他用户 Session 统一 404；不改变组卷、已保存快照、模型评分或状态机。并发导致当前题变化时 U2 前端现有校验保守拒绝并提示重试。
+- 文件：`InterviewService.java`、`InterviewHistoryServiceTest.java`、`InterviewVisibilityHttpIntegrationTest.java`；`.gitignore` 排除系统元数据及独立嵌套检出。未更改数据库结构或 evaluation 业务数据。
+- 验证：真实 HTTP、定向服务/控制器/组卷快照 **179/0/0/0**；U2 前端定向 **61/0/0/0**。后端首次普通全量 **1850/8/0/19**，临时 MySQL 的 UTC 与应用时区不一致；校正临时容器会话时区后失败相关 **41/0/0/0**，最终全量 **1850/0/0/19**。前端全量 **346/0/0/0**，lint、typecheck、build 退出 0。9 项工具离线测试通过。真实 HTTP 使用真实 JWT、MyBatis、临时 MySQL，外部 AI 和向量端口为 Mock；本轮真实模型调用 0。
+- Git：入场本地 `921f8cdb24bfda50e4e9a4d76d4e1017449fe032`；2026-11-14 实时远端 `89b77dc082272e38cfbbecb4b57c37edae9ee74d`，入场 ahead/behind 11/0。本轮本地代码提交 `d090d25929bf21d9a69b4b2d3e8251c6ac6f9535`、`f1fb02b429a92796b2dc0dd4c83c2259b5315d22`、`4bed0e2525b8359d7a21f0b6b7a3a990f905e3d9`；文档提交及最终 ahead/behind 以 Git 日志和交付时核验为准。未推送。
+- 学习关联：[L-S1-01～03](SOURCE_LEARNING_BACKLOG.md#l-s1-01)，均待学习、掌握未确认。真实用户会话线索保留在未覆盖的工作区原稿；暂存版本需泛化或排除，不提交原始用户数据、备份、密钥或日志。
