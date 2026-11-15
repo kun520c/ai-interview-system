@@ -1,3 +1,6 @@
+-- Base bootstrap snapshot (pre-M1-B). For a separately approved new schema,
+-- also apply migrations/20261114_interview_report_task.sql exactly once.
+-- Existing schemas use only the approved incremental migration, never this bootstrap.
 create database if not exists ai_interview
 default character set utf8mb4
 default collate utf8mb4_unicode_ci;
