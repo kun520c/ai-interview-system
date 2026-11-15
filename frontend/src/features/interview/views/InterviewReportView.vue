@@ -14,7 +14,7 @@ import { REPORT_COPY } from '@/features/interview/copy/reportCopy'
 import { ReportPageState } from '@/features/interview/types/reportPageState'
 import { formatInterviewDate } from '@/utils/formatInterviewDate'
 import { formatScore } from '@/utils/formatScore'
-import { EvaluationLevel, InterviewReportStatus } from '@/types/enums'
+import { EvaluationLevel, EvaluationPhase, InterviewReportStatus } from '@/types/enums'
 
 const {
   pageState,
@@ -25,6 +25,7 @@ const {
   readyAbnormal,
   canGenerate,
   canRecoverGenerating,
+  checking,
   generateBusy,
   bootstrap,
   generate,
@@ -78,6 +79,16 @@ const generating = computed(() => {
     pageState.value === ReportPageState.GENERATING_POST
   )
 })
+
+// Detail has already passed the completed-session/ownership guard. Reuse it without polling it.
+const showEvidence = computed(() => timeline.value.length > 0 && ![
+  ReportPageState.NOT_FOUND,
+  ReportPageState.UNAVAILABLE,
+  ReportPageState.REDIRECTING,
+].some((state) => state === pageState.value))
+const savedFinals = computed(() => timeline.value.filter(
+  (item) => item.evaluation?.evaluationPhase === EvaluationPhase.FINAL,
+))
 </script>
 
 <template>
@@ -183,7 +194,7 @@ const generating = computed(() => {
           <BaseButton
             variant="ghost"
             :disabled="!canRecoverGenerating"
-            :loading="generateBusy"
+            :loading="checking"
             @click="recoverGenerating()"
           >
             {{ REPORT_COPY.recoverGenerating }}
@@ -240,14 +251,24 @@ const generating = computed(() => {
               <li v-for="(item, index) in report.suggestions" :key="`a-${index}`">{{ item }}</li>
             </ol>
           </section>
-
-          <section class="report-evidence" aria-labelledby="report-evidence-title">
-            <h2 id="report-evidence-title">{{ REPORT_COPY.evidence }}</h2>
-            <InterviewTimeline :items="timeline" collapsible />
-          </section>
         </template>
       </template>
     </template>
+
+    <section v-if="showEvidence" class="report-evidence" aria-labelledby="report-evidence-title">
+      <h2 id="report-evidence-title">
+        {{ pageState === ReportPageState.READY ? REPORT_COPY.evidence : REPORT_COPY.savedEvidence }}
+      </h2>
+      <template v-if="pageState !== ReportPageState.READY">
+        <p class="u-muted notice-copy">{{ REPORT_COPY.savedEvidenceHint }}</p>
+        <ul class="saved-final-scores" aria-label="已保存的逐题最终得分">
+          <li v-for="item in savedFinals" :key="item.interviewQuestionId">
+            {{ item.knowledgePoint }}：<strong>{{ formatScore(item.evaluation!.totalScore) }} / 100</strong>
+          </li>
+        </ul>
+      </template>
+      <InterviewTimeline :items="timeline" collapsible />
+    </section>
   </section>
 </template>
 
@@ -493,6 +514,14 @@ const generating = computed(() => {
 
 .notice-copy {
   margin: 8px 0 12px;
+}
+
+.saved-final-scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-bottom: 20px;
+  font-size: 14px;
 }
 
 @media (max-width: 720px) {

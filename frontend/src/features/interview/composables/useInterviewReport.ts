@@ -26,12 +26,11 @@ import type {
   InterviewReportResponse,
 } from '@/types/interview'
 
-export const REPORT_POLL_INTERVAL_MS = 3000
+export const REPORT_POLL_INTERVAL_MS = 1000
 
 type ReportSubmissionStatus =
   | typeof ReportPageState.NOT_STARTED
   | typeof ReportPageState.FAILED
-  | typeof ReportPageState.GENERATING
 
 function sortTimeline(
   questions: InterviewDetailQuestionResponse[],
@@ -65,11 +64,13 @@ export function useInterviewReport() {
   const error = ref<ApiError | null>(null)
   const statusMessage = ref<string | null>(null)
   const posting = ref(false)
+  const checking = ref(false)
   const readyAbnormal = ref(false)
   let epoch = 0
   let pollTimer: ReturnType<typeof setInterval> | null = null
   let refreshEpoch: number | null = null
   let refreshSessionId: number | null = null
+  let refreshPromise: Promise<void> | null = null
 
   const sessionId = computed(() => parsePositiveSessionId(route.params.sessionId))
 
@@ -88,7 +89,7 @@ export function useInterviewReport() {
   })
 
   const canRecoverGenerating = computed(
-    () => pageState.value === ReportPageState.GENERATING && !posting.value,
+    () => pageState.value === ReportPageState.GENERATING && !posting.value && !checking.value,
   )
   const generateBusy = computed(() => posting.value)
 
@@ -120,6 +121,7 @@ export function useInterviewReport() {
 
   function adoptReport(next: InterviewReportResponse): void {
     report.value = next
+    error.value = null
     readyAbnormal.value = false
     statusMessage.value = null
 
@@ -149,17 +151,22 @@ export function useInterviewReport() {
     pageState.value = ReportPageState.UNAVAILABLE
   }
 
-  async function refreshReport(): Promise<void> {
+  function refreshReport(): Promise<void> {
     const operationEpoch = epoch
     const operationSessionId = sessionId.value
     if (operationSessionId === null || posting.value) {
-      return
+      return Promise.resolve()
     }
-    if (refreshEpoch === operationEpoch && refreshSessionId === operationSessionId) {
-      return
+    if (refreshEpoch === operationEpoch && refreshSessionId === operationSessionId && refreshPromise !== null) {
+      return refreshPromise
     }
     refreshEpoch = operationEpoch
     refreshSessionId = operationSessionId
+    refreshPromise = queryReportForScope(operationEpoch, operationSessionId)
+    return refreshPromise
+  }
+
+  async function queryReportForScope(operationEpoch: number, operationSessionId: number): Promise<void> {
     try {
       const next = await fetchInterviewReport(operationSessionId)
       if (!isCurrentScope(operationEpoch, operationSessionId)) {
@@ -171,6 +178,7 @@ export function useInterviewReport() {
         return
       }
       if (isApiError(caught) && caught.kind === 'unauthenticated') {
+        stopPolling()
         throw caught
       }
       if (isApiError(caught) && caught.kind === 'not_found') {
@@ -191,6 +199,7 @@ export function useInterviewReport() {
       if (refreshEpoch === operationEpoch && refreshSessionId === operationSessionId) {
         refreshEpoch = null
         refreshSessionId = null
+        refreshPromise = null
       }
     }
   }
@@ -210,6 +219,7 @@ export function useInterviewReport() {
         return
       }
       if (isApiError(caught) && caught.kind === 'unauthenticated') {
+        stopPolling()
         throw caught
       }
       stopPolling()
@@ -268,17 +278,6 @@ export function useInterviewReport() {
       return
     }
     if (isApiError(caught) && caught.message === REPORT_SERVICE_UNAVAILABLE) {
-      if (recoverableStatus === ReportPageState.GENERATING) {
-        // A stale claim may already have changed the durable state before the service check.
-        await recoverAfterMutationFailure(operationEpoch, operationSessionId)
-        if (
-          isCurrentScope(operationEpoch, operationSessionId) &&
-          (pageState.value === ReportPageState.GENERATING || pageState.value === ReportPageState.FAILED)
-        ) {
-          statusMessage.value = REPORT_COPY.serviceUnavailable
-        }
-        return
-      }
       stopPolling()
       statusMessage.value = REPORT_COPY.serviceUnavailable
       pageState.value = recoverableStatus
@@ -319,7 +318,15 @@ export function useInterviewReport() {
   }
 
   async function recoverGenerating(): Promise<void> {
-    await submitReport(ReportPageState.GENERATING)
+    if (!canRecoverGenerating.value) return
+    // Reuse the current poll so a manual check never starts a competing status GET.
+    const operationEpoch = epoch
+    checking.value = true
+    try {
+      await refreshReport()
+    } finally {
+      if (operationEpoch === epoch) checking.value = false
+    }
   }
 
   async function submitReport(recoverableStatus: ReportSubmissionStatus): Promise<void> {
@@ -361,12 +368,14 @@ export function useInterviewReport() {
     stopPolling()
     refreshEpoch = null
     refreshSessionId = null
+    refreshPromise = null
     detail.value = null
     report.value = null
     error.value = null
     statusMessage.value = null
     readyAbnormal.value = false
     posting.value = false
+    checking.value = false
 
     const operationSessionId = sessionId.value
     if (operationSessionId === null) {
@@ -383,6 +392,7 @@ export function useInterviewReport() {
         return
       }
       if (isApiError(caught) && caught.kind === 'unauthenticated') {
+        stopPolling()
         throw caught
       }
       if (isApiError(caught) && caught.kind === 'not_found') {
@@ -421,6 +431,7 @@ export function useInterviewReport() {
         return
       }
       if (isApiError(caught) && caught.kind === 'unauthenticated') {
+        stopPolling()
         throw caught
       }
       if (isApiError(caught) && caught.kind === 'not_found') {
@@ -461,6 +472,7 @@ export function useInterviewReport() {
     readyAbnormal,
     canGenerate,
     canRecoverGenerating,
+    checking,
     generateBusy,
     sessionId,
     bootstrap,

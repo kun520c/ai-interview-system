@@ -9,7 +9,7 @@
 | 模式 | 需要什么 | 能完成什么 |
 | --- | --- | --- |
 | 基础后端 + Vue | JDK 21、MySQL 8、Node.js | 注册/登录、题库管理、页面和基本 API；不进行真实 AI 评分或文档 Embedding |
-| 完整 AI 流程 | 上述环境 + Milvus Standalone + Embedding API + DeepSeek API | 知识入库、RAG 检索、模拟面试评分与报告；可能产生模型费用 |
+| 完整 AI 流程 | 上述环境 + Milvus Standalone + Embedding API + DeepSeek API | 知识入库、RAG 检索与模拟面试评分；异步报告还需单独配置 RocketMQ 和任务表，可能产生模型费用 |
 | 离线测试 | 独立 `ai_interview_test` 库及测试依赖 | 运行项目默认 Maven 测试；外部服务真实调用按 opt-in 开关排除 |
 
 项目没有提供一键部署脚本或 Milvus Compose 文件。不要把 `tools/` 目录里的实验脚本当作生产启动方式。
@@ -31,7 +31,11 @@ SOURCE sql/ai_interview.sql;
 EXIT;
 ```
 
-`sql/ai_interview.sql` 建立 `ai_interview` 数据库及 13 张表，**不会创建演示账号或初始化面试题目**。请使用你自己新建的本地数据库，不要在已有数据的生产数据库运行此脚本。
+`sql/ai_interview.sql` 建立 `ai_interview` 数据库及 13 张基础表，**不会创建演示账号或初始化面试题目**。脚本指定了数据库名，只能用于事先确认的全新本地库，不要在已有数据的数据库运行。异步报告另需增量任务表，不能假定此脚本已创建它。
+
+### 异步报告任务表与启用边界
+
+`report.async.enabled` 默认是 `false`，此时新报告生成请求返回受控不可用，已有报告仍可读取，不会回退到同步生成。要启用异步报告，先核验并明确批准目标实例和 Schema、检查任务表及历史 `GENERATING` 状态，并停写排空旧版同步报告执行者；然后按 [M1-B 迁移脚本](../sql/migrations/20261114_interview_report_task.sql) 的说明，仅在获批目标执行一次，配置独立 RocketMQ 后再进行验收。MySQL DDL 会隐式提交；回退应保留任务表和历史行，不能与旧版写入者无计划混跑。
 
 ### 已有数据库升级到 2026-10-19 并发修复版
 
@@ -52,7 +56,7 @@ EXIT;
 4. 仅为**缺失**的字段执行 `sql/migrations/20261015_timeout_attempt_fencing.sql` 中对应的 `ALTER TABLE`。新增字段分别是 `interview_answer.attempt_id`、`knowledge_document.processing_attempt_id`，均为可空 `varchar(32)`；历史记录无需回填。
 5. 核验两个字段及旧数据、约束后，再启动新版本。MySQL 两条 DDL **不能作为一个整体事务回滚**；部分成功时检查字段状态并补齐，不要盲目重跑。
 
-本项目的超时接管由**后续请求触发**，不是自动后台调度。已发出的 Milvus RPC 可能迟到，正式数据的孤立向量只允许在独立维护窗口依照[手动对账指南](../tools/orphan-vectors/README.md)安全处理；默认 dry-run，不应在日常启动时运行删除。详见[并发设计说明](design/timeout-task-fencing.md)及[2026-10-19 验收记录](verification/CONCURRENCY_FINAL_ACCEPTANCE_20261019.md)。
+该历史并发修复中的评价和知识处理接管由后续请求触发；当前异步报告另有后台任务扫描。已发出的 Milvus RPC 可能迟到，正式数据的孤立向量只允许在独立维护窗口依照[手动对账指南](../tools/orphan-vectors/README.md)安全处理；默认 dry-run，不应在日常启动时运行删除。详见[并发设计说明](design/timeout-task-fencing.md)及[2026-10-19 验收记录](verification/CONCURRENCY_FINAL_ACCEPTANCE_20261019.md)。
 
 ### J1 升级：移除旧模型配置
 
@@ -62,7 +66,7 @@ EXIT;
 
 本轮没有 Schema 迁移。历史 `llm_model`、`prompt_version`、`raw_result` 中的 Jev 是合法历史事实，不能改名为 DeepSeek或强制套用 DeepSeek DTO；已有评价和报告继续复用。
 
-DeepSeek 保留有限连接/读取超时（默认 3s/60s），每次业务调用仅进行一次应用层 HTTP 尝试。FAILED 后可用相同 requestId、问题和完整答案内容再次提交；更改 payload 返回冲突。报告 FAILED 按同 sessionId 再次请求。stale 接管由请求触发并受 attempt/version 保护。跨模型 fallback 已删除，业务恢复仍保留；未新增自动退避、总时间预算或并发上限。
+DeepSeek 保留有限连接/读取超时（默认 3s/60s），每次业务调用仅进行一次应用层 HTTP 尝试。答案 FAILED 后可用相同 requestId、问题和完整答案内容再次提交；更改 payload 返回冲突。报告 FAILED 可按同 sessionId 显式重新申请，异步报告由任务期限和版本隔离保护。跨模型 fallback 已删除；重试可能再次调用模型。
 
 ## 3. 启动基础后端
 
@@ -177,7 +181,7 @@ $env:DEEPSEEK_API_KEY = [System.Net.NetworkCredential]::new('', $deepseekKey).Pa
 }
 ```
 
-将 ID 替换成接口返回的当前问题 ID。重试同一提交时必须复用完全相同的 `requestId`、问题 ID 与答案内容；下一题使用新的 requestId。最终评价确认后，可通过 `POST /api/interviews/{sessionId}/report` 生成报告。
+将 ID 替换成接口返回的当前问题 ID。重试同一提交时必须复用完全相同的 `requestId`、问题 ID 与答案内容；下一题使用新的 requestId。异步报告完成独立配置后，最终评价确认可通过 `POST /api/interviews/{sessionId}/report` 受理生成，并通过 GET 查询状态。
 
 ## 7. 测试
 

@@ -1,801 +1,150 @@
 package com.kun.aiinterview.interview.service;
 
-import com.kun.aiinterview.interview.entity.InterviewAnswer;
-import com.kun.aiinterview.interview.entity.InterviewQuestion;
-import com.kun.aiinterview.interview.enums.DecisionAction;
-import com.kun.aiinterview.interview.enums.InterviewAnswerStatus;
-import com.kun.aiinterview.interview.enums.InterviewQuestionStatus;
-import com.kun.aiinterview.interview.enums.InterviewQuestionType;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kun.aiinterview.common.exception.BusinessException;
-import com.kun.aiinterview.common.exception.ConflictException;
-import com.kun.aiinterview.common.exception.ResourceNotFoundException;
-import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
-import com.kun.aiinterview.interview.entity.AnswerEvaluation;
-import com.kun.aiinterview.interview.entity.InterviewReport;
-import com.kun.aiinterview.interview.entity.InterviewSession;
-import com.kun.aiinterview.interview.enums.InterviewReportStatus;
-import com.kun.aiinterview.interview.enums.EvaluationPhase;
-import com.kun.aiinterview.interview.enums.InterviewSessionStatus;
-import com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper;
-import com.kun.aiinterview.interview.mapper.InterviewQuestionMapper;
-import com.kun.aiinterview.interview.mapper.InterviewAnswerMapper;
-import com.kun.aiinterview.interview.mapper.InterviewReportMapper;
-import com.kun.aiinterview.interview.mapper.InterviewSessionMapper;
-import com.kun.aiinterview.interview.model.InterviewReportGenerationResult;
+import com.kun.aiinterview.interview.entity.*;
+import com.kun.aiinterview.interview.enums.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.ObjectProvider;
-
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.transaction.TransactionSystemException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
 class InterviewReportServiceTest {
+    ReportUnitFixture f;
+    InterviewReportTransactionService tx;
+    InterviewReportService service;
+    @BeforeEach void setup() { f = new ReportUnitFixture(); tx = mock(InterviewReportTransactionService.class); service = f.worker(tx); }
 
-    private static final long USER_ID = 101L;
-    private static final long SESSION_ID = 201L;
-    private static final int INITIAL_VERSION = 3;
-    private static final int GENERATING_VERSION = 4;
-
-    @Mock
-    private InterviewSessionMapper interviewSessionMapper;
-
-    @Mock
-    private InterviewReportMapper interviewReportMapper;
-
-    @Mock
-    private AnswerEvaluationMapper answerEvaluationMapper;
-
-    @Mock
-    private InterviewReportTransactionService transactionService;
-
-    @Mock
-    private InterviewQuestionMapper interviewQuestionMapper;
-
-    @Mock
-    private InterviewAnswerMapper interviewAnswerMapper;
-
-    @Mock
-    private ObjectProvider<InterviewReportGenerator> generatorProvider;
-
-    @Mock
-    private InterviewReportGenerator generator;
-
-    private InterviewReportService service;
-
-    @BeforeEach
-    void setUp() {
-        service = serviceWith(new ObjectMapper());
-        // Valid persisted source plan for tests focused on report state/serialization.
-        org.mockito.Mockito.lenient().when(interviewQuestionMapper.listBySessionId(SESSION_ID))
-                .thenReturn(java.util.stream.IntStream.range(0, 3).mapToObj(index ->
-                        InterviewQuestion.builder()
-                                .id(300L + index).sessionId(SESSION_ID).planOrder(index + 1)
-                                .questionType(InterviewQuestionType.MAIN)
-                                .status(InterviewQuestionStatus.ANSWERED)
-                                .build()).toList());
-        org.mockito.Mockito.lenient().when(interviewAnswerMapper.listByInterviewQuestionIds(any()))
-                .thenReturn(java.util.stream.IntStream.range(0, 3).mapToObj(index ->
-                        InterviewAnswer.builder()
-                                .id(400L + index).interviewQuestionId(300L + index)
-                                .status(InterviewAnswerStatus.EVALUATED)
-                                .build()).toList());
+    @Test void shouldRejectNullIdentifiersBeforeMapperCalls() {
+        assertThatThrownBy(() -> service.generateReportForApi(null, 2L)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.generateReportForApi(1L, null)).isInstanceOf(IllegalArgumentException.class);
+        verifyNoInteractions(tx);
     }
 
-    @Test
-    void shouldRejectNullIdentifiersBeforeMapperCalls() {
-        assertThatThrownBy(
-                () -> service.generateReport(null, SESSION_ID)
-        )
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("userId和sessionId不能为空");
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, null)
-        )
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("userId和sessionId不能为空");
-
-        verifyNoInteractions(
-                interviewSessionMapper,
-                interviewReportMapper,
-                answerEvaluationMapper,
-                transactionService,
-                interviewQuestionMapper,
-                interviewAnswerMapper,
-                generatorProvider,
-                generator
-        );
+    @Test void postOnlyAcceptsAndDoesNotGenerate() {
+        when(tx.acceptReportTask(1L, 2L)).thenReturn(InterviewReportStatus.GENERATING);
+        assertThat(service.generateReportForApi(1L, 2L).reportStatus()).isEqualTo(InterviewReportStatus.GENERATING);
+        verifyNoInteractions(f.generator);
     }
 
-    @Test
-    void shouldRejectMissingSession() {
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(null);
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        )
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("面试会话不存在");
-
-        verifyNoInteractions(
-                interviewReportMapper,
-                answerEvaluationMapper,
-                transactionService,
-                interviewQuestionMapper,
-                interviewAnswerMapper,
-                generatorProvider,
-                generator
-        );
+    @Test void claimedExecutionBuildsReportFromFinalAndCommitsWithCapturedToken() {
+        service.generateClaimedReport(f.execution);
+        var captor = org.mockito.ArgumentCaptor.forClass(InterviewReport.class);
+        verify(tx).completeReportGeneration(eq(f.execution), captor.capture());
+        assertThat(captor.getValue().getOverallScore()).isEqualByComparingTo("60.00");
+        assertThat(captor.getValue().getStrengths()).isEqualTo("[]");
+        verify(f.generator).generate(eq(f.session), eq(List.of(f.evaluation)), eq(new BigDecimal("60.00")));
     }
 
-    @Test
-    void shouldRejectSessionOwnedByAnotherUser() {
-        InterviewSession session = initialSession(
-                InterviewReportStatus.NOT_STARTED
-        );
-        session.setUserId(USER_ID + 1);
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(session);
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        )
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("面试会话不存在");
-
-        verifyNoInteractions(
-                generatorProvider,
-                generator,
-                answerEvaluationMapper,
-                transactionService
-        );
+    @Test void historicalReportAvoidsModelAndLeavesReconciliationToTransaction() {
+        when(f.reports.getBySessionId(2L)).thenReturn(f.report);
+        service.generateClaimedReport(f.execution);
+        verify(tx).completeReportGeneration(f.execution, f.report);
+        verifyNoInteractions(f.generator, f.weaknesses);
     }
 
-    @Test
-    void shouldRejectSessionThatIsNotCompleted() {
-        InterviewSession session = initialSession(
-                InterviewReportStatus.NOT_STARTED
-        );
-        session.setStatus(InterviewSessionStatus.IN_PROGRESS);
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(session);
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        )
-                .isInstanceOf(ConflictException.class)
-                .hasMessage("面试尚未完成，无法生成报告");
-
-        verifyNoInteractions(
-                generatorProvider,
-                generator,
-                answerEvaluationMapper,
-                transactionService
-        );
+    @Test void deterministicModelFailureAcknowledgesOnlyAfterFailurePersistence() {
+        when(f.generator.generate(any(), any(), any())).thenThrow(new IllegalStateException("invalid JSON"));
+        service.generateClaimedReport(f.execution);
+        verify(tx).failExecution(f.execution, "GENERATION_FAILED");
+        verify(tx, never()).completeReportGeneration(any(), any());
     }
 
-    @Test
-    void shouldReturnExistingReportWhenSessionIsReady() {
-        InterviewSession session = initialSession(
-                InterviewReportStatus.READY
-        );
-        InterviewReport report = report();
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(session);
-        when(interviewReportMapper.getBySessionId(SESSION_ID))
-                .thenReturn(report);
-
-        InterviewReport result = service.generateReport(
-                USER_ID,
-                SESSION_ID
-        );
-
-        assertThat(result).isSameAs(report);
-        verifyNoInteractions(
-                generatorProvider,
-                generator,
-                answerEvaluationMapper,
-                transactionService
-        );
-        verify(interviewSessionMapper, never())
-                .claimReportGeneration(any(), any(), any());
+    @Test void failureWriteFailureEscapesForMqRetry() {
+        when(f.generator.generate(any(), any(), any())).thenThrow(new IllegalArgumentException());
+        var db = new DataAccessResourceFailureException("unavailable");
+        doThrow(db).when(tx).failExecution(any(), any());
+        assertThatThrownBy(() -> service.generateClaimedReport(f.execution)).isSameAs(db);
     }
 
-    @Test
-    void shouldRejectReadySessionWhenReportIsMissing() {
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(initialSession(InterviewReportStatus.READY));
-        when(interviewReportMapper.getBySessionId(SESSION_ID))
-                .thenReturn(null);
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        )
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Session为READY但Report不存在");
-
-        verifyNoInteractions(generatorProvider, generator);
+    @Test void uncertainCommitMustNotAcknowledgeOrTryToFailNewVersion() {
+        var uncertain = new TransactionSystemException("commit outcome unknown");
+        doThrow(uncertain).when(tx).completeReportGeneration(any(), any());
+        assertThatThrownBy(() -> service.generateClaimedReport(f.execution)).isSameAs(uncertain);
+        verify(tx, never()).failExecution(any(), any());
     }
 
-    @Test
-    void shouldRejectDuplicateGenerationWhenAlreadyGenerating() {
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(initialSession(
-                        InterviewReportStatus.GENERATING
-                ));
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        )
-                .isInstanceOf(ConflictException.class)
-                .hasMessage("报告正在生成中，请稍后重试");
-
-        verifyNoInteractions(generatorProvider, generator);
-        verify(interviewSessionMapper, never())
-                .claimReportGeneration(any(), any(), any());
-        verify(interviewSessionMapper, never())
-                .reclaimStaleGenerating(any(), any(), any());
+    @Test void databaseReadFailureMustNotAcknowledge() {
+        when(f.evaluations.listFinalEffectiveEvaluationsBySessionId(2L)).thenThrow(new DataAccessResourceFailureException("offline"));
+        assertThatThrownBy(() -> service.generateClaimedReport(f.execution)).isInstanceOf(DataAccessResourceFailureException.class);
+        verifyNoInteractions(tx, f.generator);
     }
 
-    @Test
-    void shouldRetryStaleGeneratingWhenReportDoesNotExist() {
-        InterviewSession stale = generatingSession();
-        stale.setUpdatedAt(LocalDateTime.now().minusMinutes(11));
-        stale.setVersion(INITIAL_VERSION);
-        InterviewSession reclaimed = generatingSession();
-        List<AnswerEvaluation> evaluations = evaluations(70, 80, 90);
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(stale, reclaimed, reclaimed);
-        when(interviewSessionMapper.reclaimStaleGenerating(
-                eq(SESSION_ID),
-                any(),
-                any()
-        ))
-                .thenReturn(1);
-        when(interviewReportMapper.getBySessionId(SESSION_ID)).thenReturn(null);
-        when(generatorProvider.getIfAvailable()).thenReturn(generator);
-        when(answerEvaluationMapper.listFinalEffectiveEvaluationsBySessionId(
-                SESSION_ID
-        )).thenReturn(evaluations);
-        when(generator.generate(any(), any(), any()))
-                .thenReturn(generationResult());
-        when(transactionService.completeReportGeneration(any(), any(), any()))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-
-        InterviewReport result = service.generateReport(USER_ID, SESSION_ID);
-
-        assertThat(result.getOverallScore()).isEqualByComparingTo("80.00");
-        verify(interviewSessionMapper).reclaimStaleGenerating(
-                eq(SESSION_ID),
-                any(),
-                any()
-        );
-        verify(interviewSessionMapper, never())
-                .claimReportGeneration(any(), any(), any());
-        verify(generator).generate(any(), any(), any());
-        verify(transactionService).completeReportGeneration(any(), any(), any());
+    @Test void deterministicCompletionRejectionRequiresFailureWrite() {
+        doThrow(new IllegalStateException("FINAL changed")).when(tx).completeReportGeneration(any(), any());
+        service.generateClaimedReport(f.execution);
+        verify(tx).failExecution(f.execution, "COMPLETION_REJECTED");
     }
 
-    @Test
-    void shouldReconcileStaleGeneratingWhenReportAlreadyExistsWithoutCallingGenerator() {
-        InterviewSession stale = generatingSession();
-        stale.setUpdatedAt(LocalDateTime.now().minusMinutes(11));
-        InterviewSession reclaimed = generatingSession();
-        InterviewReport existing = report();
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(stale, reclaimed);
-        when(interviewSessionMapper.reclaimStaleGenerating(
-                eq(SESSION_ID),
-                any(),
-                any()
-        ))
-                .thenReturn(1);
-        when(interviewReportMapper.getBySessionId(SESSION_ID)).thenReturn(existing);
-        when(answerEvaluationMapper.listFinalEffectiveEvaluationsBySessionId(SESSION_ID))
-                .thenReturn(evaluations(70, 80, 90));
-        when(interviewSessionMapper.markReportReady(
-                SESSION_ID,
-                GENERATING_VERSION + 1,
-                existing.getOverallScore()
-        )).thenReturn(1);
-
-        InterviewReport result = service.generateReport(USER_ID, SESSION_ID);
-
-        assertThat(result).isSameAs(existing);
-        verify(interviewSessionMapper).markReportReady(
-                SESSION_ID,
-                GENERATING_VERSION + 1,
-                existing.getOverallScore()
-        );
-        verifyNoInteractions(generatorProvider, generator, transactionService);
-        verify(interviewSessionMapper, never())
-                .claimReportGeneration(any(), any(), any());
-        verify(answerEvaluationMapper).listFinalEffectiveEvaluationsBySessionId(SESSION_ID);
+    @Test void missingGeneratorPersistsFailureWithoutAnotherExecution() {
+        when(f.provider.getIfAvailable()).thenReturn(null);
+        service.generateClaimedReport(f.execution);
+        verify(tx).failExecution(f.execution, "GENERATION_FAILED");
     }
 
-    @Test
-    void shouldGenerateReportFromNotStartedAndRoundAverageHalfUp() {
-        List<AnswerEvaluation> evaluations = evaluations(
-                80,
-                80,
-                81
-        );
-        stubClaimedFlow(
-                InterviewReportStatus.NOT_STARTED,
-                evaluations
-        );
-        when(generator.generate(
-                any(),
-                any(),
-                any()
-        )).thenReturn(generationResult());
-        when(transactionService.completeReportGeneration(
-                any(),
-                any(),
-                any()
-        )).thenAnswer(invocation -> invocation.getArgument(0));
-
-        InterviewReport result = service.generateReport(
-                USER_ID,
-                SESSION_ID
-        );
-
-        assertThat(result.getSessionId()).isEqualTo(SESSION_ID);
-        assertThat(result.getOverallScore())
-                .isEqualByComparingTo("80.33");
-        assertThat(result.getStrengths())
-                .isEqualTo("[\"Java基础扎实\"]");
-        assertThat(result.getWeaknesses())
-                .isEqualTo("[\"并发知识不足\"]");
-        assertThat(result.getSuggestions())
-                .isEqualTo("[\"复习线程池\"]");
-        assertThat(result.getPromptVersion())
-                .isEqualTo("report-v1");
-
-        InOrder order = inOrder(
-                interviewSessionMapper,
-                answerEvaluationMapper,
-                generator,
-                transactionService
-        );
-        order.verify(interviewSessionMapper)
-                .claimReportGeneration(
-                        SESSION_ID,
-                        INITIAL_VERSION,
-                        InterviewReportStatus.NOT_STARTED
-                );
-        order.verify(answerEvaluationMapper)
-                .listFinalEffectiveEvaluationsBySessionId(SESSION_ID);
-        order.verify(generator).generate(
-                generatingSession(),
-                evaluations,
-                new BigDecimal("80.33")
-        );
-        order.verify(transactionService)
-                .completeReportGeneration(
-                        result,
-                        generatingSession(),
-                        evaluations
-                );
-        verify(interviewSessionMapper, never())
-                .markReportFailed(any(), any());
+    @Test void nullGeneratorResultPersistsFailure() {
+        when(f.generator.generate(any(), any(), any())).thenReturn(null);
+        service.generateClaimedReport(f.execution);
+        verify(tx).failExecution(f.execution, "GENERATION_FAILED");
     }
 
-    @Test
-    void shouldRetryGenerationFromFailed() {
-        List<AnswerEvaluation> evaluations = evaluations(70, 80, 90);
-        stubClaimedFlow(
-                InterviewReportStatus.FAILED,
-                evaluations
-        );
-        when(generator.generate(any(), any(), any()))
-                .thenReturn(generationResult());
-        when(transactionService.completeReportGeneration(any(), any(), any()))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-
-        InterviewReport result = service.generateReport(
-                USER_ID,
-                SESSION_ID
-        );
-
-        assertThat(result.getOverallScore())
-                .isEqualByComparingTo("80.00");
-        verify(interviewSessionMapper)
-                .claimReportGeneration(
-                        SESSION_ID,
-                        INITIAL_VERSION,
-                        InterviewReportStatus.FAILED
-                );
-        verify(generator).generate(
-                generatingSession(),
-                evaluations,
-                new BigDecimal("80.00")
-        );
-    }
-
-    @Test
-    void shouldStopWhenClaimAffectsNoRow() {
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(initialSession(
-                        InterviewReportStatus.NOT_STARTED
-                ));
-        when(generatorProvider.getIfAvailable()).thenReturn(generator);
-        when(interviewSessionMapper.claimReportGeneration(
-                SESSION_ID,
-                INITIAL_VERSION,
-                InterviewReportStatus.NOT_STARTED
-        )).thenReturn(0);
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        )
-                .isInstanceOf(ConflictException.class)
-                .hasMessage("报告生成状态已发生变化，请重试");
-
-        verifyNoInteractions(generator);
-        verifyNoInteractions(answerEvaluationMapper, transactionService);
-    }
-
-    @Test
-    void shouldMarkFailedWhenEvaluationCountIsIncomplete() {
-        List<AnswerEvaluation> incomplete = evaluations(80, 90);
-        stubClaimedFlow(
-                InterviewReportStatus.NOT_STARTED,
-                incomplete
-        );
-        when(interviewSessionMapper.markReportFailed(
-                SESSION_ID,
-                GENERATING_VERSION
-        )).thenReturn(1);
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        )
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("有效Evaluation数量与计划的MAIN题数不一致");
-
-        verify(interviewSessionMapper).markReportFailed(
-                SESSION_ID,
-                GENERATING_VERSION
-        );
-        verifyNoInteractions(generator, transactionService);
-    }
-
-    @Test
-    void shouldMarkFailedAndRethrowOriginalGeneratorException() {
-        RuntimeException original = new RuntimeException(
-                "generator failed"
-        );
-        stubClaimedFlow(
-                InterviewReportStatus.NOT_STARTED,
-                evaluations(70, 80, 90)
-        );
-        when(generator.generate(any(), any(), any()))
-                .thenThrow(original);
-        when(interviewSessionMapper.markReportFailed(
-                SESSION_ID,
-                GENERATING_VERSION
-        )).thenReturn(1);
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        ).isSameAs(original);
-
-        verify(interviewSessionMapper).markReportFailed(
-                SESSION_ID,
-                GENERATING_VERSION
-        );
-        verifyNoInteractions(transactionService);
-    }
-
-    @Test
-    void shouldMarkFailedWhenReportJsonSerializationFails()
-            throws JsonProcessingException {
-        ObjectMapper failingObjectMapper = mock(ObjectMapper.class);
-        when(failingObjectMapper.writeValueAsString(any()))
-                .thenThrow(new JsonProcessingException(
-                        "test serialization failure"
-                ) {
-                });
-        service = serviceWith(failingObjectMapper);
-        stubClaimedFlow(
-                InterviewReportStatus.NOT_STARTED,
-                evaluations(70, 80, 90)
-        );
-        when(generator.generate(any(), any(), any()))
-                .thenReturn(generationResult());
-        when(interviewSessionMapper.markReportFailed(
-                SESSION_ID,
-                GENERATING_VERSION
-        )).thenReturn(1);
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        )
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Report strengths JSON序列化失败")
-                .hasCauseInstanceOf(JsonProcessingException.class);
-
-        verify(interviewSessionMapper).markReportFailed(
-                SESSION_ID,
-                GENERATING_VERSION
-        );
-        verifyNoInteractions(transactionService);
-    }
-
-    @Test
-    void shouldMarkFailedWhenCompletionTransactionFails() {
-        RuntimeException original = new IllegalStateException(
-                "InterviewReport写入失败"
-        );
-        stubClaimedFlow(
-                InterviewReportStatus.NOT_STARTED,
-                evaluations(70, 80, 90)
-        );
-        when(generator.generate(any(), any(), any()))
-                .thenReturn(generationResult());
-        when(transactionService.completeReportGeneration(any(), any(), any()))
-                .thenThrow(original);
-        when(interviewSessionMapper.markReportFailed(
-                SESSION_ID,
-                GENERATING_VERSION
-        )).thenReturn(1);
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        ).isSameAs(original);
-
-        verify(interviewSessionMapper).markReportFailed(
-                SESSION_ID,
-                GENERATING_VERSION
-        );
-    }
-
-    @Test
-    void shouldNotReplaceOriginalWhenFailedRecoveryAlsoThrows() {
-        RuntimeException original = new RuntimeException(
-                "generator failed"
-        );
-        RuntimeException recovery = new RuntimeException(
-                "failed recovery"
-        );
-        stubClaimedFlow(
-                InterviewReportStatus.NOT_STARTED,
-                evaluations(70, 80, 90)
-        );
-        when(generator.generate(any(), any(), any()))
-                .thenThrow(original);
-        when(interviewSessionMapper.markReportFailed(
-                SESSION_ID,
-                GENERATING_VERSION
-        )).thenThrow(recovery);
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        )
-                .isSameAs(original)
-                .satisfies(exception -> assertThat(
-                        exception.getSuppressed()
-                ).containsExactly(recovery));
-    }
-
-    @Test
-    void shouldNotMarkFailedWhenLatestSessionIsAlreadyReady() {
-        RuntimeException commitSignal = new RuntimeException(
-                "completion returned an error after commit"
-        );
-        InterviewSession ready = initialSession(
-                InterviewReportStatus.READY
-        );
-        ready.setVersion(GENERATING_VERSION + 1);
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(
-                        initialSession(
-                                InterviewReportStatus.NOT_STARTED
-                        ),
-                        initialSession(
-                                InterviewReportStatus.NOT_STARTED
-                        ),
-                        generatingSession(),
-                        ready
-                );
-        when(generatorProvider.getIfAvailable()).thenReturn(generator);
-        when(interviewSessionMapper.claimReportGeneration(
-                SESSION_ID,
-                INITIAL_VERSION,
-                InterviewReportStatus.NOT_STARTED
-        )).thenReturn(1);
-        List<AnswerEvaluation> evaluations = evaluations(70, 80, 90);
-        when(answerEvaluationMapper
-                .listFinalEffectiveEvaluationsBySessionId(SESSION_ID))
-                .thenReturn(evaluations);
-        when(generator.generate(any(), any(), any()))
-                .thenReturn(generationResult());
-        when(transactionService.completeReportGeneration(any(), any(), any()))
-                .thenThrow(commitSignal);
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        ).isSameAs(commitSignal);
-
-        verify(interviewSessionMapper).markReportFailed(SESSION_ID, GENERATING_VERSION);
-        verify(interviewSessionMapper, org.mockito.Mockito.times(1)).getInterviewSessionById(SESSION_ID);
-    }
-
-    @Test
-    void shouldRejectBeforeClaimWhenGeneratorBeanIsMissing() {
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(initialSession(
-                        InterviewReportStatus.NOT_STARTED
-                ));
-        when(generatorProvider.getIfAvailable()).thenReturn(null);
-
-        assertThatThrownBy(
-                () -> service.generateReport(USER_ID, SESSION_ID)
-        )
-                .isInstanceOf(BusinessException.class)
-                .hasMessage("报告生成服务当前不可用");
-
-        verify(interviewSessionMapper, never())
-                .claimReportGeneration(any(), any(), any());
-        verifyNoInteractions(
-                generator,
-                answerEvaluationMapper,
-                transactionService
-        );
-    }
-
-    @Test
-    void shouldRejectInitialEvenWhenEvaluationCountMatchesPlan() {
-        List<AnswerEvaluation> rows = evaluations(60, 70, 80);
-        rows.get(1).setEvaluationPhase(EvaluationPhase.INITIAL);
-        stubClaimedFlow(InterviewReportStatus.NOT_STARTED, rows);
-        org.mockito.Mockito.lenient().when(generator.generate(any(), any(), any()))
-                .thenReturn(generationResult());
-
-        assertThatThrownBy(() -> service.generateReport(USER_ID, SESSION_ID))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("报告评价必须为FINAL");
-        verifyNoInteractions(generator, transactionService);
-        verify(interviewSessionMapper).markReportFailed(SESSION_ID, GENERATING_VERSION);
+    @Test void jsonSerializationFailurePersistsFailure() throws Exception {
+        var mapper = mock(com.fasterxml.jackson.databind.ObjectMapper.class);
+        when(mapper.writeValueAsString(any())).thenThrow(new com.fasterxml.jackson.core.JsonProcessingException("invalid") {});
+        var failing = new InterviewReportService(f.sessions, f.reports, tx, f.provider, mapper, f.reader);
+        failing.generateClaimedReport(f.execution);
+        verify(tx).failExecution(f.execution, "GENERATION_FAILED");
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"null-phase", "duplicate-main", "foreign-main", "wrong-answer"})
-    void shouldRejectInvalidFinalsEvenWhenCountMatches(String invalid) {
-        List<AnswerEvaluation> rows = evaluations(60, 70, 80);
-        switch (invalid) {
-            case "null-phase" -> rows.get(1).setEvaluationPhase(null);
-            case "duplicate-main" -> rows.get(1).setMainInterviewQuestionId(rows.getFirst().getMainInterviewQuestionId());
-            case "foreign-main" -> rows.get(1).setMainInterviewQuestionId(999L);
-            case "wrong-answer" -> rows.get(1).setAnswerId(999L);
-            default -> throw new AssertionError(invalid);
+    @ValueSource(strings = {"empty", "count", "initial", "main-null", "decision", "score-null", "missing-main", "wrong-session",
+            "unanswered", "wrong-order", "missing-answer", "unfinished-answer", "wrong-answer", "duplicate-final"})
+    void finalInvariantRejectsInvalidData(String corruption) {
+        switch (corruption) {
+            case "empty" -> when(f.evaluations.listFinalEffectiveEvaluationsBySessionId(2L)).thenReturn(List.of());
+            case "count" -> f.session.setPlannedQuestionCount(2);
+            case "initial" -> f.evaluation.setEvaluationPhase(EvaluationPhase.INITIAL);
+            case "main-null" -> f.evaluation.setMainInterviewQuestionId(null);
+            case "decision" -> f.evaluation.setDecisionAction(DecisionAction.FOLLOW_UP);
+            case "score-null" -> f.evaluation.setTotalScore(null);
+            case "missing-main" -> when(f.questions.listBySessionId(2L)).thenReturn(List.of());
+            case "wrong-session", "unanswered", "wrong-order" -> {
+                var question = f.questions.listBySessionId(2L).getFirst();
+                if (corruption.equals("wrong-session")) question.setSessionId(99L);
+                if (corruption.equals("unanswered")) question.setStatus(InterviewQuestionStatus.PENDING);
+                if (corruption.equals("wrong-order")) question.setPlanOrder(2);
+            }
+            case "missing-answer" -> when(f.answers.listByInterviewQuestionIds(any())).thenReturn(List.of());
+            case "unfinished-answer" -> f.answers.listByInterviewQuestionIds(List.of(5L)).getFirst().setStatus(InterviewAnswerStatus.FAILED);
+            case "wrong-answer" -> f.evaluation.setAnswerId(99L);
+            case "duplicate-final" -> {
+                f.session.setPlannedQuestionCount(2);
+                when(f.evaluations.listFinalEffectiveEvaluationsBySessionId(2L)).thenReturn(List.of(f.evaluation, f.evaluation));
+            }
+            default -> throw new AssertionError(corruption);
         }
-        stubClaimedFlow(InterviewReportStatus.NOT_STARTED, rows);
-        assertThatThrownBy(() -> service.generateReport(USER_ID, SESSION_ID))
-                .isInstanceOf(IllegalStateException.class);
-        verifyNoInteractions(generator, transactionService);
-        verify(interviewSessionMapper).markReportFailed(SESSION_ID, GENERATING_VERSION);
+        assertThatThrownBy(() -> f.reader.aggregateFinalEvaluations(f.session)).isInstanceOf(IllegalStateException.class);
+        service.generateClaimedReport(f.execution);
+        verify(tx).failExecution(f.execution, "GENERATION_FAILED");
+        verifyNoInteractions(f.generator);
     }
 
-    private void stubClaimedFlow(
-            InterviewReportStatus initialStatus,
-            List<AnswerEvaluation> evaluations
-    ) {
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
-                .thenReturn(
-                        initialSession(initialStatus),
-                        initialSession(initialStatus),
-                        generatingSession()
-                );
-        when(generatorProvider.getIfAvailable()).thenReturn(generator);
-        when(interviewSessionMapper.claimReportGeneration(
-                SESSION_ID,
-                INITIAL_VERSION,
-                initialStatus
-        )).thenReturn(1);
-        when(answerEvaluationMapper
-                .listFinalEffectiveEvaluationsBySessionId(SESSION_ID))
-                .thenReturn(evaluations);
-    }
-
-    private InterviewReportService serviceWith(
-            ObjectMapper objectMapper
-    ) {
-        return new InterviewReportService(
-                interviewSessionMapper,
-                interviewReportMapper,
-                answerEvaluationMapper,
-                transactionService,
-                interviewQuestionMapper,
-                interviewAnswerMapper,
-                generatorProvider,
-                objectMapper,
-                new StaleRecoveryProperties()
-        );
-    }
-
-    private InterviewSession initialSession(
-            InterviewReportStatus reportStatus
-    ) {
-        return InterviewSession.builder()
-                .id(SESSION_ID)
-                .userId(USER_ID)
-                .status(InterviewSessionStatus.COMPLETED)
-                .plannedQuestionCount(3)
-                .completedQuestionCount(3)
-                .reportStatus(reportStatus)
-                .version(INITIAL_VERSION)
-                .build();
-    }
-
-    private InterviewSession generatingSession() {
-        InterviewSession session = initialSession(
-                InterviewReportStatus.GENERATING
-        );
-        session.setVersion(GENERATING_VERSION);
-        return session;
-    }
-
-    private List<AnswerEvaluation> evaluations(Integer... scores) {
-        return java.util.stream.IntStream.range(0, scores.length)
-                .mapToObj(index -> AnswerEvaluation.builder()
-                        .id(500L + index)
-                        .answerId(400L + index)
-                        .mainInterviewQuestionId(300L + index)
-                        .evaluationPhase(EvaluationPhase.FINAL)
-                        .decisionAction(DecisionAction.FINISH)
-                        .totalScore(scores[index])
-                        .build())
-                .toList();
-    }
-
-    private InterviewReportGenerationResult generationResult() {
-        return new InterviewReportGenerationResult(
-                "PASS",
-                "总体表现良好",
-                List.of("Java基础扎实"),
-                List.of("并发知识不足"),
-                List.of("复习线程池"),
-                "report-test-model",
-                "report-v1"
-        );
-    }
-
-    private InterviewReport report() {
-        return InterviewReport.builder()
-                .id(301L)
-                .sessionId(SESSION_ID)
-                .overallScore(new BigDecimal("80.00"))
-                .result("PASS")
-                .summary("总体表现良好")
-                .strengths("[]")
-                .weaknesses("[]")
-                .suggestions("[]")
-                .llmModel("report-test-model")
-                .promptVersion("report-v1")
-                .build();
+    @Test void averageUsesHalfUpAndDoesNotUseModelScore() {
+        f.session.setPlannedQuestionCount(3);
+        var questions = java.util.stream.IntStream.range(0,3).mapToObj(i -> InterviewQuestion.builder().id(5L+i).sessionId(2L)
+                .planOrder(i+1).questionType(InterviewQuestionType.MAIN).status(InterviewQuestionStatus.ANSWERED).build()).toList();
+        var answers = java.util.stream.IntStream.range(0,3).mapToObj(i -> InterviewAnswer.builder().id(15L+i)
+                .interviewQuestionId(5L+i).status(InterviewAnswerStatus.EVALUATED).build()).toList();
+        var evaluations = java.util.stream.IntStream.range(0,3).mapToObj(i -> AnswerEvaluation.builder().mainInterviewQuestionId(5L+i)
+                .answerId(15L+i).evaluationPhase(EvaluationPhase.FINAL).decisionAction(DecisionAction.FINISH).totalScore(i==0?81:80).build()).toList();
+        when(f.questions.listBySessionId(2L)).thenReturn(questions);
+        when(f.answers.listByInterviewQuestionIds(List.of(5L,6L,7L))).thenReturn(answers);
+        when(f.evaluations.listFinalEffectiveEvaluationsBySessionId(2L)).thenReturn(evaluations);
+        assertThat(f.reader.aggregateFinalEvaluations(f.session).overallScore()).isEqualByComparingTo("80.33");
     }
 }

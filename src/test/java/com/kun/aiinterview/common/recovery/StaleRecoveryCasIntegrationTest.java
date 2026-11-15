@@ -107,18 +107,14 @@ class StaleRecoveryCasIntegrationTest {
     }
 
     @Test
-    void concurrentStaleGeneratingReclaimShouldHaveSingleWinner()
+    void concurrentReportExecutionCasShouldHaveSingleWinner()
             throws Exception {
         seedGeneratingSession();
         setUpdatedAt("interview_session", sessionId, minutesAgo(20));
         LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
 
         List<Integer> results = runConcurrentCas(() ->
-                interviewSessionMapper.reclaimStaleGenerating(
-                        sessionId,
-                        cutoff,
-                        4
-                )
+                interviewSessionMapper.claimReportExecution(sessionId, 4)
         );
 
         assertThat(results).containsExactlyInAnyOrder(1, 0);

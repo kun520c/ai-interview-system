@@ -65,22 +65,14 @@ class InterviewReportApiServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new InterviewReportService(
-                interviewSessionMapper,
-                interviewReportMapper,
-                answerEvaluationMapper,
-                transactionService,
-                interviewQuestionMapper,
-                interviewAnswerMapper,
-                generatorProvider,
-                new ObjectMapper(),
-                new StaleRecoveryProperties()
-        );
+        service = new InterviewReportService(interviewSessionMapper, interviewReportMapper,
+                transactionService, generatorProvider, new ObjectMapper(),
+                new InterviewReportFinalReader(answerEvaluationMapper, interviewQuestionMapper, interviewAnswerMapper));
     }
 
     @Test
     void shouldRejectMissingSessionForGet() {
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+        when(interviewSessionMapper.getReportSession(SESSION_ID))
                 .thenReturn(null);
 
         assertThatThrownBy(() -> service.getReport(USER_ID, SESSION_ID))
@@ -96,7 +88,7 @@ class InterviewReportApiServiceTest {
                 InterviewReportStatus.NOT_STARTED
         );
         session.setUserId(USER_ID + 1);
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+        when(interviewSessionMapper.getReportSession(SESSION_ID))
                 .thenReturn(session);
 
         assertThatThrownBy(() -> service.getReport(USER_ID, SESSION_ID))
@@ -116,7 +108,7 @@ class InterviewReportApiServiceTest {
     ) {
         InterviewSession session = session(reportStatus);
         session.setStatus(InterviewSessionStatus.IN_PROGRESS);
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+        when(interviewSessionMapper.getReportSession(SESSION_ID))
                 .thenReturn(session);
 
         InterviewReportResponse response = service.getReport(
@@ -150,7 +142,7 @@ class InterviewReportApiServiceTest {
 
     @Test
     void shouldReturnReadyReportWithJsonLists() {
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+        when(interviewSessionMapper.getReportSession(SESSION_ID))
                 .thenReturn(session(InterviewReportStatus.READY));
         when(interviewReportMapper.getBySessionId(SESSION_ID))
                 .thenReturn(report());
@@ -185,7 +177,7 @@ class InterviewReportApiServiceTest {
 
     @Test
     void shouldRejectReadyStatusWhenReportIsMissing() {
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+        when(interviewSessionMapper.getReportSession(SESSION_ID))
                 .thenReturn(session(InterviewReportStatus.READY));
         when(interviewReportMapper.getBySessionId(SESSION_ID))
                 .thenReturn(null);
@@ -199,7 +191,7 @@ class InterviewReportApiServiceTest {
     void shouldRejectInvalidPersistedReportJson() {
         InterviewReport report = report();
         report.setWeaknesses("not-json");
-        when(interviewSessionMapper.getInterviewSessionById(SESSION_ID))
+        when(interviewSessionMapper.getReportSession(SESSION_ID))
                 .thenReturn(session(InterviewReportStatus.READY));
         when(interviewReportMapper.getBySessionId(SESSION_ID))
                 .thenReturn(report);
@@ -210,20 +202,22 @@ class InterviewReportApiServiceTest {
     }
 
     @Test
-    void shouldBuildReadyApiResponseFromExistingGenerateReportMethod() {
-        InterviewReportService spyService = spy(service);
-        InterviewReport report = report();
-        doReturn(report).when(spyService)
-                .generateReport(USER_ID, SESSION_ID);
+    void shouldBuildReadyApiResponseAfterDurableAcceptance() {
+        when(transactionService.acceptReportTask(USER_ID, SESSION_ID)).thenReturn(InterviewReportStatus.READY);
+        when(interviewReportMapper.getBySessionId(SESSION_ID)).thenReturn(report());
+        var response = service.generateReportForApi(USER_ID, SESSION_ID);
+        assertThat(response.reportStatus()).isEqualTo(InterviewReportStatus.READY);
+        assertThat(response.strengths()).containsExactly("Java基础扎实", "表达清晰");
+        verifyNoInteractions(generatorProvider);
+    }
 
-        InterviewReportResponse response = spyService
-                .generateReportForApi(USER_ID, SESSION_ID);
-
-        assertThat(response.reportStatus())
-                .isEqualTo(InterviewReportStatus.READY);
-        assertThat(response.strengths())
-                .containsExactly("Java基础扎实", "表达清晰");
-        verify(spyService).generateReport(USER_ID, SESSION_ID);
+    @Test
+    void shouldReturnGeneratingWithoutCallingModel() {
+        when(transactionService.acceptReportTask(USER_ID, SESSION_ID)).thenReturn(InterviewReportStatus.GENERATING);
+        var response = service.generateReportForApi(USER_ID, SESSION_ID);
+        assertThat(response.reportStatus()).isEqualTo(InterviewReportStatus.GENERATING);
+        assertThat(response.summary()).isNull();
+        verifyNoInteractions(generatorProvider, interviewReportMapper);
     }
 
     private InterviewSession session(

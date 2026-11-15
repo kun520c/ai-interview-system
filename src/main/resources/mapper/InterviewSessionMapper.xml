@@ -143,18 +143,37 @@
             AND status = 'COMPLETED'
             AND report_status = #{expectedReportStatus}
             AND report_status IN ('NOT_STARTED', 'FAILED')
+            AND version &lt;= 2147483644
     </update>
 
-    <update id="reclaimStaleGenerating">
-        UPDATE interview_session
-        SET
-            version = version + 1,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE id = #{id}
-            AND status = 'COMPLETED'
-            AND report_status = 'GENERATING'
-            AND updated_at &lt;= #{cutoff}
-            AND version = #{expectedVersion}
+    <!-- Lock the unsigned value as Long before any Java Integer conversion. -->
+    <select id="getReportVersionForUpdate" resultType="java.lang.Long">
+        SELECT version FROM interview_session WHERE id = #{id} FOR UPDATE
+    </select>
+
+    <select id="getReportOwnerId" resultType="java.lang.Long">
+        SELECT user_id FROM interview_session WHERE id = #{id}
+    </select>
+
+    <select id="getReportSession" resultType="com.kun.aiinterview.interview.entity.InterviewSession">
+        SELECT id, user_id, difficulty, status, current_interview_question_id, planned_question_count,
+               completed_question_count, total_score, report_status,
+               CASE WHEN version &lt;= 2147483647 THEN version ELSE NULL END AS version,
+               started_at, ended_at, created_at, updated_at
+        FROM interview_session WHERE id = #{id}
+    </select>
+
+    <update id="claimReportExecution">
+        UPDATE interview_session SET version = version + 1
+        WHERE id = #{id} AND status = 'COMPLETED' AND report_status = 'GENERATING'
+            AND version = #{expectedVersion} AND version &lt; 2147483646
+    </update>
+
+    <!-- Overflow is a controlled failure. Never wrap, nor increment beyond Java's range. -->
+    <update id="failReportVersionExhausted">
+        UPDATE interview_session SET report_status = 'FAILED'
+        WHERE id = #{id} AND status = 'COMPLETED' AND version = #{expectedVersion}
+            AND report_status IN ('NOT_STARTED', 'GENERATING', 'FAILED') AND version &gt; 2147483644
     </update>
 
     <update id="markReportReady">
@@ -165,6 +184,7 @@
             version = version + 1
         WHERE id = #{id}
             AND version = #{expectedVersion}
+            AND version &lt; 2147483647
             AND status = 'COMPLETED'
             AND report_status = 'GENERATING'
     </update>
@@ -176,6 +196,7 @@
             version = version + 1
         WHERE id = #{id}
             AND version = #{expectedVersion}
+            AND version &lt; 2147483647
             AND status = 'COMPLETED'
             AND report_status = 'GENERATING'
     </update>

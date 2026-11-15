@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kun.aiinterview.interview.mapper.InterviewReportTaskMapper">
+    <!-- Every task time is UTC from MySQL, independent of JVM/connection time zones. -->
+    <select id="databaseNow" resultType="java.time.LocalDateTime">SELECT UTC_TIMESTAMP(6)</select>
+    <insert id="insertQueued" useGeneratedKeys="true" keyProperty="task.id">
+        INSERT INTO interview_report_task
+            (session_id, attempt_version, task_state, delivery_state, next_send_at, queued_at, queue_deadline)
+        VALUES (#{task.sessionId}, #{task.attemptVersion}, 'QUEUED', 'PENDING', UTC_TIMESTAMP(6),
+                UTC_TIMESTAMP(6), TIMESTAMPADD(SECOND, #{queueSeconds}, UTC_TIMESTAMP(6)))
+    </insert>
+    <select id="getById" resultType="com.kun.aiinterview.interview.entity.InterviewReportTask">
+        SELECT * FROM interview_report_task WHERE id = #{id}
+    </select>
+    <select id="getByIdForUpdate" resultType="com.kun.aiinterview.interview.entity.InterviewReportTask">
+        SELECT * FROM interview_report_task WHERE id = #{id} FOR UPDATE
+    </select>
+    <select id="listActiveBySessionId" resultType="com.kun.aiinterview.interview.entity.InterviewReportTask">
+        SELECT * FROM interview_report_task WHERE session_id = #{sessionId}
+            AND task_state IN ('QUEUED', 'RUNNING') ORDER BY id LIMIT 2
+    </select>
+    <select id="listPending" resultType="com.kun.aiinterview.interview.entity.InterviewReportTask">
+        SELECT * FROM interview_report_task
+        WHERE task_state = 'QUEUED' AND delivery_state = 'PENDING' AND next_send_at &lt;= UTC_TIMESTAMP(6)
+        ORDER BY next_send_at, id LIMIT #{limit}
+    </select>
+    <select id="listExpiredLeases" resultType="com.kun.aiinterview.interview.entity.InterviewReportTask">
+        SELECT * FROM interview_report_task
+        WHERE task_state = 'QUEUED' AND delivery_state = 'LEASED' AND dispatch_lease_until &lt;= UTC_TIMESTAMP(6)
+        ORDER BY dispatch_lease_until, id LIMIT #{limit}
+    </select>
+    <select id="listExpiredQueued" resultType="com.kun.aiinterview.interview.entity.InterviewReportTask">
+        SELECT * FROM interview_report_task WHERE task_state = 'QUEUED' AND queue_deadline &lt;= UTC_TIMESTAMP(6)
+        ORDER BY queue_deadline, id LIMIT #{limit}
+    </select>
+    <select id="listExpiredRunning" resultType="com.kun.aiinterview.interview.entity.InterviewReportTask">
+        SELECT * FROM interview_report_task WHERE task_state = 'RUNNING' AND execution_deadline &lt;= UTC_TIMESTAMP(6)
+        ORDER BY execution_deadline, id LIMIT #{limit}
+    </select>
+    <update id="claimDispatch">
+        UPDATE interview_report_task SET delivery_state = 'LEASED', dispatch_token = #{token},
+            dispatch_lease_until = TIMESTAMPADD(SECOND, #{leaseSeconds}, UTC_TIMESTAMP(6)), send_attempts = send_attempts + 1
+        WHERE id = #{id} AND task_state = 'QUEUED' AND queue_deadline &gt; UTC_TIMESTAMP(6)
+            AND send_attempts &lt; #{maxAttempts}
+            AND ((delivery_state = 'PENDING' AND next_send_at &lt;= UTC_TIMESTAMP(6))
+                OR (delivery_state = 'LEASED' AND dispatch_lease_until &lt;= UTC_TIMESTAMP(6)))
+    </update>
+    <!-- Intentionally delivery-only, including when the consumer beats this acknowledgement. -->
+    <update id="markSent">
+        UPDATE interview_report_task SET delivery_state = 'SENT', dispatch_token = NULL, dispatch_lease_until = NULL
+        WHERE id = #{id} AND delivery_state = 'LEASED' AND dispatch_token = #{token}
+    </update>
+    <update id="rescheduleDispatch">
+        UPDATE interview_report_task SET delivery_state = 'PENDING', dispatch_token = NULL, dispatch_lease_until = NULL,
+            next_send_at = TIMESTAMPADD(SECOND, #{backoffSeconds}, UTC_TIMESTAMP(6))
+        WHERE id = #{id} AND task_state = 'QUEUED' AND delivery_state = 'LEASED' AND dispatch_token = #{token}
+    </update>
+    <update id="claimExecution">
+        UPDATE interview_report_task SET task_state = 'RUNNING', execution_version = #{executionVersion},
+            started_at = UTC_TIMESTAMP(6), execution_deadline = TIMESTAMPADD(SECOND, #{executionSeconds}, UTC_TIMESTAMP(6))
+        WHERE id = #{id} AND task_state = 'QUEUED' AND attempt_version = #{attemptVersion}
+            AND queue_deadline &gt; UTC_TIMESTAMP(6)
+    </update>
+    <update id="finishSuccess">
+        UPDATE interview_report_task SET task_state = 'SUCCEEDED'
+        WHERE id = #{id} AND task_state = 'RUNNING' AND execution_version = #{executionVersion}
+            AND execution_deadline &gt; UTC_TIMESTAMP(6)
+    </update>
+    <update id="finishFailure">
+        UPDATE interview_report_task SET task_state = 'FAILED', failure_code = #{failureCode}
+        WHERE id = #{id} AND task_state = #{state} AND task_state IN ('QUEUED','RUNNING')
+    </update>
+</mapper>
