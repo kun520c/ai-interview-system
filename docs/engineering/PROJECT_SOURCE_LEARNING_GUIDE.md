@@ -183,3 +183,10 @@
 - **面试问题：**为什么 7/12 不能当总体错误率？部分覆盖如何影响 CORE 追问？为什么历史 false 不能直接转为 PARTIAL？
 - **练习：**不调用模型，针对 LEFT JOIN、removeIf、ACID 各写“已答/遗漏/技术错误/证据不足”四栏；比较已有模型结论并保留分歧。
 - **掌握状态：待学习 / 待确认。** 对应 H06、H09–H12、H19。
+
+<a id="learn-16"></a>
+## 16｜单机持久卷、任务恢复与备份边界（2026-11-16 补记）
+
+- **入口：**[本机运行手册](../../tools/local-deployment/README.md)、[启动器](../../tools/local-deployment/backend.py)、[任务 Mapper](../../src/main/resources/mapper/InterviewReportTaskMapper.xml)、`ReportOutboxDispatcher`、`InterviewReportTransactionService`，以及 [提交后发送前进程故障证据](../../backups/DEPLOY_CLOSEOUT_20261116/crash-recovery/result.json)。
+- **后续需辨析：**容器重启策略、卷持久化和独立备份的差异；为什么 Broker 重投需要 DB 幂等；QUEUED/PENDING 与 RUNNING 崩溃的恢复契约为何不同；本次 MySQL 快照为什么不构成 MySQL/Milvus/MQ 一致恢复；真实模型、模型替身和结构校验证据如何分开。
+- **状态：待学习 / 待确认。** 本轮仅补充入口，没有源码教学或开发者独立掌握证据；细项见 [学习待办](SOURCE_LEARNING_BACKLOG.md#l-p2-local-deployment-closeout-01)。

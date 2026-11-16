@@ -1760,3 +1760,97 @@ L-E3E01-01后续证据（2026-11-14）：真实配置已补齐，禁重试与一
 
 - **仅登记入口：**隐私规则 `ed7a7ba8b1e0c3fc4276154f242e67178acf1b1a`、SQL `18ef21b4c3e3cd30e4d30be645f41bb2ecabb445`、异步报告 `28cb2db25519e9d26c95dc00d716af4993d60f2d`；对应本地工作区代码、测试源码清单和工程台账。各提交边界以 `git show --stat <SHA>` 和本机收口报告为准。
 - **掌握状态：待学习（未确认）。**本轮没有开展源码教学，也没有用户独立解释、复现或修改证据。
+
+
+<a id="l-p2mq-candidate-01"></a>
+### L-P2MQ-CANDIDATE-01 — 当前候选的 Outbox、消费与故障边界（2026-11-15）
+
+- **本轮只登记后续入口：**[当前候选验收台账](IMPROVEMENT_LEDGER.md#p2-mq-candidate-acceptance--当前候选-rocketmq-核心链路复核2026-11-15)、本机 `backups/MQ_CANDIDATE_20261115_soe3tev4/` 的事件、清理前对账和源码比较。未开展源码教学。
+- **入口：**`InterviewReportTransactionService.acceptReportTask/claimTaskExecution/completeReportGeneration`、`ReportOutboxWakeup.onTaskAccepted`、`ReportOutboxDispatcher.dispatchDue`、`ReportMqRuntime`、`ReportMessageConsumer.onMessage`、`InterviewReportTaskMapper.xml` 和 `RealReportRocketMqSmokeTest` 的重复消息/迟到确认方法。
+- **待学习问题：**为何受理后任务可见但报告尚未存在；为什么发送结果不确定后可重发、`markSent` 不得回退业务终态；任务去重与外部模型恰好一次有何区别；为什么 `RUNNING` 时进程崩溃的恢复契约不同于发送前 Broker 短暂停机；历史版本只有部分源码相同意味着什么。
+- **掌握状态：待学习（未确认）。**没有用户本人独立解释、复现或修改证据；一次 4.377 秒恢复仅为受控样本，不是 RTO。
+
+- **补充证据入口：**`wakeup-targeted-junit.log` 的 5 项 Unit/Mock 与 4 项真实 MySQL 事务测试；仍只登记入口，不代表本人已学习或掌握。
+
+
+<a id="l-p2-deploy-admission-01"></a>
+### L-P2-DEPLOY-ADMISSION-01 — 部署目标隔离、迁移与回退（2026-11-15）
+
+- **本轮仅登记入口：**[准入与最小部署报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-15-二期部署环境准入与最小部署方案.md)、[工程台账](IMPROVEMENT_LEDGER.md#p2-deploy-admission)；未开展源码学习或能力验收。
+- **源码入口：**`EnvironmentIsolationInitializer.validateReportMq`、`InterviewReportTransactionService.acceptReportTask`、`ReportMqRuntime.connect/close`、`ReportOutboxDispatcher.dispatchDue/expireDue`、`MilvusCollectionInitializer`、`SecurityConfiguration.securityFilterChain` 与前端 `createWebHistory`；对照 `sql/migrations/20261114_interview_report_task.sql`、本机 `tools/m1b/broker.conf`。测试/历史文件不代表当前部署目标。
+- **后续问题：**为什么 MQ 开关默认关闭且无同步回退；为何 accepting=false 时已有任务仍可被消费；旧同步执行者与历史 GENERATING 为什么须在切换前排空；为什么 MySQL、Milvus、MQ 的备份和 offset 要按一致时点核对；为何 M1-C 局部源码哈希一致不足以证明当前端到端崩溃测试；为何静态文件还需要安全放行和 SPA 路由处理。
+- **掌握状态：待学习（未确认）。**没有开发者本人独立解释、复现或修改证据；登记不授权部署、迁移或真实模型调用。
+
+- **差异复核入口：**后续可对照原始 M1-C `backups/M1C_R2_20261115/entry-B.jar` 与候选 JAR 的 `ReportAsyncProperties`、`ReportAsyncConfiguration$Scheduling`、`InterviewReportTransactionService.acceptReportTask` 和 Dispatcher 注解；本轮只核对，不开展学习。
+
+
+<a id="l-p2-local-demo-01"></a>
+### L-P2-LOCAL-DEMO-01 — 本机真实模型、RAG 与异步报告追踪（2026-11-15）
+
+- **本轮仅登记入口：**[真实演示验收](/Users/kun/Documents/Reports/ai-interview-system/2026-11-15-二期本机完整演示与真实端到端验收.md)、[工程台账](IMPROVEMENT_LEDGER.md#p2-local-demo-e2e)和本机私有 `/Users/kun/Developer/projects/ai-interview-system/backups/DEMO_ENV_20261115_9lpoxk7u/` 的事件、usage、对账及失败日志；没有开展源码学习。
+- **源码入口：**`InterviewService.submitAnswer`、`EvaluationOrchestrationService`、`SpringAiEmbeddingClient`、`MilvusVectorStoreClient`、`InterviewReportTransactionService.acceptReportTask/completeReportGeneration`、`ReportOutboxWakeup`、`ReportMqRuntime`、前端 `useInterviewReport` 与历史路由；对照本机演示 Broker 的 `mqshutdown` 与持久卷证据。
+- **后续学习问题：**为什么 HTTP 异步受理时间不能当完整报告时间；为什么 10 条跨库 ID 一致不证明向量语义质量；为什么参考答案作答会高估真实表现；为什么 `docker stop` 与 JVM `mqshutdown` 的信号路径不同；为什么空载偏移恢复不证明在途消息可靠；为什么用户已启用的后端重启后仍需重新核对限额和真实调用。
+- **掌握状态：待学习（未确认）。**没有开发者本人解释、复现或独立修改证据；登记不改变 Q1/Q2 NO-GO，不额外授权生产部署或清理数据。
+
+<a id="l-p2-aiq-01"></a>
+### L-P2-AIQ-01 — 评分语义、报告证据和模型结构校验（2026-11-15）
+
+- **范围与前置。** 仅登记，当前暂停教学。前置为会话评分点快照、五维求分、单 MAIN 对应有效 FINAL、Jackson record 绑定。 [工程台账](IMPROVEMENT_LEDGER.md#p2-ai-quality) · [验证案例](../evaluation/2026-11-15-AI质量复核案例集.md)
+- **源码入口。** EvaluationPromptBuilder.build、LlmEvaluationValidator.validateScoringPointResults、EvaluationScoreCalculator.calculate、FollowUpPolicy.decide、InterviewReportFinalReader.aggregateFinalEvaluations、InterviewReportPromptBuilder.toPromptEvaluation、DeepSeekInterviewReportGenerator.parseResponse/validateTextList，以及 DeepSeekInterviewReportGeneratorTest 的历史响应回放。
+- **以后待复现。** 用 LinkedList 第 7 点说明 weight、covered 与实际 90 分各来自哪里。分别追溯原报告的已答事实、上游错误和报告新增推断。复验 JSON 模式下重复字段、7/7/5 超限为何在 Java 被拒绝，以及怎么证明重放的字节与真实响应相同。
+- **掌握状态。** 待学习（未确认）；无开发者独立解释、复现或修改证据。
+
+
+<a id="l-p2-report-trust-01"></a>
+### L-P2-REPORT-TRUST-01 — 空弱项、JSON 契约和上游证据边界（2026-11-16）
+
+- **仅登记入口，当前不学习：**[工程台账](IMPROVEMENT_LEDGER.md#p2-report-trust-20261116)、[报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-16-报告内容可信度最小修复与回归验收.md)和被 Git 忽略的 `backups/REPORT_CONTENT_20261116_ua0rf2j0/`；候选已否决。
+- **源码入口：**`InterviewReportPromptBuilder.build/toPromptEvaluation`、`DeepSeekInterviewReportGenerator.parseResponse/validateTextList`、`DeepSeekEvaluationClient.completeJson`、`InterviewReportService` 的报告 JSON 写入与 READY 读回、前端 `InterviewReportView.vue`。对照本机保存的历史真实重复字段、6/7 项响应与 R3 真实对照；先区分结构合法和上游评价真实。
+- **掌握状态：待学习（未确认）。**没有用户本人讲解、复现或独立修改证据；本轮未开展源码学习，也未采用候选。
+
+<a id="l-p2-scoring-quality-01"></a>
+### L-P2-SCORING-QUALITY-01 — 评分金标、原答证据与稳定性（2026-11-16）
+
+- **仅登记入口，当前不开展学习：**[评测协议](../evaluation/2026-11-16-scoring-quality/PROTOCOL.md)、[人工判断历史](../evaluation/2026-11-16-scoring-quality/HUMAN_REVIEW.md)及 [工程台账](IMPROVEMENT_LEDGER.md#p2-scoring-quality-20261116)。
+- **源码入口：**`EvaluationPromptBuilder.build`、`DeepSeekEvaluationClient.evaluate/parseSuggestion`、`LlmEvaluationValidator.validateScoringPointResults`、`EvaluationScoreCalculator.calculate`、`FollowUpPolicy.decide` 与 `tools/scoring-quality-20261116/summarize.py`；对照被忽略的冻结输入及原始响应，注意隐私边界。
+- **掌握状态：待学习（未确认）。**尚无用户独立解释、复现或修改证据；仅登记不表示模型评分质量通过，也不授权修改生产评分规则。
+
+
+<a id="l-p2-reliability-01"></a>
+### L-P2-RELIABILITY-01 — 请求模式、单次核对顺序与反向门禁（2026-11-16）
+
+- **状态：待学习/待确认；本轮源码教学暂停。** 无开发者独立讲解、复现或修改证据，不能因代理完成实验标掌握。
+- **工程入口：**[完整报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-16-AI评分低成本可靠性方案甄别与验证.md) · [证据索引](../evaluation/2026-11-16-reliability/README.md)；`DeepSeekEvaluationClient.evaluate/completeJson/buildRequest`、`DeepSeekProperties`、`EvaluationPromptBuilder`、`LlmEvaluationValidator`、`EvaluationScoreCalculator`、`FollowUpPolicy/FollowUpTargetResolver`、`InterviewReportPromptBuilder.toPromptEvaluation`。
+- **记录的取舍：**候选A仅评分低思考、报告仍disabled；B在同JSON契约先点/纠错后评分，局部改善但真实非法JSON与语义残留使其淘汰。真实HTTP、Java结构、语义依据、分数校准、发布准入需分开；reasoning计入completion而非重复计费，未知请求保留预留不重发。
+- **证据：**基线139/0/0/1、A144/0/0/1、B138/0/0/0，JDK7/0/0/0，报告离线5/0/0/0；17真实响应16 Java有效、1额外环境UNKNOWN，84075已知tokens约¥0.09028836。6个共同合法诊断对2/6→5/6之外存在结构反向失败，不能择优统计。报告21/21原样依据仍可能传播上游错误。
+- **未来掌握确认（不在本轮执行）：**本人能复现删除/JOIN反例、解释真实缺项与拓展区别、说明生产请求与报告隔离和未知usage预算后再更新。没有本批提交SHA；主树代码未改、文档未提交/推送。
+
+
+<a id="l-p2-mq-net-value-01"></a>
+### L-P2-MQ-NET-VALUE-01 — 异步收益口径、恢复责任及成本（2026-11-16）
+
+- **状态：待学习／掌握未确认；本轮不开展源码教学。** 没有用户本人独立解释、复现或修改证据。
+- **入口：**[净收益报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-16-RocketMQ工程净收益审查与后端收口.md)、[指标/可靠性/成本证据](mq-net-value-20261116/README.md)；`InterviewReportService.generateReportForApi`、`InterviewReportTransactionService.acceptReportTask/claimTaskExecution/completeReportGeneration`、`ReportOutboxDispatcher`、`ReportOutboxWakeup`、`ReportMessageConsumer`、`ReportMqRuntime`及两份Task/Session Mapper XML；观测入口 `tools/m1c-r2/ReportProbe.java`、`tools/mq-net-value-20261116/analyze.py`。
+- **后续辨析项：**POST受理与事务afterCommit、轮询可见及闭环吞吐的区别；MQ重投与DB幂等的责任；executionVersion隔离旧执行者；模型返回后崩溃为何显式重试且可能再次付费；500ms扫描的数据库负担；经典PushConsumer队列分配与多实例前提。
+- **结论边界：**共同K=4预实验48+12成功不证明总体吞吐优势，方案C未实现；CONDITIONAL GO保留现有MQ并停止本轮开发。工程文档追加和候选已推送状态不等于本人掌握，也不授权后续重构或教学。
+
+<a id="l-p2-local-deployment-closeout-01"></a>
+### L-P2-LOCAL-DEPLOYMENT-CLOSEOUT-01 — 单机持久化、进程恢复与证据边界（2026-11-16）
+
+- **状态：待学习／掌握未确认；本轮不开展教学。** 用户本人独立解释、复现或修改的证据尚未提供。
+- **入口：**[运行手册](../../tools/local-deployment/README.md)、[启动器](../../tools/local-deployment/backend.py)、[验收索引](2026-11-16-本机部署收口与工程档案.md)、[当前候选故障记录](../../backups/DEPLOY_CLOSEOUT_20261116/crash-recovery/result.json)；对照 `InterviewReportTransactionService.acceptReportTask/claimTaskExecution/completeReportGeneration`、`ReportOutboxDispatcher`、`ReportMqRuntime`、`InterviewReportTaskMapper.xml` 和 `RealReportCrashWindowProbeTest.committedBeforeAnySend`。
+- **以后可辨析：**容器可写层、命名卷和备份的区别；为何消息发送前崩溃可由扫描恢复、RUNNING 崩溃可能失败并需要显式重试；Broker offset 与业务幂等分别证明什么；为何 MySQL InnoDB 一致备份不等于 Milvus/MQ 跨存储一致恢复；为什么 401 不是完整健康检查；NameServer 与 Broker 启动顺序为何仍需核验。
+- **证据边界：**本轮真实测试 MQ 2 项、一次当前候选 kill 样本均使用模型替身；本机空载停启不证明断电恢复；独立备份恢复、长期运行和公网均未放行。不凭档案追加推断个人已掌握。
+
+<a id="l-p2-final-freeze-git-closeout-01"></a>
+### L-P2-FINAL-FREEZE-01 — 交付冻结及独立恢复入口（2026-11-16）
+
+- **状态：待学习／掌握未确认。** 本轮只登记入口，不开展教学；没有开发者本人独立解释、复现或修改证据。
+- **工程入口：**[部署与恢复记录](2026-11-16-本机部署收口与工程档案.md#最终交付冻结与恢复演练)、[单机运行手册](../../tools/local-deployment/README.md)、本机私有[恢复脚本](../../backups/GIT_FREEZE_20261116_a7d4c2/restore_rehearsal.py)和[结果](../../backups/GIT_FREEZE_20261116_a7d4c2/restore-result.json)；业务源码入口 `InterviewReportTransactionService.acceptReportTask/claimTaskExecution/completeReportGeneration`、`ReportOutboxDispatcher`、`ReportMessageConsumer`、`EvaluationPromptBuilder` 和 `InterviewReportPromptBuilder`。
+- **关联历史：**[MQ 指标与故障矩阵](mq-net-value-20261116/README.md)、[评分人工裁决](../evaluation/2026-11-16-scoring-quality/HUMAN_REVIEW.md)、[失败候选](../evaluation/2026-11-16-scoring-quality/FAILURES.md)、[低成本方案](../evaluation/2026-11-16-reliability/README.md)。只记录定位与证据边界，不改变任何业务或模型规则。
+
+<a id="l-p2-final-git-commits-01"></a>
+### L-P2-FINAL-GIT-COMMITS-01 — 版本、证据和隐私边界（2026-11-16）
+
+- **状态：待学习／掌握未确认。** 本次只维护索引，没有源码教学，也没有用户独立解释、复现或修改证据。
+- **以后可查：**[Git 与测试台账](IMPROVEMENT_LEDGER.md#p2-final-git-commits-20261116)、[失败 Prompt](../evaluation/2026-11-16-scoring-quality/FAILED_PROMPTS.md)、[MQ 指标](mq-net-value-20261116/README.md)和[单机手册](../../tools/local-deployment/README.md)。区分源码 SHA、运行 JAR、文档提交和远端状态；区分历史真实服务、离线 Mock 和本轮测试。

@@ -486,3 +486,11 @@
 - [src/test/java/com/kun/aiinterview/interview/service/ReportOutboxWakeupIntegrationTest.java](../../src/test/java/com/kun/aiinterview/interview/service/ReportOutboxWakeupIntegrationTest.java)
 - [src/test/java/com/kun/aiinterview/interview/report/deepseek/DeepSeekInterviewReportGeneratorTest.java](../../src/test/java/com/kun/aiinterview/interview/report/deepseek/DeepSeekInterviewReportGeneratorTest.java)
 - [frontend/tests/InterviewReportView.spec.ts](../../frontend/tests/InterviewReportView.spec.ts)
+
+## 2026-11-16 版本化补记：研究收口与单机验收
+
+本节只补充本文件原有时间范围之后的入口，不改写 11-11～11-15 历史结论。RocketMQ 最终公平 K=4 对照、资源成本、故障矩阵和保留实现的 CONDITIONAL GO 见 [净收益档案](mq-net-value-20261116/README.md)；评分人工意见及修订、被拒绝的 Prompt/报告候选和真实反向退化见 [评分索引](../evaluation/2026-11-16-scoring-quality/REPORT.md)、[可靠性索引](../evaluation/2026-11-16-reliability/README.md)。
+
+[单机部署收口](2026-11-16-本机部署收口与工程档案.md) 记录现有卷复用、当前候选发送前进程故障与恢复、重启前后报告及偏移、当前 MySQL 逻辑备份和实际回归。受控演示 GO；机器重启后模型配置、独立备份恢复、跨存储一致恢复及公网发布均未放行。所有本轮与历史模型桩、真实模型、Mock 和受条件跳过测试保持区分。
+
+**同日后续：**上述“独立备份恢复未放行”为原验收时点；随后已在新建无网络临时 MySQL 实例完成 14 表单库恢复和重导指纹对照，跨存储、应用级及离机恢复仍未验证。详见[最终收口](2026-11-16-本机部署收口与工程档案.md#最终交付冻结与恢复演练)。

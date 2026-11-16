@@ -1,0 +1,66 @@
+[
+  {
+    "container": "ai-interview-m1c-broker-1",
+    "n": 5,
+    "memory_mib_median": 513.3,
+    "memory_mib_range": [
+      513.0,
+      513.3
+    ],
+    "docker_cpu_percent_median": 3.46,
+    "docker_cpu_percent_range": [
+      3.25,
+      4.5
+    ],
+    "pids_including_threads": "192",
+    "note": "5 snapshots; no workload sent by this audit; not a peak or steady-state proof"
+  },
+  {
+    "container": "ai-interview-m1c-namesrv-1",
+    "n": 5,
+    "memory_mib_median": 160.9,
+    "memory_mib_range": [
+      160.7,
+      161.4
+    ],
+    "docker_cpu_percent_median": 0.13,
+    "docker_cpu_percent_range": [
+      0.1,
+      0.68
+    ],
+    "pids_including_threads": "71",
+    "note": "5 snapshots; no workload sent by this audit; not a peak or steady-state proof"
+  },
+  {
+    "container": "ai-interview-local-demo-broker",
+    "n": 5,
+    "memory_mib_median": 465.3,
+    "memory_mib_range": [
+      464.8,
+      466.0
+    ],
+    "docker_cpu_percent_median": 3.57,
+    "docker_cpu_percent_range": [
+      2.93,
+      6.95
+    ],
+    "pids_including_threads": "204",
+    "note": "5 snapshots; no workload sent by this audit; not a peak or steady-state proof"
+  },
+  {
+    "container": "ai-interview-local-demo-namesrv",
+    "n": 5,
+    "memory_mib_median": 188.2,
+    "memory_mib_range": [
+      188.2,
+      188.4
+    ],
+    "docker_cpu_percent_median": 0.08,
+    "docker_cpu_percent_range": [
+      0.07,
+      0.18
+    ],
+    "pids_including_threads": "71",
+    "note": "5 snapshots; no workload sent by this audit; not a peak or steady-state proof"
+  }
+]

@@ -96,3 +96,9 @@ __pycache__/
 /tools/m1c/real_report.py
 /tools/q1/
 /tools/q2/
+
+# Scoring-quality candidate answers and the frozen, unblinded bank snapshot remain local.
+/docs/evaluation/2026-11-16-scoring-quality/development-v1.json
+/docs/evaluation/2026-11-16-scoring-quality/development-v2.json
+/docs/evaluation/2026-11-16-scoring-quality/holdout-v1.json
+/docs/evaluation/2026-11-16-scoring-quality/evaluation-bank-snapshot.json
