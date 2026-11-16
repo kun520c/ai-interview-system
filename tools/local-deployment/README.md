@@ -2,6 +2,8 @@
 
 本手册只针对本机已有的 `ai_interview` 演示目标。它不是公网部署方案，也不授权迁移、覆盖恢复或清理数据。执行前重新核对容器、端口、任务与 PID；不要操作 evaluation 或其他项目。当前实现维持评分 v4、报告 v1，以及 RocketMQ + Transactional Outbox。
 
+**公开检出范围：**启动器导入的 `tools/rag-d3/config.py` 已纳入仓库，但此工具依赖本机现有的指定 JAR、受保护的 `.env`、演示数据库及容器。默认转发器模式还依赖本机私有转发器进程、状态与令牌；`--model-config` 可改用自行准备的受保护供应商配置，但仍需要指定 JAR 和其余本机资源。凭据、原 JAR、转发器材料、数据和卷不随仓库提供，干净克隆不能直接运行该启动器；缺少配置或 JAR 时它会拒绝启动，不要为使其运行而提交密钥或绕过哈希校验。
+
 ## 身份与持久化
 
 - 候选源码 `0509cd6729c8dc6e45f35c9aef2b49985c59bf75`；运行 JAR `backups/MQ_CANDIDATE_20261115_soe3tev4/candidate-0509cd6.jar`，SHA-256 `3346146f49fca7c7c604b2d70c3ebddc134d7d49a97467a07d80fe35c2fa07e0`。`backend.py` 启动前验证哈希，不将新构建误当作正在运行的包。
