@@ -1,0 +1,14 @@
+id,scenario,status,real_components,primary_contributor,evidence,limit,source
+R01,Session + Outbox 同事务受理,当前候选已有通过；本轮未重跑回滚,真实 MySQL；MQ 替身,MySQL 事务 / 唯一约束,插入失败时两者回滚；9项唤醒组含4项真实MySQL,不保证DB与Broker原子提交,backups/MQ_CANDIDATE_20261115_soe3tev4/wakeup-targeted-junit.log
+R02,Report + Weakness + READY + SUCCEEDED 同事务,当前候选已有通过；本轮正常提交30次,真实 MySQL；本轮真实MQ+模型桩,MySQL 事务 / Java 校验,历史194项MySQL定向及1项最终READY失败回滚；本轮B30份一致,本轮未注入最终SQL失败,backups/GIT_CLOSEOUT_VERIFICATION_u0a30otz/verification-summary.json
+R03,6次并发申请只受理一次,当前候选已有通过；本轮未重测竞争,真实 HTTP/MySQL/MQ；模型桩,Session 行锁 / CAS / 唯一约束,6个POST→1 Task/1 Report/1 Weakness/1模型调用,不是6个独立模型业务,backups/MQ_CANDIDATE_20261115_soe3tev4/results.json
+R04,重复消息及迟到 markSent,当前候选已有通过；本轮未重测重复,真实 MySQL/MQ；Mockito生成器,MQ提供重复交付；DB状态/CAS保证幂等,2/0/0/0 指定真实MQ JUnit,非真实ACK网络丢包,backups/MQ_CANDIDATE_20261115_soe3tev4/real-mq-junit.log
+R05,CAS/executionVersion 拒绝旧执行者,历史真实MySQL通过；本轮未重跑交错,真实 MySQL；模型暂停/期限注入,数据库版本围栏 / Java状态机,旧成功/旧失败×新先/新后四种交错,不是自然600秒等待或真实模型超时,docs/engineering/2026-11-15-M1C-FAILURE-INJECTION.md
+R06,Broker 停止后持久受理与恢复,当前候选已有通过；本轮未故障注入,真实 Broker/MySQL；网络模型桩,Outbox保留任务/补发；Broker恢复传递,QUEUED/PENDING→READY；重启命令至观察4.377s，n=1,非RTO/SLA；Broker永久损坏未测,backups/MQ_CANDIDATE_20261115_soe3tev4/results.json
+R07,应用提交后未发即退出，重启补发,历史构建通过；当前未重测kill,真实 MySQL/MQ/进程退出；模型桩,MySQL持久任务 / 定时扫描,历史M1-C场景1恢复，模型桩1次,当前新增唤醒；不能改称当前kill通过,docs/engineering/m1c-20261114/faults-after-cache-fix.jsonl
+R08,SEND_OK 后未记账即退出,历史构建通过；当前未重测kill,真实 MySQL/MQ/进程退出；模型桩,MQ保留已收消息；租约补发与CAS,重发后仅1 Report、1次弱项累计,业务幂等主要属于数据库,docs/engineering/m1c-20261114/faults-after-cache-fix.jsonl
+R09,消费者最终事务后 ACK 前退出,历史构建通过；当前未重测kill,真实 MySQL/MQ/进程退出；模型桩,MQ重投 + 数据库终态幂等,重投后新增模型调用0,两消费组竞争≠同组重平衡,docs/engineering/m1c-20261114/faults-after-cache-fix.jsonl
+R10,模型返回后、最终提交前崩溃,历史构建验证限制；当前仍保留契约,真实进程退出/DB/MQ；模型桩,执行期限 / fencing / 用户显式重试,旧任务FAILED，新显式申请READY；再次模型调用1次,不能自动保证READY；真实DeepSeek后kill未测,docs/engineering/m1c-20261114/faults-after-cache-fix.jsonl
+R11,DB不可读 / ACK不确定,仅Mock异常契约；真实提交未知未验证,Mock故障；历史真实Broker重试/DLQ,异常传播RETRY；不能据Mock证明真实DB恢复,历史DLQ 2/0/0/0，DB异常为Mock,MySQL真停机/JDBC commit unknown未测,docs/engineering/2026-11-14-M1B-ROCKETMQ-ASYNC-REPORT-VERIFICATION.md
+R12,当前候选本机真实业务及空载MQ重启,当前候选已有通过；本轮核对原始证据,真实 MySQL/Milvus/Embedding/DeepSeek/MQ/Chrome,完整集成 + 已保存状态/偏移,5MAIN直FINAL；1报告READY；重启前后offset1/1,未自然追问、弱项新增为0、空载停复不是在途恢复,backups/DEMO_ENV_20261115_9lpoxk7u/acceptance-summary.json
+R13,多实例/长积压/永久磁盘故障/监控恢复,尚未验证,无对应实测,MQ潜在独立分发能力；需部署与运维保障,当前单Broker单队列；不提供HA证据,不能声称生产高可用或线性扩展,docs/engineering/HANDOFF_TO_CHATGPT_PHASE2.md

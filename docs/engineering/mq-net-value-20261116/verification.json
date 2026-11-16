@@ -1,0 +1,59 @@
+{
+  "date": "2026-11-16",
+  "decision": "CONDITIONAL GO",
+  "head": "0509cd6729c8dc6e45f35c9aef2b49985c59bf75",
+  "task_commit": null,
+  "task_staged": false,
+  "task_pushed": false,
+  "production_code_diff": [],
+  "entry_files": 75,
+  "untouched_entry_files": 71,
+  "four_records_original_prefix_preserved": {
+    "docs/engineering/IMPROVEMENT_LEDGER.md": true,
+    "docs/engineering/ENGINEERING_CASEBOOK.md": true,
+    "docs/engineering/RESUME_EVIDENCE_BANK.md": true,
+    "docs/engineering/SOURCE_LEARNING_BACKLOG.md": true
+  },
+  "tracked_code_files_unchanged": 558,
+  "pilot_raw_files_verified": 75,
+  "offline_recalculation": "PASS; four derived files byte-identical",
+  "measurement": {
+    "total": 48,
+    "success": 48,
+    "failures": 0
+  },
+  "warmup": {
+    "total": 12,
+    "success": 12,
+    "failures": 0
+  },
+  "full_request_pairs": 30,
+  "reliability_rows": 13,
+  "python_ast_files": 2,
+  "canvas_strict_typecheck_exit": 0,
+  "canvas_render_browser_test": "not run",
+  "junit_maven_vitest_browser_full_suite": "not run this task; historical evidence cited separately",
+  "external_api_calls": {
+    "DeepSeek": 0,
+    "Embedding": 0,
+    "Milvus": 0,
+    "tokens": 0,
+    "cost": 0
+  },
+  "git_diff_check_task_records": "PASS",
+  "git_diff_check_whole_tree": {
+    "exit_code": 2,
+    "preexisting_only": "docs/question-bank/d1-drafts/HARD_AUTHOR_NOTES_20261114.md:21: new blank line at EOF."
+  },
+  "isolated_containers_stopped": 4,
+  "demo_mq_containers_still_running": 2,
+  "experiment_ports_free": [
+    28081,
+    28082,
+    28889
+  ],
+  "schema_changes": 0,
+  "historical_rows_deleted": 0,
+  "protected_evaluation_access": false,
+  "process_credentials_extracted": false
+}

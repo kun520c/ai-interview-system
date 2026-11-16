@@ -3,6 +3,11 @@ spring:
     url: ${TEST_DB_URL:jdbc:mysql://localhost:3306/ai_interview_test?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
     username: ${TEST_DB_USERNAME:${DB_USERNAME}}
     password: ${TEST_DB_PASSWORD:${DB_PASSWORD}}
+    # Many cached test contexts share one MySQL instance; retain no idle connections.
+    # Four connections still permit the two-worker races plus their observer/transaction.
+    hikari:
+      maximum-pool-size: 4
+      minimum-idle: 0
 
 jwt:
   secret: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
@@ -26,3 +31,7 @@ milvus:
 
 deepseek:
   enabled: false
+
+report:
+  async:
+    enabled: false

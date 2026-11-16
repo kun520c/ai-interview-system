@@ -18,6 +18,31 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EnvironmentIsolationInitializerTest {
 
+    @Test
+    void ordinaryTestsAndEvaluationCannotEnableReportMq() {
+        for (String profile : new String[]{"test", "test-real", "evaluation"}) {
+            var environment = target(profile);
+            override(environment, Map.of("report.async.enabled", true));
+            assertThatThrownBy(() -> EnvironmentIsolationInitializer.validate(environment, true))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+    }
+
+    @Test
+    void realMqRequiresOptInAndExactIndependentTargets() {
+        var environment = target("test");
+        environment.setActiveProfiles("test", "report-mq-test");
+        override(environment, Map.of("report.async.enabled", true,
+                "RUN_REAL_REPORT_MQ_TEST", "true", "report.async.nameserver", "127.0.0.1:19876",
+                "report.async.topic", "ai-interview-m1b-report-test",
+                "report.async.consumer-group", "ai-interview-m1b-report-test-consumer"));
+        assertThatCode(() -> EnvironmentIsolationInitializer.validate(environment, true)).doesNotThrowAnyException();
+        override(environment, Map.of("report.async.enabled", true, "RUN_REAL_REPORT_MQ_TEST", "true",
+                "report.async.nameserver", "127.0.0.1:9876"));
+        assertThatThrownBy(() -> EnvironmentIsolationInitializer.validate(environment, true))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"test", "test-real", "evaluation"})
     void acceptsOnlyTheDedicatedTargets(String profile) {

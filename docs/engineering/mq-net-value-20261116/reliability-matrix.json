@@ -1,0 +1,132 @@
+[
+  {
+    "id": "R01",
+    "scenario": "Session + Outbox 同事务受理",
+    "status": "当前候选已有通过；本轮未重跑回滚",
+    "real_components": "真实 MySQL；MQ 替身",
+    "primary_contributor": "MySQL 事务 / 唯一约束",
+    "evidence": "插入失败时两者回滚；9项唤醒组含4项真实MySQL",
+    "limit": "不保证DB与Broker原子提交",
+    "source": "backups/MQ_CANDIDATE_20261115_soe3tev4/wakeup-targeted-junit.log"
+  },
+  {
+    "id": "R02",
+    "scenario": "Report + Weakness + READY + SUCCEEDED 同事务",
+    "status": "当前候选已有通过；本轮正常提交30次",
+    "real_components": "真实 MySQL；本轮真实MQ+模型桩",
+    "primary_contributor": "MySQL 事务 / Java 校验",
+    "evidence": "历史194项MySQL定向及1项最终READY失败回滚；本轮B30份一致",
+    "limit": "本轮未注入最终SQL失败",
+    "source": "backups/GIT_CLOSEOUT_VERIFICATION_u0a30otz/verification-summary.json"
+  },
+  {
+    "id": "R03",
+    "scenario": "6次并发申请只受理一次",
+    "status": "当前候选已有通过；本轮未重测竞争",
+    "real_components": "真实 HTTP/MySQL/MQ；模型桩",
+    "primary_contributor": "Session 行锁 / CAS / 唯一约束",
+    "evidence": "6个POST→1 Task/1 Report/1 Weakness/1模型调用",
+    "limit": "不是6个独立模型业务",
+    "source": "backups/MQ_CANDIDATE_20261115_soe3tev4/results.json"
+  },
+  {
+    "id": "R04",
+    "scenario": "重复消息及迟到 markSent",
+    "status": "当前候选已有通过；本轮未重测重复",
+    "real_components": "真实 MySQL/MQ；Mockito生成器",
+    "primary_contributor": "MQ提供重复交付；DB状态/CAS保证幂等",
+    "evidence": "2/0/0/0 指定真实MQ JUnit",
+    "limit": "非真实ACK网络丢包",
+    "source": "backups/MQ_CANDIDATE_20261115_soe3tev4/real-mq-junit.log"
+  },
+  {
+    "id": "R05",
+    "scenario": "CAS/executionVersion 拒绝旧执行者",
+    "status": "历史真实MySQL通过；本轮未重跑交错",
+    "real_components": "真实 MySQL；模型暂停/期限注入",
+    "primary_contributor": "数据库版本围栏 / Java状态机",
+    "evidence": "旧成功/旧失败×新先/新后四种交错",
+    "limit": "不是自然600秒等待或真实模型超时",
+    "source": "docs/engineering/2026-11-15-M1C-FAILURE-INJECTION.md"
+  },
+  {
+    "id": "R06",
+    "scenario": "Broker 停止后持久受理与恢复",
+    "status": "当前候选已有通过；本轮未故障注入",
+    "real_components": "真实 Broker/MySQL；网络模型桩",
+    "primary_contributor": "Outbox保留任务/补发；Broker恢复传递",
+    "evidence": "QUEUED/PENDING→READY；重启命令至观察4.377s，n=1",
+    "limit": "非RTO/SLA；Broker永久损坏未测",
+    "source": "backups/MQ_CANDIDATE_20261115_soe3tev4/results.json"
+  },
+  {
+    "id": "R07",
+    "scenario": "应用提交后未发即退出，重启补发",
+    "status": "历史构建通过；当前未重测kill",
+    "real_components": "真实 MySQL/MQ/进程退出；模型桩",
+    "primary_contributor": "MySQL持久任务 / 定时扫描",
+    "evidence": "历史M1-C场景1恢复，模型桩1次",
+    "limit": "当前新增唤醒；不能改称当前kill通过",
+    "source": "docs/engineering/m1c-20261114/faults-after-cache-fix.jsonl"
+  },
+  {
+    "id": "R08",
+    "scenario": "SEND_OK 后未记账即退出",
+    "status": "历史构建通过；当前未重测kill",
+    "real_components": "真实 MySQL/MQ/进程退出；模型桩",
+    "primary_contributor": "MQ保留已收消息；租约补发与CAS",
+    "evidence": "重发后仅1 Report、1次弱项累计",
+    "limit": "业务幂等主要属于数据库",
+    "source": "docs/engineering/m1c-20261114/faults-after-cache-fix.jsonl"
+  },
+  {
+    "id": "R09",
+    "scenario": "消费者最终事务后 ACK 前退出",
+    "status": "历史构建通过；当前未重测kill",
+    "real_components": "真实 MySQL/MQ/进程退出；模型桩",
+    "primary_contributor": "MQ重投 + 数据库终态幂等",
+    "evidence": "重投后新增模型调用0",
+    "limit": "两消费组竞争≠同组重平衡",
+    "source": "docs/engineering/m1c-20261114/faults-after-cache-fix.jsonl"
+  },
+  {
+    "id": "R10",
+    "scenario": "模型返回后、最终提交前崩溃",
+    "status": "历史构建验证限制；当前仍保留契约",
+    "real_components": "真实进程退出/DB/MQ；模型桩",
+    "primary_contributor": "执行期限 / fencing / 用户显式重试",
+    "evidence": "旧任务FAILED，新显式申请READY；再次模型调用1次",
+    "limit": "不能自动保证READY；真实DeepSeek后kill未测",
+    "source": "docs/engineering/m1c-20261114/faults-after-cache-fix.jsonl"
+  },
+  {
+    "id": "R11",
+    "scenario": "DB不可读 / ACK不确定",
+    "status": "仅Mock异常契约；真实提交未知未验证",
+    "real_components": "Mock故障；历史真实Broker重试/DLQ",
+    "primary_contributor": "异常传播RETRY；不能据Mock证明真实DB恢复",
+    "evidence": "历史DLQ 2/0/0/0，DB异常为Mock",
+    "limit": "MySQL真停机/JDBC commit unknown未测",
+    "source": "docs/engineering/2026-11-14-M1B-ROCKETMQ-ASYNC-REPORT-VERIFICATION.md"
+  },
+  {
+    "id": "R12",
+    "scenario": "当前候选本机真实业务及空载MQ重启",
+    "status": "当前候选已有通过；本轮核对原始证据",
+    "real_components": "真实 MySQL/Milvus/Embedding/DeepSeek/MQ/Chrome",
+    "primary_contributor": "完整集成 + 已保存状态/偏移",
+    "evidence": "5MAIN直FINAL；1报告READY；重启前后offset1/1",
+    "limit": "未自然追问、弱项新增为0、空载停复不是在途恢复",
+    "source": "backups/DEMO_ENV_20261115_9lpoxk7u/acceptance-summary.json"
+  },
+  {
+    "id": "R13",
+    "scenario": "多实例/长积压/永久磁盘故障/监控恢复",
+    "status": "尚未验证",
+    "real_components": "无对应实测",
+    "primary_contributor": "MQ潜在独立分发能力；需部署与运维保障",
+    "evidence": "当前单Broker单队列；不提供HA证据",
+    "limit": "不能声称生产高可用或线性扩展",
+    "source": "docs/engineering/HANDOFF_TO_CHATGPT_PHASE2.md"
+  }
+]

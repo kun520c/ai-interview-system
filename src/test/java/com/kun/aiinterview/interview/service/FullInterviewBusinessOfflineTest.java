@@ -104,6 +104,9 @@ class FullInterviewBusinessOfflineTest {
     @MockitoBean InterviewReportGenerator reportGenerator;
     @MockitoBean MilvusClientV2 milvus;
     @MockitoBean MilvusCollectionInitializer initializer;
+    @MockitoBean com.kun.aiinterview.interview.report.async.ReportAsyncProperties reportAsync;
+    @Autowired com.kun.aiinterview.interview.report.async.ReportMessageConsumer reportConsumer;
+    @Autowired com.kun.aiinterview.interview.mapper.InterviewReportTaskMapper reportTasks;
     private static final String LOG_SENTINEL = "B4B_TEST_SENSITIVE_BODY_20261112";
     private static final String EMBEDDING_LOG_SENTINEL = "B5_P2B_SENSITIVE_RESPONSE_SENTINEL";
     private static final String MALICIOUS_RESPONSE = LOG_SENTINEL
@@ -113,6 +116,10 @@ class FullInterviewBusinessOfflineTest {
     private final AtomicInteger providerCalls = new AtomicInteger();
 
     @BeforeEach void prepare() throws Exception {
+        when(reportAsync.isEnabled()).thenReturn(true);
+        when(reportAsync.isAccepting()).thenReturn(true);
+        when(reportAsync.getQueueDeadlineSeconds()).thenReturn(600);
+        when(reportAsync.getExecutionDeadlineSeconds()).thenReturn(600);
         String vectorId = createDatabaseFixtures();
         clearInvocations(milvus,initializer);
         providerCalls.set(0);
@@ -268,7 +275,10 @@ class FullInterviewBusinessOfflineTest {
         }
 
         assertThat(request("GET","/api/interviews/current",null,200).isNull()).isTrue();
-        var report=request("POST","/api/interviews/"+sessionId+"/report",null,200);
+        var accepted=request("POST","/api/interviews/"+sessionId+"/report",null,200);
+        assertThat(accepted.path("reportStatus").asText()).isEqualTo("GENERATING");
+        consumeReport(sessionId);
+        var report=request("GET","/api/interviews/"+sessionId+"/report",null,200);
         assertThat(report.path("overallScore").decimalValue()).isEqualByComparingTo("80.00");
         assertThat(request("GET","/api/interviews/"+sessionId+"/report",null,200)).isEqualTo(report);
         assertThat(request("POST","/api/interviews/"+sessionId+"/report",null,200)).isEqualTo(report);
@@ -521,10 +531,14 @@ class FullInterviewBusinessOfflineTest {
         }
         var calls = new AtomicInteger();
         useHttpReport(fault, calls);
-        var failure = withSafeProviderLog(() -> mvc.perform(post("/api/interviews/" + sessionId + "/report")
-                        .header("Authorization", "Bearer " + token))
-                .andExpect(status().isBadGateway()).andExpect(jsonPath("$.code").value(502))
-                .andExpect(jsonPath("$.message").value("外部服务暂时不可用")).andReturn(), "InterviewReportService");
+        assertThat(request("POST", "/api/interviews/" + sessionId + "/report", null, 200)
+                .path("reportStatus").asText()).isEqualTo("GENERATING");
+        var failure = withSafeReportLog(() -> {
+            consumeReport(sessionId);
+            return mvc.perform(get("/api/interviews/" + sessionId + "/report")
+                    .header("Authorization", "Bearer " + token)).andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.reportStatus").value("FAILED")).andReturn();
+        });
         assertThat(failure.getResponse().getContentAsString()).doesNotContain(LOG_SENTINEL, "PRIVATE_MODEL_OUTPUT", "private-model-id", token);
         assertThat(calls.get()).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT report_status FROM interview_session WHERE id=?", String.class, sessionId)).isEqualTo("FAILED");
@@ -532,7 +546,9 @@ class FullInterviewBusinessOfflineTest {
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM interview_report WHERE session_id=?", Integer.class, sessionId)).isZero();
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM user_weakness WHERE user_id=?", Integer.class, userId)).isZero();
         useHttpReport("valid-report", calls);
-        var ready = request("POST", "/api/interviews/" + sessionId + "/report", null, 200);
+        request("POST", "/api/interviews/" + sessionId + "/report", null, 200);
+        consumeReport(sessionId);
+        var ready = request("GET", "/api/interviews/" + sessionId + "/report", null, 200);
         assertThat(request("POST", "/api/interviews/" + sessionId + "/report", null, 200)).isEqualTo(ready);
         assertThat(calls.get()).isEqualTo(2);
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM interview_report WHERE session_id=?", Integer.class, sessionId)).isEqualTo(1);
@@ -574,6 +590,32 @@ class FullInterviewBusinessOfflineTest {
         assertThat(jdbc.queryForList("SELECT * FROM rag_hit_log WHERE answer_id=?", answerId)).isEqualTo(hitsBefore);
         assertThat(jdbc.queryForList("SELECT * FROM interview_question WHERE session_id=? ORDER BY id", sessionId)).isEqualTo(questionsBefore);
         verifyNoInteractions(judge, embedding, vectors, reportGenerator);
+    }
+
+    private void consumeReport(long sessionId) {
+        var tasks = reportTasks.listActiveBySessionId(sessionId);
+        assertThat(tasks).hasSize(1);
+        reportConsumer.onMessage(com.kun.aiinterview.interview.report.async.ReportOutboxDispatcher.message(tasks.getFirst()));
+    }
+
+    private <T> T withSafeReportLog(Callable<T> request) throws Exception {
+        Logger logger = (Logger) LoggerFactory.getLogger("com.kun.aiinterview");
+        var appender = new ListAppender<ILoggingEvent>();
+        appender.setContext(logger.getLoggerContext());
+        appender.start();
+        logger.addAppender(appender);
+        try {
+            T result = request.call();
+            assertThat(appender.list).anySatisfy(event ->
+                    assertThat(event.getFormattedMessage()).contains("REPORT_TASK_FAILED"));
+            for (var event : appender.list) {
+                assertThat(event.getThrowableProxy()).isNull();
+                assertThat(event.getFormattedMessage()).doesNotContain(LOG_SENTINEL, EMBEDDING_LOG_SENTINEL,
+                        "PRIVATE_MODEL_OUTPUT", "PRIVATE_CANDIDATE_INPUT", "private-model-id", "offline-test-key",
+                        "Authorization:", "Bearer ", token, "FORGED_LOG_RECORD", "\r", "\u001b", "\u0000");
+            }
+            return result;
+        } finally { logger.detachAppender(appender); appender.stop(); }
     }
 
     private <T> T withSafeProviderLog(Callable<T> request, String serviceClass) throws Exception {

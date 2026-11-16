@@ -60,3 +60,23 @@ deepseek:
   max-tokens: ${DEEPSEEK_MAX_TOKENS:4096}
   connect-timeout: ${DEEPSEEK_CONNECT_TIMEOUT:3s}
   read-timeout: ${DEEPSEEK_READ_TIMEOUT:60s}
+
+# Migration and cutover require explicit per-target approval. No synchronous fallback.
+report:
+  async:
+    enabled: ${REPORT_ASYNC_ENABLED:false}
+    accepting: ${REPORT_ASYNC_ACCEPTING:true}
+    wakeup-enabled: ${REPORT_ASYNC_WAKEUP_ENABLED:true}
+    nameserver: ${REPORT_MQ_NAMESERVER:127.0.0.1:19876}
+    topic: ${REPORT_MQ_TOPIC:ai-interview-report}
+    consumer-group: ${REPORT_MQ_CONSUMER_GROUP:ai-interview-report-consumer}
+    scan-batch-size: 16
+    scan-interval-ms: ${REPORT_ASYNC_SCAN_INTERVAL_MS:500}
+    send-timeout-ms: 5000
+    dispatch-lease-seconds: 30
+    max-send-attempts: 20
+    queue-deadline-seconds: 600
+    execution-deadline-seconds: 600
+    consumer-threads: ${REPORT_ASYNC_CONSUMER_THREADS:4}
+    max-reconsume-times: 5
+    consumer-timeout-minutes: 12

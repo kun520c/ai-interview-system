@@ -87,9 +87,9 @@ flowchart TB
 
 **4. 外部模型失败后的恢复**
 
-- 使用 `EVALUATING` / `GENERATING` / `PROCESSING` 超时状态回收、幂等重放和持久化结果复用处理失败；**超时接管由后续请求触发，并非后台定时任务**。
+- 评价和知识处理使用状态检查、幂等重放与任务身份隔离处理失败；报告使用持久任务、定时扫描和执行版本隔离。
 - 评分、反馈、追问建议和报告统一使用 DeepSeek；单次调用不做应用层 HTTP 自动重试，也没有跨模型 fallback。
-- FAILED 后由同一请求显式重试；stale 状态由后续请求竞争接管。重试/接管可能再次调用模型，不承诺外部调用恰好执行一次；旧 attempt/version 不能提交到新任务。
+- 报告执行超时后可能需要显式重新生成；重试可能再次调用模型，不承诺外部调用恰好执行一次。旧 attempt/version 不能提交到新任务。
 
 [更完整的实现说明与接口清单](docs/PROJECT_TECHNICAL_DETAILS_20261015.md) · [后端源码学习手册](docs/study/AI模拟面试系统-后端源码与面试学习手册.md)
 
@@ -105,11 +105,11 @@ flowchart TB
 
 J1 升级无需数据库迁移；旧 Jev 评价与 raw_result 保持原样。请按[运行指南](docs/GETTING_STARTED.md#j1-升级移除旧模型配置)移除旧环境 selector 和密钥配置。
 
-Spring AI **仅用于 Embedding 适配**，向量存储由原生 Milvus SDK 封装实现。本项目不是微服务架构，也未接入消息队列或 Redis 缓存。
+Spring AI **仅用于 Embedding 适配**，向量存储由原生 Milvus SDK 封装实现。报告异步路径使用 RocketMQ 和 MySQL 任务表，默认关闭；关闭时不会回退到同步生成。启用前需要单独核验目标库迁移、Broker 和历史任务，详见[运行指南](docs/GETTING_STARTED.md)。本项目不是微服务架构，也未接入 Redis 缓存。
 
 ## 本地运行
 
-环境：**JDK 21、MySQL 8、Node.js（满足当前前端依赖的版本要求）**。完整 AI 流程还需 Milvus、Embedding API 与 DeepSeek API 凭据。
+环境：**JDK 21、MySQL 8、Node.js（满足当前前端依赖的版本要求）**。完整 AI 流程还需 Milvus、Embedding API 与 DeepSeek API 凭据；异步生成报告还需经核验的 RocketMQ 和任务表。
 
 ```powershell
 git clone https://github.com/kun520c/ai-interview-system.git

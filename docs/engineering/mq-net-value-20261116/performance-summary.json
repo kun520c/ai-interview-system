@@ -1,0 +1,554 @@
+[
+  {
+    "group": "A",
+    "concurrency": 1,
+    "measurements": 8,
+    "success": 8,
+    "failed": 0,
+    "warmup": 2,
+    "closed_loop_reports_per_second": 0.9678838689795414,
+    "db_reports_per_second": 0.9682942242717456,
+    "model_peak": 1,
+    "metrics_ms": {
+      "http_post_ms": {
+        "n": 8,
+        "mean": 1033.07831275,
+        "median": 1031.8281670000001,
+        "min": 1026.410459,
+        "max": 1043.037417
+      },
+      "server_request_to_db_ready_ms": {
+        "n": 8,
+        "mean": 1029.4667605,
+        "median": 1028.6755835,
+        "min": 1024.070875,
+        "max": 1036.903625
+      },
+      "client_ready_ms": {
+        "n": 8,
+        "mean": 1033.08364075,
+        "median": 1031.8319375,
+        "min": 1026.412959,
+        "max": 1043.0405
+      },
+      "model_permit_wait_ms": {
+        "n": 8,
+        "mean": 0.268765625,
+        "median": 0.30266649999999995,
+        "min": 0.1445,
+        "max": 0.357875
+      },
+      "model_service_ms": {
+        "n": 8,
+        "mean": 1001.923739625,
+        "median": 1001.8885,
+        "min": 1000.138625,
+        "max": 1004.11425
+      },
+      "model_http_ms": {
+        "n": 8,
+        "mean": 1005.34829675,
+        "median": 1005.539771,
+        "min": 1003.80325,
+        "max": 1007.396916
+      },
+      "accepted_to_dispatch_ms": null,
+      "accepted_to_db_ready_ms": null
+    },
+    "get_requests": 0,
+    "resource_sample_n": 33,
+    "threads": {
+      "n": 33,
+      "mean": 33.39393939393939,
+      "median": 33,
+      "min": 33,
+      "max": 34
+    },
+    "heap_mib": {
+      "n": 33,
+      "mean": 53.79877032655658,
+      "median": 54.40483093261719,
+      "min": 49.40483093261719,
+      "max": 57.40483093261719
+    },
+    "rss_mib_short_samples": {
+      "n": 4,
+      "mean": 301.08203125,
+      "median": 301.25,
+      "min": 299.859375,
+      "max": 301.96875
+    },
+    "db_connection_peak_observed": 10,
+    "db_waiting_peak_observed": 0,
+    "sql_calls": 112,
+    "scan_sql_calls": 0,
+    "scan_sql_per_s": 0.0,
+    "scan_executor_ms_total": 0.0
+  },
+  {
+    "group": "B",
+    "concurrency": 1,
+    "measurements": 8,
+    "success": 8,
+    "failed": 0,
+    "warmup": 2,
+    "closed_loop_reports_per_second": 0.9486965931623464,
+    "db_reports_per_second": 0.9500456543192248,
+    "model_peak": 1,
+    "metrics_ms": {
+      "http_post_ms": {
+        "n": 8,
+        "mean": 11.236505375,
+        "median": 10.8147085,
+        "min": 9.876208,
+        "max": 15.184208
+      },
+      "server_request_to_db_ready_ms": {
+        "n": 8,
+        "mean": 1044.8952502500001,
+        "median": 1045.2122709999999,
+        "min": 1038.631667,
+        "max": 1051.7015
+      },
+      "client_ready_ms": {
+        "n": 8,
+        "mean": 1054.01320325,
+        "median": 1053.4828125,
+        "min": 1048.886542,
+        "max": 1062.858583
+      },
+      "model_permit_wait_ms": {
+        "n": 8,
+        "mean": 0.46019775,
+        "median": 0.171104,
+        "min": 0.0825,
+        "max": 2.410708
+      },
+      "model_service_ms": {
+        "n": 8,
+        "mean": 1002.9159324999999,
+        "median": 1003.5603329999999,
+        "min": 1000.080167,
+        "max": 1004.742709
+      },
+      "model_http_ms": {
+        "n": 8,
+        "mean": 1006.089020625,
+        "median": 1006.542229,
+        "min": 1002.613166,
+        "max": 1009.73525
+      },
+      "accepted_to_dispatch_ms": {
+        "n": 8,
+        "mean": 0.7191093749999999,
+        "median": 0.679583,
+        "min": 0.6275,
+        "max": 0.978333
+      },
+      "accepted_to_db_ready_ms": {
+        "n": 8,
+        "mean": 1035.686708625,
+        "median": 1036.108438,
+        "min": 1029.741875,
+        "max": 1040.188666
+      }
+    },
+    "get_requests": 40,
+    "resource_sample_n": 33,
+    "threads": {
+      "n": 33,
+      "mean": 85.75757575757575,
+      "median": 86,
+      "min": 83,
+      "max": 87
+    },
+    "heap_mib": {
+      "n": 33,
+      "mean": 64.26025275028113,
+      "median": 54.997337341308594,
+      "min": 40.997337341308594,
+      "max": 103.95686340332031
+    },
+    "rss_mib_short_samples": {
+      "n": 3,
+      "mean": 362.3385416666667,
+      "median": 362.703125,
+      "min": 359.109375,
+      "max": 365.203125
+    },
+    "db_connection_peak_observed": 10,
+    "db_waiting_peak_observed": 0,
+    "sql_calls": 469,
+    "scan_sql_calls": 80,
+    "scan_sql_per_s": 9.500456543192248,
+    "scan_executor_ms_total": 72.229876
+  },
+  {
+    "group": "A",
+    "concurrency": 4,
+    "measurements": 8,
+    "success": 8,
+    "failed": 0,
+    "warmup": 2,
+    "closed_loop_reports_per_second": 3.8444239311643322,
+    "db_reports_per_second": 3.851504367130773,
+    "model_peak": 4,
+    "metrics_ms": {
+      "http_post_ms": {
+        "n": 8,
+        "mean": 1040.0775835,
+        "median": 1040.1426455,
+        "min": 1036.894625,
+        "max": 1042.854584
+      },
+      "server_request_to_db_ready_ms": {
+        "n": 8,
+        "mean": 1036.469599,
+        "median": 1036.1568754999998,
+        "min": 1034.170209,
+        "max": 1038.645083
+      },
+      "client_ready_ms": {
+        "n": 8,
+        "mean": 1040.07913525,
+        "median": 1040.144562,
+        "min": 1036.896208,
+        "max": 1042.85575
+      },
+      "model_permit_wait_ms": {
+        "n": 8,
+        "mean": 0.24536475,
+        "median": 0.2171255,
+        "min": 0.025709,
+        "max": 0.492459
+      },
+      "model_service_ms": {
+        "n": 8,
+        "mean": 1002.079067625,
+        "median": 1000.8815414999999,
+        "min": 1000.134375,
+        "max": 1004.849083
+      },
+      "model_http_ms": {
+        "n": 8,
+        "mean": 1005.797276125,
+        "median": 1004.528771,
+        "min": 1003.36225,
+        "max": 1009.28875
+      },
+      "accepted_to_dispatch_ms": null,
+      "accepted_to_db_ready_ms": null
+    },
+    "get_requests": 0,
+    "resource_sample_n": 8,
+    "threads": {
+      "n": 8,
+      "mean": 36,
+      "median": 36.0,
+      "min": 36,
+      "max": 36
+    },
+    "heap_mib": {
+      "n": 8,
+      "mean": 55.95552062988281,
+      "median": 55.95552062988281,
+      "min": 53.95552062988281,
+      "max": 57.95552062988281
+    },
+    "rss_mib_short_samples": {
+      "n": 1,
+      "mean": 302.390625,
+      "median": 302.390625,
+      "min": 302.390625,
+      "max": 302.390625
+    },
+    "db_connection_peak_observed": 10,
+    "db_waiting_peak_observed": 0,
+    "sql_calls": 112,
+    "scan_sql_calls": 0,
+    "scan_sql_per_s": 0.0,
+    "scan_executor_ms_total": 0.0
+  },
+  {
+    "group": "B",
+    "concurrency": 4,
+    "measurements": 8,
+    "success": 8,
+    "failed": 0,
+    "warmup": 2,
+    "closed_loop_reports_per_second": 2.889388345428109,
+    "db_reports_per_second": 3.11728699784951,
+    "model_peak": 4,
+    "metrics_ms": {
+      "http_post_ms": {
+        "n": 8,
+        "mean": 17.9754685,
+        "median": 18.1128955,
+        "min": 15.525875,
+        "max": 20.170208
+      },
+      "server_request_to_db_ready_ms": {
+        "n": 8,
+        "mean": 1138.109567875,
+        "median": 1074.9711255,
+        "min": 1060.779584,
+        "max": 1338.589625
+      },
+      "client_ready_ms": {
+        "n": 8,
+        "mean": 1328.89477075,
+        "median": 1276.9305625,
+        "min": 1259.460875,
+        "max": 1501.945291
+      },
+      "model_permit_wait_ms": {
+        "n": 8,
+        "mean": 0.231646,
+        "median": 0.2432085,
+        "min": 0.0975,
+        "max": 0.334792
+      },
+      "model_service_ms": {
+        "n": 8,
+        "mean": 1001.380166375,
+        "median": 1000.850458,
+        "min": 1000.0475,
+        "max": 1003.440416
+      },
+      "model_http_ms": {
+        "n": 8,
+        "mean": 1004.42851575,
+        "median": 1003.8598125000001,
+        "min": 1002.839625,
+        "max": 1006.194917
+      },
+      "accepted_to_dispatch_ms": {
+        "n": 8,
+        "mean": 74.305010625,
+        "median": 8.1772085,
+        "min": 0.950708,
+        "max": 285.326417
+      },
+      "accepted_to_db_ready_ms": {
+        "n": 8,
+        "mean": 1122.76021375,
+        "median": 1060.6069794999999,
+        "min": 1045.556083,
+        "max": 1322.66825
+      }
+    },
+    "get_requests": 50,
+    "resource_sample_n": 10,
+    "threads": {
+      "n": 10,
+      "mean": 90.3,
+      "median": 90.5,
+      "min": 88,
+      "max": 91
+    },
+    "heap_mib": {
+      "n": 10,
+      "mean": 63.50503845214844,
+      "median": 58.01594543457031,
+      "min": 42.51594543457031,
+      "max": 105.96141052246094
+    },
+    "rss_mib_short_samples": {
+      "n": 1,
+      "mean": 361.15625,
+      "median": 361.15625,
+      "min": 361.15625,
+      "max": 361.15625
+    },
+    "db_connection_peak_observed": 10,
+    "db_waiting_peak_observed": 0,
+    "sql_calls": 432,
+    "scan_sql_calls": 26,
+    "scan_sql_per_s": 10.131182743010909,
+    "scan_executor_ms_total": 26.951539
+  },
+  {
+    "group": "A",
+    "concurrency": 8,
+    "measurements": 8,
+    "success": 8,
+    "failed": 0,
+    "warmup": 2,
+    "closed_loop_reports_per_second": 3.8997973872454326,
+    "db_reports_per_second": 3.9080787327755346,
+    "model_peak": 4,
+    "metrics_ms": {
+      "http_post_ms": {
+        "n": 8,
+        "mean": 1544.146281125,
+        "median": 1544.565479,
+        "min": 1037.187042,
+        "max": 2050.482541
+      },
+      "server_request_to_db_ready_ms": {
+        "n": 8,
+        "mean": 1540.7805256249999,
+        "median": 1540.7726659999998,
+        "min": 1034.944208,
+        "max": 2047.0345
+      },
+      "client_ready_ms": {
+        "n": 8,
+        "mean": 1544.14827075,
+        "median": 1544.567208,
+        "min": 1037.188083,
+        "max": 2050.48425
+      },
+      "model_permit_wait_ms": {
+        "n": 8,
+        "mean": 501.21183824999997,
+        "median": 499.936958,
+        "min": 0.040416,
+        "max": 1004.356083
+      },
+      "model_service_ms": {
+        "n": 8,
+        "mean": 1002.6549897499999,
+        "median": 1002.8411045,
+        "min": 1000.12425,
+        "max": 1005.341834
+      },
+      "model_http_ms": {
+        "n": 8,
+        "mean": 1507.489265375,
+        "median": 1507.5818955,
+        "min": 1004.585625,
+        "max": 2009.057875
+      },
+      "accepted_to_dispatch_ms": null,
+      "accepted_to_db_ready_ms": null
+    },
+    "get_requests": 0,
+    "resource_sample_n": 8,
+    "threads": {
+      "n": 8,
+      "mean": 37,
+      "median": 37.0,
+      "min": 37,
+      "max": 37
+    },
+    "heap_mib": {
+      "n": 8,
+      "mean": 57.04594421386719,
+      "median": 57.04594421386719,
+      "min": 56.04594421386719,
+      "max": 58.04594421386719
+    },
+    "rss_mib_short_samples": {
+      "n": 1,
+      "mean": 302.296875,
+      "median": 302.296875,
+      "min": 302.296875,
+      "max": 302.296875
+    },
+    "db_connection_peak_observed": 10,
+    "db_waiting_peak_observed": 0,
+    "sql_calls": 112,
+    "scan_sql_calls": 0,
+    "scan_sql_per_s": 0.0,
+    "scan_executor_ms_total": 0.0
+  },
+  {
+    "group": "B",
+    "concurrency": 8,
+    "measurements": 8,
+    "success": 8,
+    "failed": 0,
+    "warmup": 2,
+    "closed_loop_reports_per_second": 3.7291160759630264,
+    "db_reports_per_second": 3.751758637447516,
+    "model_peak": 4,
+    "metrics_ms": {
+      "http_post_ms": {
+        "n": 8,
+        "mean": 21.725645749999998,
+        "median": 21.505104,
+        "min": 21.217666,
+        "max": 23.726125
+      },
+      "server_request_to_db_ready_ms": {
+        "n": 8,
+        "mean": 1605.930614625,
+        "median": 1612.036042,
+        "min": 1075.712333,
+        "max": 2131.059458
+      },
+      "client_ready_ms": {
+        "n": 8,
+        "mean": 1714.128546875,
+        "median": 1714.9880624999998,
+        "min": 1283.655334,
+        "max": 2143.156125
+      },
+      "model_permit_wait_ms": {
+        "n": 8,
+        "mean": 0.213770875,
+        "median": 0.145021,
+        "min": 0.052208,
+        "max": 0.474
+      },
+      "model_service_ms": {
+        "n": 8,
+        "mean": 1001.339208375,
+        "median": 1000.720146,
+        "min": 1000.172333,
+        "max": 1003.884333
+      },
+      "model_http_ms": {
+        "n": 8,
+        "mean": 1004.470526,
+        "median": 1003.5435415,
+        "min": 1001.751708,
+        "max": 1008.491042
+      },
+      "accepted_to_dispatch_ms": {
+        "n": 8,
+        "mean": 42.63825525,
+        "median": 28.197646,
+        "min": 1.31525,
+        "max": 91.148875
+      },
+      "accepted_to_db_ready_ms": {
+        "n": 8,
+        "mean": 1587.62771375,
+        "median": 1593.7900005000001,
+        "min": 1057.138042,
+        "max": 2112.86575
+      }
+    },
+    "get_requests": 64,
+    "resource_sample_n": 8,
+    "threads": {
+      "n": 8,
+      "mean": 95.5,
+      "median": 95.5,
+      "min": 95,
+      "max": 96
+    },
+    "heap_mib": {
+      "n": 8,
+      "mean": 54.65571594238281,
+      "median": 54.78071594238281,
+      "min": 45.28071594238281,
+      "max": 62.28071594238281
+    },
+    "rss_mib_short_samples": {
+      "n": 1,
+      "mean": 361.375,
+      "median": 361.375,
+      "min": 361.375,
+      "max": 361.375
+    },
+    "db_connection_peak_observed": 10,
+    "db_waiting_peak_observed": 0,
+    "sql_calls": 450,
+    "scan_sql_calls": 22,
+    "scan_sql_per_s": 10.317336252980668,
+    "scan_executor_ms_total": 20.066331
+  }
+]

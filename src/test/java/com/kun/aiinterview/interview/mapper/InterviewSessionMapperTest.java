@@ -546,7 +546,7 @@ class InterviewSessionMapperTest {
     }
 
     @Test
-    void shouldReclaimStaleGeneratingAndRejectFreshGenerating() {
+    void shouldClaimExecutionOnceIndependentOfSessionUpdatedAt() {
         long staleSessionId = insertSession(
                 insertUser(),
                 "MEDIUM",
@@ -574,11 +574,7 @@ class InterviewSessionMapperTest {
 
         assertEquals(
                 1,
-                interviewSessionMapper.reclaimStaleGenerating(
-                        staleSessionId,
-                        cutoff,
-                        4
-                )
+                interviewSessionMapper.claimReportExecution(staleSessionId, 4)
         );
         InterviewSession reclaimed = interviewSessionMapper
                 .getInterviewSessionById(staleSessionId);
@@ -591,22 +587,14 @@ class InterviewSessionMapperTest {
         );
         assertEquals(
                 0,
-                interviewSessionMapper.reclaimStaleGenerating(
-                        staleSessionId,
-                        cutoff,
-                        4
-                )
+                interviewSessionMapper.claimReportExecution(staleSessionId, 4)
         );
         assertEquals(
-                0,
-                interviewSessionMapper.reclaimStaleGenerating(
-                        freshSessionId,
-                        cutoff,
-                        4
-                )
+                1,
+                interviewSessionMapper.claimReportExecution(freshSessionId, 4)
         );
         assertEquals(
-                4,
+                5,
                 interviewSessionMapper.getInterviewSessionById(freshSessionId)
                         .getVersion()
         );

@@ -9,6 +9,7 @@ import com.kun.aiinterview.interview.mapper.InterviewReportMapper;
 import com.kun.aiinterview.interview.mapper.InterviewSessionMapper;
 import com.kun.aiinterview.question.enums.QuestionCategory;
 import com.kun.aiinterview.user.service.UserWeaknessService;
+import com.kun.aiinterview.interview.report.async.ReportExecution;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,8 +35,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class InterviewReportTransactionServiceTest {
 
-    private static final long USER_ID = 101L;
-    private static final long SESSION_ID = 201L;
+    private static final long USER_ID = 1L;
+    private static final long SESSION_ID = 2L;
     private static final int SESSION_VERSION = 4;
 
     @Mock
@@ -48,14 +49,16 @@ class InterviewReportTransactionServiceTest {
     private UserWeaknessService userWeaknessService;
 
     private InterviewReportTransactionService service;
+    private ReportUnitFixture fixture;
 
     @BeforeEach
     void setUp() {
-        service = new InterviewReportTransactionService(
-                interviewReportMapper,
-                interviewSessionMapper,
-                userWeaknessService
-        );
+        fixture = new ReportUnitFixture();
+        interviewReportMapper = fixture.reports;
+        interviewSessionMapper = fixture.sessions;
+        userWeaknessService = fixture.weaknesses;
+        service = fixture.transactions;
+        org.mockito.Mockito.lenient().when(fixture.tasks.finishSuccess(3L, 4)).thenReturn(1);
     }
 
     @Test
@@ -74,11 +77,8 @@ class InterviewReportTransactionServiceTest {
                 report.getOverallScore()
         )).thenReturn(1);
 
-        InterviewReport result = service.completeReportGeneration(
-                report,
-                session,
-                evaluations
-        );
+        service.completeReportGeneration(fixture.execution, report);
+        InterviewReport result = report;
 
         assertThat(result).isSameAs(report);
         assertThat(result.getId()).isEqualTo(301L);
@@ -106,14 +106,10 @@ class InterviewReportTransactionServiceTest {
                 .thenReturn(0);
 
         assertThatThrownBy(
-                () -> service.completeReportGeneration(
-                        report,
-                        session(),
-                        evaluations()
-                )
+                () -> service.completeReportGeneration(fixture.execution, report)
         )
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("InterviewReport写入失败");
+                .hasMessage("report insert affected rows must be 1");
 
         verifyNoInteractions(userWeaknessService);
         verify(interviewSessionMapper, never())
@@ -131,11 +127,7 @@ class InterviewReportTransactionServiceTest {
                 .thenReturn(1);
 
         assertThatThrownBy(
-                () -> service.completeReportGeneration(
-                        report,
-                        session(),
-                        evaluations()
-                )
+                () -> service.completeReportGeneration(fixture.execution, report)
         )
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("InterviewReport主键未回填");
@@ -164,11 +156,7 @@ class InterviewReportTransactionServiceTest {
                 .applySessionEvaluations(USER_ID, evaluations);
 
         assertThatThrownBy(
-                () -> service.completeReportGeneration(
-                        report,
-                        session,
-                        evaluations
-                )
+                () -> service.completeReportGeneration(fixture.execution, report)
         )
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Evaluation缺少category");
@@ -201,14 +189,10 @@ class InterviewReportTransactionServiceTest {
         )).thenReturn(0);
 
         assertThatThrownBy(
-                () -> service.completeReportGeneration(
-                        report,
-                        session(),
-                        evaluations
-                )
+                () -> service.completeReportGeneration(fixture.execution, report)
         )
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Session报告状态更新为READY失败");
+                .hasMessage("session READY affected rows must be 1");
 
         verify(interviewReportMapper).insertReport(report);
         verify(userWeaknessService).applySessionEvaluations(
@@ -228,19 +212,18 @@ class InterviewReportTransactionServiceTest {
         Method method = InterviewReportTransactionService.class
                 .getMethod(
                         "completeReportGeneration",
-                        InterviewReport.class,
-                        InterviewSession.class,
-                        List.class
+                        ReportExecution.class,
+                        InterviewReport.class
                 );
 
-        assertThat(method.getAnnotation(Transactional.class))
+        assertThat(method.getDeclaringClass().getAnnotation(Transactional.class))
                 .isNotNull();
     }
 
     private InterviewReport report() {
         return InterviewReport.builder()
                 .sessionId(SESSION_ID)
-                .overallScore(new BigDecimal("80.33"))
+                .overallScore(new BigDecimal("60.00"))
                 .result("PASS")
                 .summary("总体表现良好")
                 .strengths("[]")
@@ -262,12 +245,6 @@ class InterviewReportTransactionServiceTest {
     }
 
     private List<AnswerEvaluation> evaluations() {
-        return List.of(
-                AnswerEvaluation.builder()
-                        .category(QuestionCategory.JAVA_COLLECTION)
-                        .knowledgePoint("HashMap")
-                        .totalScore(60)
-                        .build()
-        );
+        return List.of(fixture.evaluation);
     }
 }

@@ -14,16 +14,18 @@ export const REPORT_COPY = {
   generatingTitle: '报告正在生成',
   generatingHint: '可能需要一些时间，可以留在页面等待。',
   generatingBusy: '正在生成报告',
-  recoverGenerating: '检查并尝试恢复报告',
+  recoverGenerating: '检查报告状态',
   recoveryHint:
-    '如果等待较久，可以请服务器检查并尝试恢复。正常生成中的任务会拒绝重复执行；只有服务器判定任务已过期时才可能允许恢复。页面等待时长不能判断是否过期，点击也不保证重新生成或立即完成。',
-  stillGenerating: '服务器确认报告仍在生成，本次未重复执行。请继续等待，页面会自动查询最新状态。',
+    '当前记录为生成中，可离开页面后再回来查看。检查状态不会重复生成；若长时间没有变化，请联系管理员核对。失败后可点击重新生成。',
+  stillGenerating: '当前记录仍为生成中，本次未重复执行。页面会查询最新状态；若长时间没有变化，请联系管理员核对。',
   outcome: '结果',
   meaning: '本场说明',
   strength: '优势',
   gap: '薄弱点',
   action: '建议',
   evidence: '过程证据',
+  savedEvidence: '逐题结果已就绪',
+  savedEvidenceHint: '以下内容来自本场已保存的逐题评价，综合报告尚未完成。',
   overallScore: '总分',
   abnormalTitle: '报告数据暂时异常',
   abnormalHint: '服务端标记报告已生成，但内容不完整。不会用零分或空卡片代替。',
@@ -40,3 +42,5 @@ export const REPORT_CONFLICT_GENERATING = '报告正在生成中，请稍后重�
 export const REPORT_CONFLICT_STATE_CHANGED = '报告生成状态已发生变化，请重试'
 export const REPORT_CONFLICT_NOT_COMPLETED = '面试尚未完成，无法生成报告'
 export const REPORT_SERVICE_UNAVAILABLE = '报告生成服务当前不可用'
+export const REPORT_SERVICE_DISABLED = '报告生成服务未启用，请联系管理员'
+export const REPORT_SERVICE_NOT_ACCEPTING = '报告生成服务暂不受理新请求，请稍后重试'

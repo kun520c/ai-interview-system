@@ -33,6 +33,7 @@ public class EnvironmentIsolationInitializer
         if (testRuntime && !evaluation && !test) {
             throw new IllegalStateException("Tests must explicitly use test or test-real profile");
         }
+        validateReportMq(environment, profiles, testRuntime, evaluation);
         if (!evaluation && !test) {
             return;
         }
@@ -56,6 +57,26 @@ public class EnvironmentIsolationInitializer
                 });
         requireValue(binder.bind("milvus.collection-name", String.class).orElse(""),
                 collection, "Milvus collection");
+    }
+
+    private static void validateReportMq(ConfigurableEnvironment environment, Set<String> profiles,
+                                         boolean testRuntime, boolean evaluation) {
+        Binder binder = Binder.get(environment);
+        boolean enabled = binder.bind("report.async.enabled", Boolean.class).orElse(false);
+        if (!enabled) return;
+        if (evaluation) throw new IllegalStateException("evaluation rejects report MQ");
+        if (testRuntime || profiles.contains("test") || profiles.contains("test-real")) {
+            if (!profiles.contains("report-mq-test")
+                    || !"true".equals(environment.getProperty("RUN_REAL_REPORT_MQ_TEST"))) {
+                throw new IllegalStateException("Test MQ requires report-mq-test and explicit RUN_REAL_REPORT_MQ_TEST");
+            }
+            requireValue(binder.bind("report.async.nameserver", String.class).orElse(""),
+                    "127.0.0.1:19876", "report NameServer");
+            requireValue(binder.bind("report.async.topic", String.class).orElse(""),
+                    "ai-interview-m1b-report-test", "report Topic");
+            requireValue(binder.bind("report.async.consumer-group", String.class).orElse(""),
+                    "ai-interview-m1b-report-test-consumer", "report consumer group");
+        }
     }
 
     private static void requireDatabase(String jdbcUrl, String expected) {

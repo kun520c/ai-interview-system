@@ -1,0 +1,41 @@
+# Reference for the existing local-demo containers and their external volumes.
+# Do not run `compose up`: changing the bind source can recreate a live container.
+# The runbook starts the existing containers by their exact names instead.
+name: ai-interview-local-demo-9lpoxk7u
+services:
+  namesrv:
+    container_name: ai-interview-local-demo-namesrv
+    image: apache/rocketmq:5.3.2
+    platform: linux/arm64
+    command: sh mqnamesrv
+    environment:
+      JAVA_OPT_EXT: -Xms128m -Xmx256m -Xmn64m
+    ports:
+      - "127.0.0.1:19877:9876"
+    mem_limit: 512m
+    cpus: 0.5
+    restart: unless-stopped
+  broker:
+    container_name: ai-interview-local-demo-broker
+    image: apache/rocketmq:5.3.2
+    platform: linux/arm64
+    command: sh mqbroker -n namesrv:9876 -c /home/rocketmq/broker.conf
+    environment:
+      JAVA_OPT_EXT: -Xms256m -Xmx512m -Xmn128m
+    ports:
+      - "127.0.0.1:20912:20912"
+    volumes:
+      # This remains the existing bind source, not a replacement or migration.
+      - ../../backups/DEMO_ENV_20261115_9lpoxk7u/broker.demo.conf:/home/rocketmq/broker.conf:ro
+      - demo-store:/home/rocketmq/store
+      - demo-logs:/home/rocketmq/logs
+    mem_limit: 1g
+    cpus: 1
+    restart: unless-stopped
+volumes:
+  demo-store:
+    external: true
+    name: ai-interview-local-demo-mq-store-9lpoxk7u
+  demo-logs:
+    external: true
+    name: ai-interview-local-demo-mq-logs-9lpoxk7u

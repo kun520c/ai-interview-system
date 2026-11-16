@@ -1,0 +1,294 @@
+{
+  "generatedAtUtc": "2026-11-15T18:12:36.107442+00:00",
+  "scope": "Five historical diagnostic inputs; no holdout calls and no production database writes.",
+  "attempts": 12,
+  "http200": 12,
+  "httpStatusesRecorded": 12,
+  "contentJsonObjectSyntax": 12,
+  "javaClientParsed": 12,
+  "javaValidatorPassed": 12,
+  "missingUsageRecords": 0,
+  "usage": {
+    "prompt_tokens": 49513,
+    "completion_tokens": 6898,
+    "total_tokens": 56411,
+    "prompt_cache_hit_tokens": 47360,
+    "prompt_cache_miss_tokens": 2153
+  },
+  "latencyMs": {
+    "min": 2356,
+    "median": 3259.0,
+    "mean": 3258.6,
+    "max": 4507
+  },
+  "humanConfirmedBinaryChecks": [
+    {
+      "sampleId": "D-A02",
+      "phase": "probe",
+      "attempt": 1,
+      "scoringPointId": 605,
+      "expectedCovered": true,
+      "actualCovered": true,
+      "matched": true
+    },
+    {
+      "sampleId": "D-A02",
+      "phase": "baseline",
+      "attempt": 1,
+      "scoringPointId": 605,
+      "expectedCovered": true,
+      "actualCovered": true,
+      "matched": true
+    },
+    {
+      "sampleId": "D-A02",
+      "phase": "baseline",
+      "attempt": 2,
+      "scoringPointId": 605,
+      "expectedCovered": true,
+      "actualCovered": true,
+      "matched": true
+    },
+    {
+      "sampleId": "D-A02",
+      "phase": "probe",
+      "attempt": 1,
+      "scoringPointId": 608,
+      "expectedCovered": true,
+      "actualCovered": true,
+      "matched": true
+    },
+    {
+      "sampleId": "D-A02",
+      "phase": "baseline",
+      "attempt": 1,
+      "scoringPointId": 608,
+      "expectedCovered": true,
+      "actualCovered": true,
+      "matched": true
+    },
+    {
+      "sampleId": "D-A02",
+      "phase": "baseline",
+      "attempt": 2,
+      "scoringPointId": 608,
+      "expectedCovered": true,
+      "actualCovered": true,
+      "matched": true
+    },
+    {
+      "sampleId": "D-A04",
+      "phase": "probe",
+      "attempt": 2,
+      "scoringPointId": 608,
+      "expectedCovered": true,
+      "actualCovered": true,
+      "matched": true
+    },
+    {
+      "sampleId": "D-A04",
+      "phase": "baseline",
+      "attempt": 3,
+      "scoringPointId": 608,
+      "expectedCovered": true,
+      "actualCovered": true,
+      "matched": true
+    },
+    {
+      "sampleId": "D-A04",
+      "phase": "baseline",
+      "attempt": 4,
+      "scoringPointId": 608,
+      "expectedCovered": true,
+      "actualCovered": true,
+      "matched": true
+    },
+    {
+      "sampleId": "D-H01",
+      "phase": "baseline",
+      "attempt": 5,
+      "scoringPointId": 550,
+      "expectedCovered": false,
+      "actualCovered": false,
+      "matched": true
+    },
+    {
+      "sampleId": "D-H01",
+      "phase": "baseline",
+      "attempt": 6,
+      "scoringPointId": 550,
+      "expectedCovered": false,
+      "actualCovered": false,
+      "matched": true
+    }
+  ],
+  "samples": [
+    {
+      "sampleId": "D-A02",
+      "attempts": 3,
+      "totals": [
+        80,
+        74,
+        72
+      ],
+      "totalSpread": 8,
+      "dimensions": {
+        "correctnessScore": {
+          "min": 16,
+          "max": 18
+        },
+        "completenessScore": {
+          "min": 15,
+          "max": 16
+        },
+        "depthScore": {
+          "min": 12,
+          "max": 14
+        },
+        "clarityScore": {
+          "min": 15,
+          "max": 18
+        },
+        "practiceScore": {
+          "min": 14,
+          "max": 15
+        }
+      },
+      "coveredFlips": []
+    },
+    {
+      "sampleId": "D-A04",
+      "attempts": 3,
+      "totals": [
+        40,
+        52,
+        55
+      ],
+      "totalSpread": 15,
+      "dimensions": {
+        "correctnessScore": {
+          "min": 8,
+          "max": 10
+        },
+        "completenessScore": {
+          "min": 7,
+          "max": 12
+        },
+        "depthScore": {
+          "min": 5,
+          "max": 9
+        },
+        "clarityScore": {
+          "min": 13,
+          "max": 14
+        },
+        "practiceScore": {
+          "min": 7,
+          "max": 10
+        }
+      },
+      "coveredFlips": []
+    },
+    {
+      "sampleId": "D-H01",
+      "attempts": 2,
+      "totals": [
+        62,
+        72
+      ],
+      "totalSpread": 10,
+      "dimensions": {
+        "correctnessScore": {
+          "min": 15,
+          "max": 16
+        },
+        "completenessScore": {
+          "min": 12,
+          "max": 13
+        },
+        "depthScore": {
+          "min": 11,
+          "max": 13
+        },
+        "clarityScore": {
+          "min": 14,
+          "max": 17
+        },
+        "practiceScore": {
+          "min": 10,
+          "max": 13
+        }
+      },
+      "coveredFlips": []
+    },
+    {
+      "sampleId": "D-M05",
+      "attempts": 2,
+      "totals": [
+        71,
+        60
+      ],
+      "totalSpread": 11,
+      "dimensions": {
+        "correctnessScore": {
+          "min": 14,
+          "max": 16
+        },
+        "completenessScore": {
+          "min": 11,
+          "max": 13
+        },
+        "depthScore": {
+          "min": 10,
+          "max": 13
+        },
+        "clarityScore": {
+          "min": 13,
+          "max": 15
+        },
+        "practiceScore": {
+          "min": 12,
+          "max": 14
+        }
+      },
+      "coveredFlips": [
+        452
+      ]
+    },
+    {
+      "sampleId": "D-CARD-06",
+      "attempts": 2,
+      "totals": [
+        93,
+        98
+      ],
+      "totalSpread": 5,
+      "dimensions": {
+        "correctnessScore": {
+          "min": 19,
+          "max": 20
+        },
+        "completenessScore": {
+          "min": 19,
+          "max": 20
+        },
+        "depthScore": {
+          "min": 18,
+          "max": 19
+        },
+        "clarityScore": {
+          "min": 19,
+          "max": 20
+        },
+        "practiceScore": {
+          "min": 18,
+          "max": 19
+        }
+      },
+      "coveredFlips": []
+    }
+  ],
+  "formalScoreRanges": 0,
+  "holdoutExecuted": 0,
+  "warning": "Repeated calls are correlated; raw evidence and semantic decisions need human review."
+}

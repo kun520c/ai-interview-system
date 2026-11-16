@@ -4,46 +4,22 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kun.aiinterview.common.exception.BusinessException;
-import com.kun.aiinterview.common.exception.ConflictException;
 import com.kun.aiinterview.common.exception.ResourceNotFoundException;
-import com.kun.aiinterview.common.recovery.StaleRecoveryProperties;
-import com.kun.aiinterview.interview.entity.AnswerEvaluation;
-import com.kun.aiinterview.interview.entity.InterviewAnswer;
-import com.kun.aiinterview.interview.entity.InterviewQuestion;
-import com.kun.aiinterview.interview.enums.DecisionAction;
-import com.kun.aiinterview.interview.enums.EvaluationPhase;
-import com.kun.aiinterview.interview.enums.InterviewAnswerStatus;
-import com.kun.aiinterview.interview.enums.InterviewQuestionStatus;
-import com.kun.aiinterview.interview.enums.InterviewQuestionType;
-import com.kun.aiinterview.interview.mapper.InterviewAnswerMapper;
-import com.kun.aiinterview.interview.mapper.InterviewQuestionMapper;
 import com.kun.aiinterview.interview.entity.InterviewReport;
 import com.kun.aiinterview.interview.entity.InterviewSession;
 import com.kun.aiinterview.interview.enums.InterviewReportStatus;
-import com.kun.aiinterview.interview.enums.InterviewSessionStatus;
-import com.kun.aiinterview.interview.mapper.AnswerEvaluationMapper;
 import com.kun.aiinterview.interview.mapper.InterviewReportMapper;
 import com.kun.aiinterview.interview.mapper.InterviewSessionMapper;
 import com.kun.aiinterview.interview.model.InterviewReportGenerationResult;
 import com.kun.aiinterview.interview.vo.InterviewReportResponse;
+import com.kun.aiinterview.interview.report.async.ReportExecution;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.Objects;
-
-import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.REPORT_CLAIM;
-import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.REPORT_COMMIT;
-import static com.kun.aiinterview.common.observability.InterviewRequestTiming.Phase.REPORT_FINAL_AGGREGATION;
-import static com.kun.aiinterview.common.observability.InterviewRequestTiming.measure;
 
 @Service
 @RequiredArgsConstructor
@@ -55,13 +31,10 @@ public class InterviewReportService {
 
     private final InterviewSessionMapper interviewSessionMapper;
     private final InterviewReportMapper interviewReportMapper;
-    private final AnswerEvaluationMapper answerEvaluationMapper;
     private final InterviewReportTransactionService transactionService;
-    private final InterviewQuestionMapper interviewQuestionMapper;
-    private final InterviewAnswerMapper interviewAnswerMapper;
     private final ObjectProvider<InterviewReportGenerator> generatorProvider;
     private final ObjectMapper objectMapper;
-    private final StaleRecoveryProperties staleRecoveryProperties;
+    private final InterviewReportFinalReader finalReader;
 
     public InterviewReportResponse getReport(
             Long userId,
@@ -98,152 +71,48 @@ public class InterviewReportService {
         return buildReadyResponse(sessionId, report);
     }
 
-    public InterviewReportResponse generateReportForApi(
-            Long userId,
-            Long sessionId
-    ) {
-        return buildReadyResponse(
-                sessionId,
-                generateReport(userId, sessionId)
-        );
-    }
-
-    public InterviewReport generateReport(
-            Long userId,
-            Long sessionId
-    ) {
+    /** POST accepts durable work; it never calls the model. */
+    public InterviewReportResponse generateReportForApi(Long userId, Long sessionId) {
         if (userId == null || sessionId == null) {
-            throw new IllegalArgumentException(
-                    "userId和sessionId不能为空"
-            );
+            throw new IllegalArgumentException("userId和sessionId不能为空");
         }
+        InterviewReportStatus status = transactionService.acceptReportTask(userId, sessionId);
+        return status == InterviewReportStatus.READY
+                ? buildReadyResponse(sessionId, interviewReportMapper.getBySessionId(sessionId))
+                : buildStatusResponse(sessionId, status);
+    }
 
-        InterviewSession session = loadOwnedSession(sessionId, userId);
-        validateCompleted(session);
-
-        if (session.getReportStatus() == InterviewReportStatus.READY) {
-            return requireExistingReport(sessionId);
-        }
-
-        if (session.getVersion() == null || session.getReportStatus() == null) {
-            throw new IllegalStateException("Session缺少Report状态或version");
-        }
-
-        int claimed = measure(REPORT_CLAIM, () -> claimReportGeneration(sessionId, session));
-
-        if (claimed != 1) {
-            InterviewSession latest = loadOwnedSession(sessionId, userId);
-            if (latest.getReportStatus() == InterviewReportStatus.READY) {
-                return requireExistingReport(sessionId);
-            }
-            throw new ConflictException("报告生成状态已发生变化，请重试");
-        }
-
-        // The successful CAS increments exactly this version. Never reload a newer token.
-        session.setVersion(Math.addExact(session.getVersion(), 1));
-        session.setReportStatus(InterviewReportStatus.GENERATING);
-        int attemptVersion = session.getVersion();
-
+    /** Only a successful consumer claim supplies this immutable execution token. */
+    public void generateClaimedReport(ReportExecution execution) {
+        InterviewReport report;
         try {
-            InterviewReport existing = existingReportOrContinue(session);
-            if (existing != null) {
-                return existing;
-            }
-            return generateClaimedReport(session, requireGenerator());
-        } catch (RuntimeException original) {
-            recoverReportFailure(sessionId, attemptVersion, original);
-            throw original;
+            var session = execution.session();
+            var aggregate = finalReader.aggregateFinalEvaluations(session);
+            // A historical report is reconciled by the final transaction without another model call.
+            InterviewReport existing = interviewReportMapper.getBySessionId(session.getId());
+            report = existing != null ? existing : buildReport(session.getId(), aggregate.overallScore(),
+                    requireGenerator().generate(session, List.copyOf(aggregate.evaluations()), aggregate.overallScore()));
+        } catch (org.springframework.dao.DataAccessException uncertain) {
+            throw uncertain;
+        } catch (RuntimeException deterministic) {
+            transactionService.failExecution(execution, "GENERATION_FAILED");
+            return;
+        }
+        // Commit uncertainty must escape to MQ. Never turn an uncertain commit into an ACK.
+        try {
+            transactionService.completeReportGeneration(execution, report);
+        } catch (IllegalStateException | IllegalArgumentException deterministic) {
+            transactionService.failExecution(execution, "COMPLETION_REJECTED");
         }
     }
-
-    private int claimReportGeneration(Long sessionId, InterviewSession session) {
-        if (session.getReportStatus() == InterviewReportStatus.GENERATING) {
-            if (!staleRecoveryProperties.isGeneratingStale(session.getUpdatedAt())) {
-                throw new ConflictException("报告正在生成中，请稍后重试");
-            }
-            return interviewSessionMapper.reclaimStaleGenerating(
-                    sessionId, staleRecoveryProperties.generatingCutoff(), session.getVersion());
-        }
-        requireGenerator();
-        return interviewSessionMapper.claimReportGeneration(sessionId, session.getVersion(), session.getReportStatus());
-    }
-
-    private InterviewReport requireExistingReport(Long sessionId) {
-        InterviewReport report = interviewReportMapper.getBySessionId(sessionId);
-        if (report == null) {
-            throw new IllegalStateException("Session为READY但Report不存在");
-        }
-        return report;
-    }
-
-    private InterviewReport generateClaimedReport(
-            InterviewSession generatingSession,
-            InterviewReportGenerator generator
-    ) {
-        Long sessionId = generatingSession.getId();
-        var aggregate = measure(REPORT_FINAL_AGGREGATION, () -> aggregateFinalEvaluations(generatingSession));
-        InterviewReportGenerationResult generationResult = generator.generate(
-                generatingSession, List.copyOf(aggregate.evaluations()), aggregate.overallScore());
-        InterviewReport report = buildReport(sessionId, aggregate.overallScore(), generationResult);
-
-        return measure(REPORT_COMMIT,
-                () -> transactionService.completeReportGeneration(report, generatingSession, aggregate.evaluations()));
-    }
-
-    private FinalEvaluationAggregate aggregateFinalEvaluations(InterviewSession session) {
-        List<AnswerEvaluation> evaluations = answerEvaluationMapper.listFinalEffectiveEvaluationsBySessionId(session.getId());
-        validateEvaluations(session, evaluations);
-        return new FinalEvaluationAggregate(evaluations, calculateOverallScore(evaluations));
-    }
-
-    private record FinalEvaluationAggregate(List<AnswerEvaluation> evaluations, BigDecimal overallScore) {}
 
     private InterviewSession loadOwnedSession(Long sessionId, Long userId) {
         InterviewSession session = interviewSessionMapper
-                .getInterviewSessionById(sessionId);
+                .getReportSession(sessionId);
         if (session == null || !Objects.equals(session.getUserId(), userId)) {
             throw new ResourceNotFoundException("面试会话不存在");
         }
         return session;
-    }
-
-    private void validateCompleted(InterviewSession session) {
-        if (session.getStatus()
-                != InterviewSessionStatus.COMPLETED) {
-            throw new ConflictException(
-                    "面试尚未完成，无法生成报告"
-            );
-        }
-    }
-
-    private InterviewReport existingReportOrContinue(
-            InterviewSession session
-    ) {
-        InterviewReport report = interviewReportMapper
-                .getBySessionId(session.getId());
-        if (report == null) {
-            return null;
-        }
-
-        if (report.getOverallScore() == null) {
-            throw new IllegalStateException(
-                    "已有Report缺少overallScore"
-            );
-        }
-        // READY history is returned earlier; recovering an unready row must obey the same invariant.
-        measure(REPORT_FINAL_AGGREGATION,
-                () -> validateEvaluations(session, answerEvaluationMapper.listFinalEffectiveEvaluationsBySessionId(session.getId())));
-        int affectedRows = measure(REPORT_COMMIT, () -> interviewSessionMapper.markReportReady(
-                session.getId(),
-                session.getVersion(),
-                report.getOverallScore()
-        ));
-        if (affectedRows != 1) {
-            throw new IllegalStateException(
-                    "已有Report时READY状态恢复失败"
-            );
-        }
-        return report;
     }
 
     private InterviewReportGenerator requireGenerator() {
@@ -255,127 +124,6 @@ public class InterviewReportService {
             );
         }
         return generator;
-    }
-
-    private void validateEvaluations(
-            InterviewSession session,
-            List<AnswerEvaluation> evaluations
-    ) {
-        if (evaluations == null || evaluations.isEmpty()) {
-            throw new IllegalStateException(
-                    "面试缺少有效Evaluation"
-            );
-        }
-        if (session.getPlannedQuestionCount() == null
-                || evaluations.size()
-                != session.getPlannedQuestionCount()) {
-            throw new IllegalStateException(
-                    "有效Evaluation数量与计划的MAIN题数不一致"
-            );
-        }
-        Set<Long> mainIds = new HashSet<>();
-        for (AnswerEvaluation evaluation : evaluations) {
-            if (evaluation == null || evaluation.getEvaluationPhase() != EvaluationPhase.FINAL) {
-                throw new IllegalStateException("报告评价必须为FINAL");
-            }
-            if (evaluation.getMainInterviewQuestionId() == null
-                    || !mainIds.add(evaluation.getMainInterviewQuestionId())) {
-                throw new IllegalStateException("每道MAIN必须恰有一个FINAL评价");
-            }
-            if (evaluation.getDecisionAction() != DecisionAction.NEXT_MAIN
-                    && evaluation.getDecisionAction() != DecisionAction.FINISH) {
-                throw new IllegalStateException("FINAL评价决策非法");
-            }
-        }
-        validateEvaluationAssociations(session, evaluations, mainIds);
-    }
-
-    private void validateEvaluationAssociations(
-            InterviewSession session, List<AnswerEvaluation> evaluations, Set<Long> mainIds
-    ) {
-        List<InterviewQuestion> questions = interviewQuestionMapper.listBySessionId(session.getId());
-        List<InterviewQuestion> mains = questions.stream()
-                .filter(question -> question.getQuestionType() == InterviewQuestionType.MAIN)
-                .sorted(Comparator.comparing(InterviewQuestion::getPlanOrder))
-                .toList();
-        if (mains.size() != session.getPlannedQuestionCount()
-                || !mainIds.equals(new HashSet<>(mains.stream().map(InterviewQuestion::getId).toList()))) {
-            throw new IllegalStateException("FINAL评价未完整覆盖本场MAIN计划");
-        }
-
-        Map<Long, InterviewQuestion> followUps = new HashMap<>();
-        for (InterviewQuestion question : questions) {
-            if (!Objects.equals(question.getSessionId(), session.getId())
-                    || question.getStatus() != InterviewQuestionStatus.ANSWERED) {
-                throw new IllegalStateException("报告问题不属于本场或尚未回答");
-            }
-            if (question.getQuestionType() == InterviewQuestionType.FOLLOW_UP) {
-                if (!mainIds.contains(question.getParentQuestionId())
-                        || followUps.put(question.getParentQuestionId(), question) != null) {
-                    throw new IllegalStateException("报告追问必须属于本场MAIN且每题最多一个");
-                }
-            }
-        }
-        Map<Long, InterviewAnswer> answers = new HashMap<>();
-        for (InterviewAnswer answer : interviewAnswerMapper.listByInterviewQuestionIds(
-                questions.stream().map(InterviewQuestion::getId).toList())) {
-            answers.put(answer.getInterviewQuestionId(), answer);
-        }
-        for (int index = 0; index < mains.size(); index++) {
-            InterviewQuestion main = mains.get(index);
-            AnswerEvaluation evaluation = evaluations.get(index);
-            if (!Objects.equals(main.getPlanOrder(), index + 1)
-                    || !Objects.equals(main.getId(), evaluation.getMainInterviewQuestionId())) {
-                throw new IllegalStateException("报告MAIN计划或评价顺序非法");
-            }
-            InterviewAnswer mainAnswer = requireEvaluatedAnswer(answers.get(main.getId()));
-            InterviewQuestion followUp = followUps.get(main.getId());
-            InterviewAnswer finalAnswer = followUp == null ? mainAnswer
-                    : requireEvaluatedAnswer(answers.get(followUp.getId()));
-            if (!Objects.equals(evaluation.getAnswerId(), finalAnswer.getId())) {
-                throw new IllegalStateException("FINAL评价未关联所属MAIN的最终答案");
-            }
-            if (followUp != null) {
-                AnswerEvaluation initial = answerEvaluationMapper.getByAnswerId(mainAnswer.getId());
-                if (initial == null || initial.getEvaluationPhase() != EvaluationPhase.INITIAL
-                        || initial.getDecisionAction() != DecisionAction.FOLLOW_UP
-                        || !Objects.equals(initial.getMainInterviewQuestionId(), main.getId())) {
-                    throw new IllegalStateException("追问缺少所属MAIN的INITIAL评价");
-                }
-            }
-        }
-    }
-
-    private InterviewAnswer requireEvaluatedAnswer(InterviewAnswer answer) {
-        if (answer == null || answer.getStatus() != InterviewAnswerStatus.EVALUATED) {
-            throw new IllegalStateException("报告答案缺失或尚未完成评价");
-        }
-        return answer;
-    }
-
-    private BigDecimal calculateOverallScore(
-            List<AnswerEvaluation> evaluations
-    ) {
-        BigDecimal total = BigDecimal.ZERO;
-        for (AnswerEvaluation evaluation : evaluations) {
-            if (evaluation == null
-                    || evaluation.getTotalScore() == null) {
-                throw new IllegalStateException(
-                        "有效Evaluation缺少totalScore"
-                );
-            }
-            total = total.add(
-                    BigDecimal.valueOf(
-                            evaluation.getTotalScore()
-                    )
-            );
-        }
-
-        return total.divide(
-                BigDecimal.valueOf(evaluations.size()),
-                2,
-                RoundingMode.HALF_UP
-        );
     }
 
     private InterviewReport buildReport(
@@ -504,12 +252,4 @@ public class InterviewReportService {
         }
     }
 
-    private void recoverReportFailure(Long sessionId, int attemptVersion, RuntimeException original) {
-        try {
-            // Zero rows means this task has lost ownership; no latest-version retry is allowed.
-            interviewSessionMapper.markReportFailed(sessionId, attemptVersion);
-        } catch (RuntimeException recovery) {
-            original.addSuppressed(recovery);
-        }
-    }
 }

@@ -190,6 +190,10 @@ interview_report
 user_weakness
 ```
 
+The M1-B asynchronous report implementation additionally requires the separately approved
+`interview_report_task` migration. Its presence must be checked per target schema; the
+13-table bootstrap alone does not create it, and no target is implicitly approved.
+
 The database structure has been reviewed and should be treated as frozen unless a concrete implementation problem proves that a change is necessary.
 
 Do not casually modify table structures.
@@ -399,7 +403,12 @@ At the end of each development stage, report:
 - Record evidence, changed files/methods, call chains, tradeoffs, exact test counts/types, commit SHA, and separately verified local/remote/uncommitted status. Mark missing evidence and candidate scope explicitly; do not infer performance gains or real-service success.
 - Keep implementation status separate from developer mastery. New learning items remain unconfirmed until developer-provided explanation, reproduction, or independent modification evidence is recorded. Updating these documents does not authorize implementation, commit, or push.
 
-Current stage:
+The following stage list is a historical milestone, not a live Git or deployment status.
+The current phase-2 workspace includes an asynchronous report candidate; verify its Git,
+test, migration, and release status independently. Report content quality and production
+MQ readiness are not established by this note.
+
+Historical stage:
 
 ```text
 Evaluation Core                 COMPLETE
@@ -922,7 +931,7 @@ External Interview API completed capability on 2026-09-15:
 * The final ordinary `.\mvnw.cmd -B -ntp test` regression executed 1053 tests with 0 failures, 0 errors, and 18 guarded real-service skips, and completed with `BUILD SUCCESS`.
 * Ordinary real-MySQL Mapper and transaction tests passed. Real DeepSeek, Embedding, and Milvus tests remained protected and disabled; the 18 skips are not evidence of real external-service verification.
 
-Interview Report completed capability on 2026-09-17:
+Historical Interview Report capability on 2026-09-17 (later superseded by FINAL-only aggregation and the asynchronous report path):
 
 ### Report aggregation, generation, and state
 

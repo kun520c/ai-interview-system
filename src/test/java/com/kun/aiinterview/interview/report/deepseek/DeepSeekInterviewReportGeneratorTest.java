@@ -14,18 +14,23 @@ import com.kun.aiinterview.question.enums.QuestionCategory;
 import com.kun.aiinterview.question.enums.QuestionDifficulty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Duration;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -210,6 +215,50 @@ class DeepSeekInterviewReportGeneratorTest {
         verifyAfter(() -> assertThatThrownBy(this::generate)
                 .isInstanceOf(ExternalServiceException.class)
                 .hasMessageContaining(expectedMessage));
+    }
+
+    @Test
+    void givenSyntheticSevenStrengths_whenReplayed_thenRejectsWithoutRepair()
+            throws JsonProcessingException {
+        expectCompletion("""
+                {
+                  "summary": "Synthetic summary",
+                  "strengths": ["s1", "s2", "s3", "s4", "s5", "s6", "s7"],
+                  "weaknesses": ["w1", "w2", "w3", "w4", "w5", "w6", "w7"],
+                  "suggestions": ["a1", "a2", "a3", "a4", "a5"]
+                }
+                """);
+
+        verifyAfter(() -> assertThatThrownBy(this::generate)
+                .isInstanceOf(ExternalServiceException.class)
+                .hasMessage("DeepSeek Report strengths数量必须在1到5之间"));
+    }
+
+    @Test
+    @EnabledIf("hasPrivateM1eResponse")
+    void givenSavedM1eResponse_whenReplayed_thenRejectsSevenStrengthsWithoutRepair()
+            throws Exception {
+        byte[] response = new ClassPathResource(
+                "report/m1e-structure-failure-response.json").getContentAsByteArray();
+        assertThat(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(response)))
+                .isEqualTo("2f121678ed97ece061db77affa98bceb8b035e518333a63855c0b0f3820724a4");
+        var envelope = objectMapper.readTree(response);
+        assertThat(envelope.at("/choices/0/finish_reason").asText()).isEqualTo("stop");
+        assertThat(envelope.at("/usage/completion_tokens").asInt()).isEqualTo(876);
+        var reportJson = objectMapper.readTree(envelope.at("/choices/0/message/content").asText());
+        assertThat(reportJson.get("strengths").size()).isEqualTo(7);
+        assertThat(reportJson.get("weaknesses").size()).isEqualTo(7);
+        assertThat(reportJson.get("suggestions").size()).isEqualTo(5);
+        mockServer.expect(once(), requestTo(COMPLETIONS_URL))
+                .andRespond(withSuccess(new String(response, StandardCharsets.UTF_8), MediaType.APPLICATION_JSON));
+
+        verifyAfter(() -> assertThatThrownBy(this::generate)
+                .isInstanceOf(ExternalServiceException.class)
+                .hasMessage("DeepSeek Report strengths数量必须在1到5之间"));
+    }
+
+    static boolean hasPrivateM1eResponse() {
+        return new ClassPathResource("report/m1e-structure-failure-response.json").exists();
     }
 
     private InterviewReportGenerationResult generate() {

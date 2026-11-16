@@ -1,5 +1,7 @@
 # 源码学习待办清单
 
+> **历史证据范围：**本文含不同时点的历史记录。部分原始数据、本地报告和实验工具仅保留在私有或未提交工作区，公开检出中的相关链接可能不可用；Git 和部署状态以最新记录及实际仓库为准。
+
 建立：2026-11-13；最近更新：2026-11-14（Asia/Shanghai）。C7 已将 C6 验收的同一源码依次提交，累计源码提交为 `71aeb22f7da906660763e9efb1100a20df7705c9`；B4-D／B4-E／B5-P2-A／B5-P2-B 的完整 SHA 和父子关系见 [工程优化台账](IMPROVEMENT_LEDGER.md#11-git-实际状态)。本清单与台账的C7版本随其后的独立文档提交归档，未推送；后续更新尚未提交。
 
 建档及 C6 时点的基线是 `01ac774caff491b978dd2268e8b427355a64b97a` 加四批未提交修改。下文各批“无 SHA／未提交”保留为当时事实，当前提交定位以以上 C7 更新为准。源码内容与历史回归证据不变；新执行的独立编译／类型检查见 [C7 记录](IMPROVEMENT_LEDGER.md#c7)，不等于重跑功能测试或开发者掌握。
@@ -1195,7 +1197,7 @@ L-E3E01-01后续证据（2026-11-14）：真实配置已补齐，禁重试与一
 - 独立练习：说明为何仅凭当前 Chunk 不一定能证明历史提示词正文；为双目标随机组卷列出可检查的会话条件，分别设计重复点击、失败恢复和阶段耗时证据，并解释样本不足时为何不能给 P95。
 - 证据和状态：本轮仅完成代码和测试边界检查，未执行真实会话或记录耗时；开发者本人证据未提供。**待学习（掌握未确认）**。
 
-2026-11-14 U1-R1 后续证据：专用账号已创建并通过精确授权及两个其他 Schema 的拒绝访问检查；人工历史会话 的数据库归属、题答及两道题的历史快照已只读核验，题库更新经正式 Service 提交并回读。复核了 MySQL Schema 级授权下划线通配符的转义要求。上述为工程代理证据，L-U1R1-01～02 仍为**待学习（掌握未确认）**；开发者本人讲解或复现尚未提供，真实浏览器耗时与完整流程仍待验收。
+2026-11-14 U1-R1 后续证据：专用账号已创建并通过精确授权及两个其他 Schema 的拒绝访问检查；人工测试会话 的数据库归属、题答及两道题的历史快照已只读核验，题库更新经正式 Service 提交并回读。复核了 MySQL Schema 级授权下划线通配符的转义要求。上述为工程代理证据，L-U1R1-01～02 仍为**待学习（掌握未确认）**；开发者本人讲解或复现尚未提供，真实浏览器耗时与完整流程仍待验收。
 
 同日补充：真实 HTTP 未登录边界及合成账号 API 登录已核验；浏览器工具未能使用脱敏后的凭据完成 GUI 登录，完整浏览器与计时仍未验收。学习状态不变。
 
@@ -1258,3 +1260,638 @@ L-E3E01-01后续证据（2026-11-14）：真实配置已补齐，禁重试与一
 - 入口：`EnvironmentIsolationInitializer`、超时回收 CAS 测试、`InterviewVisibilityHttpIntegrationTest`。
 - 独立练习：对比 MySQL 服务器时区、JDBC 配置和 JVM 本地时间对过期判断的影响；设计只连接临时测试库的真实 HTTP 与 Mock 模型验证，分别报告失败、重测、跳过和真实外部服务范围。
 - 掌握状态：**待学习（掌握未确认）**；未收到开发者本人讲解或复现证据。
+
+### S1-R1 Evaluation 部署与终验（2026-11-14）
+
+<a id="l-s1r1-01"></a>
+
+#### L-S1R1-01 — 构建身份与安全切换
+
+- 入口：`git archive`、Maven package、`InterviewService.getDetail`、`EnvironmentIsolationInitializer`、evaluation 配置。
+- 独立练习：说明源码 SHA、JAR SHA、运行 PID、端口和字节码检查分别证明什么；画出预验、确认空闲、只停止已归属旧进程、启动失败不恢复旧漏洞服务的顺序。
+- 掌握状态：**待学习（掌握未确认）**；尚无开发者本人解释或独立复现证据。
+
+#### L-S1R1-02 — 真实 HTTP、浏览器与快照边界
+
+- 入口：`InterviewController`、`InterviewService.getDetail`、`InterviewQuestionSnapshotFactory`、`PreviousInterviewFeedback.vue`。
+- 独立练习：区分页面显示与前端代理实际 JSON；逐步解释 401、403、404、当前题、未作答题、历史反馈和刷新重新登录测试各自证明的边界。解释为什么一次组卷与 5 道快照对账不能证明随机分布。
+- 掌握状态：**待学习（掌握未确认）**；尚无开发者本人解释或独立复现证据。
+
+#### L-S1R1-03 — 行摘要、真实模型阶段和用量证据
+
+- 入口：evaluation 只读快照对账、`InterviewRequestTiming`、`EvaluationRetrievalAdapter`、`JudgeProvider`。
+- 独立练习：说明既有行逐行摘要和新增合成数据如何分别核验；区分一次应用阶段、供应商 HTTP 尝试次数、usage 与实际账单，并解释未采集 usage 时为何不能计算费用。
+- 掌握状态：**待学习（掌握未确认）**；尚无开发者本人解释或独立复算证据。
+
+### Q1 真实评分、RAG 对照与成本边界（2026-11-14）
+
+<a id="l-q1-01"></a>
+
+#### L-Q1-01 — 评分点证据与反馈一致性
+
+- 入口：`EvaluationPromptBuilder`、`LlmEvaluationValidator`、`EvaluationScoreCalculator`、`FollowUpPolicy`，以及 Q1 的 M05、A02、H01 合成诊断。
+- 独立练习：区分完整覆盖、部分覆盖、事实错误及未作答；逐一指出 `strengths`、`missingPoints`、`correction` 与原答之间的证据关系。说明 Java 结构校验及五维求和为何不能保证技术判断正确。
+- 掌握状态：**待学习（掌握未确认）**；未收到开发者本人独立审核或讲解证据。
+
+#### L-Q1-02 — 配对消融与盲审
+
+- 入口：Q1 固定样本、`SCORING_RESULTS.json`、两份盲卡及历史检索 Prompt。
+- 独立练习：先独立盲审再解盲，分析四组配对的覆盖与事实差异；解释一次输出、历史证据、同源模型和未固定人工 gold 如何限制因果与泛化结论。
+- 掌握状态：**待学习（掌握未确认）**；未收到开发者本人解释或复核证据。
+
+#### L-Q1-03 — 未知请求与三类验证
+
+- 入口：`tools/q1/` 执行门禁和私有逐次 usage 账本、只读行摘要与 HTTP 读回记录。
+- 独立练习：核对 62 次 DeepSeek 尝试中 61 份 usage 与 1 次结果未知，解释为何不能把未知当零费用；区分结构合法、业务完成、评分准确以及历史数据未改变各自需要的证据。
+- 掌握状态：**待学习（掌握未确认）**；未收到开发者本人复算或复现证据。
+
+### Q1-R1 错误归因与盲审（2026-11-14）
+
+<a id="l-q1r1-01"></a>
+
+#### L-Q1R1-01 — 外连接反例与回答归因
+
+- 入口：Q1-R1 只读 SQL 反例、历史题目快照、`EvaluationPromptBuilder`、Q1 业务评价。
+- 独立练习：手推无订单、只有未支付、仅已支付和混合订单时 ON 与 WHERE OR 的行集；分开列候选人真正说过、模型认可和模型错误归因的内容。说明为什么四个正确覆盖的评分点不能证明整条回答没有额外错误。
+- 掌握状态：**待学习（掌握未确认）**；尚无开发者本人盲审、讲解或复现证据。
+
+#### L-Q1R1-02 — Java 版本事实与证据来源
+
+- 入口：接口题原主答与追问、`javac --release 8/9` 反例、JLS 8/9/21 及 Q1 的 rank 1–2 知识正文。
+- 独立练习：解释接口 default/static 与 private 的版本差异，并核对 LLM 的原句、参考答案和知识正文；说明“证据没写某个年份”何时只是范围缺口，为什么不必推断知识错误或模型因果。
+- 掌握状态：**待学习（掌握未确认）**；尚无开发者本人复核或讲解证据。
+
+#### L-Q1R1-03 — 二值覆盖、盲审和回归门槛
+
+- 入口：`LlmEvaluationValidator`、`FollowUpPolicy`、评分点 96 和 449、Q1-R1 首轮 12 张盲卡及 Q2 草案。
+- 独立练习：比较部分覆盖、未答、事实错误与二值 `covered`；说明 M05 的模型建议与 Java 实际决策不同，提出不泄露系统结论的盲审与未见样本方案，并说明一次模型通过为何不足以证明永久修复。
+- 掌握状态：**待学习（掌握未确认）**；尚无开发者本人讲解、盲审或独立修改证据。
+
+### Q1-R2 总体盲评解盲（2026-11-14）
+
+#### L-Q1R2-01 — 名称、机制与人工金标准
+
+- 入口：Q1-R2 卡 01、07、09 及 `UNBLIND_REPORT.md`。
+- 独立练习：区分术语没有命名与机制未答、部分覆盖与错误观点；解释为什么总体评语和空白评分点不能用作逐点准确率分母。
+- 状态：**待学习（掌握未确认）**；首轮已有总体评语，但尚无逐点裁决或独立讲解证据。
+
+#### L-Q1R2-02 — 反馈误判与 Java 工作流
+
+- 入口：Q1-R2 卡 03、06、08、11 和 `FollowUpPolicy`。
+- 独立练习：区分错误认可、正确内容被写成遗漏和追问建议未被执行；对同一卡可同时存在正确评分点与错误额外观点的情况画出证据链。
+- 状态：**待学习（掌握未确认）**；尚无开发者本人逐点讲解证据。
+
+### Q2 评分候选验证（2026-11-14）
+
+#### L-Q2-01 — 结构校验与真实评分退化
+
+- 入口：`EvaluationPromptBuilder`、Q2 `CANDIDATE_V5.patch` 和 `COMPARISON.json`。
+- 独立练习：对比 A02、A04、M05 的 v4/v5 结果，解释为何提示词合同测试通过、HTTP 200 和总分变化均不能证明评价正确；说明为何未通过的候选撤回但证据保留。
+- 状态：**待学习（掌握未确认）**；未收到开发者本人独立讲解或复现实证。
+
+#### L-Q2-02 — 独立留出与模型输出失败
+
+- 入口：Q2 `DIAGNOSTIC.md`、H02 原始响应与 usage、Mockito agent 测试记录。
+- 独立练习：区分旧开发样本与未见独立留出集；说明 HTTP 200、JSON 合法、Java 校验及人工技术评价分别证明什么；区分 Mockito 环境错误与生产业务故障。
+- 状态：**待学习（掌握未确认）**；尚无开发者本人复核或解释证据。
+
+### Q2-R1 评分契约与离线证据（2026-11-14）
+
+#### L-Q2R1-01 — 复合评分点、子项映射与追问
+
+- 入口：`LlmEvaluationValidator.validate`、`FollowUpPolicy.decide`、`FollowUpTargetResolver.resolve`，及 `tools/q2/q2_r1_offline_contract.py`。
+- 独立练习：自行标注一个包含必答子项、可选替代方案及拓展内容的评分点，解释 ALL/ANY、PARTIAL 映射成 false 后丢失的信息，以及模型建议、CORE、总分和最多两个目标如何共同影响追问。区分历史已保存结果与未来会话快照。
+- 状态：**待学习（掌握未确认）**；未收到开发者本人讲解或复现证据。
+
+#### L-Q2R1-02 — 原答证据、技术事实与结构化输出
+
+- 入口：`DeepSeekEvaluationClient`、`LlmEvaluationSuggestion`、Q2-R1 审计报告及离线 SQL 反例。
+- 独立练习：说明原文引用存在为何不证明观点正确；分别追踪 HTTP 200、finish reason、JSON 解析、字段校验及技术事实核验。分析 Q2 第 18 次 v5 非法 JSON 为什么不是已证实的截断，并解释历史二值评价为什么不能自动回填为部分覆盖。
+- 状态：**待学习（掌握未确认）**；未收到开发者本人解释或独立验证证据。
+
+### Q2-R2 评分口径与受控对照（2026-11-14）
+
+#### L-Q2R2-01 — 评分点澄清与产品要求
+
+- 入口：`docs/evaluation/q2-20261114/q2-r2/CANDIDATE_RULES.json`、`QuestionAdminService.updateQuestion`、`EvaluationRagQueryBuilder`。
+- 独立练习：区分名称和含义、等价替代与在增强 for 中直接结构修改；解释 552 的风险清单为什么需要出题人裁决。追踪全量替换时评分点 ID、历史快照和检索查询如何变化。
+- 状态：**待学习（掌握未确认）**；无开发者本人讲解或独立验证证据。
+
+#### L-Q2R2-02 — 样本冻结与未知费用
+
+- 入口：`tools/q2/Q2R2Probe.java`、Q2-R2 对照总结及私有计划、usage 账本。
+- 独立练习：解释留出先冻结但未独立盲审为何不能算金标准；区分预请求计数、无 HTTP 状态、未知 usage、预算预留和供应商实际账单，推导为何首次失败后停止，不能报告任何模型收益。
+- 状态：**待学习（掌握未确认）**；无开发者本人复算或讲解证据。
+
+#### L-Q2R2-03 — OR 评分口径与网络预检
+
+- 入口：`docs/evaluation/q2-20261114/q2-r2/CANDIDATE_552_OR.json`、Q2-R2 对照总结及 `ENGINEERING_CASEBOOK.md`。
+- 独立练习：解释为什么用户确认至少一种风险不等于取消解释机制及相应限制；区分相关风险、笼统声称有风险、以及只说出术语。画出 DNS 预检、受保护配置检查、上轮未知账单预留、停止付费调用和后续重新冻结对照的边界。
+- 状态：**待学习（掌握未确认）**；已收到用户对产品规则的决定，尚无开发者本人关于实现、验证或账单边界的讲解或复现证据。
+
+### M1-A 异步报告方案（2026-11-14）
+
+<a id="l-m1a-01"></a>
+#### L-M1A-01 — 普通双写、Outbox 与事务消息
+
+- 入口：[M1-A 方案](2026-11-14-M1A-ROCKETMQ-ASYNC-REPORT-DESIGN.md)第 2～3 节、Apache RocketMQ 事务消息文档。
+- 独立练习：画出 DB 提交后、MQ 发送前崩溃及 MQ 成功但回执丢失的两种时间线，解释 Outbox 同事务范围、重复发送与半消息回查的区别；说明为何不是分布式原子提交。
+- 状态：**待学习（掌握未确认）**；无开发者独立讲解或复现证据。
+
+#### L-M1A-02 — 任务领取、排队期限与 fencing
+
+- 入口：`InterviewReportService`、`InterviewSessionMapper.xml`、`InterviewReportTransactionService` 与 M1-A 第 3 节。
+- 独立练习：推演重复消息、两个消费者、长排队、超时后旧模型响应及 ACK 丢失，说明 Session version、task 状态、事务回滚与独立截止各保证什么；解释为何不能承诺 DeepSeek 恰好一次。
+- 状态：**待学习（掌握未确认）**；无开发者独立讲解或复现证据。
+
+#### L-M1A-03 — API 恢复与证据边界
+
+- 入口：`useInterviewReport.ts`、B4-E、U1-R1 浏览器验收与 M1-A 第 4～7 节。
+- 独立练习：说明 200 GENERATING、GET 轮询、刷新登录、FAILED 显式重试与旧 POST 兼容；设计真实 MQ 故障注入并区分 POST 受理时间与申请到 READY 时间。
+- 状态：**待学习（掌握未确认）**；无开发者独立讲解或复现证据。
+
+#### L-M1A-04 — 双进度、ACK 与迁移回退
+
+- 入口：[M1-A 第 8～9 节](2026-11-14-M1A-ROCKETMQ-ASYNC-REPORT-DESIGN.md)、`InterviewReportTransactionService.completeReportGeneration`、临时探针源码。
+- 独立练习：画出消息被消费后派发器才记录 SENT 的顺序，说明两个状态列及 token 为什么不倒退；推演 DB 成功但 ACK 丢失、执行超时后旧线程提交与显式新轮，说明事务、fencing 与 ACK 分别保护什么；解释升级或回退时为什么不能混跑旧同步和新异步实例。
+- 状态：**待学习（掌握未确认）**；没有开发者独立讲解、复现或修改证据。一次真实 MQ 收发不代表故障恢复已验证。
+
+### M1-B 实现与故障证据（2026-11-14）
+
+本批新增 5 条；工程测试通过不替代本人掌握证据。关联 [M1-B 台账](IMPROVEMENT_LEDGER.md#m1-b) 和 [验收](2026-11-14-M1B-ROCKETMQ-ASYNC-REPORT-VERIFICATION.md)，源码未提交，本轮基线 SHA `84e3489a85d0fb6c8b54ad2a130c52d7476fb897`。
+
+<a id="l-m1b-01"></a>
+#### L-M1B-01 — 同事务受理与投递租约
+
+- 关联工程记录／验收／代码 SHA：M1-B，链接及未提交状态见本节引言。
+- 前置知识：L-M1A-01、Spring 事务代理、SQL 唯一约束、条件 UPDATE。
+- 源码入口：`InterviewReportTransactionService.acceptReportTask` → `InterviewReportTaskMapper.insertQueued`；`ReportOutboxDispatcher.dispatchDue` → claimDispatch/markSent/rescheduleDispatch；`ReportTaskMapperIntegrationTest`。
+- 核心问题：Session 和 Outbox 为什么同事务？为什么 broker SEND_OK 不等于业务成功？晚到 markSent 为什么不能同时改 task_state？一个单体数据库线程替代 MQ 有何收益/代价？
+- 独立练习／讲解验收目标：复述受理 SQL 失败整体回滚与消费先于 markSent 的实际测试，手算 token A/B 交错和 2/4/8/16/32/60 秒退避；指出测试没有覆盖的进程 kill。
+- 掌握状态：**待学习（未确认）**；开发者掌握证据：未提供。
+- 尚未理解／待验证点：大批积压时索引、扫描间隔和租约参数；不能把小 fixture EXPLAIN 当性能证据。
+- 最近复核日期／人：2026-11-14 / Codex（源码与工程证据）；状态变更：新增待确认，无本人验收。
+
+<a id="l-m1b-02"></a>
+#### L-M1B-02 — 固定执行资格、锁序与版本溢出
+
+- 关联工程记录／验收／代码 SHA：M1-B，未提交。
+- 前置知识：L-B1-03、Session version、Java Integer/Long、MySQL UNSIGNED、行锁。
+- 源码入口：`claimTaskExecution/completeReportGeneration/settleStaleOrThrow`、`ReportExecution`、`InterviewSessionMapper.xml`；真实事务测试 `oldReportVersionCannotCommitOrFailReplacement` 和 Mapper 版本边界案例。
+- 核心问题：为什么固定 Session→Task 锁序？attempt 和 executionVersion 各是什么？为何读到新 version 不能让旧执行者获得新资格？为什么受理预留三次增量？
+- 独立练习／讲解验收目标：推演旧模型成功/抛错×新执行者先后完成四种顺序，指出唯一有效提交；解释 INT UNSIGNED 能存但 Java Integer 不能读的边界和受控 FAILED。
+- 掌握状态：**待学习（未确认）**；开发者掌握证据：未提供。
+- 尚未理解／待验证点：外部模型无法靠 fencing 撤销已发请求；尚无真实 kill 后费用/恢复证据。
+- 最近复核日期／人：2026-11-14 / Codex；状态变更：新增待确认。
+
+<a id="l-m1b-03"></a>
+#### L-M1B-03 — ACK、提交未知与 DLQ
+
+- 关联工程记录／验收／代码 SHA：M1-B，未提交。
+- 前置知识：消息至少一次、异常传播、事务提交、幂等。
+- 源码入口：`ReportMqRuntime` listener、`ReportMessageConsumer.onMessage`、`InterviewReportService.generateClaimedReport`；`RealReportRocketMqSmokeTest.retryExhaustionDlqAndControlledReplay`。
+- 核心问题：哪些数据库证据允许 ACK？为什么失败回写失败不能吞掉？RUNNING 重复与未知所有权的区别？为何 DLQ 不是业务 FAILED？
+- 独立练习／讲解验收目标：从日志定位重试次数和 DLQ offset，解释 CLI 表格输出曾导致的探针超时；按手册从 DB 重建合法消息，明确终态/旧任务不重放与 FAILED 新 POST 的区别。
+- 掌握状态：**待学习（未确认）**；开发者掌握证据：未提供。
+- 尚未理解／待验证点：真实 ACK 丢失、JDBC 提交结果未知仍未注入；Mock DB 异常与真实 Broker 故障证据不同。
+- 最近复核日期／人：2026-11-14 / Codex；状态变更：新增待确认。
+
+<a id="l-m1b-04"></a>
+#### L-M1B-04 — 三类期限与前端状态查询
+
+- 关联工程记录／验收／代码 SHA：M1-B，未提交。
+- 前置知识：数据库时钟、UTC/DATETIME、定时扫描、异步 HTTP、请求世代。
+- 源码入口：`expireTask`、Task Mapper 四条扫描 SQL、`ReportAsyncProperties`；`useInterviewReport.ts`、`InterviewReportView.spec.ts`。
+- 核心问题：派发租约/排队/执行期限各何时开始？为什么 DB 停机会打破准时收口？POST 200 GENERATING 与旧同步完成语义有什么区别？GET 如何保持无副作用并拒绝旧响应？
+- 独立练习／讲解验收目标：推演 600 秒排队可能先于 20 次发送上限，手动 GET 与旧轮询交错、刷新/401/FAILED 重试；解释为什么 HTTP Timing 不再代表生成 READY 的全程耗时。
+- 掌握状态：**待学习（未确认）**；开发者掌握证据：未提供。
+- 尚未理解／待验证点：自然等待期限、长时间停机补扫、实际浏览器和真实模型端到端尚未验证。
+- 最近复核日期／人：2026-11-14 / Codex；状态变更：新增待确认。
+
+<a id="l-m1b-05"></a>
+#### L-M1B-05 — 逐目标迁移、资源故障及切换回退
+
+- 关联工程记录／验收／代码 SHA：M1-B、数据库准入和 `tools/m1b/README.md`，未提交。
+- 前置知识：MySQL DDL 隐式提交、环境隔离、Maven 依赖树、Hikari 与 Spring 测试上下文缓存。
+- 源码入口：单表增量、`EnvironmentIsolationInitializer`、`tools/m1b/run-tests.py`、test Hikari 配置、dependency-tree/effective-model 日志。
+- 核心问题：test 名称为何不证明授权？为什么 snapshot 与增量不能重复执行？为什么旧同步和异步不能混跑？连接池总量为何可使业务并发测试失败？javassist tools.jar 告警是否等于已知功能失败或安全通过？
+- 独立练习／讲解验收目标：列出某一精确目标的审批材料，按历史 GENERATING 分类制定停写/排空方案；用原始测试日志区分 2 业务等待失败、1 stub 错误和实际 max_connections 证据，不靠删断言通过。
+- 掌握状态：**待学习（未确认）**；开发者掌握证据：未提供。
+- 尚未理解／待验证点：正式目标迁移/回退演练和依赖升级仍未完成；备份不能自动覆盖现有数据。
+- 最近复核日期／人：2026-11-14 / Codex；状态变更：新增待确认。
+
+### M1-C 真实故障与性能证据（2026-11-15）
+
+<a id="l-m1c-01"></a>
+#### L-M1C-01 — 区分受理、READY 与吞吐
+
+- 关联记录：[M1-C 台账](IMPROVEMENT_LEDGER.md#m1-c)、[最终构建 HTTP 数据](m1c-20261115-after-fix/AB_RESULTS.md)、[浏览器数据](m1c-20261115-browser/BROWSER_RESULTS.md)与[修复前历史数据](m1c-20261114/AB_RESULTS.md)，B 仍未提交。
+- 源码入口：`ReportOutboxDispatcher.dispatchDue`、`ReportMqRuntime` 消费线程设置、`tools/m1c/benchmark.py` 与 `summarize.py`。
+- 独立练习：复算最终构建 1 秒/并发 10 的 POST P95、READY P95 和完成吞吐变化；解释 A POST READY 与 B POST GENERATING 不能混称生成耗时、2 个消费者/2 秒扫描与 200 ms HTTP 客户端轮询的影响，并说明 30 样本、闭环吞吐和浏览器实际 3 秒轮询的限制。
+- 掌握状态：**待学习（未确认）**；开发者独立复算或讲解证据未提供。
+
+#### L-M1C-02 — 进程退出、ACK 和有界重试
+
+- 关联记录：[故障注入与问题](2026-11-15-M1C-FAILURE-INJECTION.md)、`tools/m1c/faults.py`、`RealReportCrashWindowProbeTest`。
+- 独立练习：画出提交后未发送、SEND_OK 后未记账、DB 成功 ACK 前 kill 及模型返回后提交前 kill 的持久状态；解释哪些实际自动恢复、为什么旧执行者不能提交、为什么显式新 attempt 可能再调一次模型。
+- 掌握状态：**待学习（未确认）**；开发者独立复现或讲解证据未提供。
+
+#### L-M1C-03 — 真实模型证据与费用边界
+
+- 关联记录：[两份合成报告](m1c-20261114/real-report-evidence.json)、[usage](m1c-20261114/real-model-usage.jsonl)、`InterviewReportPromptBuilder`、`DeepSeekInterviewReportGenerator`。
+- 独立练习：指出输入没有哪些事实而报告却作了具体判断；区分结构有效与事实有据，复算 901 输入/529 输出 token 的高峰费率估算，说明 usage、预算预留与供应商账单的区别。
+- 掌握状态：**待学习（未确认）**；开发者独立讲解或复算证据未提供。
+
+#### L-M1C-04 — 所有权检查与数据库锁
+
+- 关联记录：[所有权锁复现](2026-11-15-M1C-FAILURE-INJECTION.md)、`ReportOwnershipLockIsolationTest`、`ReportTaskTransactionTest`。
+- 前置知识：普通一致性读、`SELECT ... FOR UPDATE`、事务锁顺序、TOCTOU 和 MyBatis 会话级一级缓存的查询键。
+- 独立练习：说明为什么无权请求在目标行已被持有时会先等待，以及无锁预查为什么仍必须在拿锁后再次验证；复现修复前 2 秒超时。用真实 MySQL 模拟等待锁期间归属变化，解释相同 Mapper 语句可能命中一级缓存并导致错误接受、使用不同 Mapper 语句的原因，并讨论额外 SELECT 对性能对照的影响。
+- 掌握状态：**待学习（未确认）**；开发者独立复现、讲解或修改证据未提供。
+
+### M1-C-R1 实际执行并发与恢复契约（2026-11-15）
+
+此前 L-M1C-01 的“2 个消费者”应理解为一个实例的两条监听执行线程，不是两个实例或全局许可。以下条目均为新增学习任务，不代表开发者已经掌握。
+
+<a id="l-m1c-r1-01"></a>
+#### L-M1C-R1-01 — 闭环、实际在途与阶段时间
+
+- 关联记录：[M1-C-R1 复核](M1C_R1_BOTTLENECK_REVIEW.md)第 2～3 节及其逐任务数据；最终 B 未提交。
+- 前置知识：并发与吞吐、闭环负载、概率分位数、单调时钟和数据库审计时间。
+- 源码入口：`tools/m1c/benchmark.py`、`ReportMqRuntime`、`ReportOutboxDispatcher`。
+- 独立练习：从一个 1 秒必含模型调用区间推导必经子区间 `[end−1s,start+1s]`；解释为何两个实例和两条线程不同、A=10/B=2 是带条件的区间推导，复算单任务排队和同任务观察残差，说明为何不能相减不同样本 P95。
+- 掌握状态：**待学习（未确认）**；开发者独立复算或讲解证据未提供。
+- 尚待验证：扫描/传输/锁等待各自精确时间及相同实际并发 8 的隔离对照。
+
+#### L-M1C-R1-02 — 消费者崩溃与预算化恢复
+
+- 关联记录：[故障原始记录](m1c-20261114/faults-after-cache-fix.jsonl)、[M1-A 设计](2026-11-14-M1A-ROCKETMQ-ASYNC-REPORT-DESIGN.md)及本轮复核。
+- 源码入口：`claimTaskExecution`、`expireTask`、`ReportMessageConsumer.onMessage`、`completeReportGeneration`。
+- 独立练习：画出 task 821 模型返回后崩溃的状态、被 ACK 的重复消息、显式过期和新请求；说明自动 FAILED 与自动 READY 的差别，分别讨论第二次模型调用及报告/弱项不重复，设计重启不重置的有限预算而不绕过版本 CAS。
+- 掌握状态：**待学习（未确认）**；开发者独立解释或复现证据未提供。
+- 尚待验证：产品是否接受人工契约、自然到期扫描与有界自动恢复所需持久字段。
+
+#### L-M1C-R1-03 — 事务隔离、MyBatis 缓存与锁后复查
+
+- 关联记录：[所有权锁故障](2026-11-15-M1C-FAILURE-INJECTION.md)及本轮复核。
+- 源码入口：`InterviewReportTransactionService.acceptReportTask`、`InterviewSessionMapper.xml`、MyBatis `BaseExecutor.createCacheKey`。
+- 独立练习：说明为什么无锁预查不能替代加锁后检查；解释不同 MappedStatement ID 如何避免本路径一级缓存命中、READ_COMMITTED 如何影响锁后普通读，以及 `useCache=false` 为什么不是关闭一级缓存。用历史 MySQL 回归阐明旧执行者 fencing 和事务外模型调用的边界。
+- 掌握状态：**待学习（未确认）**；开发者独立解释或修改证据未提供。
+- 尚待验证：更高并发下的锁/池等待和异常传播；不改变隔离级别或删除检查。
+
+
+### M1-C-R2 多瓶颈归因与最小调优（2026-11-15）
+
+以下四项均待学习，工程验证不代表开发者已掌握。关联[本轮证据](m1c-r2-20261115/README.md)与[正式报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-15-M1-C-R2-RocketMQ多瓶颈归因与最小调优.md)；当前HEAD84e3489a85d0fb6c8b54ad2a130c52d7476fb897加未提交工作区，无本批提交SHA。
+
+<a id="l-m1c-r2-01"></a>
+#### L-M1C-R2-01 — 真实提交边界与跨进程时钟
+
+- 前置知识：Spring事务同步、JDBC提交、单调/墙钟、往返时延和统计分位数。
+- 源码入口：`tools/m1c-r2/ReportProbe.java`的SqlProbe/committed、`run.py`的calibrate、`analyze.py`；对应insertQueued、claimExecution、finishSuccess事务。
+- 核心问题：SQL返回、updated_at、afterCommit为什么不同？为什么T4可能晚于T5？怎样保留缺失字段及校时误差，而不是相减两个P95？
+- 独立练习：任选一个task在原始归档中还原T0～T10；复算一个阶段P50/P95和配对均值总和，解释HTTP校时误差及Broker时钟不能精确拆纯网络时延。
+- 掌握状态：**待学习（未确认）**。开发者本人讲解、复算或独立修改证据：未提供。
+- 尚待验证：逐条Broker ACK持久确认、JDBC提交结果未知与更低扰动观测。
+- 最近复核：2026-11-15 / Codex；状态变更：新增待确认。
+
+#### L-M1C-R2-02 — 执行并发、拉取缓存和背压
+
+- 前置知识：ThreadPoolExecutor、线程池排队、push客户端的后台拉取、CAS执行权。
+- 源码入口：`ReportMqRuntime.connect`、`ReportMessageConsumer.onMessage`；5.3.2 DefaultMQPushConsumerImpl.pullMessage与ConsumeMessageConcurrentlyService；探针PULLED/T5/T7计数。
+- 核心问题：1个实例、1个Topic队列、2/4/8条执行线程为何不同？缓存阈值8为何可观测9？为什么提高消费并发后Broker拉取等待也可能改变？
+- 独立练习：用原2/2000样本找到“已PULLED但等回调”的任务，解释2.31秒平均执行排队；复核固定到达率下flow-control20与0，不把所有延迟称为Broker网络开销。
+- 掌握状态：**待学习（未确认）**。开发者本人复现证据：未提供。
+- 尚待验证：收费模型实际配额、同组多进程重平衡及同用户弱项热点。
+- 最近复核：2026-11-15 / Codex；状态变更：新增待确认。
+
+#### L-M1C-R2-03 — 闭环、固定到达率与有限批次吞吐
+
+- 前置知识：到达率/并发/吞吐、队列积压、起步排空、nearest-rank、小样本限制。
+- 源码入口：`run.py`的wave、`analyze.py`的DB/客户端速率、`collect.py`的fixed-arrival-summary；原`tools/m1c/benchmark.py`。
+- 核心问题：为什么原两波15条与新单波20条不能混算收益？为什么4条/秒A的峰值可以为5？POST受理快为什么仍可积压？
+- 独立练习：从T1/T6计数重建最大QUEUED10与3，复算排空5.967与1.666秒；区分原始历史7.252/1.489、新配置收益及生产容量。
+- 掌握状态：**待学习（未确认）**。开发者本人复算/讲解证据：未提供。
+- 尚待验证：长期稳态容量、混合用户负载、采样对JIT/CPU的扰动及正式SLA。
+- 最近复核：2026-11-15 / Codex；状态变更：新增待确认。
+
+#### L-M1C-R2-04 — 后端完成、页面可见与工程取舍
+
+- 前置知识：XHR、轮询计时、DOM布局/动画帧、外部调用与版本围栏、配置回退。
+- 源码入口：`useInterviewReport.ts`的3000ms轮询；`browser-worker.cjs`的XHR/DOM时点；`ReportAsyncProperties`和Dispatcher的默认4/500。
+- 核心问题：为什么GET后十几毫秒可见，但提交后仍等1.71秒？1秒轮询如何增加认证/查询成本？为什么只落地两项服务端配置，保留前端候选？
+- 独立练习：复算一条T9→T10→T11，解释1→2次GET和小样本限制；给出两个环境变量恢复2/2000的排空方案，并比较MQ与仅MySQL任务Worker的收益/成本，保留人工重试和内容质量边界。
+- 掌握状态：**待学习（未确认）**。开发者本人独立操作/解释证据：未提供。
+- 尚待验证：前端高并发GET负担、生产运维、报告证据约束与真实模型质量。
+- 最近复核：2026-11-15 / Codex；状态变更：新增待确认。
+
+
+### M1-D — 报告证据、生成策略与可见延迟（2026-11-15）
+
+以下6项均为待学习，掌握未确认；工程实现和本轮技术审核不代表开发者已能独立讲解。[报告与证据](m1d-20261115/README.md)。
+
+<a id="l-m1d-01"></a>
+#### L-M1D-01 — FINAL 与最终报告分工
+
+- 前置知识：MAIN/INITIAL/FINAL、BigDecimal、事务边界。
+- 源码入口：InterviewReportFinalReader.aggregateFinalEvaluations/validateEvaluationAssociations；InterviewReportService.generateClaimedReport；EvaluationStandard.resolveLevel。
+- 核心问题：追问为什么不是额外一题？报告为什么不能根据文字再评分？旧说明中的INITIAL fallback为什么不能套到当前源码？
+- 练习：沿A场5个FINAL手算73.40并追踪原INITIAL的关联校验，指出LLM被允许改变的四个文本字段。
+- 掌握状态：待学习（未确认）；开发者证据未提供，复核日期待补。
+
+<a id="l-m1d-02"></a>
+#### L-M1D-02 — 有来源不等于正确，压缩不等于等价
+
+- 前置知识：Prompt、结构化输出、证据索引与语义范围。
+- 源码入口：InterviewReportPromptBuilder.build；DeepSeekInterviewReportGenerator.validateTextList；tools/m1d/CompactReportPromptBuilder.java与QUALITY_AUDIT.md。
+- 核心问题：correction里的拓展为什么不能变成weakness？Q引用存在为什么仍可能丢MAIN/追问限定？输入已有错误时第二次模型能保证修复吗？
+- 练习：从call6指出漏掉的Q4；复现private接口方法release8/9反例；解释call8为何finish_reason=stop仍必须FAILED，不得放宽5项校验。
+- 掌握状态：待学习（未确认）；开发者证据未提供，复核日期待补。
+
+<a id="l-m1d-03"></a>
+#### L-M1D-03 — 受理、持久READY和可见时间
+
+- 前置知识：单调时钟、afterCommit、浏览器轮询、异步请求防重。
+- 源码入口：tools/m1c-r2/ReportProbe.java；tools/m1d/analyze.py/browser-worker.cjs；useInterviewReport.ts的startPolling/refreshReport/adoptReport。
+- 核心问题：为什么生成器0.658ms仍需约3.1秒看到？缩短轮询改变哪段延迟、不改变哪段？为什么不能把不同组P95相减当分段？
+- 练习：从task-timeline取一条T9到GET/DOM时点复算，解释3.416秒回放的GET2→4；推导长GENERATING下1秒轮询负载约3倍以及in-flight锁作用。
+- 掌握状态：待学习（未确认）；开发者证据未提供，复核日期待补。
+
+<a id="l-m1d-04"></a>
+#### L-M1D-04 — Token、缓存与失败调用成本
+
+- 前置知识：usage、缓存命中/未命中、预算预留与未知结果。
+- 源码入口：tools/m1d/guard.py；m1d-20261115/paid-usage.jsonl/cost-summary.json。
+- 核心问题：为什么精简v1 Token更少但本批估算更贵？校验失败为何仍计费？费用估算与实际账单有什么差别？
+- 练习：手算8次15592/4658 Token的非高峰$0.004268064；解释固定12次/$0.50预算为何在第8次停止，未知usage时为什么不能盲目重试。
+- 掌握状态：待学习（未确认）；开发者证据未提供，复核日期待补。
+
+<a id="l-m1d-05"></a>
+#### L-M1D-05 — 纯Java、MQ和两阶段报告取舍
+
+- 前置知识：Outbox、CAS、唯一约束、不可变最终结果、幂等。
+- 源码入口：DeterministicReportGenerator.generate/select；InterviewReportTransactionService.completeReportGeneration；M1dExperiment的提交后提示原型。
+- 核心问题：无模型时哪些恢复成本仍存在？为什么不能把规则报告先READY再直接覆盖AI结果？只读basicReport与持久两阶段状态有什么区别？
+- 练习：用模型返回前/后、事务提交前/后四个崩溃窗口解释当前契约，设计互斥的未来执行方式，不能同时启用两条提交路径。
+- 掌握状态：待学习（未确认）；开发者证据未提供，复核日期待补。
+
+<a id="l-m1d-06"></a>
+#### L-M1D-06 — 实验夹具也需要业务隔离
+
+- 前置知识：随机组卷、题目状态、评分点约束、事务回滚。
+- 源码入口：tools/m1d/fixtures.py；InterviewQuestionPlanSnapshotService.prepareSnapshot；FullInterviewBusinessOfflineTest.createDatabaseFixtures。
+- 核心问题：为什么报告实验复制的EASY题会影响另一组离线组卷测试？仅用独立数据库为什么还不够？
+- 练习：追踪首次125失败的question has no enabled scoring points证据，说明只把本轮新建且有标记的复制题设DISABLED为什么不影响已保存MAIN快照，也不应删除约束/跳过测试。
+- 掌握状态：待学习（未确认）；开发者证据未提供，复核日期待补。
+
+
+### M1-E — 可靠提交、可丢失提示与用户可见时间（2026-11-15）
+
+关联[主报告和逐条证据](m1e-20261115/DECISION_AND_VERIFICATION.md)。工程测试通过与开发者本人掌握分别登记；当前HEAD84e3489a85d0fb6c8b54ad2a130c52d7476fb897加未提交工作区，本批无提交SHA。
+
+<a id="l-m1e-01"></a>
+#### L-M1E-01 — 持久Outbox与提交后唤醒的不同责任
+
+- 前置知识：Spring事务同步、ThreadLocal事务资源、线程池拒绝策略、CAS租约。
+- 源码入口：ReportOutboxWakeup.onTaskAccepted、ReportAsyncConfiguration.reportWakeupExecutor、InterviewReportTransactionService.acceptReportTask、ReportOutboxDispatcher.dispatchDue；ReportOutboxWakeupIntegrationTest。
+- 核心问题：为什么事件可丢失而任务不能丢失？AFTER_COMMIT为什么不直接发网络？为何不用CallerRuns或在残留事务资源上继续写？AtomicBoolean吞掉执行中的提示为何仍正确？
+- 独立练习：复现提交回滚/执行器拒绝/并行扫描/消费者先完成4个窗口，解释500ms兜底、leaseToken与executionVersion保护的对象，说明提示只能优化等待而不保证恰好一次。
+- 掌握状态：**待学习（未确认）**；开发者独立解释、复现或修改证据未提供。最近复核：2026-11-15 / Codex。
+
+<a id="l-m1e-02"></a>
+#### L-M1E-02 — 生成、提前开始、观察与基础内容可见
+
+- 前置知识：MAIN/INITIAL/FINAL、完成事务、幂等POST、Vue computed/epoch、XHR与动画帧。
+- 源码入口：InterviewReportView.vue的showEvidence/savedFinals，useInterviewReport.ts的timeline/refreshReport，tools/m1e/browser-worker.cjs与analyze.py。
+- 核心问题：首份逐题分数0.085秒为什么不等于完整报告？P2的5秒阅读为什么减少页面等待而不是模型耗时？FINAL数据库旧记录重放与本次完成事务提交的计时边界有何差别？
+- 独立练习：复算A的完整页反而慢986.6ms和首份结果早4146ms；核对B FAILED仍展示保存分数、不写报告/弱项；解释详情每页1次以及401/404停止与旧响应隔离。
+- 掌握状态：**待学习（未确认）**；开发者证据未提供。尚待验证：后台标签页退避、真人可用性，不把未实现候选记为掌握。
+
+<a id="l-m1e-03"></a>
+#### L-M1E-03 — 完整输入、模型失败和可核验费用
+
+- 前置知识：不可信模型输出、数组校验、证据范围、响应流、Token/cache用量和预算预留。
+- 源码入口：DeepSeekInterviewReportGenerator.validateTextList、InterviewReportPromptBuilder.build；tools/m1e/guard.py；quality-audit.json、paid-usage.jsonl。
+- 核心问题：同样请求为什么一份READY一份FAILED？200/stop为何不等于业务成功？为什么“有题干+得分”不能推出replace知识欠缺？保存和转发响应如何保证只读一次？
+- 独立练习：定位call3的7项违例；对齐F输入空列表与输出具体弱项，查Java8/9规范；复算12次费用、区分预算换算与真实汇率/账单，说明未知usage不能按0处理。
+- 掌握状态：**待学习（未确认）**；无开发者本人审核证据。内容发布仍NO-GO，不以AI抽查代替人工盲审。
+
+<a id="l-m1e-04"></a>
+#### L-M1E-04 — 实验协议纠错与实际并发
+
+- 前置知识：客户端线程数、模型在途区间、闭环相位、热身与冷启动、单调时钟校准。
+- 源码入口：tools/m1e/run.py的ThreadPoolExecutor、ReportProbe.java、analyze.py；protocol-correction.json和原始事件。
+- 核心问题：为什么concurrency+1把标称1/8变成2/9？客户端8为什么模型峰值4？采样DB等待0为何不证明没有短等待？为何成功样本中位数不能掩盖1个失败？
+- 独立练习：从T7/T8重建峰值，复算正确c1和c8对照、解释c8无收益；按6对请求哈希配对并保留失败/冷连接/缓存条件，不宣传稳定P95。
+- 掌握状态：**待学习（未确认）**；开发者独立复现证据未提供。后续学习不授权新增付费实验或提交推送。
+
+
+#### L-M1E-05 — epoch 隔离不等于请求合并，离线重放不等于新模型成功（2026-11-15）
+
+- 前置知识：Promise 在途复用、组件生命周期、路由 epoch、防止过期响应与防止重复请求的区别；完整原响应、结构校验短路顺序、Mock HTTP 与外部调用证据类型。
+- 源码入口：`useInterviewReport.refreshReport/queryReportForScope/recoverGenerating`、`InterviewReportView.spec.ts`；`DeepSeekInterviewReportGeneratorTest.givenSavedM1eResponse_whenReplayed_thenRejectsSevenStrengthsWithoutRepair` 与原响应资源。调用链：定时器/手动按钮→同域 Promise→GET→终态停轮询；原响应→客户端解析→报告列表校验→越界异常。
+- 核心问题：手动递增 epoch 为什么能防止旧响应覆盖，却同时绕过在途保护？离页后停止轮询为什么不等于已发 HTTP 被取消？FAILED 重新登录应怎样从服务端归属校验后的已保存结果恢复？stop＋可解析 JSON 为什么仍可被 1–5 项业务约束拒绝？为什么本次重放不能冒充事故时保存的完整异常堆栈？
+- 独立练习：复现 3 个重叠失败，再使同域峰值 GET=1；解释 READY/FAILED/404、换路由、离页及登录切换断言。核验原响应 SHA 和 7/7/5 条目，指出实际第一异常和未执行到的后续约束；区分本次 14 项 Mock 与历史真实 11 READY/1 FAILED，不修改 JSON 或校验规则。
+- 证据与取舍：本次前端定向 59、全量 349、生成器 14 全通过；旧后端 1947/0/0/34 复用未重跑。原 1.463→1.040 秒为 1 秒桩 c1；4.223→0.085 秒为已有逐题结果可见，不能说完整报告稳定提速；内容发布 NO-GO 仍成立。[本次验证](m1e-20261115/closeout/VERIFICATION.json)。
+- 掌握状态：**待学习（未确认）**。尚无开发者本人解释、复现或独立修改证据；L-M1E-01～04 状态不变。学习条目不授权后续真实调用、提交或部署。
+
+
+### ARCHIVE-01｜依赖顺序学习索引（2026-11-15）
+
+- 原有学习条目和已有证据原样保留；[15 个源码学习模块](PROJECT_SOURCE_LEARNING_GUIDE.md) 按 Session/FINAL → 幂等/CAS → 事务与 MyBatis 缓存 → 同步/异步报告 → MQ/Outbox → 执行围栏/恢复 → 前端与性能 → 评分/RAG 顺序串联。
+- 与已有条目建立入口：[H01–H04](PROJECT_ENGINEERING_HISTORY_20261111_20261115.md#h01) 对应 B1–B4/B5；[H05–H12](PROJECT_ENGINEERING_HISTORY_20261111_20261115.md#h05) 对应题库、U1/U2、S1 和 Q1/Q2；[H13–H21](PROJECT_ENGINEERING_HISTORY_20261111_20261115.md#h13) 对应 M1-A～M1-E。
+- [10 个面试演练](PROJECT_INTERVIEW_CASES.md) 含追问、取舍、历史证据和禁止夸大之处。AI 辅助产出不等于本人独立实现或掌握。
+- 新路线全部为 **待学习 / 待确认**；仅在用户提供本人解释、复现或独立修改证据后确认。归档不授权启动真实模型、迁移、部署或新增大规模测试。
+
+
+### P2-MQ-AUDIT｜公平性能比较与单体异步取舍（2026-11-15）
+
+本次只登记后续学习入口，未开展源码学习或个人能力验收；以下两项均待学习，旧条目状态不变。
+
+<a id="l-p2mq-01"></a>
+#### L-P2MQ-01 — 相同模型上限下的端到端性能口径
+
+- 关联记录：[P2-MQ-AUDIT](IMPROVEMENT_LEDGER.md#p2-mq-audit)、[审计报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-15-RocketMQ性能收益与工程价值审计.md)第 3、7 节；当前为 HEAD 84e3489 加未提交工作区，无本批代码 SHA。
+- 前置知识：L-M1C-01、L-M1C-R2-01～04、L-M1E-04；闭环并发、样本分位数和事务提交。
+- 源码入口：tools/m1c/benchmark.py、tools/m1c/summarize.py、tools/m1c-r2/ReportProbe.java、tools/m1c-r2/analyze.py；ReportMqRuntime.connect 和 ReportMessageConsumer.onMessage。
+- 核心问题：为何 POST READY 与 GENERATING 延迟不能直接当生成收益？K=4 的桩许可为何必须计入排队？为什么不能用不同任务或组的 P95 相减？模型峰值与客户端并发分别代表什么？
+- 将来独立练习：复算 M1-C 原波次吞吐、R2 8/8 同峰值及 M1-E c1/c8 的中位数；区分失败分母和缺少稳定 P95 的证据。不在本轮执行学习。
+- 掌握状态：待学习（未确认）；开发者掌握证据未提供；尚待公平 A/B 和本人复现/解释；最近复核 2026-11-15 / Codex。
+
+<a id="l-p2mq-02"></a>
+#### L-P2MQ-02 — 事务 Outbox 与数据库持久任务的工程边界
+
+- 关联记录：[P2-MQ-AUDIT](IMPROVEMENT_LEDGER.md#p2-mq-audit)、[审计报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-15-RocketMQ性能收益与工程价值审计.md)第 4～6 节；数据库任务替代方案仅设计。
+- 前置知识：L-M1B-01～04、L-M1E-01；事务、租约、版本围栏、终态幂等。
+- 源码入口：InterviewReportTransactionService.acceptReportTask/claimTaskExecution/completeReportGeneration、ReportOutboxWakeup.onTaskAccepted、ReportOutboxDispatcher.dispatchDue、ReportMqRuntime.connect、InterviewReportTaskMapper.xml 与 UserWeaknessMapper.xml。
+- 核心问题：哪些可靠性来自同库事务/CAS，哪些依赖 Broker？本地 Future 为何不是持久任务？同用户弱项热点为何尚无实验结论？超过单批量与丢失提示怎样由补扫兜底？
+- 将来独立练习：按提交前后、发送回执未知、模型返回后及最终提交后四个窗口画状态表，对照历史失败证据；对比方案 C 所需领取、回退与运维，不先修改数据库。不在本轮执行学习。
+- 掌握状态：待学习（未确认）；开发者掌握证据未提供；方案 C 等价性、无迁移复用和本人理解均待验证；最近复核 2026-11-15 / Codex。
+
+
+<a id="l-p2mq-03"></a>
+### L-P2MQ-03 — 公平模型许可与实验准入（2026-11-15）
+
+- **本轮仅登记后续学习入口：**关联 [P2-MQ-FAIR-AB](IMPROVEMENT_LEDGER.md#p2-mq-fair-ab) 和[核验报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-15-RocketMQ公平AB基线验证.md)；没有开展源码教学或个人能力验收。
+- **入口：**`tools/m1c/benchmark.py` 的模型桩与单 MAIN 夹具、`tools/m1c-r2/run.py`/`ReportProbe.java` 的模型峰值及 afterCommit 计时、`tools/m1d/fixtures.py` 的五 MAIN 夹具、`docs/engineering/p2-mq-fair-ab-20261115/offline_replay.py` 的历史口径。
+- **以后待核验问题：**客户端并发、工作线程、模型入口排队与实际 K=4 许可各自限制什么；为什么请求体完整哈希和成对数据是准入条件；为什么 POST READY 与 GENERATING 不同，n=8 的 nearest-rank P95 仅为最大值；旧线程数和扫描周期同时改变时如何避免错误归因。
+- **掌握状态：待学习（未确认）。**没有用户独立解释、复现或修改证据；本轮仅完成离线复算，公平 A/B、生产可靠性和 4→8 收益均未验证。
+
+
+<a id="l-git-01"></a>
+### L-GIT-01 — 工作区版本身份与可构建提交边界（2026-11-15）
+
+- **本轮仅登记后续入口：**[工作区审计台账](IMPROVEMENT_LEDGER.md#git-closeout-audit--二期工作区安全清点与提交规划2026-11-15) 与[逐文件清点报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-15-Git工作区安全收口与提交规划.md)；本轮没有开展源码教学。
+- **源码/证据入口：**`InterviewReportTransactionService.acceptReportTask/claimTaskExecution/completeReportGeneration`、`ReportOutboxDispatcher`、`ReportOutboxWakeup`、`InterviewReportTaskMapper.xml`、`frontend/src/features/interview/composables/useInterviewReport.ts`、M1-E 收口 `source-manifest.json` / `VERIFICATION.json` 与历史原始索引。
+- **后续学习问题：**为什么相同 HEAD 不能标识未提交源码；为什么前后端报告状态协议和迁移/测试必须按依赖审查；历史测试的文件散列与运行环境各能证明什么；如何在不覆盖证据的前提下只选择安全文件。
+- **掌握状态：待学习（未确认）。**用户尚未提供本人解释、复现或独立修改证据；未把自动审计等同于个人掌握。
+
+
+<a id="l-git-02"></a>
+### L-GIT-02 — 隐私夹具、事务回滚与可复验的提交快照（2026-11-15）
+
+- **仅登记后续学习入口：**[工程台账](IMPROVEMENT_LEDGER.md)与[提交前验证报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-15-Git安全整理与提交前验证.md)；本轮不开展源码教学。
+- **入口：**`InterviewReportTransactionService.completeReportGeneration`、`InterviewReportTransactionServiceIntegrationTest.shouldRollbackReportAndWeaknessWhenSessionReadyUpdateFails`、`DeepSeekInterviewReportGeneratorTest` 的合成响应与私有回放、`sql/migrations/20261114_interview_report_task.sql`、本机恢复快照和最终源码清单。
+- **掌握状态：待学习（未确认）。**尚无用户本人独立解释、复现或修改证据；测试通过不代表开发者已掌握。
+
+
+<a id="l-git-03"></a>
+### L-GIT-03 — 分批提交和证据版本的追溯（2026-11-15）
+
+- **仅登记入口：**隐私规则 `ed7a7ba8b1e0c3fc4276154f242e67178acf1b1a`、SQL `18ef21b4c3e3cd30e4d30be645f41bb2ecabb445`、异步报告 `28cb2db25519e9d26c95dc00d716af4993d60f2d`；对应本地工作区代码、测试源码清单和工程台账。各提交边界以 `git show --stat <SHA>` 和本机收口报告为准。
+- **掌握状态：待学习（未确认）。**本轮没有开展源码教学，也没有用户独立解释、复现或修改证据。
+
+
+<a id="l-p2mq-candidate-01"></a>
+### L-P2MQ-CANDIDATE-01 — 当前候选的 Outbox、消费与故障边界（2026-11-15）
+
+- **本轮只登记后续入口：**[当前候选验收台账](IMPROVEMENT_LEDGER.md#p2-mq-candidate-acceptance--当前候选-rocketmq-核心链路复核2026-11-15)、本机 `backups/MQ_CANDIDATE_20261115_soe3tev4/` 的事件、清理前对账和源码比较。未开展源码教学。
+- **入口：**`InterviewReportTransactionService.acceptReportTask/claimTaskExecution/completeReportGeneration`、`ReportOutboxWakeup.onTaskAccepted`、`ReportOutboxDispatcher.dispatchDue`、`ReportMqRuntime`、`ReportMessageConsumer.onMessage`、`InterviewReportTaskMapper.xml` 和 `RealReportRocketMqSmokeTest` 的重复消息/迟到确认方法。
+- **待学习问题：**为何受理后任务可见但报告尚未存在；为什么发送结果不确定后可重发、`markSent` 不得回退业务终态；任务去重与外部模型恰好一次有何区别；为什么 `RUNNING` 时进程崩溃的恢复契约不同于发送前 Broker 短暂停机；历史版本只有部分源码相同意味着什么。
+- **掌握状态：待学习（未确认）。**没有用户本人独立解释、复现或修改证据；一次 4.377 秒恢复仅为受控样本，不是 RTO。
+
+- **补充证据入口：**`wakeup-targeted-junit.log` 的 5 项 Unit/Mock 与 4 项真实 MySQL 事务测试；仍只登记入口，不代表本人已学习或掌握。
+
+
+<a id="l-p2-deploy-admission-01"></a>
+### L-P2-DEPLOY-ADMISSION-01 — 部署目标隔离、迁移与回退（2026-11-15）
+
+- **本轮仅登记入口：**[准入与最小部署报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-15-二期部署环境准入与最小部署方案.md)、[工程台账](IMPROVEMENT_LEDGER.md#p2-deploy-admission)；未开展源码学习或能力验收。
+- **源码入口：**`EnvironmentIsolationInitializer.validateReportMq`、`InterviewReportTransactionService.acceptReportTask`、`ReportMqRuntime.connect/close`、`ReportOutboxDispatcher.dispatchDue/expireDue`、`MilvusCollectionInitializer`、`SecurityConfiguration.securityFilterChain` 与前端 `createWebHistory`；对照 `sql/migrations/20261114_interview_report_task.sql`、本机 `tools/m1b/broker.conf`。测试/历史文件不代表当前部署目标。
+- **后续问题：**为什么 MQ 开关默认关闭且无同步回退；为何 accepting=false 时已有任务仍可被消费；旧同步执行者与历史 GENERATING 为什么须在切换前排空；为什么 MySQL、Milvus、MQ 的备份和 offset 要按一致时点核对；为何 M1-C 局部源码哈希一致不足以证明当前端到端崩溃测试；为何静态文件还需要安全放行和 SPA 路由处理。
+- **掌握状态：待学习（未确认）。**没有开发者本人独立解释、复现或修改证据；登记不授权部署、迁移或真实模型调用。
+
+- **差异复核入口：**后续可对照原始 M1-C `backups/M1C_R2_20261115/entry-B.jar` 与候选 JAR 的 `ReportAsyncProperties`、`ReportAsyncConfiguration$Scheduling`、`InterviewReportTransactionService.acceptReportTask` 和 Dispatcher 注解；本轮只核对，不开展学习。
+
+
+<a id="l-p2-local-demo-01"></a>
+### L-P2-LOCAL-DEMO-01 — 本机真实模型、RAG 与异步报告追踪（2026-11-15）
+
+- **本轮仅登记入口：**[真实演示验收](/Users/kun/Documents/Reports/ai-interview-system/2026-11-15-二期本机完整演示与真实端到端验收.md)、[工程台账](IMPROVEMENT_LEDGER.md#p2-local-demo-e2e)和本机私有 `/Users/kun/Developer/projects/ai-interview-system/backups/DEMO_ENV_20261115_9lpoxk7u/` 的事件、usage、对账及失败日志；没有开展源码学习。
+- **源码入口：**`InterviewService.submitAnswer`、`EvaluationOrchestrationService`、`SpringAiEmbeddingClient`、`MilvusVectorStoreClient`、`InterviewReportTransactionService.acceptReportTask/completeReportGeneration`、`ReportOutboxWakeup`、`ReportMqRuntime`、前端 `useInterviewReport` 与历史路由；对照本机演示 Broker 的 `mqshutdown` 与持久卷证据。
+- **后续学习问题：**为什么 HTTP 异步受理时间不能当完整报告时间；为什么 10 条跨库 ID 一致不证明向量语义质量；为什么参考答案作答会高估真实表现；为什么 `docker stop` 与 JVM `mqshutdown` 的信号路径不同；为什么空载偏移恢复不证明在途消息可靠；为什么用户已启用的后端重启后仍需重新核对限额和真实调用。
+- **掌握状态：待学习（未确认）。**没有开发者本人解释、复现或独立修改证据；登记不改变 Q1/Q2 NO-GO，不额外授权生产部署或清理数据。
+
+<a id="l-p2-aiq-01"></a>
+### L-P2-AIQ-01 — 评分语义、报告证据和模型结构校验（2026-11-15）
+
+- **范围与前置。** 仅登记，当前暂停教学。前置为会话评分点快照、五维求分、单 MAIN 对应有效 FINAL、Jackson record 绑定。 [工程台账](IMPROVEMENT_LEDGER.md#p2-ai-quality) · [验证案例](../evaluation/2026-11-15-AI质量复核案例集.md)
+- **源码入口。** EvaluationPromptBuilder.build、LlmEvaluationValidator.validateScoringPointResults、EvaluationScoreCalculator.calculate、FollowUpPolicy.decide、InterviewReportFinalReader.aggregateFinalEvaluations、InterviewReportPromptBuilder.toPromptEvaluation、DeepSeekInterviewReportGenerator.parseResponse/validateTextList，以及 DeepSeekInterviewReportGeneratorTest 的历史响应回放。
+- **以后待复现。** 用 LinkedList 第 7 点说明 weight、covered 与实际 90 分各来自哪里。分别追溯原报告的已答事实、上游错误和报告新增推断。复验 JSON 模式下重复字段、7/7/5 超限为何在 Java 被拒绝，以及怎么证明重放的字节与真实响应相同。
+- **掌握状态。** 待学习（未确认）；无开发者独立解释、复现或修改证据。
+
+
+<a id="l-p2-report-trust-01"></a>
+### L-P2-REPORT-TRUST-01 — 空弱项、JSON 契约和上游证据边界（2026-11-16）
+
+- **仅登记入口，当前不学习：**[工程台账](IMPROVEMENT_LEDGER.md#p2-report-trust-20261116)、[报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-16-报告内容可信度最小修复与回归验收.md)和被 Git 忽略的 `backups/REPORT_CONTENT_20261116_ua0rf2j0/`；候选已否决。
+- **源码入口：**`InterviewReportPromptBuilder.build/toPromptEvaluation`、`DeepSeekInterviewReportGenerator.parseResponse/validateTextList`、`DeepSeekEvaluationClient.completeJson`、`InterviewReportService` 的报告 JSON 写入与 READY 读回、前端 `InterviewReportView.vue`。对照本机保存的历史真实重复字段、6/7 项响应与 R3 真实对照；先区分结构合法和上游评价真实。
+- **掌握状态：待学习（未确认）。**没有用户本人讲解、复现或独立修改证据；本轮未开展源码学习，也未采用候选。
+
+<a id="l-p2-scoring-quality-01"></a>
+### L-P2-SCORING-QUALITY-01 — 评分金标、原答证据与稳定性（2026-11-16）
+
+- **仅登记入口，当前不开展学习：**[评测协议](../evaluation/2026-11-16-scoring-quality/PROTOCOL.md)、[人工判断历史](../evaluation/2026-11-16-scoring-quality/HUMAN_REVIEW.md)及 [工程台账](IMPROVEMENT_LEDGER.md#p2-scoring-quality-20261116)。
+- **源码入口：**`EvaluationPromptBuilder.build`、`DeepSeekEvaluationClient.evaluate/parseSuggestion`、`LlmEvaluationValidator.validateScoringPointResults`、`EvaluationScoreCalculator.calculate`、`FollowUpPolicy.decide` 与 `tools/scoring-quality-20261116/summarize.py`；对照被忽略的冻结输入及原始响应，注意隐私边界。
+- **掌握状态：待学习（未确认）。**尚无用户独立解释、复现或修改证据；仅登记不表示模型评分质量通过，也不授权修改生产评分规则。
+
+
+<a id="l-p2-reliability-01"></a>
+### L-P2-RELIABILITY-01 — 请求模式、单次核对顺序与反向门禁（2026-11-16）
+
+- **状态：待学习/待确认；本轮源码教学暂停。** 无开发者独立讲解、复现或修改证据，不能因代理完成实验标掌握。
+- **工程入口：**[完整报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-16-AI评分低成本可靠性方案甄别与验证.md) · [证据索引](../evaluation/2026-11-16-reliability/README.md)；`DeepSeekEvaluationClient.evaluate/completeJson/buildRequest`、`DeepSeekProperties`、`EvaluationPromptBuilder`、`LlmEvaluationValidator`、`EvaluationScoreCalculator`、`FollowUpPolicy/FollowUpTargetResolver`、`InterviewReportPromptBuilder.toPromptEvaluation`。
+- **记录的取舍：**候选A仅评分低思考、报告仍disabled；B在同JSON契约先点/纠错后评分，局部改善但真实非法JSON与语义残留使其淘汰。真实HTTP、Java结构、语义依据、分数校准、发布准入需分开；reasoning计入completion而非重复计费，未知请求保留预留不重发。
+- **证据：**基线139/0/0/1、A144/0/0/1、B138/0/0/0，JDK7/0/0/0，报告离线5/0/0/0；17真实响应16 Java有效、1额外环境UNKNOWN，84075已知tokens约¥0.09028836。6个共同合法诊断对2/6→5/6之外存在结构反向失败，不能择优统计。报告21/21原样依据仍可能传播上游错误。
+- **未来掌握确认（不在本轮执行）：**本人能复现删除/JOIN反例、解释真实缺项与拓展区别、说明生产请求与报告隔离和未知usage预算后再更新。没有本批提交SHA；主树代码未改、文档未提交/推送。
+
+
+<a id="l-p2-mq-net-value-01"></a>
+### L-P2-MQ-NET-VALUE-01 — 异步收益口径、恢复责任及成本（2026-11-16）
+
+- **状态：待学习／掌握未确认；本轮不开展源码教学。** 没有用户本人独立解释、复现或修改证据。
+- **入口：**[净收益报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-16-RocketMQ工程净收益审查与后端收口.md)、[指标/可靠性/成本证据](mq-net-value-20261116/README.md)；`InterviewReportService.generateReportForApi`、`InterviewReportTransactionService.acceptReportTask/claimTaskExecution/completeReportGeneration`、`ReportOutboxDispatcher`、`ReportOutboxWakeup`、`ReportMessageConsumer`、`ReportMqRuntime`及两份Task/Session Mapper XML；观测入口 `tools/m1c-r2/ReportProbe.java`、`tools/mq-net-value-20261116/analyze.py`。
+- **后续辨析项：**POST受理与事务afterCommit、轮询可见及闭环吞吐的区别；MQ重投与DB幂等的责任；executionVersion隔离旧执行者；模型返回后崩溃为何显式重试且可能再次付费；500ms扫描的数据库负担；经典PushConsumer队列分配与多实例前提。
+- **结论边界：**共同K=4预实验48+12成功不证明总体吞吐优势，方案C未实现；CONDITIONAL GO保留现有MQ并停止本轮开发。工程文档追加和候选已推送状态不等于本人掌握，也不授权后续重构或教学。
+
+<a id="l-p2-local-deployment-closeout-01"></a>
+### L-P2-LOCAL-DEPLOYMENT-CLOSEOUT-01 — 单机持久化、进程恢复与证据边界（2026-11-16）
+
+- **状态：待学习／掌握未确认；本轮不开展教学。** 用户本人独立解释、复现或修改的证据尚未提供。
+- **入口：**[运行手册](../../tools/local-deployment/README.md)、[启动器](../../tools/local-deployment/backend.py)、[验收索引](2026-11-16-本机部署收口与工程档案.md)、[当前候选故障记录](../../backups/DEPLOY_CLOSEOUT_20261116/crash-recovery/result.json)；对照 `InterviewReportTransactionService.acceptReportTask/claimTaskExecution/completeReportGeneration`、`ReportOutboxDispatcher`、`ReportMqRuntime`、`InterviewReportTaskMapper.xml` 和 `RealReportCrashWindowProbeTest.committedBeforeAnySend`。
+- **以后可辨析：**容器可写层、命名卷和备份的区别；为何消息发送前崩溃可由扫描恢复、RUNNING 崩溃可能失败并需要显式重试；Broker offset 与业务幂等分别证明什么；为何 MySQL InnoDB 一致备份不等于 Milvus/MQ 跨存储一致恢复；为什么 401 不是完整健康检查；NameServer 与 Broker 启动顺序为何仍需核验。
+- **证据边界：**本轮真实测试 MQ 2 项、一次当前候选 kill 样本均使用模型替身；本机空载停启不证明断电恢复；独立备份恢复、长期运行和公网均未放行。不凭档案追加推断个人已掌握。
+
+<a id="l-p2-final-freeze-git-closeout-01"></a>
+### L-P2-FINAL-FREEZE-01 — 交付冻结及独立恢复入口（2026-11-16）
+
+- **状态：待学习／掌握未确认。** 本轮只登记入口，不开展教学；没有开发者本人独立解释、复现或修改证据。
+- **工程入口：**[部署与恢复记录](2026-11-16-本机部署收口与工程档案.md#最终交付冻结与恢复演练)、[单机运行手册](../../tools/local-deployment/README.md)、本机私有[恢复脚本](../../backups/GIT_FREEZE_20261116_a7d4c2/restore_rehearsal.py)和[结果](../../backups/GIT_FREEZE_20261116_a7d4c2/restore-result.json)；业务源码入口 `InterviewReportTransactionService.acceptReportTask/claimTaskExecution/completeReportGeneration`、`ReportOutboxDispatcher`、`ReportMessageConsumer`、`EvaluationPromptBuilder` 和 `InterviewReportPromptBuilder`。
+- **关联历史：**[MQ 指标与故障矩阵](mq-net-value-20261116/README.md)、[评分人工裁决](../evaluation/2026-11-16-scoring-quality/HUMAN_REVIEW.md)、[失败候选](../evaluation/2026-11-16-scoring-quality/FAILURES.md)、[低成本方案](../evaluation/2026-11-16-reliability/README.md)。只记录定位与证据边界，不改变任何业务或模型规则。
+
+<a id="l-p2-final-git-commits-01"></a>
+### L-P2-FINAL-GIT-COMMITS-01 — 版本、证据和隐私边界（2026-11-16）
+
+- **状态：待学习／掌握未确认。** 本次只维护索引，没有源码教学，也没有用户独立解释、复现或修改证据。
+- **以后可查：**[Git 与测试台账](IMPROVEMENT_LEDGER.md#p2-final-git-commits-20261116)、[失败 Prompt](../evaluation/2026-11-16-scoring-quality/FAILED_PROMPTS.md)、[MQ 指标](mq-net-value-20261116/README.md)和[单机手册](../../tools/local-deployment/README.md)。区分源码 SHA、运行 JAR、文档提交和远端状态；区分历史真实服务、离线 Mock 和本轮测试。
+
+<a id="l-p2-final-pr-review-01"></a>
+### L-P2-FINAL-PR-REVIEW-01 — 默认兼容与历史状态切换（2026-11-16）
+
+- **状态：待学习／掌握未确认。** 本轮仅记录审查入口，没有源码教学或开发者独立解释、复现、修改证据。
+- **以后可查：**[PR 审查台账](IMPROVEMENT_LEDGER.md#p2-final-pr-review-20261116)，对照 main 上旧 `InterviewReportService.generateReport/claimReportGeneration` 与候选 `InterviewReportTransactionService.acceptReportTask`、`ReportOutboxDispatcher.expireDue`、前端 `recoverGenerating`。区分无任务的历史 GENERATING、持久 QUEUED 和已领取 RUNNING；区分合并代码与目标迁移、部署授权。
+
+
+<a id="l-pr12-p1-01"></a>
+#### L-PR12-P1-01 — 异步成功语义与确定拒绝
+
+- 关联工程记录／版本：[PR12-P1-COMPAT](IMPROVEMENT_LEDGER.md#pr12-p1-compat-20261116)，`1a425fa5f7939907c5d3468449936d44daa413fd` + 未提交改动；P1-1 ACCEPTED Breaking Change。
+- 前置知识：HTTP 状态码、Result envelope、前端状态机、提交结果不确定。
+- 源码入口：`src/main/java/com/kun/aiinterview/interview/service/InterviewReportTransactionService.java#acceptReportTask`、`common/exception/ServiceUnavailableException.java` 与 `GlobalExceptionHandler`；`frontend/src/features/interview/composables/useInterviewReport.ts#handleGenerateFailure`；`InterviewControllerTest`、`ReportTaskTransactionTest` 和 `frontend/tests/InterviewReportView.spec.ts`。
+- 核心问题：为什么 POST 200/GENERATING 不代表完成？为什么已知 503 可保持原状态而未知 503 必须先 GET？默认关闭和暂停受理为何不同？为什么本轮不恢复同步路径？
+- 独立练习／讲解验收目标：未来对照 NOT_STARTED/FAILED/READY/GENERATING，解释已知拒绝、网络丢响应、异步受理与最终事务；本轮不开展。
+- 掌握状态：**待学习（未确认）**。开发者掌握证据：未提供；测试通过不代替本人解释或独立修改。
+- 尚未验证点：仓库外客户端行为、本人独立复现。最近复核：2026-11-16／Codex，仅登记入口。
+
+<a id="l-pr12-p1-02"></a>
+#### L-PR12-P1-02 — 历史会话与任务所有权的只读切换核对
+
+- 关联工程记录／版本：[本批切换条件](pr12-p1-20261116/README.md)，同上基线 + 未提交改动；P1-2 RESOLVED 仅指已授权目标的核对项。
+- 前置知识：MySQL 一致快照、任务终态、Session CAS、attemptVersion 与 executionVersion、弱项幂等。
+- 源码入口：[只读 SQL](pr12-p1-20261116/report-cutover-readonly.sql)、`InterviewReportTransactionService.acceptReportTask/ownsSession/completeReportGeneration`、`ReportOutboxDispatcher.expireDue`、`InterviewReportTaskMapper.xml#listActiveBySessionId`、`InterviewReportTransactionServiceIntegrationTest`；前端 `recoverGenerating` 仅 GET。
+- 核心问题：为什么 RUNNING 不能只比 attemptVersion？无活跃任务是否等于无历史任务或无报告？为什么异常为 0 只支持当前目标时点，不能证明自动恢复？有报告时怎样避免重放弱项？
+- 独立练习／讲解验收目标：未来用已有隔离用例区分无任务、终态未同步、多活跃和版本不符，解释逐目标授权及停旧执行者条件；本轮仅登记，不能擅自对业务库练习。
+- 掌握状态：**待学习（未确认）**。开发者掌握证据：未提供；真实 MySQL 测试不是本人掌握证据。
+- 尚未验证点：其他数据库、未来切换时点、历史异常的数据修复。最近复核：2026-11-16／Codex，无源码教学或状态升级。
+
+
+<a id="l-pr12-final-01"></a>
+#### L-PR12-FINAL-01 — 全量回归、提交源码与远端检查的对应关系
+
+- 关联记录／版本：[最终回归台账](IMPROVEMENT_LEDGER.md#pr12-final-regression-20261116)；源码 `9a95e53b13fc77be27962696202dc14169f18248`，后续文档提交只改记录。
+- 前置知识：Maven生命周期、Surefire结果、Git提交树、CI head SHA、环境隔离；可先看 L-PR12-P1-01/02。
+- 源码入口：`pom.xml`、`src/test/resources/application-test.yaml`、`ReportTaskTransactionTest`、`InterviewReportTransactionServiceIntegrationTest`、`frontend/tests/InterviewReportView.spec.ts`、`.github/workflows/frontend-checks.yml`；[脱敏回归清单](pr12-p1-20261116/final-regression.json)。
+- 核心问题：为什么package包含test而无需重复全量？为什么1937通过和34跳过要分开？为何提交前测试可由源码散列关联，但远端Checks仍须核对最终HEAD？为什么Node24本地通过不能替代Node22的CI？
+- 未来独立练习／讲解目标：从原始XML、源码SHA和PR检查分别复核一次结果，指出历史真实MQ证据与当前Mock/DB回归边界；本轮仅登记，不开展教学或练习。
+- 掌握状态：**待学习（未确认）**。开发者掌握证据：未提供；实际贡献与独立理解待本人产出。
+- 尚待验证点：本人独立复核能力、其他目标部署准入；没有因此追加业务开发。最近复核：2026-11-16／Codex。

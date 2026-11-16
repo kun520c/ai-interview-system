@@ -77,3 +77,28 @@ __pycache__/
 # One-off runtime resource identities and recovery authorization are local history
 /tools/rag-e2e/contract.json
 /tools/rag-e2e/recovery-plan.json
+
+# Phase 2 private originals: retain locally; publish only separately reviewed fixtures.
+/docs/engineering/2026-11-15-AI面试系统二期交接资料.zip
+/docs/engineering/m1c-20261114/
+/docs/engineering/m1c-20261115-after-fix/
+/docs/engineering/m1c-20261115-browser/
+/docs/engineering/m1c-r2-20261115/
+/docs/engineering/m1d-20261115/
+/docs/engineering/m1e-20261115/
+/docs/engineering/p2-mq-audit-20261115/
+/docs/engineering/p2-mq-fair-ab-20261115/
+/docs/evaluation/q1-20261114/
+/docs/evaluation/q1-r1-20261114/
+/docs/evaluation/q1-r2-20261114/
+/docs/evaluation/q2-20261114/
+/src/test/resources/report/m1e-structure-failure-response.json
+/tools/m1c/real_report.py
+/tools/q1/
+/tools/q2/
+
+# Scoring-quality candidate answers and the frozen, unblinded bank snapshot remain local.
+/docs/evaluation/2026-11-16-scoring-quality/development-v1.json
+/docs/evaluation/2026-11-16-scoring-quality/development-v2.json
+/docs/evaluation/2026-11-16-scoring-quality/holdout-v1.json
+/docs/evaluation/2026-11-16-scoring-quality/evaluation-bank-snapshot.json
