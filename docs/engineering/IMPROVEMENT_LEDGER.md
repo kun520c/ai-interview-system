@@ -1117,3 +1117,45 @@
 - **部署依赖与验证：**`tools/rag-d3/config.py` 已在仓库。启动器仍为既有本机演示工具：指定 JAR、`.env`、数据库及容器由本机提供；默认模式还需私有转发器材料，`--model-config` 可替代转发器但不能替代 JAR 和本机资源。干净检出不能直接复现，私有文件不随仓库公开；[手册](../../tools/local-deployment/README.md)明确此边界。实际本机 `--check` 通过、活跃任务 0；启动器离线测试 `8/0/0/0`，另以模拟缺少配置和 JAR 的两项定向检查 `2/0/0/0` 验证先于模型及数据库访问而拒绝；Compose 配置解析通过。未启动或更改服务，未调用模型。
 - **实际远端结果：**SSH 普通推送首次因代理未加载身份而以 `Permission denied (publickey)` 失败；随后使用已登录 GitHub CLI 的临时 HTTPS 凭据正常推送，GitHub 实时核对远端候选分支与 `5f1240f27a16cd5c2359a401b13a066a80188525` 一致，包含 `38f8ac9eac4d92581bb082fa93a5a8dded16e930` 和 `5f1240f27a16cd5c2359a401b13a066a80188525` 两批。仓库 `origin` 地址未改，未强推、合并或部署。本条及手册的后续文档提交身份和远端状态，以 `git log` 与远端实时核验为准，不能在自身提交正文中预填自身 SHA。
 - **证据与发布限制：**仓库公开汇总数据、技术决策、脱敏案例及失败 Prompt；原始回答、模型响应、私有清单、日志、备份和实验工具仍保留本机，完整研究链不能仅凭公开检出复算。业务源码、前端、SQL、评分 v4 和报告 v1 未变，本轮不重跑历史全量；历史后端 `1950/0/0/34`、真实 MySQL/MQ `2/0/0/0`（模型替身）、前端 `349/0/0/0` 仍按原版本和范围引用。本机受控演示 GO，MQ CONDITIONAL GO，长期运行、公网部署与 AI 内容质量未获准入；没有开展源码学习或确认个人掌握。
+
+<a id="p2-final-pr-review-20261116"></a>
+### P2-FINAL-PR-REVIEW — Draft PR 与合并准入（2026-11-16）
+
+- **范围与版本：**[Draft PR #12](https://github.com/kun520c/ai-interview-system/pull/12)，基线 `84e3489a85d0fb6c8b54ad2a130c52d7476fb897`，候选 `1a425fa5f7939907c5d3468449936d44daa413fd`，`main...HEAD` 为 7 提交、97 文件。仅审查代码、历史证据和配置，不修改业务、评分 v4、报告 v1、MQ 或 SQL，不执行迁移。此前 64 个未提交文件及私有原件保留。
+- **P1 — 默认行为与接口不兼容：**`report.async.enabled=false` 是默认值；`InterviewReportService.generateReportForApi → InterviewReportTransactionService.acceptReportTask` 对未生成或失败报告返回受控 HTTP 400，不再调用 main 上的同步生成路径，已有 READY 可读。启用异步后，新请求的 HTTP 200 表示 GENERATING、报告字段为空，旧同步接口成功则返回 READY；现有前端已轮询，其他假设 POST 直接包含完整报告的客户端须适配。该行为已在 README 标明，仍改变原默认业务能力和成功响应语义。合并前须决定保留兼容的同步回退，或明确接受异步为必需条件并在实际切换前完成目标迁移、MQ 及启用配置；不能直接把开关改为默认开启而假定依赖已就绪。本轮未实施任何修复。
+- **P1 — 历史 GENERATING 的切换：**旧同步版本崩溃遗留的 GENERATING 若无新任务，启用异步时当前代码记录 `REPORT_HISTORY_REQUIRES_RECONCILIATION` 并返回 GENERATING；关闭异步时则直接返回 GENERATING。扫描器只扫描任务表，前端检查仅 GET，无法自行创建新 attempt。旧版提供 stale reclaim。已知切换方案要求停写排空并逐项对账；存在遗留行时须先明确经授权的安全处置，不能批量改状态、无条件重发或假设已恢复。本轮未访问目标数据，遗留行是否存在未知。
+- **一致性审查：**受理同事务更新 Session 并插入任务；派发以租约 CAS 保护，发送在事务外，重复和不确定回执可重投；消费以 Session→Task 锁顺序及 attempt/executionVersion 隔离，报告、弱项和终态在同一事务提交。RUNNING 崩溃可能超时 FAILED、需显式重试和再次调用模型。接口公开状态为 NOT_STARTED/GENERATING/READY/FAILED，Outbox 的 PENDING 是内部投递状态，并非前端 API 状态。
+- **本轮验证 T/F/E/S：**报告受理、状态、消费者、派发、唤醒及配置的 8 个 Maven Unit/Mock 类 `100/0/0/0`，无真实外部服务；GitHub Actions 的 Vue typecheck、lint、构建通过，单测 `349/0/0/0`。GitHub commit status 无条目，仓库目前没有后端 Actions 工作流；不将本地测试称为后端 CI。源码版本一致，复用历史后端全量 `1950/0/0/34`、真实 MySQL/MQ `2/0/0/0`（模型替身）及 MySQL 单库恢复 14/14；均非本轮重跑，跳过不表示真实外部集成通过。
+- **安全与档案：**扫描候选分支完整祖先的 1,983 个可达 blob，并核对本地已知敏感值；历史 Embedding 命中是禁用真实模型的示例占位值，Bearer 命中为测试替身或说明文本，未证实真实凭据泄露，因此未提出无依据的轮换结论。另查本地已知其他 origin 分支独有 blob；模式扫描不能排除未知格式。已核对公开 MQ 正反指标、资源成本、失败 Prompt、人工修订和单机恢复限制；私有原件不上传，公开检出不可完整复算。
+- **P2 — 已公开的历史测试口令：**main 历史中的 `frontend/scripts/phase-9b-real-smoke.mjs` 会向本机 8080 注册使用固定测试口令的生成账号，脚本没有断言目标库隔离或清理账号；这是既有文件，不是本 PR 引入。已找到的原验收记录显示当次 `ECONNREFUSED`、未创建账号，其他运行及当前各库是否存在这些账号未知。另一个浏览器验收工具的固定测试管理员限定于独立测试数据库与私有 datadir，历史记录显示服务已停止。不要把这些测试值当真实供应商凭据；若旧 smoke 曾成功作用于非隔离目标，应在获准的确切目标核查并禁用或重置对应临时账号，不擅自查询或改动用户库。
+- **决策与状态：**当前 **合并 NO-GO**，先解决或明确接受以上兼容性及切换条件；不把 GitHub 的可自动合并等同业务准入。MQ 仍 CONDITIONAL GO，本机受控演示 GO，长期运行、公网发布和 AI 内容质量未放行。此条及相关案例、简历证据、学习入口为本地文档追加，尚未提交或推送；未进行源码教学，个人掌握待确认。无本轮新增模型调用或数据迁移。
+
+
+<a id="pr12-p1-compat-20261116"></a>
+### PR12-P1-COMPAT — 接受异步接口变更并核对历史状态（2026-11-16）
+
+- **日期／执行者／状态：**2026-11-16（Asia/Shanghai），Codex。已审查、编码、编译、定向验证；未打包、部署、暂存、提交或推送。基线 `1a425fa5f7939907c5d3468449936d44daa413fd`，对照 main `84e3489a85d0fb6c8b54ad2a130c52d7476fb897`。前一条 PR 审查和原始实验完整保留，本条是后续状态更新。
+- **发现／证据：**[PR #12](https://github.com/kun520c/ai-interview-system/pull/12) 描述列出两个 P1，本轮评论/review threads 均为空；源码对照确认旧同步路径和 stale POST CAS 存在于 main、新版已移除。[本批处置与切换说明](pr12-p1-20261116/README.md)、[只读 SQL](pr12-p1-20261116/report-cutover-readonly.sql)、[逐类验证及散列](pr12-p1-20261116/verification.json)为当前证据。原始日志与入场保护位于 `/Users/kun/Developer/projects/ai-interview-system/backups/PR12_P1_20261116/`，没有上传私有 XML/凭据。
+- **P1-1／最终 ACCEPTED：**原同步 POST 成功返回 READY，新版 HTTP 200 只表示 GENERATING；默认 false 时首次/FAILED 生成不再可用，READY 仍可读。根因是 `acceptReportTask` 取代同步生成且将未启用、暂停受理/无生成器混为 BusinessException 400。用户明确允许接受异步必需条件；不恢复两套同步状态机、不做 MQ 故障同步降级、不默认开启 MQ。新增 `ServiceUnavailableException` 和 503 映射，两种原因分别为“未启用”与“暂不受理”；前端只精确识别已知 503，保留旧 400 消息及未知 5xx GET-first。解决的是错误分类和提示，**接受的是旧默认能力及成功响应语义的不兼容**。其他同步客户端/只认 400 的客户端尚未穷举，须配套升级。
+- **P1-2／最终 RESOLVED（限获准目标核对项）：**旧 GENERATING 没有新任务时，新消费者/扫描器看不到，GET 可能长期等待。用户本轮明确允许现有容器 `ai-interview-mac-mysql-1`、`127.0.0.1:3308/ai_interview` 只读，并允许同实例 `ai_interview_test` 有界测试。16:26:16 本机演示库一致快照：READY 1、GENERATING 0、SUCCEEDED/SENT 1、活跃任务 0；无报告无任务、已有报告非 READY、仅失败/成功终态未同步、多活跃任务、Session/任务版本异常等均 0，情况 A。备选自动重建、批量修状态和复杂恢复均拒绝；保留不接管，补充 POST 版本不匹配日志及前端长期等待人工核对提示。**没有修复历史数据或恢复旧同步 stale reclaim**；其他数据库和未来时点未核查，须再执行切换门禁，存在异常则停止并逐项另取数据操作授权。
+- **文件／调用链：**生产为 `common/exception/ServiceUnavailableException`（新增）、`GlobalExceptionHandler`、`InterviewReportTransactionService.acceptReportTask`、前端 `useInterviewReport.handleGenerateFailure` 与 `reportCopy`；4 个相关测试文件补契约/事务/前端反例。调用链 `Controller → InterviewReportService.generateReportForApi → acceptReportTask` 保留 Session→Task 锁顺序、同事务受理，最终报告/弱项/终态事务不变；`getReport` 与扫描器只读审查未改。配置/Mapper/Schema/Prompt 未改。`GETTING_STARTED` 加门禁，本目录新增说明/SQL/验证 JSON，四份工程档案仅追加；完整文件列表见本批说明。
+- **实际验证 T/F/E/S：**Java 21.0.13、Maven 3.9.16、MySQL 8.0.45，实测 macOS 26.7.1 ARM64；后端 13 类共 **200/0/0/0**，200 通过，拆为 Unit/Mock/配置 106、MockMvc 35、真实 MySQL/MyBatis/事务 59，退出 0。Node 24.22.1/npm 11.19.1/Vitest 5.0.1，报告页 **65/0/0/0**、65 通过，typecheck/定向 ESLint 退出 0。含禁用四状态、启用受理、重复 POST、READY 重读、正常 QUEUED/RUNNING、无任务、仅终态、版本不符、多任务、已有报告不重放弱项；前端已知拒绝不显示成功、不自动 POST，未知 503 保持 GET-first。测试库涉及 9 表前后均 0，只清理本轮生成主键。
+- **失败／未执行：**初次普通沙箱读取 Docker socket 被拒绝，随后按获准范围提升权限完成，非代码失败。测试首轮全通过，无降级检查、删测试或跳过失败。全量 Maven/前端、真实 MQ、供应商模型、Embedding/Milvus、evaluation、真实浏览器端到端未运行；本轮模型调用 0。0 跳过仅是选定集合，不等于 guarded Smoke 通过；不把历史全量当本轮结果。性能未测，MQ CONDITIONAL GO 和原失败证据保持。
+- **Git／准入／后续：**本地与实时远端候选 HEAD 仍为 `1a425fa5f7939907c5d3468449936d44daa413fd`；所有本批改动仅工作区，暂存区为空，无本批 commit SHA。入场 68 个 dirty 文件保留，四份工程档案保留原文后追加，其余 64 项正文/mode 不变。当前本地修订满足本轮定向技术门禁；远端 Draft PR 仍是旧代码和 NO-GO 描述，须另获提交/推送授权，更新审查信息、核对新 HEAD CI 后才确认实际合并准入。未向 GitHub发消息。切换仍需旧执行者停止、备份、逐目标核对及迁移/部署授权；本轮没有批准或实施这些操作。
+- **学习关联：**L-PR12-P1-01／02，以下清单仅登记入口；没有教学或本人独立解释、复现、修改证据。工程完成不等于个人掌握。本机受控演示 GO，长期运行/公网发布 NO-GO 不变。
+
+
+<a id="pr12-final-regression-20261116"></a>
+### PR12-FINAL-REGRESSION — 全量回归、普通推送与合并建议（2026-11-16）
+
+- **任务／状态：**用户明确授权本轮审查、最终回归、逐文件暂存、普通提交/推送、更新 Draft PR #12，不授权合并或部署。17 个 P1 文件逐项及散列核对一致，未发现需要继续修复的新生产问题；旧 68 个 dirty 文件保护仍有效，四份共享档案原文保留，其余 64 个正文/mode 不变。学习只登记入口。
+- **根因／选择／风险：**P1-1 的旧同步 POST→READY 被异步 POST→GENERATING 取代，默认关闭导致新报告不可生成；用户选择 **ACCEPTED Breaking Change**，不恢复双路径、不默认开启 MQ、不隐式同步降级。错误分类和前端明确拒绝处理已修正，但没有恢复同步兼容。P1-2 是旧 GENERATING 无任务无法被扫描；16:26:16 对获准 `127.0.0.1:3308/ai_interview` 只读快照异常 0，因此 **RESOLVED 仅限该核对项**，保留安全不接管。此次不重连业务库，不把旧快照写成新数据；其他目标切换前须重复核对。
+- **代码／事务／范围：**调用链及文件同 PR12-P1-COMPAT；新增 503 的 ServiceUnavailableException、受理原因区分、前端精确拒绝和历史状态诊断，无新的数据写入路径。最终事务、弱项、MQ、Schema、评分 v4/报告 v1 均未再改动。本轮生产/测试源码与已验证候选相同，只补工程记录和发布证据。
+- **实际全量 T/F/E/S：**2026-11-16 16:48:44–16:49:44，当前源码执行 `./mvnw -B -ntp package`，151 类 **1971/0/0/34**，1937 通过，退出 0、重打包成功；原 P1 定向 200 项包含其中且全部通过。真实 MySQL 仅 `127.0.0.1:3308/ai_interview_test`，14 表前后行数均 0，永久结构未变；现有迁移回归仅操作连接内临时表。Node24 本地前端全量 37 文件 **355/0/0/0**，355 通过，报告页65项包含其中；typecheck、全量 lint、build 全通过。环境版本及逐项证据见 [最终回归记录](pr12-p1-20261116/final-regression.json)。
+- **跳过／失败／复用：**34 项为显式 opt-in 的外部服务、报告 MQ/崩溃探针和 AI baseline，未启用；不是集成通过。当前全量首轮通过，无删测试、放宽检查、失败重跑或新增真实模型/MQ。历史真实 MQ/模型替身、故障恢复证据继续保留，当前差异未触及其核心链路，故不重复性能/付费测试。后端日志中的合成故障注入并非测试失败。
+- **Git 事实：**代码/测试9文件普通提交 `9a95e53b13fc77be27962696202dc14169f18248`，已普通推送到 `codex/phase2-git-closeout`；GitHub live PR head 逐字核对相同。远端 main 核对仍为 `84e3489a85d0fb6c8b54ad2a130c52d7476fb897`，未合并。接续文档批9文件包括原8项及新 final-regression.json；其自身 SHA 和最终远端/Checks 由 PR 与本机发布证据核验，不伪造自引用 SHA。无 force push/rebase/业务库迁移或部署。
+- **GitHub 源码检查：**[43834763837/job133188536470](https://github.com/kun520c/ai-interview-system/actions/runs/43834763837/job/133188536470) 全成功，Node22.23.4，Vitest355通过，typecheck/lint/build通过；Commit Status无条目。最终文档推送后继续检查该最终HEAD；后端全量是本地验证，不称为后端CI。
+- **审查结论／限制：**新增 P0、未接受 P1 未发现；最终 HEAD Checks 通过后给出 **MERGE GO** 建议，可转 Ready for Review，按本任务范围仍保留 Draft，不直接合并。P2仍有后端CI缺口、main既有固定口令smoke的其他环境使用未知；仓库外客户端需适配已接受的异步/503契约。MQ CONDITIONAL GO、内容质量局限、受控演示GO、长期/公网NO-GO保持。
+- **证据／学习／收口：**[说明第8节](pr12-p1-20261116/README.md#8-最终回归与发布记录2026-11-16后续任务)，本机 `/Users/kun/Developer/projects/ai-interview-system/backups/PR12_FINAL_20261116/` 保存完整日志、151 XML、DB前后、入场文件和推送/CI证据；首轮 evidence不覆写。关联 L-PR12-FINAL-01，掌握未确认。之后仅完成文档推送、PR说明和Checks核对，不扩展新业务任务。
+
+- 发布前安全检查补记：精确本机配置值扫描首轮命中 GETTING_STARTED 中的既有禁用示例占位值；核对原 HEAD 与当前均仅出现 1 次，未新增真实凭据。原始命中与脱敏核查存于本轮 credential-scan-triage.json。保持其他精确值与凭据模式检查，不将占位值误报为泄露，也不将这次扫描中断计作测试失败。

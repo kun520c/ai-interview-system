@@ -183,6 +183,12 @@ $env:DEEPSEEK_API_KEY = [System.Net.NetworkCredential]::new('', $deepseekKey).Pa
 
 将 ID 替换成接口返回的当前问题 ID。重试同一提交时必须复用完全相同的 `requestId`、问题 ID 与答案内容；下一题使用新的 requestId。异步报告完成独立配置后，最终评价确认可通过 `POST /api/interviews/{sessionId}/report` 受理生成，并通过 GET 查询状态。
 
+### 报告异步契约与启用门禁
+
+新版报告接口采用经审查接受的 **Breaking Change**：新任务 POST 成功仍为 HTTP 200，但返回 `GENERATING` 和空报告字段；前端须通过 GET 等待 `READY` 后展示完整报告。READY 的重复读取/POST 不重新生成。`REPORT_ASYNC_ENABLED` 默认仍为 `false`，没有同步生成回退；关闭时首次生成和 FAILED 重试返回 HTTP/code 503「报告生成服务未启用，请联系管理员」。启用但暂停受理或缺少生成器时返回 503「报告生成服务暂不受理新请求，请稍后重试」。已受理任务的 MQ 暂时失败沿既有 Outbox 处理，不同步降级。
+
+只有在明确获准的目标完成任务表核验/必要迁移、旧执行者停写排空、历史 GENERATING/报告/任务/版本对账、备份及 MQ/模型配置检查后，才允许按部署授权开启异步模式。基础 13 表初始化不足以支持异步报告；不能为了消除 503 直接打开开关。历史无任务的 GENERATING 不会自动修复，须先核对并逐项批准处置。完整步骤、只读 SQL、客户端影响及本轮证据见 [PR #12 兼容性收口](engineering/pr12-p1-20261116/README.md)。
+
 ## 7. 测试
 
 前端：

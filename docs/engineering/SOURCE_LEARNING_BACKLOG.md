@@ -1854,3 +1854,44 @@ L-E3E01-01后续证据（2026-11-14）：真实配置已补齐，禁重试与一
 
 - **状态：待学习／掌握未确认。** 本次只维护索引，没有源码教学，也没有用户独立解释、复现或修改证据。
 - **以后可查：**[Git 与测试台账](IMPROVEMENT_LEDGER.md#p2-final-git-commits-20261116)、[失败 Prompt](../evaluation/2026-11-16-scoring-quality/FAILED_PROMPTS.md)、[MQ 指标](mq-net-value-20261116/README.md)和[单机手册](../../tools/local-deployment/README.md)。区分源码 SHA、运行 JAR、文档提交和远端状态；区分历史真实服务、离线 Mock 和本轮测试。
+
+<a id="l-p2-final-pr-review-01"></a>
+### L-P2-FINAL-PR-REVIEW-01 — 默认兼容与历史状态切换（2026-11-16）
+
+- **状态：待学习／掌握未确认。** 本轮仅记录审查入口，没有源码教学或开发者独立解释、复现、修改证据。
+- **以后可查：**[PR 审查台账](IMPROVEMENT_LEDGER.md#p2-final-pr-review-20261116)，对照 main 上旧 `InterviewReportService.generateReport/claimReportGeneration` 与候选 `InterviewReportTransactionService.acceptReportTask`、`ReportOutboxDispatcher.expireDue`、前端 `recoverGenerating`。区分无任务的历史 GENERATING、持久 QUEUED 和已领取 RUNNING；区分合并代码与目标迁移、部署授权。
+
+
+<a id="l-pr12-p1-01"></a>
+#### L-PR12-P1-01 — 异步成功语义与确定拒绝
+
+- 关联工程记录／版本：[PR12-P1-COMPAT](IMPROVEMENT_LEDGER.md#pr12-p1-compat-20261116)，`1a425fa5f7939907c5d3468449936d44daa413fd` + 未提交改动；P1-1 ACCEPTED Breaking Change。
+- 前置知识：HTTP 状态码、Result envelope、前端状态机、提交结果不确定。
+- 源码入口：`src/main/java/com/kun/aiinterview/interview/service/InterviewReportTransactionService.java#acceptReportTask`、`common/exception/ServiceUnavailableException.java` 与 `GlobalExceptionHandler`；`frontend/src/features/interview/composables/useInterviewReport.ts#handleGenerateFailure`；`InterviewControllerTest`、`ReportTaskTransactionTest` 和 `frontend/tests/InterviewReportView.spec.ts`。
+- 核心问题：为什么 POST 200/GENERATING 不代表完成？为什么已知 503 可保持原状态而未知 503 必须先 GET？默认关闭和暂停受理为何不同？为什么本轮不恢复同步路径？
+- 独立练习／讲解验收目标：未来对照 NOT_STARTED/FAILED/READY/GENERATING，解释已知拒绝、网络丢响应、异步受理与最终事务；本轮不开展。
+- 掌握状态：**待学习（未确认）**。开发者掌握证据：未提供；测试通过不代替本人解释或独立修改。
+- 尚未验证点：仓库外客户端行为、本人独立复现。最近复核：2026-11-16／Codex，仅登记入口。
+
+<a id="l-pr12-p1-02"></a>
+#### L-PR12-P1-02 — 历史会话与任务所有权的只读切换核对
+
+- 关联工程记录／版本：[本批切换条件](pr12-p1-20261116/README.md)，同上基线 + 未提交改动；P1-2 RESOLVED 仅指已授权目标的核对项。
+- 前置知识：MySQL 一致快照、任务终态、Session CAS、attemptVersion 与 executionVersion、弱项幂等。
+- 源码入口：[只读 SQL](pr12-p1-20261116/report-cutover-readonly.sql)、`InterviewReportTransactionService.acceptReportTask/ownsSession/completeReportGeneration`、`ReportOutboxDispatcher.expireDue`、`InterviewReportTaskMapper.xml#listActiveBySessionId`、`InterviewReportTransactionServiceIntegrationTest`；前端 `recoverGenerating` 仅 GET。
+- 核心问题：为什么 RUNNING 不能只比 attemptVersion？无活跃任务是否等于无历史任务或无报告？为什么异常为 0 只支持当前目标时点，不能证明自动恢复？有报告时怎样避免重放弱项？
+- 独立练习／讲解验收目标：未来用已有隔离用例区分无任务、终态未同步、多活跃和版本不符，解释逐目标授权及停旧执行者条件；本轮仅登记，不能擅自对业务库练习。
+- 掌握状态：**待学习（未确认）**。开发者掌握证据：未提供；真实 MySQL 测试不是本人掌握证据。
+- 尚未验证点：其他数据库、未来切换时点、历史异常的数据修复。最近复核：2026-11-16／Codex，无源码教学或状态升级。
+
+
+<a id="l-pr12-final-01"></a>
+#### L-PR12-FINAL-01 — 全量回归、提交源码与远端检查的对应关系
+
+- 关联记录／版本：[最终回归台账](IMPROVEMENT_LEDGER.md#pr12-final-regression-20261116)；源码 `9a95e53b13fc77be27962696202dc14169f18248`，后续文档提交只改记录。
+- 前置知识：Maven生命周期、Surefire结果、Git提交树、CI head SHA、环境隔离；可先看 L-PR12-P1-01/02。
+- 源码入口：`pom.xml`、`src/test/resources/application-test.yaml`、`ReportTaskTransactionTest`、`InterviewReportTransactionServiceIntegrationTest`、`frontend/tests/InterviewReportView.spec.ts`、`.github/workflows/frontend-checks.yml`；[脱敏回归清单](pr12-p1-20261116/final-regression.json)。
+- 核心问题：为什么package包含test而无需重复全量？为什么1937通过和34跳过要分开？为何提交前测试可由源码散列关联，但远端Checks仍须核对最终HEAD？为什么Node24本地通过不能替代Node22的CI？
+- 未来独立练习／讲解目标：从原始XML、源码SHA和PR检查分别复核一次结果，指出历史真实MQ证据与当前Mock/DB回归边界；本轮仅登记，不开展教学或练习。
+- 掌握状态：**待学习（未确认）**。开发者掌握证据：未提供；实际贡献与独立理解待本人产出。
+- 尚待验证点：本人独立复核能力、其他目标部署准入；没有因此追加业务开发。最近复核：2026-11-16／Codex。

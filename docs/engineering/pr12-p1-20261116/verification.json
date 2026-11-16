@@ -1,0 +1,387 @@
+{
+  "checked_at": "2026-11-16T16:38:15.782987+08:00",
+  "baseline_head": "1a425fa5f7939907c5d3468449936d44daa413fd",
+  "remote": {
+    "source": "GitHub connector get_pr_info live read",
+    "head": "1a425fa5f7939907c5d3468449936d44daa413fd",
+    "draft": true,
+    "state": "open",
+    "url": "https://github.com/kun520c/ai-interview-system/pull/12",
+    "updated_at": "2026-11-16T07:47:39Z"
+  },
+  "git": {
+    "staged": false,
+    "committed": false,
+    "pushed": false,
+    "deployed": false
+  },
+  "environment": {
+    "os_observed": "macOS 26.7.1",
+    "arch": "aarch64",
+    "java": "Temurin 21.0.13",
+    "maven": "3.9.16",
+    "spring_boot": "3.5.16",
+    "mybatis_starter": "3.0.5",
+    "mysql": "8.0.45",
+    "node": "24.22.1",
+    "npm": "11.19.1",
+    "vitest": "5.0.1"
+  },
+  "database_authorization": {
+    "source": "Explicit user reply in this chat: 允许上述两个精确目标",
+    "container": "ai-interview-mac-mysql-1",
+    "host": "127.0.0.1",
+    "port": 3308,
+    "local_schema": "ai_interview",
+    "local_permission": "read-only",
+    "test_schema": "ai_interview_test",
+    "test_permission": "bounded synthetic fixture writes and cleanup only",
+    "evaluation_accessed": false,
+    "ddl_executed": false,
+    "historical_data_modified": false
+  },
+  "local_readonly": {
+    "checked_at": "2026-11-16T16:26:16+08:00",
+    "ready_sessions": 1,
+    "generating_sessions": 0,
+    "generating_with_report": 0,
+    "generating_without_active_task": 0,
+    "no_report_no_active_task": 0,
+    "terminal_tasks_only": 0,
+    "failed_tasks_without_active": 0,
+    "multiple_active_tasks": 0,
+    "generating_not_completed": 0,
+    "active_tasks": 0,
+    "active_with_invalid_session_state": 0,
+    "ownership_version_mismatches": 0,
+    "invalid_execution_versions": 0,
+    "expired_active_tasks": 0,
+    "ready_without_report": 0,
+    "report_without_ready": 0,
+    "succeeded_sent_tasks": 1,
+    "other_targets_checked": false
+  },
+  "backend": {
+    "tests": 200,
+    "passed": 200,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "test_suites": [
+      {
+        "class": "com.kun.aiinterview.interview.controller.InterviewControllerTest",
+        "kind": "mockmvc",
+        "tests": 21,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 21,
+        "raw_xml_sha256": "f0ff7d84f417afa73c1e50c073138da0f1bb67116370d2a1b8c88e201f80c90f"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.controller.HttpErrorTaxonomyControllerTest",
+        "kind": "mockmvc",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 14,
+        "raw_xml_sha256": "378b45006a43fea0d4c4d46b4918c8d889cfec068c8fe77d7d83df563f8492a4"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.report.async.ReportOutboxWakeupTest",
+        "kind": "unit_mock_configuration",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 5,
+        "raw_xml_sha256": "93559a7039b82ec5a9b001e515806f616db26aecf1d4ddab2bba45837eba1b74"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.report.async.ReportAsyncConfigurationTest",
+        "kind": "unit_mock_configuration",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 4,
+        "raw_xml_sha256": "b72e7bb6c97e8e43836e85994f4d200a4cf02287f7e986b90f856d7db0f43bc6"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.report.async.ReportOutboxDispatcherTest",
+        "kind": "unit_mock_configuration",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 7,
+        "raw_xml_sha256": "84a9d22febb204a8700608c242198b4efe67ea3d6882c50533866f69dc34704d"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.report.async.ReportMessageConsumerTest",
+        "kind": "unit_mock_configuration",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 4,
+        "raw_xml_sha256": "c799e1b31a6661e96db55d542c0ec15eaf55bb2b10f095bf4201d7d9a9a764d4"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.service.ReportTaskMapperIntegrationTest",
+        "kind": "real_mysql_mybatis_transaction",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 10,
+        "raw_xml_sha256": "be72c2da0d8c9f9ca8ff7f5b76320334233eb9d31bfde1193c24f711e7466338"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.service.InterviewReportApiServiceTest",
+        "kind": "unit_mock_configuration",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 10,
+        "raw_xml_sha256": "1fa7e4f08bead5eba6742308e06b75ee5d6a99feb0c4bc24b0899955e09f3408"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.service.InterviewReportTransactionServiceIntegrationTest",
+        "kind": "real_mysql_mybatis_transaction",
+        "tests": 25,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 25,
+        "raw_xml_sha256": "6b1490b7feae96ef2669a8d517159a399e7dbc8e82796f9d6a43934d76071ad4"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.service.InterviewReportServiceTest",
+        "kind": "unit_mock_configuration",
+        "tests": 27,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 27,
+        "raw_xml_sha256": "7df953fee4382385e26508e118bb73691f8e4ea03cd8bb4b2d04517342559b4d"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.service.InterviewReportFinalConsistencyIntegrationTest",
+        "kind": "real_mysql_mybatis_transaction",
+        "tests": 24,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 24,
+        "raw_xml_sha256": "0065328339edb23db92a726f02ecd63e2a0a8fe3cbcac9c0b7515a30c3939641"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.service.InterviewReportTransactionServiceTest",
+        "kind": "unit_mock_configuration",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 6,
+        "raw_xml_sha256": "8790d74d7977da1c7154a140cbada1d673bfb0923583d6ca4d97ca5c86331d68"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.service.ReportTaskTransactionTest",
+        "kind": "unit_mock_configuration",
+        "tests": 43,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 43,
+        "raw_xml_sha256": "3dccaae7afb0405ad2bf4a92b54271f78d34759f6a09e9360b2bb24f5977acae"
+      }
+    ]
+  },
+  "frontend": {
+    "file": "frontend/tests/InterviewReportView.spec.ts",
+    "tests": 65,
+    "passed": 65,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "typecheck_exit_code": 0,
+    "targeted_lint_exit_code": 0
+  },
+  "cleanup": {
+    "tables": [
+      "user",
+      "question",
+      "interview_session",
+      "interview_question",
+      "interview_answer",
+      "answer_evaluation",
+      "interview_report",
+      "interview_report_task",
+      "user_weakness"
+    ],
+    "before_all_zero": true,
+    "after_all_zero": true,
+    "historical_cleanup": false
+  },
+  "not_run": [
+    "full_maven",
+    "full_frontend",
+    "real_mq",
+    "deepseek",
+    "embedding",
+    "milvus",
+    "evaluation",
+    "browser_e2e",
+    "deployment"
+  ],
+  "model_calls": 0,
+  "environment_incident": "Initial sandbox Docker socket access denied; authorized read retried with escalation. No approval-review rejection or test failure.",
+  "original_file_integrity": {
+    "existing_dirty_files": 68,
+    "originals_preserved_byte_for_byte": 64,
+    "append_only_original_prefix_preserved": [
+      "docs/engineering/ENGINEERING_CASEBOOK.md",
+      "docs/engineering/IMPROVEMENT_LEDGER.md",
+      "docs/engineering/RESUME_EVIDENCE_BANK.md",
+      "docs/engineering/SOURCE_LEARNING_BACKLOG.md"
+    ],
+    "modes_preserved": true
+  },
+  "changed_files": [
+    {
+      "path": "src/main/java/com/kun/aiinterview/common/exception/ServiceUnavailableException.java",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/src/main/java/com/kun/aiinterview/common/exception/ServiceUnavailableException.java",
+      "sha256": "10b5d1259a0c2c68d233a64d1da6956d70f958d9ae1f4f54439465b2fbb2b269"
+    },
+    {
+      "path": "src/main/java/com/kun/aiinterview/common/exception/GlobalExceptionHandler.java",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/src/main/java/com/kun/aiinterview/common/exception/GlobalExceptionHandler.java",
+      "sha256": "ef9f3df7c6db21313f450442f6e4209a0561d25e1883f08545baceca8df44f3a"
+    },
+    {
+      "path": "src/main/java/com/kun/aiinterview/interview/service/InterviewReportTransactionService.java",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/src/main/java/com/kun/aiinterview/interview/service/InterviewReportTransactionService.java",
+      "sha256": "da2e3bf99698c09016fff87a2907a85cf68cdb7f57ad3acfbf327b0dfd5a5897"
+    },
+    {
+      "path": "frontend/src/features/interview/composables/useInterviewReport.ts",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/frontend/src/features/interview/composables/useInterviewReport.ts",
+      "sha256": "e67074b8b3c5b7a79109b147200abfa623b06070b693de90eabcb239e4d36376"
+    },
+    {
+      "path": "frontend/src/features/interview/copy/reportCopy.ts",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/frontend/src/features/interview/copy/reportCopy.ts",
+      "sha256": "79dfede4ba861ab671f0670c303ac272872d02950c9a23e74ac1fa5bac13f07e"
+    },
+    {
+      "path": "src/test/java/com/kun/aiinterview/interview/service/ReportTaskTransactionTest.java",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/src/test/java/com/kun/aiinterview/interview/service/ReportTaskTransactionTest.java",
+      "sha256": "d4c00a590807533d723102e30f65d93981a328b6e171240b846f9ada0165c108"
+    },
+    {
+      "path": "src/test/java/com/kun/aiinterview/interview/controller/InterviewControllerTest.java",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/src/test/java/com/kun/aiinterview/interview/controller/InterviewControllerTest.java",
+      "sha256": "e3ceee39e4cfd8278afd8741bb2d5e68a21295724bed51178ee73c26f09c0cda"
+    },
+    {
+      "path": "src/test/java/com/kun/aiinterview/interview/service/InterviewReportTransactionServiceIntegrationTest.java",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/src/test/java/com/kun/aiinterview/interview/service/InterviewReportTransactionServiceIntegrationTest.java",
+      "sha256": "d9e4dcd4c45a055e341082752b35b2445692a165e864c26fcb819a0c13f06617"
+    },
+    {
+      "path": "frontend/tests/InterviewReportView.spec.ts",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/frontend/tests/InterviewReportView.spec.ts",
+      "sha256": "717ecaf13ffbc0b5e7ce9fcd0dcf335bf151ae91c5d0694740b4ca32eca42dde"
+    },
+    {
+      "path": "docs/GETTING_STARTED.md",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/docs/GETTING_STARTED.md",
+      "sha256": "bea882cd30a3c343a9e8e4e0162d9910cbca9af8eb92227cf88a9c8b8cdedde4"
+    },
+    {
+      "path": "docs/engineering/IMPROVEMENT_LEDGER.md",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/docs/engineering/IMPROVEMENT_LEDGER.md",
+      "sha256": "37b3abe95fe4b45187cc49cb98909c57a85aefe2c93594f89afe802f31e461f0"
+    },
+    {
+      "path": "docs/engineering/ENGINEERING_CASEBOOK.md",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/docs/engineering/ENGINEERING_CASEBOOK.md",
+      "sha256": "fecc0270c903e79a6c1d805b718c45b5fb2a48b7762a8f204f0834462c848905"
+    },
+    {
+      "path": "docs/engineering/RESUME_EVIDENCE_BANK.md",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/docs/engineering/RESUME_EVIDENCE_BANK.md",
+      "sha256": "d0685a75c560fb4859e4e2dbb0083a3cd15df31e62e6d99638dd301dc5667049"
+    },
+    {
+      "path": "docs/engineering/SOURCE_LEARNING_BACKLOG.md",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/docs/engineering/SOURCE_LEARNING_BACKLOG.md",
+      "sha256": "1c1b7d59bbf7f629260ba6ad3cbf7d46e6a00fa4ccc197797ec7e35261c5fcbc"
+    },
+    {
+      "path": "docs/engineering/pr12-p1-20261116/README.md",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/docs/engineering/pr12-p1-20261116/README.md",
+      "sha256": "79fa38ba92fd6b47e897352e661298dfd56771342901ac3ffb839d7d5304cccf"
+    },
+    {
+      "path": "docs/engineering/pr12-p1-20261116/report-cutover-readonly.sql",
+      "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/docs/engineering/pr12-p1-20261116/report-cutover-readonly.sql",
+      "sha256": "086dba5f978b3115e1f93b49bafdd20c4f8db5c32ea971a7594a6e1caf87f78e"
+    }
+  ],
+  "manifest_self": {
+    "path": "docs/engineering/pr12-p1-20261116/verification.json",
+    "absolute_path": "/Users/kun/Developer/projects/ai-interview-system/docs/engineering/pr12-p1-20261116/verification.json",
+    "sha256": "not self-hashed"
+  },
+  "private_evidence": {
+    "directory": "/Users/kun/Developer/projects/ai-interview-system/backups/PR12_P1_20261116",
+    "files": [
+      {
+        "file": "backend-targeted.log",
+        "sha256": "51c4a43ad515b2d68c7b532b7f2806fdc8c3d3bf06c5ce666f02bd22ad759f94"
+      },
+      {
+        "file": "frontend-targeted.log",
+        "sha256": "7cf5bd044242cc3b91e8e917c753ddcf18567b5f9caba4018ce17a5d0679fb10"
+      },
+      {
+        "file": "frontend-typecheck.log",
+        "sha256": "e0ea40bbf65f7eecc907e974f285d660233af3420437ac9a807f9a28f82eae43"
+      },
+      {
+        "file": "frontend-lint.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "local-readonly.tsv",
+        "sha256": "12cb07ef962f05268d1209b3b0adc4c31dfeaa9458ef5a4cecbb8e368f99e502"
+      },
+      {
+        "file": "test-preflight.tsv",
+        "sha256": "a44c416e2c87b107b65f46c733e0e3ae94b7ae2ad4d81a9cf8546093489313be"
+      },
+      {
+        "file": "test-postflight.tsv",
+        "sha256": "7a6bd6fe1cce4767e1cabe86e82e46cc6b3ecfaad03268ec073c74fd86c7e75e"
+      },
+      {
+        "file": "integrity-after.json",
+        "sha256": "2dd2a904a3134afe88fc3fb8d9fbbd2b9b1b4bc5b542cd0acd664db6f5b58f9a"
+      }
+    ]
+  },
+  "dispositions": {
+    "P1-1": "ACCEPTED_BREAKING_CHANGE",
+    "P1-2": "RESOLVED_FOR_APPROVED_LOCAL_SNAPSHOT_ONLY",
+    "remote_pr_merge_admission": "NOT_YET_LOCAL_FIX_UNCOMMITTED",
+    "mq": "CONDITIONAL_GO",
+    "local_controlled_demo": "GO",
+    "long_running_or_public": "NO_GO"
+  }
+}

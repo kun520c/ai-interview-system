@@ -1,0 +1,348 @@
+{
+  "recorded_at": "2026-11-16T16:53:24.928178+08:00",
+  "phase": "final local regression and ordinary source commit; final documentation HEAD/CI recorded by PR after publication",
+  "baseline": "1a425fa5f7939907c5d3468449936d44daa413fd",
+  "source_commit": "9a95e53b13fc77be27962696202dc14169f18248",
+  "code_commit_file_count": 9,
+  "code_files": [
+    {
+      "path": "src/main/java/com/kun/aiinterview/common/exception/ServiceUnavailableException.java",
+      "sha256": "10b5d1259a0c2c68d233a64d1da6956d70f958d9ae1f4f54439465b2fbb2b269"
+    },
+    {
+      "path": "src/main/java/com/kun/aiinterview/common/exception/GlobalExceptionHandler.java",
+      "sha256": "ef9f3df7c6db21313f450442f6e4209a0561d25e1883f08545baceca8df44f3a"
+    },
+    {
+      "path": "src/main/java/com/kun/aiinterview/interview/service/InterviewReportTransactionService.java",
+      "sha256": "da2e3bf99698c09016fff87a2907a85cf68cdb7f57ad3acfbf327b0dfd5a5897"
+    },
+    {
+      "path": "frontend/src/features/interview/composables/useInterviewReport.ts",
+      "sha256": "e67074b8b3c5b7a79109b147200abfa623b06070b693de90eabcb239e4d36376"
+    },
+    {
+      "path": "frontend/src/features/interview/copy/reportCopy.ts",
+      "sha256": "79dfede4ba861ab671f0670c303ac272872d02950c9a23e74ac1fa5bac13f07e"
+    },
+    {
+      "path": "src/test/java/com/kun/aiinterview/interview/service/ReportTaskTransactionTest.java",
+      "sha256": "d4c00a590807533d723102e30f65d93981a328b6e171240b846f9ada0165c108"
+    },
+    {
+      "path": "src/test/java/com/kun/aiinterview/interview/controller/InterviewControllerTest.java",
+      "sha256": "e3ceee39e4cfd8278afd8741bb2d5e68a21295724bed51178ee73c26f09c0cda"
+    },
+    {
+      "path": "src/test/java/com/kun/aiinterview/interview/service/InterviewReportTransactionServiceIntegrationTest.java",
+      "sha256": "d9e4dcd4c45a055e341082752b35b2445692a165e864c26fcb819a0c13f06617"
+    },
+    {
+      "path": "frontend/tests/InterviewReportView.spec.ts",
+      "sha256": "717ecaf13ffbc0b5e7ce9fcd0dcf335bf151ae91c5d0694740b4ca32eca42dde"
+    }
+  ],
+  "backend": {
+    "command": [
+      "./mvnw",
+      "-B",
+      "-ntp",
+      "package"
+    ],
+    "exit_code": 0,
+    "classes": 151,
+    "total": 1971,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 34,
+    "passed": 1937,
+    "p1_targeted_subset": {
+      "total": 200,
+      "passed": 200,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "included_in_full_run": true
+    },
+    "skipped_suites": [
+      {
+        "class": "com.kun.aiinterview.knowledge.embedding.RealEmbeddingSmokeTest",
+        "total": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 1,
+        "sha256": "d80fb8fa991e007b6b2b4c8a58e7e8aab9fc500d033698907be19c019d4dd148"
+      },
+      {
+        "class": "com.kun.aiinterview.knowledge.service.KnowledgePersistenceIntegrationTest",
+        "total": 10,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 10,
+        "sha256": "267c1ae93bceaafa4cdfbfd70b6c73107535bfca6615fad5e34a8357d97232cb"
+      },
+      {
+        "class": "com.kun.aiinterview.knowledge.service.RealKnowledgeDocumentProcessingFailureIntegrationTest",
+        "total": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 2,
+        "sha256": "0ba74b8e383a7614c3613ec5da812c56348d09b11354c030f4be51930851fbde"
+      },
+      {
+        "class": "com.kun.aiinterview.knowledge.service.RealKnowledgeDocumentProcessingSmokeTest",
+        "total": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 2,
+        "sha256": "fdccdf84a531cfdfee93bf9dc41d3ebd7241d0ad87d134c2dd6fc688b2f794d4"
+      },
+      {
+        "class": "com.kun.aiinterview.knowledge.vector.milvus.RealMilvusVectorStoreSmokeTest",
+        "total": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 1,
+        "sha256": "8d3923b8eed694ce6728081503efb4e11c4752a00d3451d58cf0d6ba6f288524"
+      },
+      {
+        "class": "com.kun.aiinterview.knowledge.vector.milvus.RealMilvusSchemaValidationSmokeTest",
+        "total": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 2,
+        "sha256": "e3a7137501da23d37b929244968bdb73361fae43bd71b0cfb45a3802aaa16f2a"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.service.RealReportRocketMqSmokeTest",
+        "total": 4,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 4,
+        "sha256": "81d0fea6ff85f99314cdd8cf6cfd155b43ccdc78cd876c5c6e5b783d23d3b80f"
+      },
+      {
+        "class": "com.kun.aiinterview.interview.service.RealReportCrashWindowProbeTest",
+        "total": 11,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 11,
+        "sha256": "0ace6badae6064ff42d86a03dead68e7bfd1595e1d3158e1d82557dfad94bc54"
+      },
+      {
+        "class": "com.kun.aiinterview.evaluation.AiSystemBaselineEvaluationTest",
+        "total": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 1,
+        "sha256": "7c92edeb2997d35b3efe36c6155b6c15eae48b3e72e82aad4bbcc01c17727029"
+      }
+    ],
+    "package_success": true,
+    "jar_path": "/Users/kun/Developer/projects/ai-interview-system/target/ai-interview-system-0.0.1-SNAPSHOT.jar",
+    "jar_sha256": "91f38ff73f7ddfc91bd5c42e3598a40f373bb7b15a66dbfe77c26f5767bd19da"
+  },
+  "frontend": {
+    "command": [
+      "npm run test:unit",
+      "npm run typecheck",
+      "npm run lint",
+      "npm run build"
+    ],
+    "files": 37,
+    "total": 355,
+    "passed": 355,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "report_page_cases": 65,
+    "report_page_subset_included": true
+  },
+  "environment": {
+    "os_observed": "macOS 26.7.1",
+    "arch": "aarch64",
+    "java": "Temurin 21.0.13",
+    "maven": "3.9.16",
+    "spring_boot": "3.5.16",
+    "mybatis_starter": "3.0.5",
+    "mysql": "8.0.45",
+    "node": "24.22.1",
+    "npm": "11.19.1",
+    "vitest": "5.0.1"
+  },
+  "database": {
+    "endpoint": "127.0.0.1:3308/ai_interview_test",
+    "container": "ai-interview-mac-mysql-1",
+    "account": "ai_interview_test@%",
+    "before_counts": {
+      "user": 0,
+      "question": 0,
+      "question_scoring_point": 0,
+      "interview_session": 0,
+      "interview_question": 0,
+      "interview_answer": 0,
+      "answer_evaluation": 0,
+      "knowledge_document": 0,
+      "knowledge_chunk": 0,
+      "rag_retrieval_batch": 0,
+      "rag_hit_log": 0,
+      "interview_report": 0,
+      "user_weakness": 0,
+      "interview_report_task": 0
+    },
+    "after_counts": {
+      "user": 0,
+      "question": 0,
+      "question_scoring_point": 0,
+      "interview_session": 0,
+      "interview_question": 0,
+      "interview_answer": 0,
+      "answer_evaluation": 0,
+      "knowledge_document": 0,
+      "knowledge_chunk": 0,
+      "rag_retrieval_batch": 0,
+      "rag_hit_log": 0,
+      "interview_report": 0,
+      "user_weakness": 0,
+      "interview_report_task": 0
+    },
+    "permanent_schema_unchanged": true,
+    "migration_test": "existing test uses connection-local temporary copies; no permanent migration",
+    "business_schema_access_this_regression": false,
+    "evaluation_access": false
+  },
+  "historical_local_reconciliation": {
+    "source": "verification.json",
+    "checked_at": "2026-11-16T16:26:16+08:00",
+    "target": "127.0.0.1:3308/ai_interview",
+    "generating": 0,
+    "anomalies": 0,
+    "rerun_in_final_regression": false,
+    "scope": "only approved target and original snapshot; repeat before future cutover"
+  },
+  "real_external": {
+    "mq": false,
+    "deepseek": false,
+    "embedding": false,
+    "milvus": false,
+    "model_calls": 0,
+    "all_RUN_REAL_switches_unset": true,
+    "reason": "No change to dispatch/claim/final transaction core; focused regression included and historical real MQ/stub evidence retained"
+  },
+  "initial_local_results_incidents": [],
+  "git_at_source_commit": {
+    "local_source_head": "9a95e53b13fc77be27962696202dc14169f18248",
+    "ordinary_push_success": true,
+    "remote_source_head_verified": true,
+    "documentation_commit_pending": true,
+    "force_push": false,
+    "merge": false,
+    "deployment": false
+  },
+  "compatibility_review": {
+    "P1-1": "ACCEPTED: async-only contract and explicit 503; no synchronous fallback",
+    "P1-2": "RESOLVED only for approved snapshot; no automatic takeover",
+    "new_P0": 0,
+    "new_unaccepted_P1": 0,
+    "remaining_P2": [
+      "backend CI absent; full backend evidence is local",
+      "legacy fixed-password smoke outside this diff; non-isolated usage remains unknown",
+      "other clients must adapt accepted async and 503 contract"
+    ],
+    "release_boundary": [
+      "MQ CONDITIONAL GO",
+      "controlled local demo GO",
+      "long-running/public deployment NO-GO",
+      "scoring v4 and report v1 frozen; content-quality limitations retained"
+    ]
+  },
+  "private_evidence": {
+    "directory": "/Users/kun/Developer/projects/ai-interview-system/backups/PR12_FINAL_20261116",
+    "files": [
+      {
+        "name": "run_backend.py",
+        "sha256": "1f07c027e962e44bf420696d35b964133d89784ddf4174c5ab422822bff956df"
+      },
+      {
+        "name": "backend-full-package.log",
+        "sha256": "3cffdafde92b6b7ec77e5aa38d94ca9f047674c70c72709b9e8340c2634bc389"
+      },
+      {
+        "name": "backend-run.json",
+        "sha256": "345c8c07adf6dad75a07ad135db1d3f6041c03a0fb7362acea09606b9d9d62c6"
+      },
+      {
+        "name": "suite-summary.json",
+        "sha256": "fedbfdc5f3bf810e9315e658862933295c4fc0860a94a59852597ea3d3e52cf2"
+      },
+      {
+        "name": "database-before.json",
+        "sha256": "c8e620f2d1d689a36a36f21bd2bc062ba098a8e9ddde0e944e5414d85ee57e81"
+      },
+      {
+        "name": "database-after.json",
+        "sha256": "c8e620f2d1d689a36a36f21bd2bc062ba098a8e9ddde0e944e5414d85ee57e81"
+      },
+      {
+        "name": "frontend-full.log",
+        "sha256": "3fd59d7317d30c1e30c1151ce7bd5bac1f3af3cf86925d6f78464134f841c13c"
+      },
+      {
+        "name": "frontend-typecheck.log",
+        "sha256": "e0ea40bbf65f7eecc907e974f285d660233af3420437ac9a807f9a28f82eae43"
+      },
+      {
+        "name": "frontend-lint.log",
+        "sha256": "f91531818bb20875897af3971ca617ac80c92434ecd8647d4851712cd0c9fa54"
+      },
+      {
+        "name": "frontend-build.log",
+        "sha256": "590d94e9403d3f03749c3b2fad2bc7d888658e647397986abbc23f8fba292e52"
+      },
+      {
+        "name": "push-code.log",
+        "sha256": "2c694590919580a8ce62250de07a9a2827f9401c86b4770b3af462fdfa0e46e0"
+      },
+      {
+        "name": "credential-scan-triage.json",
+        "sha256": "beb14925e3512018029c1f25289bdc3d1e2a02102982016dd31bfe4a56dcd1d7"
+      }
+    ]
+  },
+  "prior_evidence_preserved": "verification.json and backups/PR12_P1_20261116 retained; not overwritten",
+  "learning": "entry registration only; mastery unconfirmed",
+  "github_source_checks": {
+    "head": "9a95e53b13fc77be27962696202dc14169f18248",
+    "run_id": 43834763837,
+    "job_id": 133188536470,
+    "conclusion": "success",
+    "typecheck": "success",
+    "lint": "success",
+    "unit_tests": {
+      "total": 355,
+      "passed": 355,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "build": "success",
+    "node": "22.23.4",
+    "combined_status_entries": 0,
+    "url": "https://github.com/kun520c/ai-interview-system/actions/runs/43834763837/job/133188536470",
+    "final_documentation_head_checks": "verify after subsequent ordinary documentation push; see PR for final live result"
+  },
+  "publication_validation_incident": {
+    "initial_result": "exact known-value scan stopped on one match",
+    "triage": "existing unchanged local-disabled-placeholder, not a real provider credential",
+    "original_HEAD_occurrences": 1,
+    "current_occurrences": 1,
+    "unresolved_sensitive_matches": 0,
+    "evidence": "backups/PR12_FINAL_20261116/credential-scan-triage.json"
+  }
+}
