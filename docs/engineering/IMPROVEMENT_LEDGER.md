@@ -489,7 +489,7 @@
 - B4-B：[full-regression-reports](/private/tmp/ai-b4b-20261112/full-regression-reports)，132 个 XML，**1635/0/0/19**。
 - B4-C：[full-regression-reports](/private/tmp/ai-b4c-20261112/full-regression-reports)，134 个 XML，**1698/0/0/19**。
 - C3：[full-reports](/private/tmp/ai-c3-20261112/full-reports)，134 个 XML，**1698/0/0/19**。
-- B4-A：复核原 [focused-tests.log](/private/var/folders/xx/vxww8vxd1hz_f8szvp9th6j40000gn/T/b4a-audit-dnu77b5b/focused-tests.log) 与 [mockito-rerun.log](/private/var/folders/xx/vxww8vxd1hz_f8szvp9th6j40000gn/T/b4a-audit-dnu77b5b/mockito-rerun.log)，分别 **201/0/85/0**、**85/0/0/0**；未拿当前 target 覆盖文件冒充历史 XML。
+- B4-A：复核原 `focused-tests.log`（`/private/var/folders/xx/vxww8vxd1hz_f8szvp9th6j40000gn/T/b4a-audit-dnu77b5b/focused-tests.log`）与 `mockito-rerun.log`（`/private/var/folders/xx/vxww8vxd1hz_f8szvp9th6j40000gn/T/b4a-audit-dnu77b5b/mockito-rerun.log`），分别 **201/0/85/0**、**85/0/0/0**；未拿当前 target 覆盖文件冒充历史 XML。**2026-11-16 归档核对：**这两个原临时路径当前不存在；保留历史路径与统计，不推断其他备份是否完整。
 
 各批复现／聚焦 XML 亦按独立运行目录复核。工具 gate、package、手工探针及环境解释沿用原验收报告，不声称本轮重跑。具体命令、完整失败过程、隔离容器及清理记录在各原报告，无需复制为第二份验收报告。
 
@@ -1005,6 +1005,7 @@
 
 
 <a id="p2-local-demo-e2e"></a>
+<a id="p2-local-demo-e2e-20261115"></a>
 ### P2-LOCAL-DEMO-E2E — 本机隔离演示与真实端到端验收（2026-11-15）
 
 - **结果和范围：**按用户对精确目标的明确授权完成一场真实 MySQL/Milvus/Embedding/DeepSeek/RocketMQ 的本机 EASY 合成面试，单用户有界演示 **GO**；长期运行、公网及 Q1/Q2 内容质量均 **NO-GO**。API 执行注册/组卷/答题/报告，独立浏览器验证登录、历史与报告刷新，不将这些分别执行的检查夸大为每一步均由 UI 完成。完整[验收报告](/Users/kun/Documents/Reports/ai-interview-system/2026-11-15-二期本机完整演示与真实端到端验收.md)，私有证据目录 `/Users/kun/Developer/projects/ai-interview-system/backups/DEMO_ENV_20261115_9lpoxk7u/`。
@@ -1159,3 +1160,25 @@
 - **证据／学习／收口：**[说明第8节](pr12-p1-20261116/README.md#8-最终回归与发布记录2026-11-16后续任务)，本机 `/Users/kun/Developer/projects/ai-interview-system/backups/PR12_FINAL_20261116/` 保存完整日志、151 XML、DB前后、入场文件和推送/CI证据；首轮 evidence不覆写。关联 L-PR12-FINAL-01，掌握未确认。之后仅完成文档推送、PR说明和Checks核对，不扩展新业务任务。
 
 - 发布前安全检查补记：精确本机配置值扫描首轮命中 GETTING_STARTED 中的既有禁用示例占位值；核对原 HEAD 与当前均仅出现 1 次，未新增真实凭据。原始命中与脱敏核查存于本轮 credential-scan-triage.json。保持其他精确值与凭据模式检查，不将占位值误报为泄露，也不将这次扫描中断计作测试失败。
+
+<a id="p2-final-casebook-retrospective-20261116"></a>
+### P2-FINAL-CASEBOOK-RETROSPECTIVE — PR 合并后的安全同步与工程案例复盘（2026-11-16）
+
+- **状态／目标：**文档归档和 Git 引用快进；不新增业务功能、迁移、评测或源码教学。保留原案例与原验收时点，在 [ENGINEERING_CASEBOOK.md](ENGINEERING_CASEBOOK.md#二期最终复盘阅读路径2026-11-16) 原章节内补充 16 个复盘小节，串联同步设计、Outbox、崩溃、性能、AI 质量、部署恢复和 PR 兼容性；简历与学习清单仅增索引和后续状态。
+- **Git 实测：**原工作树 `codex/phase2-git-closeout` HEAD `63e868114cd715ebb921e65b50923966a919ddf9`；原 main `84e3489a85d0fb6c8b54ad2a130c52d7476fb897` 是合并提交祖先，且 main 未被工作树检出。SSH 443 fetch 认证失败；改用同一仓库 HTTPS fetch，核验远端 main 为 `3d85d9495b151da06260f2d0b57dc1031abab02c`。以带旧值校验的 `git update-ref` 快进本地 main 至同一 SHA，不切换工作树；GitHub PR #12 只读记录为 merged，原 HEAD 是合并第二父提交，两个提交的文件树相同。远端观察为本次 fetch 时点，未推送或新建提交。
+- **保护与变更：**同步前后原 `git status --porcelain=v1 -z` 清单 SHA-256 同为 `a37b17434f1987a4b3329dce2e92c40e16b87662c68547ec5edcbbfa00d25fa2`，原 `git diff --binary` 同为 `032e894aaba22373ebf25d07ca636ffad56cbe5c675a9df347c500269e074e2e`；暂存区为空。入场已有 1 个已跟踪修改和 63 个未跟踪文件，未操作忽略的私有备份；此证明不等于对全部私有文件逐一哈希。新增修改仅四份既有工程档案：案例库、台账、简历证据库和学习清单，均未暂存／提交／推送。
+- **调用链与取舍：**历史 `acceptReportTask → ReportOutboxDispatcher → ReportMessageConsumer → claimTaskExecution → generateClaimedReport → completeReportGeneration`；Session/Task 同库受理、发送租约、固定执行版本及最终事务分责。历史共同 K=4 桩实验为 48 测量＋12 预热；快速受理属于异步化，报告完成与闭环吞吐在该实验未优于同步；RocketMQ 独立净收益相对未实现的数据库 Worker 尚未证明，维持 CONDITIONAL GO。[原始指标及矩阵](mq-net-value-20261116/README.md)
+- **测试与边界：**本轮无 Maven/JUnit、Vitest、真实服务、浏览器、性能或收费模型运行，T/F/E/S 不适用；仅执行 Git/文档检查。历史最终源码 Maven package `1971/0/0/34`、前端 `355/0/0/0` 和 PR HEAD 前端 CI 成功是先前证据，不是本轮重跑；失败、跳过及其他历史环境见案例库和[原回归](pr12-p1-20261116/final-regression.json)。不操作 evaluation、业务数据库或其他项目。
+- **文档核验：**四档案旧正文逐行顺序均保留；新增 16 个案例补充。针对四份档案执行 `git diff --check` 退出 0；本机静态检查新增 76 个本地链接／锚点，缺失 0，其中部分是私有或被忽略证据，公开检出不保证可访问。离线复核性能 JSON 六组及逐请求 CSV 48 行，确认各组测量／预热数与 READY、闭环比较；未重跑实验。
+- **学习及限制：**现有关联 [L-M1A-01](SOURCE_LEARNING_BACKLOG.md#l-m1a-01)、[L-M1B-01](SOURCE_LEARNING_BACKLOG.md#l-m1b-01)、[L-M1C-02](SOURCE_LEARNING_BACKLOG.md#l-m1c-02)、[L-P2-MQ-NET-VALUE-01](SOURCE_LEARNING_BACKLOG.md#l-p2-mq-net-value-01)、[L-PR12-P1-01](SOURCE_LEARNING_BACKLOG.md#l-pr12-p1-01) 均待学习、本人掌握与贡献未确认。长期运行／公网／AI 内容质量仍 NO-GO；仅受控本机演示 GO，其他目标与未来切换时点未验证。
+
+
+<a id="p2-final-document-archive-20261116"></a>
+### P2-FINAL-DOCUMENT-ARCHIVE — 独立工作树归档二期工程记录（2026-11-16）
+
+- **范围与状态：**二期业务开发和工程优化阶段结束，保留 [16 个案例补充](ENGINEERING_CASEBOOK.md#二期最终复盘阅读路径2026-11-16)、失败记录及学习入口；只归档四份既有工程文档，不新建第二套报告。PR #12 已合并至 `3d85d9495b151da06260f2d0b57dc1031abab02c`；本文档 PR、最终 SHA 和实际 Checks 以 GitHub PR 记录为准，不自引用尚未产生的提交。
+- **隔离与原工作树：**以 GitHub 当时 `main` 的上述 SHA 在独立工作树创建 `docs/phase2-engineering-final-archive`；原工作树仍在 `codex/phase2-git-closeout` / `63e868114cd715ebb921e65b50923966a919ddf9`，入场 5 个已跟踪修改、63 个未跟踪文件、暂存区为空；入场已对 63 个未跟踪文件建立 SHA-256 清单。嵌套仓库和本机备份未清理。
+- **复制前源文件与复制后目标的 SHA-256 相同：**`ENGINEERING_CASEBOOK.md` `72a52b545b1784e5d2481c46d8a62d650a1e8db955702a27ce251ddc9c96dc81`；`IMPROVEMENT_LEDGER.md` `a8711f1d2033e426860bdd94b2ca134fc9d1a1e3f4f6565907a817d196f0d8c9`；`RESUME_EVIDENCE_BANK.md` `5194c5185d52f8eb6db868169aafa5c0174d2fc502118f97a5d4daa39c55261a`；`SOURCE_LEARNING_BACKLOG.md` `8e2fd65b3e31e3c58904c47e79392c1eefb3931aba9989f41d56e8dd7cf48388`。这是**复制完成、归档补记之前**的值；此后仅独立副本作小范围修订，原件不改。
+- **证据和引用：**复核 16 个小节及事务、失败窗口、MQ 公平实验、AI 反例、部署与 PR 兼容边界。四文档原有本机临时日志中 2 个 B4-A 路径已不存在，已在原记录处标明，未冒充仍可访问或删除历史结果；其余私有／忽略原件不作为公开检出可访问的承诺。凭据模式、项目本机配置值和已定位私人答题文本的本地比较未发现命中；该检查不能穷举未知敏感内容。完整性脚本初次未匹配到案例库中的完整英文术语 Transactional Outbox；原文已有相关设计，归档补记补全术语后重查，并把报告候选的 7 对／14 次调用口径写清，未改变实验结论。
+- **验证与职责：**本次仅文档和 Git 检查，不运行 Maven、Vitest、模型、数据库或性能实验；T/F/E/S 不适用。历史后端 `1971/0/0/34`、前端 `355/0/0/0` 为 PR #12 验证，不冒充本轮运行。调用链仍是 `acceptReportTask → ReportOutboxDispatcher → ReportMessageConsumer → claimTaskExecution → completeReportGeneration`，未修改代码。
+- **决策与学习：**异步 HTTP 受理、数据库与 Java 一致性、RocketMQ 传递和重投分别归因；MQ CONDITIONAL GO、本机受控演示 GO、长期/公网/AI 内容 NO-GO。源码学习与个人掌握仍待确认；[学习入口](SOURCE_LEARNING_BACKLOG.md#l-p2-final-casebook-review-20261116)。此归档不授权新的工程优化或部署研究。
