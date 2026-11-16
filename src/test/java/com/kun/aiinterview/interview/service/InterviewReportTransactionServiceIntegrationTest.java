@@ -8,6 +8,7 @@ import com.kun.aiinterview.user.service.UserWeaknessService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -176,6 +177,81 @@ class InterviewReportTransactionServiceIntegrationTest extends ReportDatabaseFix
         assertThat(service.generateReportForApi(userId,sessionId).reportStatus()).isEqualTo(InterviewReportStatus.GENERATING);
         assertThat(tasks.listActiveBySessionId(sessionId)).isEmpty();
         assertThat(generatorCalls.get()).isZero(); assertNoReportOrWeakness();
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"NOT_STARTED", "FAILED", "READY", "GENERATING"})
+    void disabledReportApiDoesNotMutatePersistedState(String status) {
+        if (status.equals("READY")) acceptAndConsume();
+        else jdbc.update("UPDATE interview_session SET report_status=? WHERE id=?",status,sessionId);
+        when(asyncProperties.isEnabled()).thenReturn(false);
+        var before = jdbc.queryForMap("SELECT * FROM interview_session WHERE id=?",sessionId);
+        var taskRows = jdbc.queryForList("SELECT * FROM interview_report_task WHERE session_id=?",sessionId);
+        int calls = generatorCalls.get();
+        assertThat(service.getReport(userId,sessionId).reportStatus()).isEqualTo(InterviewReportStatus.valueOf(status));
+        if (status.equals("NOT_STARTED") || status.equals("FAILED")) {
+            assertThatThrownBy(() -> service.generateReportForApi(userId,sessionId))
+                    .isInstanceOf(com.kun.aiinterview.common.exception.ServiceUnavailableException.class)
+                    .hasMessage("报告生成服务未启用，请联系管理员");
+            assertNoReportOrWeakness();
+        } else if (status.equals("READY")) {
+            assertReadyReplayUnchanged(reports.getBySessionId(sessionId));
+        } else {
+            assertThat(service.generateReportForApi(userId,sessionId).reportStatus()).isEqualTo(InterviewReportStatus.GENERATING);
+            assertNoReportOrWeakness();
+        }
+        assertThat(jdbc.queryForMap("SELECT * FROM interview_session WHERE id=?",sessionId)).isEqualTo(before);
+        assertThat(jdbc.queryForList("SELECT * FROM interview_report_task WHERE session_id=?",sessionId)).isEqualTo(taskRows);
+        assertThat(generatorCalls.get()).isEqualTo(calls);
+    }
+
+    @Test void pausedAcceptanceRefusesNewAttemptButKeepsExistingWorkReadable() {
+        when(asyncProperties.isAccepting()).thenReturn(false);
+        assertThatThrownBy(() -> service.generateReportForApi(userId,sessionId))
+                .isInstanceOf(com.kun.aiinterview.common.exception.ServiceUnavailableException.class)
+                .hasMessage("报告生成服务暂不受理新请求，请稍后重试");
+        assertThat(sessions.getInterviewSessionById(sessionId).getVersion()).isZero();
+        assertThat(tasks.listActiveBySessionId(sessionId)).isEmpty();
+        assertNoReportOrWeakness();
+        when(asyncProperties.isAccepting()).thenReturn(true);
+        var accepted = accept();
+        when(asyncProperties.isAccepting()).thenReturn(false);
+        assertThat(service.generateReportForApi(userId,sessionId).reportStatus()).isEqualTo(InterviewReportStatus.GENERATING);
+        assertThat(tasks.listActiveBySessionId(sessionId)).extracting(InterviewReportTask::getId).containsExactly(accepted.taskId());
+        assertThat(service.getReport(userId,sessionId).reportStatus()).isEqualTo(InterviewReportStatus.GENERATING);
+        assertThat(generatorCalls.get()).isZero();
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"QUEUED", "RUNNING", "FAILED", "SUCCEEDED", "VERSION_MISMATCH", "MULTIPLE_ACTIVE", "REPORT_EXISTS"})
+    void generatingReadsAndPostsNeverRepairOrDuplicateHistoricalState(String scenario) {
+        var message = accept();
+        switch (scenario) {
+            case "RUNNING" -> transactions.claimTaskExecution(message);
+            case "FAILED", "SUCCEEDED" -> jdbc.update("UPDATE interview_report_task SET task_state=? WHERE id=?",scenario,message.taskId());
+            case "VERSION_MISMATCH" -> jdbc.update("UPDATE interview_session SET version=version+1 WHERE id=?",sessionId);
+            case "MULTIPLE_ACTIVE" -> {
+                var duplicate = new InterviewReportTask();
+                duplicate.setSessionId(sessionId); duplicate.setAttemptVersion(message.attemptVersion()+1);
+                tasks.insertQueued(duplicate,600);
+            }
+            case "REPORT_EXISTS" -> {
+                reports.insertReport(reportDraft());
+                jdbc.update("UPDATE interview_report_task SET task_state='SUCCEEDED' WHERE id=?",message.taskId());
+            }
+        }
+        var before = jdbc.queryForMap("SELECT * FROM interview_session WHERE id=?",sessionId);
+        var taskRows = jdbc.queryForList("SELECT * FROM interview_report_task WHERE session_id=? ORDER BY id",sessionId);
+        var reportRows = jdbc.queryForList("SELECT * FROM interview_report WHERE session_id=?",sessionId);
+        for (int i=0; i<2; i++) {
+            assertThat(service.getReport(userId,sessionId).reportStatus()).isEqualTo(InterviewReportStatus.GENERATING);
+            var response=service.generateReportForApi(userId,sessionId);
+            assertThat(response.reportStatus()).isEqualTo(InterviewReportStatus.GENERATING);
+            assertThat(response.summary()).isNull();
+        }
+        assertThat(jdbc.queryForMap("SELECT * FROM interview_session WHERE id=?",sessionId)).isEqualTo(before);
+        assertThat(jdbc.queryForList("SELECT * FROM interview_report_task WHERE session_id=? ORDER BY id",sessionId)).isEqualTo(taskRows);
+        assertThat(jdbc.queryForList("SELECT * FROM interview_report WHERE session_id=?",sessionId)).isEqualTo(reportRows);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM user_weakness WHERE user_id=?",Integer.class,userId)).isZero();
+        assertThat(generatorCalls.get()).isZero();
     }
 
     @Test void existingValidReportRecoveredWithoutApplyingWeaknessAgain() {

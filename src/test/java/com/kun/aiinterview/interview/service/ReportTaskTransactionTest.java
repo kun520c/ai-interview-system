@@ -183,8 +183,39 @@ class ReportTaskTransactionTest {
         assertThat(f.transactions.acceptReportTask(1L,2L)).isEqualTo(InterviewReportStatus.GENERATING);
         f.session.setReportStatus(InterviewReportStatus.NOT_STARTED);
         assertThatThrownBy(() -> f.transactions.acceptReportTask(1L,2L))
-                .isInstanceOf(com.kun.aiinterview.common.exception.BusinessException.class);
+                .isInstanceOf(com.kun.aiinterview.common.exception.ServiceUnavailableException.class)
+                .hasMessage("报告生成服务未启用，请联系管理员");
         verifyNoInteractions(f.tasks);
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"NOT_STARTED", "FAILED", "READY", "GENERATING"})
+    void disabledFeatureHasExplicitContractForEveryStatus(String status) {
+        f.properties.setEnabled(false);
+        f.session.setReportStatus(InterviewReportStatus.valueOf(status));
+        if (status.equals("READY")) when(f.reports.getBySessionId(2L)).thenReturn(f.report);
+        if (status.equals("NOT_STARTED") || status.equals("FAILED")) {
+            assertThatThrownBy(() -> f.transactions.acceptReportTask(1L,2L))
+                    .isInstanceOf(com.kun.aiinterview.common.exception.ServiceUnavailableException.class)
+                    .hasMessage("报告生成服务未启用，请联系管理员");
+        } else {
+            assertThat(f.transactions.acceptReportTask(1L,2L)).isEqualTo(f.session.getReportStatus());
+        }
+        verifyNoInteractions(f.tasks, f.provider, f.generator, f.weaknesses, f.events);
+        verify(f.sessions,never()).claimReportGeneration(any(),any(),any());
+        verify(f.reports,never()).insertReport(any());
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"paused", "generator"})
+    void enabledButUnavailableIsNotDescribedAsDisabled(String reason) {
+        f.session.setReportStatus(InterviewReportStatus.NOT_STARTED);
+        if (reason.equals("paused")) f.properties.setAccepting(false);
+        else when(f.provider.getIfAvailable()).thenReturn(null);
+        assertThatThrownBy(() -> f.transactions.acceptReportTask(1L,2L))
+                .isInstanceOf(com.kun.aiinterview.common.exception.ServiceUnavailableException.class)
+                .hasMessage("报告生成服务暂不受理新请求，请稍后重试");
+        verify(f.tasks,never()).insertQueued(any(),anyInt());
+        verify(f.sessions,never()).claimReportGeneration(any(),any(),any());
+        verifyNoInteractions(f.generator, f.weaknesses, f.events);
     }
 
     @ParameterizedTest @ValueSource(strings = {"owner", "missing", "incomplete", "final", "disabled", "generator", "active", "cas", "insert", "key"})

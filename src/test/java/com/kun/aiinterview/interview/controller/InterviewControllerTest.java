@@ -1,6 +1,9 @@
 package com.kun.aiinterview.interview.controller;
 
 import com.kun.aiinterview.common.exception.ConflictException;
+import com.kun.aiinterview.common.exception.ServiceUnavailableException;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import com.kun.aiinterview.interview.dto.SubmitInterviewAnswerRequest;
 import com.kun.aiinterview.interview.enums.DecisionAction;
 import com.kun.aiinterview.interview.enums.EvaluationPhase;
@@ -639,6 +642,34 @@ class InterviewControllerTest {
                         "类加载过程是什么？"
                 )
         );
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"报告生成服务未启用，请联系管理员", "报告生成服务暂不受理新请求，请稍后重试"})
+    void shouldReturn503ForKnownReportRefusal(String message) throws Exception {
+        stubTokenUser("report-refusal-token");
+        when(interviewReportService.generateReportForApi(USER_ID, 21L))
+                .thenThrow(new ServiceUnavailableException(message));
+        mockMvc.perform(post("/api/interviews/21/report")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer report-refusal-token"))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.code").value(503))
+                .andExpect(jsonPath("$.message").value(message))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @org.junit.jupiter.api.Test
+    void shouldReturn200GeneratingForAcceptedReportWithoutReportContent() throws Exception {
+        stubTokenUser("report-accepted-token");
+        when(interviewReportService.generateReportForApi(USER_ID, 21L))
+                .thenReturn(new InterviewReportResponse(21L, InterviewReportStatus.GENERATING,
+                        null, null, null, null, null, null));
+        mockMvc.perform(post("/api/interviews/21/report")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer report-accepted-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.reportStatus").value("GENERATING"))
+                .andExpect(jsonPath("$.data.summary").isEmpty());
     }
 
     private InterviewReportResponse reportResponse() {

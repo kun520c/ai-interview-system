@@ -11,6 +11,8 @@ import {
   REPORT_CONFLICT_NOT_COMPLETED,
   REPORT_COPY,
   REPORT_SERVICE_UNAVAILABLE,
+  REPORT_SERVICE_DISABLED,
+  REPORT_SERVICE_NOT_ACCEPTING,
 } from '@/features/interview/copy/reportCopy'
 import { ReportPageState } from '@/features/interview/types/reportPageState'
 import {
@@ -277,9 +279,18 @@ export function useInterviewReport() {
       pageState.value = ReportPageState.NOT_FOUND
       return
     }
-    if (isApiError(caught) && caught.message === REPORT_SERVICE_UNAVAILABLE) {
+    // Only these application refusals prove no work was accepted. Unknown 5xx still require a GET.
+    const knownRefusal = isApiError(caught) && (
+      (caught.httpStatus === 400 && caught.message === REPORT_SERVICE_UNAVAILABLE) ||
+      (caught.httpStatus === 503 && (
+        caught.message === REPORT_SERVICE_DISABLED || caught.message === REPORT_SERVICE_NOT_ACCEPTING
+      ))
+    )
+    if (knownRefusal) {
       stopPolling()
-      statusMessage.value = REPORT_COPY.serviceUnavailable
+      statusMessage.value = caught.message === REPORT_SERVICE_UNAVAILABLE
+        ? REPORT_COPY.serviceUnavailable
+        : caught.message
       pageState.value = recoverableStatus
       return
     }

@@ -17,7 +17,7 @@ import {
   generateInterviewReport,
 } from '@/features/interview/api/interviewApi'
 import { REPORT_POLL_INTERVAL_MS } from '@/features/interview/composables/useInterviewReport'
-import { REPORT_COPY } from '@/features/interview/copy/reportCopy'
+import { REPORT_COPY, REPORT_SERVICE_DISABLED, REPORT_SERVICE_NOT_ACCEPTING } from '@/features/interview/copy/reportCopy'
 import { authenticate, makeUser, mountApp } from './helpers/mountApp'
 import { deferred } from './helpers/deferred'
 import {
@@ -890,6 +890,54 @@ describe('InterviewReportView', () => {
     expect(wrapper.text()).toContain('报告生成服务暂时不可用')
     expect(wrapper.text()).toContain('尚未生成报告')
     expect(wrapper.text()).not.toContain('报告正在生成')
+  })
+
+  it.each([
+    { initial: InterviewReportStatus.NOT_STARTED, message: REPORT_SERVICE_DISABLED },
+    { initial: InterviewReportStatus.FAILED, message: REPORT_SERVICE_DISABLED },
+    { initial: InterviewReportStatus.NOT_STARTED, message: REPORT_SERVICE_NOT_ACCEPTING },
+    { initial: InterviewReportStatus.FAILED, message: REPORT_SERVICE_NOT_ACCEPTING },
+  ])('shows known 503 refusal from $initial without success or automatic retry: $message', async ({ initial, message }) => {
+    vi.useFakeTimers()
+    vi.mocked(fetchInterviewReport).mockResolvedValue(statusReport(initial, 41))
+    const { wrapper } = await mountReport()
+    vi.mocked(generateInterviewReport).mockRejectedValue(new ApiError({ httpStatus: 503, code: 503, message }))
+    await generateButton(wrapper)!.trigger('click')
+    await flushPromises()
+    expect(wrapper.text()).toContain(message)
+    expect(wrapper.text()).toContain(initial === InterviewReportStatus.FAILED ? REPORT_COPY.failedTitle : REPORT_COPY.notStartedTitle)
+    expect(wrapper.text()).not.toContain(REPORT_COPY.generatingTitle)
+    expect(wrapper.find('.report-summary').exists()).toBe(false)
+    expect(wrapper.find('.saved-final-scores').exists()).toBe(true)
+    await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS * 3)
+    expect(fetchInterviewReport).toHaveBeenCalledTimes(1)
+    expect(generateInterviewReport).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps unknown 503 on GET-first recovery rather than assuming refusal', async () => {
+    vi.useFakeTimers()
+    const { wrapper } = await mountReport()
+    vi.mocked(generateInterviewReport).mockRejectedValue(new ApiError({ httpStatus: 503, code: 503, message: 'gateway unavailable' }))
+    vi.mocked(fetchInterviewReport).mockResolvedValue(statusReport(InterviewReportStatus.GENERATING, 41))
+    await generateButton(wrapper)!.trigger('click')
+    await flushPromises()
+    expect(fetchInterviewReport).toHaveBeenCalledTimes(2)
+    expect(generateInterviewReport).toHaveBeenCalledTimes(1)
+    expect(wrapper.text()).toContain(REPORT_COPY.generatingTitle)
+    expect(wrapper.find('.report-summary').exists()).toBe(false)
+  })
+
+  it('offers manual diagnosis for persistent GENERATING without claiming a running worker or reposting', async () => {
+    vi.useFakeTimers()
+    vi.mocked(fetchInterviewReport).mockResolvedValue(statusReport(InterviewReportStatus.GENERATING, 41))
+    const { wrapper } = await mountReport()
+    await vi.advanceTimersByTimeAsync(REPORT_POLL_INTERVAL_MS * 3)
+    await recoveryButton(wrapper)!.trigger('click')
+    await flushPromises()
+    expect(wrapper.text()).toContain('若长时间没有变化，请联系管理员核对')
+    expect(wrapper.text()).not.toContain('系统正在后台生成')
+    expect(wrapper.find('.report-summary').exists()).toBe(false)
+    expect(generateInterviewReport).not.toHaveBeenCalled()
   })
 
   it('uses generic missing copy for report 404', async () => {

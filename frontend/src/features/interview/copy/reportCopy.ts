@@ -16,8 +16,8 @@ export const REPORT_COPY = {
   generatingBusy: '正在生成报告',
   recoverGenerating: '检查报告状态',
   recoveryHint:
-    '请求已受理，系统正在后台生成。可离开页面后再回来查看；检查状态不会重复生成。失败后可点击重新生成。',
-  stillGenerating: '服务器确认报告仍在生成，本次未重复执行。请继续等待，页面会自动查询最新状态。',
+    '当前记录为生成中，可离开页面后再回来查看。检查状态不会重复生成；若长时间没有变化，请联系管理员核对。失败后可点击重新生成。',
+  stillGenerating: '当前记录仍为生成中，本次未重复执行。页面会查询最新状态；若长时间没有变化，请联系管理员核对。',
   outcome: '结果',
   meaning: '本场说明',
   strength: '优势',
@@ -42,3 +42,5 @@ export const REPORT_CONFLICT_GENERATING = '报告正在生成中，请稍后重�
 export const REPORT_CONFLICT_STATE_CHANGED = '报告生成状态已发生变化，请重试'
 export const REPORT_CONFLICT_NOT_COMPLETED = '面试尚未完成，无法生成报告'
 export const REPORT_SERVICE_UNAVAILABLE = '报告生成服务当前不可用'
+export const REPORT_SERVICE_DISABLED = '报告生成服务未启用，请联系管理员'
+export const REPORT_SERVICE_NOT_ACCEPTING = '报告生成服务暂不受理新请求，请稍后重试'

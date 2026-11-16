@@ -1,6 +1,6 @@
 package com.kun.aiinterview.interview.service;
 
-import com.kun.aiinterview.common.exception.BusinessException;
+import com.kun.aiinterview.common.exception.ServiceUnavailableException;
 import com.kun.aiinterview.common.exception.ConflictException;
 import com.kun.aiinterview.common.exception.ResourceNotFoundException;
 import com.kun.aiinterview.interview.entity.*;
@@ -64,19 +64,20 @@ public class InterviewReportTransactionService {
         if (!properties.isEnabled()) {
             // The disabled application also works before the separately approved task-table migration.
             if (session.getReportStatus() == InterviewReportStatus.GENERATING) return InterviewReportStatus.GENERATING;
-            throw new BusinessException("报告生成服务当前不可用");
+            throw new ServiceUnavailableException("报告生成服务未启用，请联系管理员");
         }
         var active = taskMapper.listActiveBySessionId(sessionId);
         if (session.getReportStatus() == InterviewReportStatus.GENERATING) {
-            if (active.size() != 1) {
-                log.error("REPORT_HISTORY_REQUIRES_RECONCILIATION sessionId={} activeTasks={}", sessionId, active.size());
+            if (active.size() != 1 || !ownsSession(locked, active.getFirst())) {
+                log.error("REPORT_HISTORY_REQUIRES_RECONCILIATION sessionId={} activeTasks={} sessionVersion={}",
+                        sessionId, active.size(), locked.version());
             }
             // Historical GENERATING is never reclaimed through POST.
             return InterviewReportStatus.GENERATING;
         }
         if (!active.isEmpty()) throw new IllegalStateException("非GENERATING会话存在活跃报告任务，需人工核对");
         if (!properties.isAccepting() || generatorProvider.getIfAvailable() == null) {
-            throw new BusinessException("报告生成服务当前不可用");
+            throw new ServiceUnavailableException("报告生成服务暂不受理新请求，请稍后重试");
         }
         // Reserve acceptance + execution + terminal increments; never overflow Java Integer.
         if (locked.version() > Integer.MAX_VALUE - 3L) {
